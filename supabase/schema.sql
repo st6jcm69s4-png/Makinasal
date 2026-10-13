@@ -151,7 +151,9 @@ create policy "favorilerim" on favorites for all using (auth.uid()=user_id) with
 create policy "aramalarım" on saved_searches for all using (auth.uid()=user_id) with check (auth.uid()=user_id);
 
 create policy "konuşmalarım" on threads for select using (auth.uid() in (buyer_id, seller_id));
-create policy "konuşma başlat" on threads for insert with check (auth.uid()=buyer_id);
+create policy "konuşma başlat" on threads for insert
+  with check (auth.uid()=buyer_id and buyer_id<>seller_id
+    and exists (select 1 from listings l where l.id=listing_id and l.seller_id=threads.seller_id and l.status='active'));
 
 create policy "mesajlarım" on messages for select
   using (exists (select 1 from threads t where t.id=thread_id and auth.uid() in (t.buyer_id,t.seller_id)));
@@ -166,6 +168,63 @@ create policy "anlaşma onayla" on deals for update
   using (exists (select 1 from threads t where t.id=thread_id and auth.uid() in (t.buyer_id,t.seller_id)));
 
 create policy "yorumlar herkese açık" on reviews for select using (true);
-create policy "yorum yaz" on reviews for insert with check (auth.uid()=reviewer_id);
+create policy "yorum yaz" on reviews for insert
+  with check (
+    auth.uid()=reviewer_id
+    and exists (select 1 from threads t where t.id=thread_id
+      and ((t.buyer_id=reviewer_id and t.seller_id=reviewee_id and role='seller')
+        or (t.seller_id=reviewer_id and t.buyer_id=reviewee_id and role='buyer')))
+  );
 
 create policy "şikayet et" on reports for insert with check (auth.uid()=reporter_id);
+
+
+-- ===== Güvenlik sertleştirmesi =====
+
+-- Kullanıcı kendi profilinde premium / doğrulama alanlarını değiştiremez (bunlar sunucudan yönetilir)
+create function protect_profile_flags() returns trigger language plpgsql as $$
+begin
+  if auth.uid() is not null and (new.is_premium is distinct from old.is_premium
+     or new.verified_phone is distinct from old.verified_phone) then
+    raise exception 'Bu alan yalnızca sistem tarafından değiştirilebilir';
+  end if;
+  return new;
+end $$;
+create trigger profiles_protect before update on profiles for each row execute function protect_profile_flags();
+
+-- Anlaşma: herkes yalnızca kendi onayını verir; iki onay tamamlanınca completed_at otomatik dolar
+create function guard_deal() returns trigger language plpgsql security definer set search_path=public as $$
+declare t threads;
+begin
+  select * into t from threads where id=new.thread_id;
+  if tg_op='INSERT' then
+    if auth.uid()=t.buyer_id then new.seller_confirmed:=false; else new.buyer_confirmed:=false; end if;
+    new.completed_at:=null;
+  else
+    if auth.uid()<>t.buyer_id then new.buyer_confirmed:=old.buyer_confirmed; end if;
+    if auth.uid()<>t.seller_id then new.seller_confirmed:=old.seller_confirmed; end if;
+    new.thread_id:=old.thread_id;
+    new.completed_at:=old.completed_at;
+  end if;
+  if new.buyer_confirmed and new.seller_confirmed and new.completed_at is null then
+    new.completed_at:=now();
+  end if;
+  return new;
+end $$;
+create trigger deals_guard before insert or update on deals for each row execute function guard_deal();
+
+-- Mesajlarda IBAN / link sunucu tarafında da engellenir (istemci filtresi atlatılamasın)
+create function guard_message() returns trigger language plpgsql as $$
+begin
+  if new.body ~* '\mTR\s?\d{2}(\s?\d{4}){5}\s?\d{2}\M|\miban\M' then
+    raise exception 'Mesajlarda IBAN paylaşımı engellenir';
+  end if;
+  if new.body ~* '(https?://|www\.|wa\.me|t\.me|\.com\M|\.net\M|\.org\M)' then
+    raise exception 'Mesajlarda harici link paylaşımı engellenir';
+  end if;
+  return new;
+end $$;
+create trigger messages_guard before insert on messages for each row execute function guard_message();
+
+-- Yorum: puan verilen kişi, o konuşmadaki karşı taraf olmalı (policy ile birlikte çift kilit)
+-- Not: reviews tablosunda güncelleme/silme politikası yoktur; yorumlar değiştirilemez.
