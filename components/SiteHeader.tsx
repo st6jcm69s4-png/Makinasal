@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { UserMenu } from './UserMenu';
 
 export function SiteHeader() {
   return (
@@ -11,7 +12,7 @@ export function SiteHeader() {
           <Link href="/ilanlar" aria-current="page">İlanlar</Link>
           <a href="/prototip.html">Prototip</a>
         </nav>
-        <span className="demo">Demo veri</span>
+        <UserMenu />
       </div>
     </header>
   );

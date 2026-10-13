@@ -41,3 +41,8 @@ Gerçek kimlik belgelerini prototipte saklama. Sunucu tarafı doğrulama ve RLS 
 - `/ilanlar/[id]` — ilan detayı: özellikler, fiyat uyarısı, satıcı güven seviyesi
 - `/prototip.html` — eski HTML prototip (karşılaştırma için duruyor)
 Henüz yok: giriş, ilan verme, mesajlaşma, puanlama, veritabanı bağlantısı.
+
+## Giriş sistemi (3. adım)
+- `/giris` — e-posta + şifre ile kayıt ve giriş (Supabase Auth). Üst menüde kullanıcı adı ve Çıkış düğmesi.
+- Kurulum: `.env.local.example` dosyasını `.env.local` olarak kopyalayıp Supabase URL ve anon anahtarını yaz. `npm install` (yeni paketler var) ve `npm run dev`.
+- Geliştirme sırasında Supabase → Authentication → Sign In / Providers → Email bölümünde "Confirm email" seçeneğini kapatırsan kayıt sonrası onay e-postası beklemezsin. Canlıya çıkmadan önce tekrar aç.
