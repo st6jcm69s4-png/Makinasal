@@ -27,3 +27,11 @@
 
 ## Güvenlik
 Gerçek kimlik belgelerini prototipte saklama. Sunucu tarafı doğrulama ve RLS olmadan canlı kullanıcı verisi toplama.
+
+## Kod yapısı (1. adım tamamlandı)
+- `lib/data/` — prototipten aktarılan kategoriler, şehirler, satıcılar ve demo ilanlar (TypeScript).
+- `lib/trust.ts` — güven seviyesi kuralı (Riskli / Yeni üye / Orta güven / Güvenilir / Çok güvenilir).
+- `lib/pricing.ts` — kategori medyanı ve fiyat uyarısı (parça/lastikte hesaplanmaz).
+- `lib/messageFilter.ts` — mesajda IBAN/link engeli, kapora uyarısı.
+- `lib/geo.ts`, `lib/format.ts` — mesafe ve TL/sayı biçimleri.
+- Kural testi (npm gerekmez, Node 22+): `node --experimental-strip-types --import ./scripts/ts-resolve.mjs scripts/check-logic.mjs`
