@@ -35,3 +35,9 @@ Gerçek kimlik belgelerini prototipte saklama. Sunucu tarafı doğrulama ve RLS 
 - `lib/messageFilter.ts` — mesajda IBAN/link engeli, kapora uyarısı.
 - `lib/geo.ts`, `lib/format.ts` — mesafe ve TL/sayı biçimleri.
 - Kural testi (npm gerekmez, Node 22+): `node --experimental-strip-types --import ./scripts/ts-resolve.mjs scripts/check-logic.mjs`
+
+## Sayfalar (2. adım)
+- `/ilanlar` — filtreli ilan listesi (arama, kategori, şehir, fiyat, sıralama)
+- `/ilanlar/[id]` — ilan detayı: özellikler, fiyat uyarısı, satıcı güven seviyesi
+- `/prototip.html` — eski HTML prototip (karşılaştırma için duruyor)
+Henüz yok: giriş, ilan verme, mesajlaşma, puanlama, veritabanı bağlantısı.
