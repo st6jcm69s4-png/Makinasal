@@ -1,0 +1,1624 @@
+<!doctype html><html><head><meta charset=utf8><meta name="theme-color" content="#262b28"><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}
+/* Makinasal refresh — warm white, graphite and restrained amber */
+:root{--bg:#F7F8FA;--surface:#FFFFFF;--plate:#F0F2F5;--ink:#202A35;--muted:#647181;--line:#E2E7EC;--accent:#F59E0B;--accent-ink:#1E2935;--accent-text:#A65C00;--neutral-bg:#F0F3F6;color-scheme:light}
+body{background:var(--bg)}
+.top{background:rgba(255,255,255,.97);color:var(--ink);border-bottom:1px solid var(--line);box-shadow:0 3px 20px rgba(29,43,58,.045);backdrop-filter:blur(14px);padding-block:14px}
+.top::after{display:none}
+.logo{color:#202A35;letter-spacing:-.025em}
+.logo .gear{color:#D98600}
+.logo small{color:#697584;opacity:1}
+nav button{color:#465362;border-radius:9px;transition:background .15s,color .15s}
+nav button:hover{background:#F2F4F7}
+nav button[aria-current="true"]{background:#FFF2D8;color:#915100}
+.nb{background:#F59E0B;color:#202A35}
+nav button[aria-current="true"] .nb{background:#F59E0B;color:#202A35}
+.proto{color:#6B7785;border-color:#D9DFE6;background:#F7F8FA}
+main{padding-top:34px}
+h1{letter-spacing:-.035em}
+h2,h3{letter-spacing:-.015em}
+.card,.panel,.tile,.store{border-radius:14px;box-shadow:0 4px 20px rgba(27,42,59,.035)}
+.card{transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}
+.card:hover{transform:translateY(-3px);box-shadow:0 12px 30px rgba(27,42,59,.09)}
+.btn{border-radius:10px;transition:filter .15s,transform .15s}
+.btn:hover:not(:disabled){filter:brightness(.96)}
+.btn:active:not(:disabled){transform:translateY(1px)}
+input[type=text],input[type=number],select,textarea,.searchbar input{border-radius:10px}
+input:focus,select:focus,textarea:focus{border-color:#D38B15;outline:2px solid #FDE9C4;outline-offset:1px}
+.tile{border-left:1px solid var(--line);border-top:3px solid #F1A72A}
+.tile:hover,.store:hover{box-shadow:0 10px 24px rgba(27,42,59,.08)}
+#sheet{background:#FFFFFF;border-radius:18px;box-shadow:0 24px 70px rgba(10,20,30,.17)}
+.thumb{background-color:#F2F4F6}
+.pill.prem{background:#FFF0D1;color:#875000}
+@media(max-width:600px){body{padding-inline:12px}.top{margin-inline:-12px;padding-inline:12px}.top .wrap{gap:12px}.logo{font-size:23px}nav{gap:5px}nav button{padding:9px 10px;font-size:13px}main{padding-top:24px}.grid{grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:10px}.card .cbody{padding:11px}.card .ttl{font-size:15px}.card .price{font-size:22px}.thumb.has img{height:145px}.proto{display:none}.panel{padding:14px}.searchbar{gap:8px}.searchbar input{flex-basis:100%}#overlay{padding:8px}#sheet{padding:14px}}
+@media(prefers-reduced-motion:reduce){.card,.btn{transition:none}.card:hover{transform:none}}
+</style><style id="makinasal-v3-theme">
+/* Warm graphite + stone: deliberately avoids both navy and all-white layouts. */
+:root{--bg:#eae8e2;--surface:#faf9f6;--plate:#dfded8;--ink:#242725;--muted:#646a66;--line:#d4d3cc;--accent:#e89528;--accent-ink:#20231f;--accent-text:#965510;--neutral-bg:#eae9e3;color-scheme:light}
+html{scroll-behavior:smooth}body{background:linear-gradient(180deg,#e3e1d9 0,#eeece7 420px,#eae8e2 100%);color:var(--ink)}
+.top{background:#262b28!important;color:#f6f3eb!important;box-shadow:0 5px 24px #1d241d22;border-bottom:1px solid #434a42}
+.top::after{height:3px;bottom:-3px;background:linear-gradient(90deg,#e89528,#f3bd69 45%,#e89528)}
+.logo,.logo small,.top nav button{color:#f7f4eb!important}.logo small{opacity:.65}
+.top nav button:hover{background:#414741!important}.top nav button[aria-current="true"]{background:#e89528!important;color:#242725!important}
+.top .proto{color:#edcf9e!important;border-color:#74644d!important}.nb{background:#e89528!important;color:#20231f!important}
+h1,h2,h3{letter-spacing:-.025em}h1{font-size:clamp(34px,5vw,50px)}h1 mark{background:linear-gradient(transparent 64%,#eeb15a 64%)}
+.panel,.card,.tile,.store,.service-box{background:#faf9f6!important;border-color:#d6d3ca!important;border-radius:14px!important;box-shadow:0 4px 18px #262b280b}
+.card,.tile,.store,.service-box,.btn{transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}
+.card:hover,.tile:hover,.store:hover{transform:translateY(-3px);box-shadow:0 12px 30px #262b281b;border-color:#e89528!important}
+.btn{border-radius:9px!important;background:#e89528;color:#242725}.btn:hover:not(:disabled){filter:brightness(.96);transform:translateY(-1px)}
+.btn.ghost{background:#f8f6f0;color:#252a26;border:1px solid #c9c8c0}
+input[type=text],input[type=number],select,textarea,.searchbar input{background:#fffefa;border-color:#c9c8c0;border-radius:9px}
+.thumb{background-color:#deddd6}.chip{background:#f8f6f0}.chip[aria-pressed=true]{background:#e89528}
+#sheet{background:#efede7;border-radius:18px}.service-box .status{background:#eae4d7;color:#715322}
+#cmpBar{background:#faf9f6}#toast{background:#292e29;color:#fff}
+.mission-strip{margin:22px 0 8px;padding:20px 24px;border-radius:16px;background:linear-gradient(115deg,#292e2a,#40463e);color:#f9f6ec;display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap;border-left:5px solid #e89528;box-shadow:0 10px 28px #20282025}
+.mission-strip strong{display:block;font:700 22px/1.25 var(--f-display);margin-bottom:5px}.mission-strip p{margin:0;color:#d4d5ca;font-size:14px}.mission-strip .btn{white-space:nowrap}
+.decision-panel{margin-top:20px;background:#faf9f6;border:1px solid #d6d3ca;border-radius:14px;padding:22px}.decision-panel h2{font-size:23px}.decision-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin-top:14px}.decision-grid article{padding:14px;border-radius:10px;background:#efede6;border:1px solid #dedbd2}.decision-grid b{display:block;font-size:15px}.decision-grid p{margin:6px 0 0;font-size:13px;color:#626861}
+@media(max-width:600px){.mission-strip{padding:17px}.mission-strip .btn{width:100%}.decision-panel{padding:16px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.card,.tile,.store,.service-box,.btn{transition:none}}
+</style><style id="makinasal-jobs-style">.jobs-home{margin:24px 0;padding:25px;background:#303832;color:#f8f5ee;border-radius:16px;display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap;border-left:5px solid #e89528}.jobs-home p{margin:8px 0 0;color:#d6d8d2}.jobs-home h2{margin-top:10px}.jobs-heading{display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap}.job-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:22px 0}.job-stats div{background:var(--surface);border:1px solid var(--line);padding:16px;border-radius:12px}.job-stats strong{display:block;font-size:25px}.job-stats span{color:var(--muted);font-size:13px}.job-form{margin:18px 0;display:flex;flex-direction:column;gap:14px}.job-form[hidden]{display:none}.job-filters{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.job-card{padding:18px;gap:12px;border-radius:13px}.job-card h3{margin:8px 0}.job-card .job-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:auto;flex-wrap:wrap}.job-card .job-price{font-weight:700;font-size:20px}.job-card .job-tags{display:flex;gap:6px;flex-wrap:wrap}.job-card p{margin:0;color:var(--muted);font-size:14px}.job-card .job-meta{font-size:13px;color:var(--muted)}@media(max-width:850px){.job-filters{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:500px){.job-filters{grid-template-columns:1fr}.job-stats{grid-template-columns:1fr 1fr}.jobs-heading>.btn{width:100%}}</style></head><body>
+<title>Makinasal</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@600;700&family=Noto+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: sticky amber top bar with scrolling nav, home showcase, search with collapsible filter rail, message split view, overlay sheet for details and comparison. */
+:root{
+  --bg:#EEF0F3; --surface:#FFFFFF; --plate:#E2E6EB; --ink:#14191F; --muted:#4B5663; --line:#CCD3DB;
+  --accent:#FF8F00; --accent-ink:#1B1406; --accent-text:#9A4A00;
+  --good:#1B6F40; --good-bg:#DCEFE3; --warn:#7F5200; --warn-bg:#FAEBC9; --bad:#9C2626; --bad-bg:#F5DADA; --neutral-bg:#E3E7E5;
+  --f-display:'Barlow','Arial',sans-serif;
+  --f-body:'Noto Sans','Segoe UI',system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font:16px/1.6 var(--f-body);padding-inline:16px;font-variant-numeric:tabular-nums}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent-text);outline-offset:2px}
+.wrap{max-width:1180px;margin-inline:auto}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--accent);color:var(--accent-ink);margin-inline:-16px;padding:10px 16px}
+.top::after{content:"";position:absolute;left:0;right:0;bottom:-7px;height:7px;background:repeating-linear-gradient(135deg,#14191F 0 9px,var(--accent) 9px 18px)}
+.top .wrap{display:flex;flex-wrap:wrap;align-items:center;gap:8px 18px}
+.logo{font:700 26px/1 var(--f-display);letter-spacing:.03em;text-transform:uppercase}
+.logo{display:flex;align-items:center;gap:8px}
+.logo .gear{flex:none}
+.logo small{display:block;font:500 12px/1.3 var(--f-body);letter-spacing:0;color:var(--accent-ink);opacity:.8;text-transform:none;margin-top:3px}
+nav{display:flex;gap:2px;flex-wrap:wrap}
+nav button{background:none;border:0;padding:9px 11px;border-radius:6px;cursor:pointer;font-weight:600;color:var(--accent-ink);font-size:15px;white-space:nowrap}
+nav button:hover{background:rgba(20,25,31,.12)}
+nav button[aria-current="true"]{background:var(--accent-ink);color:var(--accent)}
+.nb{display:inline-flex;min-width:18px;height:18px;border-radius:9px;background:var(--accent-ink);color:var(--accent);font:700 11px/18px var(--f-body);justify-content:center;margin-left:6px;padding-inline:4px}
+nav button[aria-current="true"] .nb{background:var(--accent);color:var(--accent-ink)}
+.proto{margin-left:auto;font:500 12px var(--f-body);color:var(--accent-ink);border:1px dashed rgba(27,20,6,.55);padding:4px 8px;border-radius:4px}
+@media (max-width:900px){.top .wrap nav{order:3;flex:1 1 100%;flex-wrap:nowrap;overflow-x:auto;padding-bottom:2px}}
+h1 mark{background:linear-gradient(transparent 62%,var(--accent) 62%);color:inherit;padding-inline:2px}
+main{padding-block:22px 110px}
+h1,h2,h3{font-family:var(--f-display);font-weight:700;text-wrap:balance;margin:0}
+h1{font-size:clamp(30px,5vw,42px);line-height:1.1}
+h2{font-size:28px;line-height:1.15}
+h3{font-size:20px;line-height:1.25}
+.lead{color:var(--muted);max-width:64ch;margin:8px 0 0;font-size:16px}
+.layout{display:grid;grid-template-columns:270px minmax(0,1fr);gap:24px;margin-top:20px}
+.layout.nofilter{grid-template-columns:minmax(0,1fr)}
+@media (max-width:820px){.layout{grid-template-columns:minmax(0,1fr)}}
+.rail{display:flex;flex-direction:column;gap:18px;align-self:start}
+.field{display:flex;flex-direction:column;gap:6px}
+label,.lbl{font:600 13px/1.3 var(--f-body);color:var(--muted)}
+input[type=text],input[type=number],select,textarea{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:10px 11px;width:100%;min-width:0;font-size:16px}
+textarea{min-height:90px;resize:vertical}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.out{font:500 14px/1.5 var(--f-body)}
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 12px;font-size:14px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.check{display:flex;gap:9px;align-items:flex-start;font:400 15px/1.5 var(--f-body);color:var(--ink)}
+.check input{margin-top:5px;accent-color:var(--accent)}
+.bar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-bottom:14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
+.card{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:8px;display:flex;flex-direction:column;min-width:0;overflow:hidden}
+.card:hover{border-color:var(--accent)}
+.card.feat{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.cm{all:unset;box-sizing:border-box;display:flex;flex-direction:column;flex:1;cursor:pointer;text-align:left;min-width:0}
+.cm:focus-visible{outline:2px solid var(--accent-text);outline-offset:-2px}
+.card-acts{position:absolute;top:8px;right:8px;display:flex;gap:6px;z-index:2}
+.ibtn{width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--ink);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
+.ibtn[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.ibtn svg{width:18px;height:18px}
+.ibtn.fav path{fill:none;stroke:currentColor;stroke-width:2;stroke-linejoin:round}
+.ibtn.fav[aria-pressed="true"] path{fill:currentColor}
+.thumb{background:var(--plate);padding:12px;display:flex;flex-direction:column;justify-content:space-between;min-height:150px;border-bottom:1px solid var(--line);position:relative;background-image:repeating-linear-gradient(135deg,transparent 0 10px,color-mix(in srgb,var(--line) 45%,transparent) 10px 11px)}
+.thumb .cat{font:600 13px var(--f-body);color:var(--muted);max-width:70%}
+.thumb .nophoto{font:500 13px var(--f-body);color:var(--muted)}
+.thumb.has{padding:0;background-image:none}
+.thumb.has img{width:100%;height:170px;object-fit:cover;display:block}
+.thumb.has .cat,.thumb.has .cnt{position:absolute;left:8px;background:var(--surface);color:var(--ink);padding:3px 8px;border-radius:4px;font:600 12px var(--f-body)}
+.thumb.has .cat{top:8px}
+.thumb.has .cnt{bottom:8px}
+.cbody{padding:12px 14px 14px;display:flex;flex-direction:column;gap:8px;flex:1}
+.ttl{font:600 17px/1.3 var(--f-body)}
+.price{font:700 26px/1 var(--f-display)}
+.meta{display:flex;flex-wrap:wrap;gap:2px 12px;font:400 14px/1.5 var(--f-body);color:var(--muted)}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto}
+.pill{display:inline-flex;align-items:center;gap:5px;font:500 12.5px/1.2 var(--f-body);padding:5px 8px;border-radius:4px;background:var(--neutral-bg);color:var(--ink)}
+.pill.good{background:var(--good-bg);color:var(--good)}
+.pill.warn{background:var(--warn-bg);color:var(--warn)}
+.pill.bad{background:var(--bad-bg);color:var(--bad)}
+.pill.prem{background:var(--accent);color:var(--accent-ink)}
+.btn{background:var(--accent);color:var(--accent-ink);border:0;border-radius:6px;padding:11px 18px;font-weight:600;cursor:pointer;font-size:15px}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.btn.sm{padding:7px 12px;font-size:14px}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+.linkbtn{background:none;border:0;color:var(--accent-text);font-weight:600;cursor:pointer;padding:4px 0;text-decoration:underline;font-size:15px}
+.empty{border:1px dashed var(--line);border-radius:8px;padding:28px;text-align:center;color:var(--muted)}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:18px;min-width:0}
+.panel.prem{border:2px solid var(--accent)}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.three{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px}
+.row2{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px}
+.note{border-left:3px solid var(--warn);background:var(--warn-bg);color:var(--warn);padding:11px 13px;border-radius:0 6px 6px 0;font-size:15px}
+.note.good{border-color:var(--good);background:var(--good-bg);color:var(--good)}
+.note.bad{border-color:var(--bad);background:var(--bad-bg);color:var(--bad)}
+.err{color:var(--bad);font-size:15px;min-height:1em}
+.err button{background:none;border:0;color:var(--accent-text);text-decoration:underline;cursor:pointer;padding:0;font-size:15px}
+table{width:100%;border-collapse:collapse;font-size:15px}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font:600 13px var(--f-body);color:var(--muted)}
+.scroll{overflow-x:auto}
+ul.clean{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:7px}
+.sub{color:var(--muted);font-size:14.5px}
+#overlay{position:fixed;inset:0;background:rgba(10,14,16,.6);z-index:20;display:flex;justify-content:center;align-items:flex-start;overflow-y:auto;padding:16px}
+#sheet{background:var(--bg);border:1px solid var(--line);border-radius:10px;width:100%;max-width:900px;margin-block:env(safe-area-inset-top,0px) 24px;padding:18px;display:flex;flex-direction:column;gap:16px}
+.sh-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}
+.score{display:flex;align-items:center;gap:8px}
+.meter{flex:1;height:7px;background:var(--neutral-bg);border-radius:4px;overflow:hidden;min-width:60px}
+.meter i{display:block;height:100%;background:var(--accent)}
+#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(92px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:11px 16px;border-radius:6px;z-index:30;max-width:90vw;font-size:15px}
+.step{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:start}
+.badge-n{font:700 14px var(--f-body);background:var(--plate);border-radius:4px;padding:3px 8px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.drop{border:2px dashed var(--line);border-radius:8px;padding:20px;text-align:center;background:var(--surface);display:flex;flex-direction:column;gap:8px;align-items:center}
+.drop.on{border-color:var(--accent)}
+.ph-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px}
+.ph{position:relative;aspect-ratio:4/3;border-radius:6px;overflow:hidden;background:var(--plate);border:1px solid var(--line)}
+.ph img{width:100%;height:100%;object-fit:cover;display:block}
+.ph .tg{position:absolute;left:6px;top:6px}
+.ph .acts{position:absolute;left:0;right:0;bottom:0;display:flex;justify-content:space-between;gap:4px;padding:5px;background:linear-gradient(transparent,rgba(0,0,0,.65))}
+.ph .acts button{background:var(--surface);border:0;border-radius:4px;font-size:12px;padding:3px 7px;cursor:pointer}
+.gal-main{background:var(--plate);border-radius:8px;overflow:hidden;aspect-ratio:16/10;display:flex;align-items:center;justify-content:center;border:1px solid var(--line)}
+.gal-main img{width:100%;height:100%;object-fit:contain;display:block}
+.gal-th{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.gal-th button{width:76px;height:56px;padding:0;border:2px solid transparent;border-radius:5px;overflow:hidden;background:var(--plate);cursor:pointer}
+.gal-th button[aria-pressed="true"]{border-color:var(--accent)}
+.gal-th img{width:100%;height:100%;object-fit:cover;display:block}
+.avatar{width:64px;height:64px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:flex;align-items:center;justify-content:center;font:700 28px var(--f-display);flex:none}
+.avatar.sm{width:44px;height:44px;font-size:20px}
+.prof-head{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.mine{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--line)}
+.mine:last-child{border-bottom:0}
+.acts-row{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.big{font:700 34px/1 var(--f-display)}
+.searchbar{display:flex;gap:8px;margin-top:18px;flex-wrap:wrap}
+.searchbar input{flex:1;min-width:180px;font-size:17px;padding:13px 14px;background:var(--surface);border:1px solid var(--line);border-radius:6px}
+.searchbar .btn{padding-inline:22px}
+.searchbar .pill{background:var(--accent);color:var(--accent-ink);font-weight:600}
+.row-mm{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-top:22px}
+.tile{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:8px;padding:12px 14px;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:2px}
+.tile:hover{border-color:var(--accent)}
+.tn{font:600 16px/1.3 var(--f-body)}
+.tc{font-size:13.5px;color:var(--muted)}
+.sect{margin-top:32px}
+.sect-h{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:12px}
+.stores{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.store{display:flex;gap:12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px;cursor:pointer;text-align:left}
+.store:hover{border-color:var(--accent)}
+.msgs{display:grid;grid-template-columns:320px minmax(0,1fr);gap:16px;margin-top:18px;align-items:start}
+@media (max-width:820px){.msgs{grid-template-columns:minmax(0,1fr)}.msgs.show-conv .thr-list{display:none}.msgs:not(.show-conv) .thr-conv{display:none}}
+.thr{display:block;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--line);padding:12px 6px;cursor:pointer}
+.thr[aria-current="true"]{background:var(--neutral-bg)}
+.thr b{display:block}
+.udot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--accent);margin-left:6px}
+.conv-msgs{display:flex;flex-direction:column;gap:8px;max-height:44vh;overflow-y:auto;padding:6px 2px}
+.bub{max-width:84%;padding:9px 12px;border-radius:10px;background:var(--neutral-bg);align-self:flex-start;font-size:15px;white-space:pre-wrap;word-break:break-word}
+.bub.me{align-self:flex-end;background:var(--accent);color:var(--accent-ink)}
+.bub.sys{align-self:center;background:transparent;color:var(--muted);font-size:13.5px;text-align:center}
+.bub.offer{border:2px solid var(--accent-text)}
+.bub.warnb{outline:2px solid var(--warn)}
+.bub .tm{display:block;font-size:11.5px;opacity:.75;margin-top:2px}
+.stars{display:flex;gap:4px}
+.star{background:none;border:0;font-size:30px;line-height:1;color:var(--muted);cursor:pointer;padding:2px}
+.star[aria-pressed="true"]{color:var(--accent-text)}
+.pbar{position:relative;margin:34px 10px 36px}
+.pb-track{position:relative;height:8px;border-radius:4px;background:var(--neutral-bg)}
+.pb-tick{position:absolute;top:-4px;width:2px;height:16px;background:var(--muted)}
+.pb-me{position:absolute;top:-6px;width:14px;height:20px;margin-left:-7px;border-radius:3px;background:var(--accent);border:2px solid var(--ink)}
+.pb-ml{position:absolute;top:-30px;transform:translateX(-50%);font-size:12.5px;font-weight:600;white-space:nowrap}
+.pb-tl{position:absolute;top:16px;transform:translateX(-50%);font-size:12.5px;color:var(--muted);white-space:nowrap}
+.pb-end{position:absolute;top:16px;font-size:12.5px;color:var(--muted);white-space:nowrap}
+.chk{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.prog{height:6px;background:var(--neutral-bg);border-radius:3px;overflow:hidden;margin-top:6px}
+.prog i{display:block;height:100%;background:var(--good)}
+#cmpBar{position:fixed;left:0;right:0;bottom:0;z-index:15;background:var(--surface);border-top:2px solid var(--accent);padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:center}
+.cmpt td,.cmpt th{min-width:150px}
+.cmpt th:first-child{min-width:110px;white-space:nowrap}
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-top:14px}
+.stat-grid div{background:var(--bg);border-radius:6px;padding:10px 12px}
+.stat-grid b{display:block;font:700 22px/1.2 var(--f-display)}
+.rv{padding:12px 0;border-bottom:1px solid var(--line)}
+.rv:last-child{border-bottom:0}
+@media (prefers-reduced-motion:no-preference){.card{transition:border-color .15s}}
+
+/* Makinasal V2 — açık, modern pazar yeri kimliği */
+:root,:root[data-theme="dark"]{color-scheme:light;--bg:#F7F9FC;--surface:#FFFFFF;--plate:#EDF1F5;--ink:#202733;--muted:#657184;--line:#E1E7EF;--accent:#F5A623;--accent-ink:#202733;--accent-text:#925500;--neutral-bg:#F0F3F7;--good:#1B6F40;--good-bg:#DCEFE3;--warn:#7F5200;--warn-bg:#FAEBC9;--bad:#9C2626;--bad-bg:#F5DADA}
+body{background:var(--bg);color:var(--ink)}
+.top{background:#fff;color:var(--ink);border-bottom:1px solid var(--line);box-shadow:0 3px 20px rgba(28,39,56,.05)}
+.top::after{display:none}.logo small{color:var(--muted);opacity:1}
+nav button{color:var(--ink)}nav button:hover{background:#F2F5F9}
+nav button[aria-current="true"]{background:#FFF1D6;color:#885000}
+.nb{background:var(--accent);color:var(--ink)}
+.proto{color:var(--muted);border:1px solid var(--line);background:#F8FAFC}
+.card,.panel,.store,.tile{border-radius:14px;box-shadow:0 3px 14px rgba(26,40,59,.035)}
+.card:hover,.store:hover,.tile:hover{border-color:#E6A43B;box-shadow:0 9px 28px rgba(26,40,59,.09)}
+.btn{border-radius:9px}.searchbar input,input[type=text],input[type=number],select,textarea{border-radius:9px}
+#sheet{background:#fff;border-radius:18px;box-shadow:0 25px 80px rgba(10,20,30,.18)}
+.service-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:18px}
+.service-box{background:white;border:1px solid var(--line);border-radius:14px;padding:20px;box-shadow:0 3px 14px rgba(26,40,59,.035)}
+.service-box .service-icon{font-size:25px;display:block;margin-bottom:8px}.service-box h3{font-size:19px;margin-bottom:6px}
+.service-box p{margin:0;color:var(--muted);font-size:14px}.service-box .status{display:inline-block;margin-top:12px;border-radius:20px;padding:4px 9px;background:#FFF1D6;color:#805000;font-size:12px;font-weight:700}
+@media(max-width:700px){.top .wrap{gap:10px}.logo{font-size:23px}.service-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.service-box{padding:14px}}
+@media(max-width:400px){.service-grid{grid-template-columns:1fr}}
+</style>
+
+<style id="makinasal-v4-menu">
+.top .wrap{display:flex;flex-wrap:nowrap;gap:14px;align-items:center}.top .logo{margin-right:auto}.top .proto{display:none}
+.menu-toggle{order:-1;width:44px;height:44px;border:1px solid #59615a;background:#363c37;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;flex:none}
+.menu-toggle span{width:21px;height:2px;background:#f7f4eb;border-radius:3px}.menu-toggle:hover{background:#4a514b}
+.header-actions{display:flex;align-items:center;gap:7px}.header-actions button{background:transparent;color:#f7f4eb;border:1px solid transparent;border-radius:9px;padding:9px 11px;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap}.header-actions button:hover{background:#414741}.header-actions .header-post{background:#e89528;color:#222822;padding:10px 15px}.header-actions .header-post:hover{background:#f3ae4b}.header-actions .nb{margin-left:3px}
+.menu-backdrop{position:fixed;inset:0;background:rgba(13,17,14,.62);z-index:39;backdrop-filter:blur(2px)}
+.side-menu{position:fixed;left:0;top:0;bottom:0;width:min(330px,88vw);background:#262b28;color:#f7f4eb;z-index:40;transform:translateX(-105%);transition:transform .24s ease;box-shadow:15px 0 40px #1117;overflow-y:auto;padding:22px 16px;display:flex;flex-direction:column}
+.side-menu.open{transform:translateX(0)}.side-head{display:flex;justify-content:space-between;align-items:center;padding:5px 10px 22px;border-bottom:1px solid #495149}.side-head strong{font:700 23px Barlow,Arial,sans-serif;letter-spacing:.04em}.side-head small{font:600 10px Arial,sans-serif;color:#e89528}.side-head button{background:#3d453e;border:0;color:#fff;border-radius:8px;padding:8px 12px;cursor:pointer}
+.side-menu nav{display:flex;flex-direction:column;gap:3px;padding-top:12px;flex-wrap:nowrap}.side-menu .menu-section{font-size:11px;font-weight:700;letter-spacing:.13em;color:#dca763;padding:22px 13px 7px}.side-menu nav button{display:block;width:100%;text-align:left;padding:12px 13px;border-radius:9px;font-size:15px;color:#e8e9e4!important}.side-menu nav button:hover{background:#414741!important}.side-menu nav button[aria-current="true"]{background:#e89528!important;color:#242725!important}.menu-disclaimer{font-size:12px;color:#a9b0a8;margin:auto 10px 0;padding-top:30px}
+@media(max-width:760px){.header-actions .action-label{display:none}.header-actions{gap:0}.header-actions button{font-size:19px;padding:7px}.header-actions .header-post{font-size:13px;padding:9px 10px}.top .logo{font-size:21px}.top .logo small{font-size:10px}.top .wrap{gap:8px}}
+@media(max-width:420px){.top .logo{font-size:18px}.top .logo .gear{width:22px;height:22px}.header-actions button{padding:6px}.header-actions .header-post{font-size:12px}.menu-toggle{width:38px;height:38px}}
+@media(prefers-reduced-motion:reduce){.side-menu{transition:none}}
+</style>
+<header class="top"><div class="wrap">
+  <div class="logo" lang="tr"><svg class="gear" viewBox="0 0 24 24" width="28" height="28" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="3.5" stroke-dasharray="2.67 2.67"/><circle cx="12" cy="12" r="6.2" fill="none" stroke="currentColor" stroke-width="2.4"/><circle cx="12" cy="12" r="2" fill="currentColor"/></svg><span>Makinasal<small>iş makinesi ve kamyon pazarı</small></span></div>
+  <button id="menuToggle" class="menu-toggle" type="button" aria-label="Menüyü aç" aria-expanded="false" aria-controls="sideMenu"><span></span><span></span><span></span></button>
+  <div class="header-actions" aria-label="Hızlı işlemler">
+    <button type="button" data-view="favs" aria-label="Favoriler">♡ <span class="action-label">Favoriler</span><span class="nb" id="nbFav" hidden></span></button>
+    <button type="button" data-view="msgs" aria-label="Mesajlar">✉ <span class="action-label">Mesajlar</span><span class="nb" id="nbMsg" hidden></span></button>
+    <button type="button" data-view="profile" aria-label="Profil">♙ <span class="action-label">Profil</span></button>
+    <button type="button" class="header-post" data-view="new">+ İlan Ver</button>
+  </div>
+  <span class="proto">DEMO · gerçek işlem yapılmaz</span>
+</div></header>
+
+<div id="menuBackdrop" class="menu-backdrop" hidden></div>
+<aside id="sideMenu" class="side-menu" aria-label="Ana menü" aria-hidden="true" inert>
+  <div class="side-head"><strong>MAKİNASAL <small>MENÜ</small></strong><button id="menuClose" type="button" aria-label="Menüyü kapat">✕</button></div>
+  <nav aria-label="Bölümler">
+    <div class="menu-section">KEŞFET</div>
+    <button data-view="home" aria-current="true">⌂ &nbsp; Ana Sayfa</button>
+    <button data-view="list">⌕ &nbsp; İlan Ara</button>
+    <button data-view="new">＋ &nbsp; İlan Ver</button>
+    <button data-view="jobs">⚡ &nbsp; Günlük İşler ve Acil İhtiyaçlar</button>
+    <button data-view="jobs">👷 &nbsp; Operatör ve Şoför Bul</button>
+    <div class="menu-section">HESABIM</div>
+    <button data-view="profile">♙ &nbsp; Profilim ve İlanlarım</button>
+    <button data-view="favs">♡ &nbsp; Favorilerim</button>
+    <button data-view="msgs">✉ &nbsp; Mesajlarım</button>
+    <div class="menu-section">DİĞER</div>
+    <button data-view="premium">★ &nbsp; Premium</button>
+    <button data-view="trust">◇ &nbsp; Güven Sistemi</button>
+  </nav>
+  <p class="menu-disclaimer">Demo sürümü · Gerçek ödeme veya işlem yapılmaz.</p>
+</aside>
+<main class="wrap">
+
+<section id="v-home">
+  <h1>Makineni bul, <mark>satıcıyı tanı.</mark></h1>
+  <p class="lead">İş makineleri, kamyonlar, çekiciler, yedek parça ve lastik. Her ilanda satıcının güven seviyesi, fiyat kontrolü ve son doğrulama tarihi görünür.</p>
+  <form id="homeSearch" class="searchbar" role="search">
+    <label class="sr" for="hq">Marka veya model ara</label>
+    <input type="text" id="hq" placeholder="Marka veya model ara. Örn. Hidromek, Scania, 315/80R22.5">
+    <button class="btn" type="submit">Ara</button>
+  </form>
+  <div class="mission-strip"><div><strong>İşinizin gücü, tek pazaryerinde.</strong><p>Türkiye genelinde iş makinesi ve ağır vasıta ilanları · Kiralama ve nakliye hizmetleri için yeni modüller yolda.</p></div><button type="button" class="btn" data-view="list">İlanları keşfet →</button></div>
+  <div class="tiles" id="tiles"></div>
+  <section class="sect" aria-label="Makinasal hizmetleri"><div class="sect-h"><h2>İşiniz için tek platform</h2></div><p class="sub">Önce Türkiye genelinde alım-satım; kiralama, yedek parça ve nakliye modülleri aşamalı olarak geliştirilecek.</p><div class="service-grid"><div class="service-box"><span class="service-icon" aria-hidden="true">🚜</span><h3>Makine ve araç alım-satımı</h3><p>İlanları inceleyin, karşılaştırın ve satıcılarla iletişim kurun.</p><span class="status">Prototipte mevcut</span></div><div class="service-box"><span class="service-icon" aria-hidden="true">📅</span><h3>Makine kiralama</h3><p>Günlük, haftalık veya aylık kiralık ekipman arayın.</p><span class="status">Planlanıyor</span></div><div class="service-box"><span class="service-icon" aria-hidden="true">⚙️</span><h3>Yedek parça ve lastik</h3><p>Parça ve lastik ilanlarını tek yerden keşfedin.</p><span class="status">Prototipte mevcut</span></div><div class="service-box"><span class="service-icon" aria-hidden="true">🚚</span><h3>Nakliye hizmetleri</h3><p>İş makineleri için taşıma teklifi alma altyapısı.</p><span class="status">Planlanıyor</span></div></div></section>
+  <div class="jobs-home"><div><span class="pill prem">YENİ · GÜNLÜK İŞLER</span><h2>Bugün kamyon mu, operatör mü lazım?</h2><p>Günlük kamyon ve lowbed ihtiyacına teklif al; operatör ve şoför ilanlarına başvur.</p></div><button class="btn" type="button" data-view="jobs">Günlük işleri keşfet →</button></div><div id="homeSecs"></div><p class="sub" style="margin-top:16px">İlan kartlarındaki örnek fotoğraflar temsili amaçlıdır; gerçek satış ilanlarının fotoğrafları değildir. Görseller internet bağlantısıyla yüklenir.</p><div class="decision-panel"><h2>Makinasal nasıl çalışacak?</h2><div class="decision-grid"><article><b>Ücretsiz başlangıç</b><p>Temel ilanlar ücretsiz; premium görünürlük isteğe bağlı. Ücretler lansmanda netleşecek.</p></article><article><b>Kiralama talebi</b><p>Alıcı tarih aralığı ve tahmini bedeli görüp rezervasyon talebi gönderecek. Çevrim içi ödeme sonraki aşama.</p></article><article><b>Nakliye teklifleri</b><p>Nakliyeciler hizmet profili açabilecek; müşteriler çıkış/varış bilgisiyle teklif isteyebilecek.</p></article><article><b>Hesap ve iletişim</b><p>Bireysel, kurumsal ve nakliye firması hesapları; telefon yalnızca giriş yapanlara ve satıcının izniyle gösterilecek.</p></article><article><b>Giriş seçenekleri</b><p>Telefon, e-posta, Google ve Apple ile giriş gerçek üyelik altyapısında sunulacak.</p></article><article><b>Önce web, sonra uygulama</b><p>Önce güvenli ve mobil uyumlu web sitesi; daha sonra iOS ve Android.</p></article></div><p class="sub" style="margin:14px 0 0">Bu sayfa tasarım prototipidir. Kiralama, nakliye teklifi, hesap doğrulama ve sosyal giriş işlemleri henüz canlı değildir.</p></div>
+</section>
+
+<section id="v-jobs" hidden>
+  <div class="jobs-heading"><div><span class="pill prem">⚡ MAKİNASAL İŞ AĞI</span><h1>Günlük İşler & Operatör</h1><p class="lead">Günlük kamyon, lowbed ve makine ihtiyacına teklif al. Operatör ve şoför işlerine başvur. <b>Bu bölüm tarayıcıda çalışan bir demodur.</b></p></div><button class="btn" id="jobNewToggle" type="button">+ İhtiyaç / İş İlanı Ver</button></div>
+  <div class="job-stats"><div><strong id="jobTotal">0</strong><span>Açık ilan</span></div><div><strong id="jobUrgent">0</strong><span>Acil ihtiyaç</span></div><div><strong>Türkiye</strong><span>81 il hedefi</span></div></div>
+  <form id="jobForm" class="panel job-form" hidden><h2>Yeni iş ilanı</h2><p class="sub">İlan bu cihazın tarayıcısında saklanır, diğer kullanıcılara gönderilmez.</p><div class="row2"><div class="field"><label for="jobKind">İlan türü</label><select id="jobKind"><option value="vehicle">Kamyon / lowbed / makine ihtiyacı (teklif)</option><option value="worker">Operatör / şoför ihtiyacı (başvuru)</option><option value="available">İş veya hizmet arıyorum</option></select></div><div class="field"><label for="jobTitle">İlan başlığı</label><input id="jobTitle" type="text" required maxlength="100" placeholder="Örn. 2 hafriyat kamyonu aranıyor"></div><div class="field"><label for="jobCity">İl</label><select id="jobCity" required></select></div><div class="field"><label for="jobDate">Başlangıç tarihi</label><input id="jobDate" type="date" required></div><div class="field"><label for="jobDays">Süre (gün)</label><input id="jobDays" type="number" min="1" max="365" value="1" required></div><div class="field"><label for="jobQty">Kişi / araç adedi</label><input id="jobQty" type="number" min="1" max="100" value="1" required></div><div class="field"><label for="jobBudget">Önerilen günlük bütçe (₺, isteğe bağlı)</label><input id="jobBudget" type="number" min="0" placeholder="Örn. 8000"></div><div class="field"><label for="jobContact">İletişim tercihi</label><select id="jobContact"><option>Platform içi mesaj</option><option>Telefon (giriş yapanlara)</option></select></div></div><label class="check"><input type="checkbox" id="jobIsUrgent">⚡ Acil ihtiyaç</label><div class="field"><label for="jobDesc">İş açıklaması ve koşullar</label><textarea id="jobDesc" required maxlength="1500" placeholder="Çalışma saati, yakıt, şoför, belge, ödeme koşulları..." ></textarea></div><div class="acts-row"><button class="btn" type="submit">Demo ilanı oluştur</button><button class="btn ghost" type="button" id="jobCancel">Vazgeç</button></div><p class="err" id="jobError" aria-live="polite"></p></form>
+  <div class="panel job-filters"><div class="field"><label for="jobSearch">İlan ara</label><input id="jobSearch" type="text" placeholder="Kamyon, operatör, lowbed, şehir..."></div><div class="field"><label for="jobTypeFilter">İlan kategorisi</label><select id="jobTypeFilter"><option value="all">Tüm işler</option><option value="vehicle">Araç / makine ihtiyacı</option><option value="worker">Operatör / şoför ihtiyacı</option><option value="available">İş / hizmet arayanlar</option></select></div><div class="field"><label for="jobTimeFilter">Zaman</label><select id="jobTimeFilter"><option value="all">Tüm tarihler</option><option value="today">Bugün</option><option value="tomorrow">Yarın</option><option value="week">Önümüzdeki 7 gün</option><option value="urgent">⚡ Acil işler</option></select></div><div class="field"><label for="jobCityFilter">İl</label><select id="jobCityFilter"></select></div></div>
+  <div class="bar" style="margin-top:20px"><h2>Açık ihtiyaçlar</h2><span id="jobCount" class="sub"></span></div><div id="jobGrid" class="grid"></div>
+  <div class="note" style="margin-top:20px">Güvenlik: Çalışmaya başlamadan önce gerekli mesleki belgeleri, iş koşullarını ve karşı tarafın kimliğini doğrulayın. Bu demoda başvuru ve teklifler yalnızca bu cihazda kaydedilir; gerçek kullanıcıya iletilmez.</div>
+</section>
+
+<section id="v-list" hidden>
+  <h1>İlanlarda ara</h1>
+  <form id="searchForm" class="searchbar" role="search">
+    <label class="sr" for="q">Marka veya model ara</label>
+    <input type="text" id="q" placeholder="Marka veya model ara. Örn. Hidromek, Scania">
+    <button class="btn ghost" type="button" id="fToggle" aria-expanded="false" aria-controls="rail">Filtreler <span class="pill" id="fCount" hidden></span></button>
+    <button class="btn" type="submit">Ara</button>
+  </form>
+  <div class="layout nofilter" id="layout">
+    <aside class="rail" id="rail" aria-label="Filtreler" hidden>
+      <div class="field"><span class="lbl">1. Araç türü</span><div class="chips" id="cats"></div></div>
+      <div class="field" id="fUse"><span class="lbl">2. Kullanım (saat veya km)</span>
+        <div class="chips" id="unitChips"><button type="button" class="chip" data-unit="sa" aria-pressed="true">Saat</button><button type="button" class="chip" data-unit="km" aria-pressed="false">Kilometre</button></div>
+        <div class="row-mm"><input type="number" id="useMin" min="0" placeholder="En az" aria-label="En az kullanım"><input type="number" id="useMax" min="0" placeholder="En çok" aria-label="En çok kullanım"></div>
+        <span class="sub" id="useHint"></span></div>
+      <div class="field" id="fYear"><span class="lbl">3. Model yılı</span>
+        <div class="row-mm"><input type="number" id="yearMin" min="1980" max="2026" placeholder="En eski" aria-label="En eski model yılı"><input type="number" id="yearMax" min="1980" max="2026" placeholder="En yeni" aria-label="En yeni model yılı"></div></div>
+      <div class="field"><label for="minScore">4. Satıcı puanı</label>
+        <select id="minScore"><option value="0">Hepsi</option><option value="3">3,0 ve üzeri</option><option value="4">4,0 ve üzeri</option><option value="4.5">4,5 ve üzeri</option></select>
+        <label class="check"><input type="checkbox" id="incNew" checked>Puanı olmayan yeni üyeleri de göster</label></div>
+      <div class="field"><label for="city">Şehir</label><select id="city"></select></div>
+      <div class="field"><label for="near">Bana uzaklık</label>
+        <select id="near"><option value="0">Hepsi</option><option value="50">50 km içinde</option><option value="150">150 km içinde</option><option value="300">300 km içinde</option><option value="600">600 km içinde</option></select>
+        <span class="sub" id="nearHint"></span></div>
+      <div class="field"><label for="maxPrice">En yüksek fiyat</label><input type="range" id="maxPrice" min="500000" max="6000000" step="100000" value="6000000"><span class="out" id="maxPriceOut"></span></div>
+      <label class="check"><input type="checkbox" id="takasOnly">Sadece takas kabul edenler</label>
+      <label class="check"><input type="checkbox" id="verOnly">Sadece doğrulanmış satıcılar</label>
+      <label class="check"><input type="checkbox" id="hideRisk">Riskli satıcıları gizle</label>
+      <button class="btn ghost" type="button" id="reset">Filtreleri sıfırla</button>
+    </aside>
+    <div style="min-width:0">
+      <div class="bar">
+        <span class="out" id="count"></span>
+        <div class="acts-row">
+          <button class="btn ghost sm" type="button" id="saveSearch">Aramayı kaydet</button>
+          <label for="sort">Sırala</label>
+          <select id="sort" style="width:auto"><option value="rec">Öne çıkanlar önce</option><option value="new">En yeni ilan</option><option value="near">Bana en yakın</option><option value="drop">Fiyatı düşenler önce</option><option value="ua">Kullanım: az olan önce</option><option value="yd">Model yılı: yeniden eskiye</option><option value="ya">Model yılı: eskiden yeniye</option><option value="trust">Satıcı puanı: yüksek önce</option><option value="pa">Fiyat: artan</option><option value="pd">Fiyat: azalan</option></select>
+        </div>
+      </div>
+      <div class="grid" id="grid"></div>
+    </div>
+  </div>
+</section>
+
+<section id="v-new" hidden>
+  <h1>İlan ver</h1>
+  <p class="lead">Kurucu döneminde ilan ücreti yok. Makine fiyatın piyasa ortalamasından çok uzak olup olmadığını form sırasında görürsün.</p>
+  <form id="form" class="panel" style="margin-top:18px;display:flex;flex-direction:column;gap:18px" novalidate>
+    <div class="row2">
+      <div class="field"><label for="f-cat">Kategori</label><select id="f-cat"></select></div>
+      <div class="field"><label for="f-brand">Marka</label><input type="text" id="f-brand" placeholder="Örn. Hidromek"></div>
+      <div class="field"><label for="f-model" id="f-model-l">Model</label><input type="text" id="f-model" placeholder="Örn. HMK 220 LC"></div>
+    </div>
+    <div class="row2" id="machFields">
+      <div class="field"><label for="f-year">Model yılı</label><input type="number" id="f-year" min="1980" max="2026" placeholder="2018"></div>
+      <div class="field"><label for="f-use">Kullanım</label><div class="row-mm" style="grid-template-columns:1fr 96px"><input type="number" id="f-use" min="0" placeholder="6500"><select id="f-unit" aria-label="Birim"><option value="sa">saat</option><option value="km">km</option></select></div></div>
+    </div>
+    <div class="row2" id="partFields" hidden>
+      <div class="field"><label for="f-spec" id="f-spec-l">Parça numarası</label><input type="text" id="f-spec" placeholder="Örn. A10VO71"></div>
+      <div class="field"><label for="f-cond">Durum</label><select id="f-cond"><option>Sıfır</option><option>Çıkma</option><option>Revizyonlu</option></select></div>
+      <div class="field"><label for="f-compat">Uyumlu makine veya araç</label><input type="text" id="f-compat" placeholder="Örn. Hidromek HMK 220 LC"></div>
+      <div class="field"><label for="f-qty">Adet</label><input type="number" id="f-qty" min="1" placeholder="1"></div>
+    </div>
+    <div class="row2">
+      <div class="field"><label for="f-city">Şehir</label><select id="f-city"></select></div>
+      <div class="field"><label for="f-price" id="f-price-l">Fiyat (₺, KDV dahil)</label><input type="number" id="f-price" min="1" placeholder="3500000"></div>
+    </div>
+    <div id="priceCheck"></div>
+    <label class="check"><input type="checkbox" id="f-takas">Takas kabul ederim</label>
+
+    <div class="field">
+      <span class="lbl">Fotoğraflar <span id="phCount" class="out"></span></span>
+      <div class="drop" id="drop">
+        <span>Fotoğrafları buraya sürükle veya telefondan seç</span>
+        <button type="button" class="btn ghost sm" id="pickBtn">Fotoğraf seç</button>
+        <input type="file" id="f-files" class="sr" accept="image/*" multiple tabindex="-1" aria-label="Fotoğraf seç">
+        <span class="sub">Makinenin dört yönünden, kabin içinden, saat göstergesinden ve seri plakasından çek. İlk fotoğraf kapak olur.</span>
+      </div>
+      <div class="ph-grid" id="phGrid"></div>
+      <div class="err" id="ph-err"></div>
+    </div>
+
+    <div class="field"><label for="f-desc">Açıklama</label><textarea id="f-desc" placeholder="Bakım geçmişi, belgeler, takas durumu"></textarea></div>
+    <label class="check"><input type="checkbox" id="f-pledge">Alıcı ürünü görmeden kapora veya ön ödeme istemeyeceğimi kabul ediyorum.</label>
+    <div class="err" id="f-err" aria-live="polite"></div>
+    <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center">
+      <button class="btn" type="submit">İlanı yayınla</button>
+      <span class="sub">İlan ücreti: 0 ₺ · 30 günde bir "hâlâ satılık mı?" sorulur</span>
+    </div>
+  </form>
+</section>
+
+<section id="v-msgs" hidden>
+  <h1>Mesajlar</h1>
+  <p class="lead">Alıcı ve satıcı platform içinde yazışır. Mesajlarda IBAN ve harici link paylaşımı engellenir. Prototipte satıcı yanıtları örnek otomatik yanıttır.</p>
+  <div class="msgs" id="msgsBox">
+    <div class="panel thr-list" id="thrList"></div>
+    <div class="panel thr-conv" id="thrConv"></div>
+  </div>
+</section>
+
+<section id="v-favs" hidden>
+  <h1>Favoriler</h1>
+  <p class="lead">Beğendiğin ilanları ve kayıtlı aramalarını burada takip et. Fiyatı düşen ya da aramana uyan yeni ilanlar işaretlenir.</p>
+  <div id="favBox" style="margin-top:18px;display:flex;flex-direction:column;gap:18px"></div>
+</section>
+
+<section id="v-store" hidden><div id="storeBox"></div></section>
+
+<section id="v-profile" hidden>
+  <h1>Profil</h1>
+  <p class="lead">Bilgilerini, doğrulamalarını, aldığın değerlendirmeleri ve ilanlarını buradan yönet.</p>
+  <div id="profileBox" style="margin-top:18px;display:flex;flex-direction:column;gap:16px"></div>
+</section>
+
+<section id="v-premium" hidden>
+  <h1>Premium</h1>
+  <p class="lead">Premium görünürlük ve araçlar verir. Güven puanı ve doğrulanmış rozeti para ile satın alınamaz.</p>
+  <div class="three" style="margin-top:18px">
+    <div class="panel"><h3>Ücretsiz</h3><div class="big" style="margin:10px 0">0 ₺</div>
+      <ul class="clean"><li>3 aktif ilan</li><li>İlan başına 8 fotoğraf</li><li>Doğrulama ve güven puanı</li><li>Temel arama sonuçlarında görünür</li></ul></div>
+    <div class="panel prem"><span class="pill prem">Önerilen</span><h3 style="margin-top:8px">Premium</h3><div class="big" style="margin:10px 0">299 ₺<span class="sub" style="font:400 15px var(--f-body)"> / ay</span></div>
+      <ul class="clean"><li>30 aktif ilan</li><li>İlan başına 20 fotoğraf</li><li>İlanlar "Öne çıkan" etiketiyle önde gösterilir</li><li>Premium satıcı rozeti</li><li>İlan istatistikleri: görüntülenme, telefon, mesaj</li></ul>
+      <div style="margin-top:14px;display:flex;flex-wrap:wrap;gap:10px;align-items:center"><button class="btn" id="premBtn" type="button">Premium’a geç</button><span class="out" id="premState"></span></div></div>
+    <div class="panel"><span class="pill">Yakında</span><h3 style="margin-top:8px">Kurumsal mağaza</h3><div class="big" style="margin:10px 0">Teklif</div>
+      <ul class="clean"><li>Sınırsız ilan</li><li>Toplu ilan yükleme ve taşıma</li><li>Mağaza sayfası ve logo</li><li>Birden fazla kullanıcı</li></ul></div>
+  </div>
+  <div class="panel" style="margin-top:16px">
+    <h3>Tek ilanı öne çıkar</h3>
+    <p class="sub" style="margin:8px 0 0">Premium olmayan üyeler, tek bir ilanı 7 günlüğüne öne çıkarabilir: 99 ₺. Profil sekmesinde ilanının yanındaki "Öne çıkar" düğmesinden dene.</p>
+  </div>
+  <div class="note" style="margin-top:16px">Fiyatlar örnektir, lansmanda belirlenecek. Bu prototipte ödeme alınmaz. Gerçek sürümde ödeme lisanslı bir ödeme kuruluşu üzerinden alınır.</div>
+</section>
+
+<section id="v-trust" hidden>
+  <h1>Güven sistemi</h1>
+  <p class="lead">Her üyenin alıcı ve satıcı olarak ayrı puanı olur. Puan yalnızca iki tarafın da işlemi onayladığı görüşmelerden sonra verilebilir.</p>
+  <div class="two" style="margin-top:18px">
+    <div class="panel">
+      <h3>Seviyeler</h3>
+      <p class="sub" style="margin:6px 0 12px">Eşikler bu prototipte örnek olarak belirlendi.</p>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div><span class="pill good">Çok güvenilir</span> <span class="out"> 4,5 üzeri puan ve en az 10 onaylı işlem</span></div>
+        <div><span class="pill good">Güvenilir</span> <span class="out"> 4,0 üzeri puan</span></div>
+        <div><span class="pill warn">Orta güven</span> <span class="out"> 4,0 altı puan</span></div>
+        <div><span class="pill">Yeni üye</span> <span class="out"> 3 işlemden az, puan henüz oluşmadı</span></div>
+        <div><span class="pill bad">Riskli</span> <span class="out"> 2 veya daha fazla doğrulanmış şikayet, ya da düşük puan</span></div>
+      </div>
+    </div>
+    <div class="panel">
+      <h3>Puan nasıl verilir</h3>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:12px">
+        <div class="step"><span class="badge-n">1</span><span>Alıcı ve satıcı Mesajlar bölümünde yazışır.</span></div>
+        <div class="step"><span class="badge-n">2</span><span>Alım satım gerçekleşirse iki taraf da "işlem gerçekleşti" onayı verir.</span></div>
+        <div class="step"><span class="badge-n">3</span><span>İki onay tamamlanınca iki taraf birbirini yıldız ve kısa yorumla puanlar.</span></div>
+        <div class="step"><span class="badge-n">4</span><span>Puan, satıcı veya alıcı ortalamasına işlenir. Onaysız görüşmede puan verilemez.</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="panel" style="margin-top:16px">
+    <h3>Puanı ne etkiler</h3>
+    <ul class="clean" style="margin-top:10px">
+      <li>Kimlik ve vergi levhası doğrulaması</li>
+      <li>Mesajlara cevap süresi</li>
+      <li>Doğrulanmış şikayet oranı</li>
+      <li>İlanın gerçekten satıldığı bilgisi</li>
+      <li>İlan fiyatı ile telefonda söylenen fiyatın tutarlılığı</li>
+    </ul>
+  </div>
+  <div class="panel" style="margin-top:16px">
+    <h3>Örnek üyeler</h3>
+    <div class="scroll" style="margin-top:8px"><table>
+      <thead><tr><th>Üye</th><th>Tür</th><th>Satıcı puanı</th><th>Alıcı puanı</th><th>İşlem</th><th>Seviye</th></tr></thead>
+      <tbody id="trustRows"></tbody></table></div>
+  </div>
+  <div class="note" style="margin-top:16px">Kötüye kullanım önlemi: puan verilen kişi itiraz edebilir. İtirazlar moderasyon ekibince incelenir. Yorum ve puan kuralları KVKK ve hakaret konularında hukukçuyla yazılmalıdır.</div>
+</section>
+
+</main>
+
+<div id="cmpBar" hidden></div>
+<div id="overlay" hidden><div id="sheet" role="dialog" aria-modal="true" aria-label="Ayrıntı"></div></div>
+<div id="toast" hidden></div>
+<script>
+(function(){
+'use strict';
+var MACH=['Ekskavatör','Beko Loder','Vinç','Beton (mikser ve pompa)','Kamyon','Çekici (tır)','Kurtarıcı (oto çekici)','Forklift'];
+var PARTS=['Yedek parça','Lastik ve jant'];
+var CATS=MACH.concat(PARTS);
+var KMCATS={'Kamyon':1,'Çekici (tır)':1,'Kurtarıcı (oto çekici)':1};
+function isPart(c){return PARTS.indexOf(c)>=0}
+var CITIES=['Adana','Adıyaman','Afyonkarahisar','Ağrı','Aksaray','Amasya','Ankara','Antalya','Ardahan','Artvin','Aydın','Balıkesir','Bartın','Batman','Bayburt','Bilecik','Bingöl','Bitlis','Bolu','Burdur','Bursa','Çanakkale','Çankırı','Çorum','Denizli','Diyarbakır','Düzce','Edirne','Elazığ','Erzincan','Erzurum','Eskişehir','Gaziantep','Giresun','Gümüşhane','Hakkâri','Hatay','Iğdır','Isparta','İstanbul','İzmir','Kahramanmaraş','Karabük','Karaman','Kars','Kastamonu','Kayseri','Kırıkkale','Kırklareli','Kırşehir','Kilis','Kocaeli','Konya','Kütahya','Malatya','Manisa','Mardin','Mersin','Muğla','Muş','Nevşehir','Niğde','Ordu','Osmaniye','Rize','Sakarya','Samsun','Siirt','Sinop','Sivas','Şanlıurfa','Şırnak','Tekirdağ','Tokat','Trabzon','Tunceli','Uşak','Van','Yalova','Yozgat','Zonguldak'];
+CITIES.sort(function(a,b){return a.localeCompare(b,'tr')});
+/* Şehir merkezi koordinatları (yaklaşık). Mesafe kuş uçuşu hesaplanır. */
+var COORDS={'Adana':[37.00,35.32],'Adıyaman':[37.76,38.28],'Afyonkarahisar':[38.76,30.54],'Ağrı':[39.72,43.05],'Aksaray':[38.37,34.03],'Amasya':[40.65,35.83],'Ankara':[39.93,32.86],'Antalya':[36.90,30.70],'Ardahan':[41.11,42.70],'Artvin':[41.18,41.82],'Aydın':[37.85,27.84],'Balıkesir':[39.65,27.89],'Bartın':[41.64,32.34],'Batman':[37.89,41.13],'Bayburt':[40.26,40.23],'Bilecik':[40.14,29.98],'Bingöl':[38.88,40.50],'Bitlis':[38.40,42.11],'Bolu':[40.73,31.61],'Burdur':[37.72,30.29],'Bursa':[40.19,29.06],'Çanakkale':[40.15,26.41],'Çankırı':[40.60,33.62],'Çorum':[40.55,34.95],'Denizli':[37.78,29.09],'Diyarbakır':[37.91,40.24],'Düzce':[40.84,31.16],'Edirne':[41.68,26.56],'Elazığ':[38.67,39.22],'Erzincan':[39.75,39.49],'Erzurum':[39.90,41.27],'Eskişehir':[39.78,30.52],'Gaziantep':[37.07,37.38],'Giresun':[40.91,38.39],'Gümüşhane':[40.46,39.48],'Hakkâri':[37.58,43.74],'Hatay':[36.40,36.35],'Iğdır':[39.92,44.04],'Isparta':[37.76,30.55],'İstanbul':[41.01,28.98],'İzmir':[38.42,27.14],'Kahramanmaraş':[37.58,36.94],'Karabük':[41.20,32.63],'Karaman':[37.18,33.22],'Kars':[40.60,43.10],'Kastamonu':[41.38,33.78],'Kayseri':[38.73,35.49],'Kırıkkale':[39.85,33.51],'Kırklareli':[41.74,27.23],'Kırşehir':[39.15,34.17],'Kilis':[36.72,37.12],'Kocaeli':[40.77,29.92],'Konya':[37.87,32.48],'Kütahya':[39.42,29.98],'Malatya':[38.35,38.31],'Manisa':[38.61,27.43],'Mardin':[37.31,40.74],'Mersin':[36.81,34.64],'Muğla':[37.22,28.36],'Muş':[38.74,41.49],'Nevşehir':[38.62,34.71],'Niğde':[37.97,34.68],'Ordu':[40.98,37.88],'Osmaniye':[37.07,36.25],'Rize':[41.02,40.52],'Sakarya':[40.69,30.44],'Samsun':[41.29,36.33],'Siirt':[37.93,41.94],'Sinop':[42.03,35.15],'Sivas':[39.75,37.02],'Şanlıurfa':[37.16,38.79],'Şırnak':[37.52,42.46],'Tekirdağ':[40.98,27.51],'Tokat':[40.31,36.55],'Trabzon':[41.00,39.72],'Tunceli':[39.11,39.55],'Uşak':[38.68,29.41],'Van':[38.50,43.38],'Yalova':[40.65,29.27],'Yozgat':[39.82,34.81],'Zonguldak':[41.45,31.80]};
+var LIM={free:{photos:8,listings:3},prem:{photos:20,listings:30}};
+
+var S={
+ A:{name:'Anadolu İş Makineleri',type:'Kurumsal',ver:true,prem:true,s:4.8,b:4.7,deals:42,rep:0,city:'Ankara',since:2021,reviews:[
+   {who:'Ömer D.',role:'Alıcı',rating:5,text:'Makine anlatıldığı gibiydi, belgeler eksiksiz çıktı.',date:'2 hafta önce',tags:['İlana uygun çıktı','Belgeler tamdı']},
+   {who:'Kemal A.',role:'Alıcı',rating:5,text:'Yerinde incelememe izin verdi, pazarlık makuldü.',date:'1 ay önce',tags:['Hızlı cevap verdi']},
+   {who:'Burak S.',role:'Alıcı',rating:4,text:'Teslimat bir gün gecikti ama haber verdi.',date:'2 ay önce',tags:[]}]},
+ B:{name:'Mehmet K.',type:'Bireysel',ver:true,s:4.3,b:4.4,deals:6,rep:0,city:'İstanbul',since:2023,reviews:[
+   {who:'Ali R.',role:'Alıcı',rating:4,text:'Dürüst anlattı, makine temiz çıktı.',date:'1 ay önce',tags:['İlana uygun çıktı']}]},
+ C:{name:'Yeni hesap',type:'Bireysel',ver:false,s:null,b:null,deals:0,rep:0,city:'Bursa',since:2026,reviews:[]},
+ D:{name:'Konya Makine Pazarı',type:'Kurumsal',ver:true,s:4.6,b:4.5,deals:18,rep:0,city:'Konya',since:2022,reviews:[
+   {who:'Hüseyin T.',role:'Alıcı',rating:5,text:'Garantili satış yaptılar, servis desteği verdiler.',date:'3 hafta önce',tags:['Belgeler tamdı']},
+   {who:'Nazlı Y.',role:'Alıcı',rating:4,text:'Fiyat tutarlıydı, ilanla telefondaki fiyat aynıydı.',date:'2 ay önce',tags:['Fiyat tutarlıydı']}]},
+ E:{name:'Hasan T.',type:'Bireysel',ver:true,s:4.1,b:4.0,deals:3,rep:0,city:'Adana',since:2024,reviews:[]},
+ F:{name:'Vinç Dünyası Ltd.',type:'Kurumsal',ver:true,prem:true,s:4.9,b:4.8,deals:57,rep:0,city:'İzmir',since:2019,reviews:[
+   {who:'Cemal B.',role:'Alıcı',rating:5,text:'Periyodik kontrol raporu ve bakım kayıtlarıyla teslim ettiler.',date:'1 hafta önce',tags:['Belgeler tamdı','İlana uygun çıktı']},
+   {who:'Sevgi K.',role:'Alıcı',rating:5,text:'Sorularıma aynı gün cevap verdiler.',date:'1 ay önce',tags:['Hızlı cevap verdi']}]},
+ G:{name:'Beton Ekipman A.Ş.',type:'Kurumsal',ver:true,prem:true,s:4.5,b:4.5,deals:26,rep:1,city:'İstanbul',since:2020,reviews:[
+   {who:'Erkan P.',role:'Alıcı',rating:5,text:'Mikser yenilenmiş çıktı, ilandaki gibi.',date:'1 ay önce',tags:['İlana uygun çıktı']},
+   {who:'Tolga M.',role:'Alıcı',rating:2,text:'Boru takımı eksik teslim edildi, sonra tamamladılar.',date:'3 ay önce',tags:[]}]},
+ H:{name:'Ali V.',type:'Bireysel',ver:false,s:2.6,b:2.9,deals:4,rep:3,city:'Mersin',since:2025,reviews:[
+   {who:'Yusuf C.',role:'Alıcı',rating:1,text:'Ön ödeme istedi, makineyi göstermedi.',date:'1 ay önce',tags:[]},
+   {who:'Mustafa D.',role:'Alıcı',rating:2,text:'Telefondaki fiyat ilandakinden farklıydı.',date:'2 ay önce',tags:[]}]},
+ I:{name:'Gaziantep Tır Galerisi',type:'Kurumsal',ver:true,s:4.4,b:4.3,deals:31,rep:0,city:'Gaziantep',since:2018,reviews:[
+   {who:'Recep A.',role:'Alıcı',rating:5,text:'Çekici temiz çıktı, ekspertize götürmeme izin verdiler.',date:'2 hafta önce',tags:['İlana uygun çıktı']},
+   {who:'Zeki F.',role:'Alıcı',rating:4,text:'Fiyat pazarlığı makuldü.',date:'2 ay önce',tags:['Fiyat tutarlıydı']}]},
+ J:{name:'Ege Forklift',type:'Kurumsal',ver:true,s:4.7,b:4.6,deals:22,rep:0,city:'İzmir',since:2020,reviews:[
+   {who:'Nuri S.',role:'Alıcı',rating:5,text:'Forklift bakımlı ve ilandaki saatle uyumlu çıktı.',date:'1 ay önce',tags:['İlana uygun çıktı']}]},
+ K:{name:'Serkan Y.',type:'Bireysel',ver:true,s:4.0,b:4.2,deals:2,rep:0,city:'Bursa',since:2024,reviews:[]},
+ L:{name:'Çelik Yedek Parça',type:'Kurumsal',ver:true,s:4.6,b:4.4,deals:35,rep:0,city:'Ankara',since:2020,reviews:[
+   {who:'Orhan G.',role:'Alıcı',rating:5,text:'Parça numarası uyumluydu, iade koşulunu yazılı verdiler.',date:'3 hafta önce',tags:['Belgeler tamdı']}]},
+ M:{name:'Lastik Merkezi Ltd.',type:'Kurumsal',ver:true,s:4.4,b:4.3,deals:48,rep:0,city:'İstanbul',since:2019,reviews:[
+   {who:'Fikret Ö.',role:'Alıcı',rating:4,text:'Lastikler yeni üretimdi, DOT yılı ilandaki gibiydi.',date:'1 ay önce',tags:['İlana uygun çıktı']}]},
+ N:{name:'Yol Yardım Kurtarıcı',type:'Kurumsal',ver:true,s:4.7,b:4.6,deals:15,rep:0,city:'Ankara',since:2021,reviews:[]},
+ O:{name:'Murat B.',type:'Bireysel',ver:true,s:4.2,b:4.1,deals:5,rep:0,city:'İzmir',since:2023,reviews:[]},
+ ME:{name:'Sen',type:'Bireysel',ver:false,prem:false,s:null,b:null,bn:0,deals:0,rep:0,city:'İstanbul',since:2026,reviews:[]}
+};
+var me={premium:false,phone:false,id:false,tax:false,favs:{2:4100000},cmp:[],saved:[],checks:{}};
+var L=[
+ {id:1,cat:'Ekskavatör',brand:'Hidromek',model:'HMK 220 LC',year:2019,use:6200,city:'Ankara',price:4850000,sel:'A',conf:2,serial:true,takas:false,desc:'Düzenli servis kayıtlı. Fatura ve ruhsat hazır.'},
+ {id:2,cat:'Ekskavatör',brand:'Caterpillar',model:'320',year:2016,use:11800,city:'İstanbul',price:3900000,prev:4100000,sel:'B',conf:6,serial:true,takas:false,desc:'Tek sahibinden. Takas düşünülmez.'},
+ {id:3,cat:'Ekskavatör',brand:'Komatsu',model:'PC200',year:2018,use:7000,city:'Bursa',price:1150000,sel:'C',conf:0,serial:false,takas:false,desc:'Acil satılık. Hemen kapora gönderene öncelik.'},
+ {id:4,cat:'Beko Loder',brand:'JCB',model:'3CX',year:2015,use:7400,city:'Konya',price:1650000,sel:'D',conf:4,serial:true,takas:true,desc:'Joystick ve klimalı kabin. Galeri garantili.'},
+ {id:5,cat:'Beko Loder',brand:'Hidromek',model:'102S',year:2011,use:9800,city:'Adana',price:1280000,prev:1350000,sel:'E',conf:11,serial:false,takas:false,desc:'İnşaat firmasından. Lastikler yeni.'},
+ {id:6,cat:'Vinç',brand:'Tadano',model:'20 ton mobil',year:2010,use:14200,city:'İzmir',price:5400000,sel:'F',conf:1,serial:true,takas:false,desc:'Periyodik muayenesi yapıldı.'},
+ {id:7,cat:'Vinç',brand:'Manitou',model:'Teleskopik',year:2017,use:5300,city:'Kocaeli',price:2750000,sel:'F',conf:9,serial:true,takas:true,desc:'Platform aparatı dahil.'},
+ {id:8,cat:'Beton (mikser ve pompa)',brand:'Mercedes',model:'Mikser 8 m³',year:2017,use:312000,unit:'km',city:'İstanbul',price:3600000,sel:'G',conf:3,serial:true,takas:false,desc:'Mikser tamburu yenilendi.'},
+ {id:9,cat:'Beton (mikser ve pompa)',brand:'Putzmeister',model:'Mobil pompa 36 m',year:2014,use:9100,city:'İzmir',price:5200000,sel:'G',conf:5,serial:true,takas:true,desc:'Boru takımı dahil.'},
+ {id:10,cat:'Kamyon',brand:'Ford Trucks',model:'3542 damperli',year:2018,use:410000,city:'Kocaeli',price:3450000,prev:3600000,sel:'I',conf:2,serial:true,takas:false,desc:'Hardox kasa. Bakımları yetkili serviste.'},
+ {id:11,cat:'Kamyon',brand:'Iveco',model:'Eurocargo',year:2013,use:520000,city:'Bursa',price:1450000,sel:'K',conf:14,serial:false,takas:false,desc:'Sandıklı kasa, temiz.'},
+ {id:12,cat:'Çekici (tır)',brand:'Scania',model:'R450',year:2017,use:780000,city:'Gaziantep',price:2950000,prev:3100000,sel:'I',conf:7,serial:true,takas:true,desc:'Retarderli. İki yılda bir fren bakımı yapıldı.'},
+ {id:13,cat:'Çekici (tır)',brand:'Volvo',model:'FH 500',year:2019,use:620000,city:'Mersin',price:4100000,sel:'H',conf:18,serial:false,takas:false,desc:'Fiyatta pazarlık yok, ön ödeme şart.'},
+ {id:14,cat:'Forklift',brand:'Linde',model:'H35',year:2015,use:6800,city:'Bursa',price:780000,sel:'J',conf:3,serial:true,takas:true,desc:'3,5 ton, yan kaydırmalı.'},
+ {id:15,cat:'Forklift',brand:'Toyota',model:'8FD25',year:2012,use:11200,city:'İstanbul',price:520000,sel:'J',conf:8,serial:false,takas:false,desc:'Dizel, kabinsiz.'},
+ {id:16,cat:'Yedek parça',brand:'Rexroth',model:'Hidrolik pompa',spec:'A10VO71',cond:'Revizyonlu',compat:'Hidromek HMK 220 LC, Caterpillar 320',qty:2,city:'Ankara',price:185000,sel:'L',conf:2,takas:false,desc:'Test raporlu, 6 ay garantili.'},
+ {id:17,cat:'Yedek parça',brand:'Çelik Parça',model:'Kova diş ve adaptör seti',spec:'KD-713',cond:'Sıfır',compat:'JCB 3CX, Hidromek 102S',qty:10,city:'Ankara',price:24500,sel:'L',conf:4,takas:false,desc:'Set halinde, faturalı.'},
+ {id:18,cat:'Yedek parça',brand:'ZF',model:'Şanzıman',spec:'16S 2220',cond:'Çıkma',compat:'Mercedes ve Ford Trucks çekici',qty:1,city:'Ankara',price:310000,sel:'L',conf:6,takas:true,desc:'Çıkma, kilometre bilgisi belgeli.'},
+ {id:19,cat:'Lastik ve jant',brand:'Michelin',model:'X Multi Z kamyon lastiği',spec:'315/80R22.5',cond:'Sıfır',compat:'Kamyon ve çekici, çekici aks',qty:12,city:'İstanbul',price:14800,sel:'M',conf:1,takas:false,desc:'Birim fiyattır. Üretim yılı 2025.'},
+ {id:20,cat:'Lastik ve jant',brand:'Bridgestone',model:'Beko loder lastiği',spec:'19.5L-24',cond:'Çıkma',compat:'JCB 3CX, Hidromek 102S',qty:4,city:'Konya',price:21000,sel:'M',conf:5,takas:false,desc:'Diş derinliği yaklaşık %70. Birim fiyattır.'},
+ {id:21,cat:'Lastik ve jant',brand:'Goodyear',model:'Kamyon lastiği',spec:'295/80R22.5',cond:'Sıfır',compat:'Kamyon, ön aks',qty:8,city:'Kocaeli',price:13200,sel:'M',conf:3,takas:false,desc:'Birim fiyattır.'},
+ {id:22,cat:'Kurtarıcı (oto çekici)',brand:'Mercedes',model:'Atego 1518 kayar kasa',year:2015,use:480000,city:'Ankara',price:2350000,sel:'N',conf:2,serial:true,takas:true,desc:'Vinçli kayar kasa kurtarıcı. Bağlama zincirleri dahil.'},
+ {id:23,cat:'Kurtarıcı (oto çekici)',brand:'Iveco',model:'Daily 70C kurtarıcı',year:2018,use:260000,city:'İzmir',price:1850000,sel:'O',conf:9,serial:true,takas:false,desc:'Yol yardım için kullanıldı, bakımları düzenli.'},
+ {id:24,cat:'Ekskavatör',brand:'Volvo',model:'EC210',year:2017,use:8900,city:'Kocaeli',price:3750000,sel:'A',conf:1,serial:true,takas:true,desc:'Servis kayıtlı, kova ve kırıcı hattı mevcut.'},
+ {id:25,cat:'Beko Loder',brand:'Case',model:'580ST',year:2014,use:8400,city:'Antalya',price:1550000,prev:1650000,sel:'B',conf:5,serial:true,takas:false,desc:'Tek elden, bakımlı.'},
+ {id:26,cat:'Vinç',brand:'Liebherr',model:'LTM 1050 mobil',year:2012,use:11800,city:'İstanbul',price:5650000,prev:5900000,sel:'F',conf:2,serial:true,takas:false,desc:'Kontrol raporu güncel.'},
+ {id:27,cat:'Forklift',brand:'Hyster',model:'H3.0FT',year:2019,use:3200,city:'Gaziantep',price:640000,sel:'J',conf:6,serial:true,takas:false,desc:'Az kullanılmış, yan kaydırmalı.'}
+];
+var DEMO_PHOTOS={"Beko Loder": "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=900&q=75", "Vinç": "https://images.unsplash.com/photo-1487958449943-2429e8be8625?auto=format&fit=crop&w=900&q=75", "Beton (mikser ve pompa)": "https://images.unsplash.com/photo-1519003722824-194d4455a60c?auto=format&fit=crop&w=900&q=75", "Kamyon": "https://images.unsplash.com/photo-1519003722824-194d4455a60c?auto=format&fit=crop&w=900&q=75", "Çekici (tır)": "https://images.unsplash.com/photo-1501706362039-c6e80948a5b8?auto=format&fit=crop&w=900&q=75", "Kurtarıcı (oto çekici)": "https://images.unsplash.com/photo-1519003722824-194d4455a60c?auto=format&fit=crop&w=900&q=75", "Forklift": "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=900&q=75", "Yedek parça": "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=900&q=75", "Lastik ve jant": "https://images.unsplash.com/photo-1485291571150-772bcfc10da5?auto=format&fit=crop&w=900&q=75", "Ekskavatör": "https://images.unsplash.com/photo-1580901368919-7738efb0f87e?auto=format&fit=crop&w=900&q=75"};
+var nextId=100,nextTid=1,tick=0;
+var photos=[];
+var curId=null,storeKey=null,activeT=null,sortKey='rec';
+var T=[];
+
+function $(i){return document.getElementById(i)}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function tl(n){return Number(n).toLocaleString('tr-TR')+' ₺'}
+function num(n){return Number(n).toLocaleString('tr-TR')}
+function unit(l){if(isPart(l.cat)) return ''; return l.unit||(KMCATS[l.cat]?'km':'sa')}
+function sc(x){return x==null?'–':Number(x).toFixed(1).replace('.',',')}
+function lim(){return me.premium?LIM.prem:LIM.free}
+function featured(l){return !!(S[l.sel].prem||l.boost)}
+function byId(id){for(var i=0;i<L.length;i++){if(L[i].id===id) return L[i]} return null}
+function maxId(){var m=0;L.forEach(function(l){if(l.id>m) m=l.id});return m}
+function nowStr(){var d=new Date();return ('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2)}
+function dropPct(l){return (l.prev&&l.prev>l.price)?Math.round((l.prev-l.price)/l.prev*100):0}
+function stars(n){var s='';for(var i=1;i<=5;i++) s+=(i<=n?'★':'☆');return '<span aria-label="'+n+' yıldız">'+s+'</span>'}
+
+function dist(a,b){
+  var p=COORDS[a],q=COORDS[b]; if(!p||!q) return null;
+  var R=6371,d=Math.PI/180,dLat=(q[0]-p[0])*d,dLon=(q[1]-p[1])*d;
+  var x=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(p[0]*d)*Math.cos(q[0]*d)*Math.sin(dLon/2)*Math.sin(dLon/2);
+  return Math.round(R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x)));
+}
+function distOf(l){return dist(S.ME.city,l.city)}
+function distLabel(l){var d=distOf(l);if(d==null) return '';return d<10?'Aynı şehir':'~'+num(Math.round(d/5)*5)+' km'}
+
+function level(m){
+  if(m.rep>=2||(m.deals>=3&&m.s!=null&&m.s<3)) return {t:'Riskli',c:'bad'};
+  if(m.deals<3||m.s==null) return {t:'Yeni üye',c:''};
+  if(m.s>=4.5&&m.deals>=10) return {t:'Çok güvenilir',c:'good'};
+  if(m.s>=4) return {t:'Güvenilir',c:'good'};
+  return {t:'Orta güven',c:'warn'};
+}
+function median(a){var b=a.slice().sort(function(x,y){return x-y}),n=b.length;return n%2?b[(n-1)/2]:(b[n/2-1]+b[n/2])/2}
+function catPrices(cat){return L.filter(function(l){return l.cat===cat}).map(function(l){return l.price})}
+function catMedian(cat,min){
+  if(isPart(cat)) return null;
+  var p=catPrices(cat);
+  return p.length>=min?median(p):null;
+}
+function priceFlag(price,cat){
+  var m=catMedian(cat,2); if(!m) return null;
+  var r=price/m;
+  if(r<0.6) return 'low'; if(r>1.6) return 'high'; return 'ok';
+}
+function cityOpts(sel){return CITIES.map(function(c){return '<option'+(c===sel?' selected':'')+'>'+c+'</option>'}).join('')}
+
+var tt;
+function toast(m){var t=$('toast');t.textContent=m;t.hidden=false;clearTimeout(tt);tt=setTimeout(function(){t.hidden=true},3600)}
+
+var ICON_FAV='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7.5-4.6-9.6-9.2C1 8.6 2.9 5 6.3 5c2 0 3.4 1.1 4.2 2.3h3C14.3 6.1 15.7 5 17.7 5c3.4 0 5.3 3.6 3.9 6.8C19.5 16.4 12 21 12 21z"/></svg>';
+var ICON_CMP='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7h11M14 3l4 4-4 4M17 17H6M10 13l-4 4 4 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+/* ---------- Filtre durumu ---------- */
+function defState(){return {cat:'Tümü',city:'Tümü',maxPrice:6000000,unit:'sa',useMin:'',useMax:'',yMin:'',yMax:'',minScore:0,incNew:true,ver:false,hide:false,takas:false,near:0,q:''}}
+var st=defState();
+me.saved=[{id:1,f:Object.assign(defState(),{cat:'Ekskavatör',minScore:4}),last:15,notify:true}];
+var nextSid=2;
+
+function filterList(f){
+  var q=f.q.trim().toLocaleLowerCase('tr');
+  function nv(x){return (x===''||x==null)?null:Number(x)}
+  var uMin=nv(f.useMin),uMax=nv(f.useMax),yMin=nv(f.yMin),yMax=nv(f.yMax);
+  var partMode=isPart(f.cat);
+  return L.filter(function(l){
+    var m=S[l.sel];
+    if(f.cat!=='Tümü'&&l.cat!==f.cat) return false;
+    if(f.city!=='Tümü'&&l.city!==f.city) return false;
+    if(l.price>f.maxPrice) return false;
+    if(!partMode){
+      if(uMin!=null||uMax!=null){
+        if(unit(l)!==f.unit) return false;
+        if(uMin!=null&&l.use<uMin) return false;
+        if(uMax!=null&&l.use>uMax) return false;
+      }
+      if(yMin!=null&&(l.year==null||l.year<yMin)) return false;
+      if(yMax!=null&&(l.year==null||l.year>yMax)) return false;
+    }
+    if(f.minScore>0){
+      if(m.s==null){ if(!f.incNew) return false; }
+      else if(m.s<f.minScore) return false;
+    }
+    if(f.near>0){var d=distOf(l); if(d==null||d>f.near) return false;}
+    if(f.takas&&!l.takas) return false;
+    if(f.ver&&!m.ver) return false;
+    if(f.hide&&level(m).t==='Riskli') return false;
+    if(q){
+      var hay=(l.brand+' '+l.model+' '+(l.spec||'')+' '+(l.compat||'')).toLocaleLowerCase('tr');
+      if(hay.indexOf(q)<0) return false;
+    }
+    return true;
+  });
+}
+function visible(){
+  var r=filterList(st);
+  if(sortKey==='pa') r.sort(function(a,b){return a.price-b.price});
+  else if(sortKey==='pd') r.sort(function(a,b){return b.price-a.price});
+  else if(sortKey==='trust') r.sort(function(a,b){return (S[b.sel].s||0)-(S[a.sel].s||0)});
+  else if(sortKey==='near') r.sort(function(a,b){return (distOf(a)||0)-(distOf(b)||0)});
+  else if(sortKey==='drop') r.sort(function(a,b){return (dropPct(b)-dropPct(a))||(b.id-a.id)});
+  else if(sortKey==='ua') r.sort(function(a,b){return unit(a)===unit(b)?(a.use||0)-(b.use||0):(unit(a)==='sa'?-1:1)});
+  else if(sortKey==='yd') r.sort(function(a,b){return (b.year||0)-(a.year||0)});
+  else if(sortKey==='ya') r.sort(function(a,b){return (a.year||9999)-(b.year||9999)});
+  else if(sortKey==='rec') r.sort(function(a,b){return (featured(b)-featured(a))||(b.id-a.id)});
+  else r.sort(function(a,b){return b.id-a.id});
+  return r;
+}
+function filterLabel(f){
+  var p=[];
+  if(f.cat!=='Tümü') p.push(f.cat);
+  if(f.q.trim()) p.push('"'+f.q.trim()+'"');
+  if(f.city!=='Tümü') p.push(f.city);
+  if(f.near>0) p.push(f.near+' km içinde');
+  if(f.yMin!==''||f.yMax!=='') p.push('yıl '+(f.yMin||'…')+'–'+(f.yMax||'…'));
+  if(f.useMin!==''||f.useMax!=='') p.push((f.useMin||'0')+'–'+(f.useMax||'…')+' '+f.unit);
+  if(f.minScore>0) p.push('puan '+String(f.minScore).replace('.',',')+'+');
+  if(f.maxPrice<6000000) p.push('en çok '+tl(f.maxPrice));
+  if(f.takas) p.push('takas olur');
+  if(f.ver) p.push('doğrulanmış');
+  return p.length?p.join(' · '):'Tüm ilanlar';
+}
+function newCount(s){return filterList(s.f).filter(function(l){return l.id>s.last}).length}
+
+/* ---------- Kart ---------- */
+function tagsFor(l){
+  var m=S[l.sel],lv=level(m),t=[];
+  if(featured(l)) t.push('<span class="pill prem">Öne çıkan</span>');
+  t.push('<span class="pill '+lv.c+'">'+lv.t+'</span>');
+  if(m.ver) t.push('<span class="pill good">Doğrulanmış satıcı</span>');
+  if(dropPct(l)) t.push('<span class="pill good">Fiyatı düştü −%'+dropPct(l)+'</span>');
+  if(l.takas) t.push('<span class="pill">Takas olur</span>');
+  var f=priceFlag(l.price,l.cat);
+  if(f==='low') t.push('<span class="pill bad">Fiyat çok düşük, dikkat</span>');
+  if(f==='high') t.push('<span class="pill warn">Fiyat ortalamanın üstünde</span>');
+  if(l.isNew) t.push('<span class="pill">Yeni ilan</span>');
+  else t.push('<span class="pill">'+(l.conf===0?'Bugün doğrulandı':l.conf+' gün önce doğrulandı')+'</span>');
+  return t.join('');
+}
+function specLabel(l){return l.cat==='Yedek parça'?'Parça no: '+l.spec:l.spec}
+function metaHtml(l){
+  var a=[],d=distLabel(l);
+  if(isPart(l.cat)){a.push(esc(specLabel(l)));a.push(esc(l.cond)+' · '+l.qty+' adet')}
+  else a.push(num(l.use)+' '+unit(l));
+  a.push(esc(l.city)+(d?' · '+d:''));
+  a.push(esc(S[l.sel].name));
+  return a.map(function(x){return '<span>'+x+'</span>'}).join('');
+}
+function cardHtml(l){
+  var demoPhoto=!l.photos&&DEMO_PHOTOS[l.cat];
+  var ph=l.photos&&l.photos.length,fav=!!me.favs[l.id],inCmp=me.cmp.indexOf(l.id)>=0;
+  var title=esc(l.brand)+' '+esc(l.model)+(isPart(l.cat)?'':' · '+l.year);
+  var thumb=ph?
+    '<div class="thumb has"><img src="'+l.photos[0]+'" alt="'+esc(l.brand+' '+l.model)+'"><span class="cat">'+esc(l.cat)+'</span><span class="cnt">'+l.photos.length+' fotoğraf</span></div>':
+    (demoPhoto?'<div class="thumb has"><img loading="lazy" src="'+demoPhoto+'" alt="'+esc(l.cat)+' için temsili görsel" ><span class="cat">'+esc(l.cat)+'</span><span class="cnt">Temsili fotoğraf</span></div>':'<div class="thumb"><span class="cat">'+esc(l.cat)+'</span><span class="nophoto">Fotoğraf eklenmemiş</span></div>');
+  return '<article class="card'+(featured(l)?' feat':'')+'">'+
+    '<button type="button" class="cm" data-open="'+l.id+'">'+thumb+
+    '<div class="cbody"><div class="ttl">'+title+'</div><div class="price">'+tl(l.price)+(isPart(l.cat)?'<span class="sub" style="font:400 14px var(--f-body)"> / adet</span>':'')+'</div>'+
+    '<div class="meta">'+metaHtml(l)+'</div><div class="tags">'+tagsFor(l)+'</div></div></button>'+
+    '<div class="card-acts"><button type="button" class="ibtn fav" data-fav="'+l.id+'" aria-pressed="'+fav+'" aria-label="Favorilere ekle veya çıkar">'+ICON_FAV+'</button>'+
+    '<button type="button" class="ibtn" data-cmp="'+l.id+'" aria-pressed="'+inCmp+'" aria-label="Karşılaştırmaya ekle veya çıkar">'+ICON_CMP+'</button></div></article>';
+}
+
+/* ---------- Ara ---------- */
+function updateUseHint(){
+  var any=st.useMin!==''||st.useMax!=='';
+  $('useHint').textContent=any?'Aralık girildi: yalnızca '+(st.unit==='sa'?'saatle':'km ile')+' ölçülen ilanlar listelenir.':'Boş bırakırsan tüm ilanlar gelir. Mikser ve pompa için birimi sen seç.';
+}
+function updateFilterCount(){
+  var n=0;
+  if(st.cat!=='Tümü') n++;
+  if(!isPart(st.cat)&&(st.useMin!==''||st.useMax!=='')) n++;
+  if(!isPart(st.cat)&&(st.yMin!==''||st.yMax!=='')) n++;
+  if(st.minScore>0) n++;
+  if(st.city!=='Tümü') n++;
+  if(st.near>0) n++;
+  if(st.maxPrice<6000000) n++;
+  if(st.takas) n++;
+  if(st.ver) n++;
+  if(st.hide) n++;
+  $('fCount').textContent=String(n);
+  $('fCount').hidden=n===0;
+}
+function renderList(){
+  var r=visible();
+  $('count').textContent=r.length+' ilan';
+  $('maxPriceOut').textContent=tl(st.maxPrice)+' ve altı';
+  $('nearHint').textContent='Konumun: '+S.ME.city+'. Profil sekmesinden değiştirebilirsin. Mesafe kuş uçuşudur.';
+  updateUseHint();
+  updateFilterCount();
+  if(!r.length){$('grid').innerHTML='<div class="empty" style="grid-column:1/-1">Bu filtrelerle ilan yok. Fiyat üst sınırını yükselt, şehri "Tümü" yap ya da aramayı kaydedip yeni ilan gelince haber al.</div>';return}
+  $('grid').innerHTML=r.map(cardHtml).join('');
+}
+function syncUnit(){
+  document.querySelectorAll('#unitChips .chip').forEach(function(x){x.setAttribute('aria-pressed',String(x.getAttribute('data-unit')===st.unit))});
+}
+function syncUI(){
+  var cats=['Tümü'].concat(CATS);
+  $('cats').innerHTML=cats.map(function(c){return '<button type="button" class="chip" data-cat="'+esc(c)+'" aria-pressed="'+(c===st.cat)+'">'+esc(c)+'</button>'}).join('');
+  $('city').innerHTML='<option>Tümü</option>'+cityOpts('');
+  $('city').value=st.city;
+  $('q').value=st.q;
+  $('useMin').value=st.useMin;$('useMax').value=st.useMax;
+  $('yearMin').value=st.yMin;$('yearMax').value=st.yMax;
+  $('maxPrice').value=st.maxPrice;
+  $('minScore').value=String(st.minScore);
+  $('incNew').checked=st.incNew;
+  $('near').value=String(st.near);
+  $('takasOnly').checked=st.takas;
+  $('verOnly').checked=st.ver;
+  $('hideRisk').checked=st.hide;
+  $('sort').value=sortKey;
+  $('fUse').hidden=isPart(st.cat);
+  $('fYear').hidden=isPart(st.cat);
+  syncUnit();
+  renderList();
+}
+function setFilters(open){
+  $('rail').hidden=!open;
+  $('layout').classList.toggle('nofilter',!open);
+  $('fToggle').setAttribute('aria-expanded',String(open));
+}
+function resetFilters(){st=defState();syncUI()}
+
+/* ---------- Ana sayfa ---------- */
+function sect(title,list,seeAll){
+  if(!list.length) return '';
+  return '<div class="sect"><div class="sect-h"><h2>'+title+'</h2>'+(seeAll?'<button type="button" class="linkbtn" data-seeall="'+seeAll+'">Tümünü gör</button>':'')+'</div><div class="grid">'+list.map(cardHtml).join('')+'</div></div>';
+}
+function renderHome(){
+  $('tiles').innerHTML=CATS.map(function(c){
+    var n=L.filter(function(l){return l.cat===c}).length;
+    return '<button type="button" class="tile" data-cat-go="'+esc(c)+'"><span class="tn">'+esc(c)+'</span><span class="tc">'+n+' ilan</span></button>';
+  }).join('');
+  var feat=L.filter(featured).sort(function(a,b){return b.id-a.id}).slice(0,4);
+  var drops=L.filter(function(l){return dropPct(l)>0}).sort(function(a,b){return dropPct(b)-dropPct(a)}).slice(0,4);
+  var fresh=L.slice().sort(function(a,b){return b.id-a.id}).slice(0,4);
+  var keys=Object.keys(S).filter(function(k){return k!=='ME'&&S[k].type==='Kurumsal'&&S[k].ver&&S[k].s>=4.5}).slice(0,6);
+  var stores='<div class="sect"><div class="sect-h"><h2>Güvenilir mağazalar</h2></div><div class="stores">'+keys.map(function(k){
+    var m=S[k],lv=level(m),n=L.filter(function(l){return l.sel===k}).length;
+    return '<button type="button" class="store" data-store="'+k+'"><span class="avatar sm" aria-hidden="true">'+esc(m.name.charAt(0))+'</span><span><b>'+esc(m.name)+'</b><br><span class="sub">'+esc(m.city)+' · '+n+' ilan · puan '+sc(m.s)+'</span><br><span class="pill '+lv.c+'">'+lv.t+'</span></span></button>';
+  }).join('')+'</div></div>';
+  var why='<div class="sect"><div class="sect-h"><h2>Neden Makinasal</h2></div><div class="three">'+
+    '<div class="panel"><h3>Satıcıyı tanı</h3><p class="sub" style="margin:6px 0 0">Alıcı ve satıcı puanı yalnızca gerçekleşen işlemlerden sonra verilir.</p></div>'+
+    '<div class="panel"><h3>Kapora tuzağına karşı</h3><p class="sub" style="margin:6px 0 0">Çok düşük fiyat uyarısı, IBAN ve link engeli, "görmeden kapora verme" hatırlatması.</p></div>'+
+    '<div class="panel"><h3>Şeffaf ücret</h3><p class="sub" style="margin:6px 0 0">Kurucu döneminde ilan ücretsiz. Fiyata göre ek ücret yok.</p></div></div></div>';
+  $('homeSecs').innerHTML=sect('Öne çıkan ilanlar',feat,'rec')+sect('Bu hafta fiyatı düşenler',drops,'drop')+sect('Yeni eklenenler',fresh,'new')+stores+why;
+}
+
+/* ---------- Rozetler ve çubuklar ---------- */
+function setBadge(id,n){var e=$(id);e.textContent=String(n);e.hidden=n<=0}
+function updateBadges(){
+  var u=0;T.forEach(function(t){u+=t.unread});
+  setBadge('nbMsg',u);
+  var f=0;
+  me.saved.forEach(function(s){if(s.notify) f+=newCount(s)});
+  Object.keys(me.favs).forEach(function(id){var l=byId(Number(id));if(l&&l.price<me.favs[id]) f++});
+  setBadge('nbFav',f);
+}
+function updateCmpBar(){
+  var b=$('cmpBar'),items=me.cmp.map(byId).filter(Boolean);
+  if(!items.length){b.hidden=true;return}
+  b.hidden=false;
+  b.innerHTML='<span class="out"><b>Karşılaştırma ('+items.length+'/3):</b> '+items.map(function(l){return esc(l.brand+' '+l.model)}).join(', ')+'</span>'+
+    '<button type="button" class="btn sm" id="cmpGo"'+(items.length<2?' disabled':'')+'>Karşılaştır</button>'+
+    '<button type="button" class="btn ghost sm" id="cmpClear">Temizle</button>';
+}
+function syncSheetBtns(){
+  document.querySelectorAll('#sheet [data-fav]').forEach(function(b){b.setAttribute('aria-pressed',String(!!me.favs[Number(b.getAttribute('data-fav'))]))});
+  document.querySelectorAll('#sheet [data-cmp]').forEach(function(b){b.setAttribute('aria-pressed',String(me.cmp.indexOf(Number(b.getAttribute('data-cmp')))>=0))});
+}
+function toggleFav(id){
+  var l=byId(id);if(!l) return;
+  if(me.favs[id]){delete me.favs[id];toast('Favorilerden çıkarıldı.')}
+  else{me.favs[id]=l.price;toast('Favorilere eklendi. Fiyatı düşerse Favoriler sekmesinde işaretlenir.')}
+  refresh();
+}
+function toggleCmp(id){
+  var i=me.cmp.indexOf(id);
+  if(i>=0) me.cmp.splice(i,1);
+  else{
+    if(me.cmp.length>=3){toast('En fazla 3 ilan karşılaştırılabilir.');return}
+    me.cmp.push(id);
+  }
+  refresh();
+}
+function visibleView(v){return !$('v-'+v).hidden}
+function refresh(){
+  renderList();renderHome();renderFavs();
+  if(storeKey&&visibleView('store')) renderStore();
+  if(visibleView('msgs')) renderMsgs();
+  if(visibleView('profile')) renderProfile();
+  updateBadges();updateCmpBar();syncSheetBtns();
+}
+
+var VIEWS=['home','list','new','msgs','favs','store','profile','premium','trust','jobs'];
+function show(v){
+  VIEWS.forEach(function(k){$('v-'+k).hidden=(k!==v)});
+  document.querySelectorAll('[data-view]').forEach(function(b){b.setAttribute('aria-current',String(b.getAttribute('data-view')===v))});
+  if(v==='home') renderHome();
+  if(v==='list') renderList();
+  if(v==='profile') renderProfile();
+  if(v==='premium') renderPremium();
+  if(v==='new'){setFormMode();renderPhotos()}
+  if(v==='msgs') renderMsgs();
+  if(v==='favs') renderFavs();
+  window.scrollTo(0,0);
+}
+
+/* ---------- Fiyat göstergesi ---------- */
+function priceInd(l){
+  if(isPart(l.cat)) return '<div class="panel"><h3>Fiyat göstergesi</h3><p class="sub" style="margin:6px 0 0">Parça ve lastik fiyatları ürüne göre çok değiştiği için piyasa göstergesi gösterilmez. Aynı parça numarasını farklı satıcılarda karşılaştır.</p></div>';
+  var pool=catPrices(l.cat);
+  var head='<h3>Fiyat göstergesi</h3>';
+  if(pool.length<3) return '<div class="panel">'+head+'<p class="sub" style="margin:6px 0 0">Bu kategoride karşılaştırma için yeterli ilan yok ('+pool.length+' ilan).</p></div>';
+  var mn=Math.min.apply(null,pool),mx=Math.max.apply(null,pool),md=median(pool);
+  var span=Math.max(1,mx-mn);
+  function pct(v){return Math.max(0,Math.min(100,(v-mn)/span*100))}
+  function clampL(p){return Math.max(10,Math.min(90,p))}
+  var diff=Math.round((l.price-md)/md*100);
+  var txt=Math.abs(diff)<3?'Bu ilan kategori ortancasıyla aynı seviyede.':'Bu ilan kategori ortancasının %'+Math.abs(diff)+(diff<0?' altında.':' üstünde.');
+  var prevTxt=dropPct(l)?' Önceki fiyat '+tl(l.prev)+', %'+dropPct(l)+' indirim.':'';
+  return '<div class="panel">'+head+
+    '<p class="sub" style="margin:4px 0 0">Aynı kategorideki '+pool.length+' ilana göre (örnek veri). '+txt+prevTxt+'</p>'+
+    '<div class="pbar" role="img" aria-label="Fiyat aralığı: en düşük '+tl(mn)+', ortanca '+tl(md)+', en yüksek '+tl(mx)+'. Bu ilan '+tl(l.price)+'.">'+
+    '<div class="pb-track"><span class="pb-tick" style="left:'+pct(md)+'%"></span><span class="pb-me" style="left:'+pct(l.price)+'%"></span></div>'+
+    '<span class="pb-ml" style="left:'+clampL(pct(l.price))+'%">Bu ilan</span>'+
+    '<span class="pb-end" style="left:0">'+tl(mn)+'</span>'+
+    '<span class="pb-tl" style="left:'+clampL(pct(md))+'%;top:34px">Ortanca '+tl(Math.round(md/1000)*1000)+'</span>'+
+    '<span class="pb-end" style="right:0">'+tl(mx)+'</span></div></div>';
+}
+
+/* ---------- İnceleme listesi ---------- */
+function checklistFor(l){
+  var c=l.cat;
+  if(c==='Yedek parça') return ['Satıcı doğrulanmış ve fatura veya fiş verecek','Parça numarası makine modeline uyumlu','Kutu, etiket ve ambalaj orijinal','Çıkma veya revizyonlu ise garanti şartı yazılı','Aşınma, çatlak, korozyon yok','Test imkânı veya iade koşulu net'];
+  if(c==='Lastik ve jant') return ['Satıcı doğrulanmış ve fatura veya fiş verecek','Ebat ile yük ve hız endeksi aracına uygun','Üretim tarihi (DOT, 4 haneli) kabul edilebilir yaşta','Diş derinliği ilanda yazanla aynı','Yan duvarda kesik, şişme veya yarık yok','Set alıyorsan aynı marka ve aşınma seviyesinde'];
+  var common=['Seri veya şasi numarası makine üzerindeki plaka ve belgelerle aynı','Fatura ve tescil/ruhsat belgeleri tam','Satıcı belgedeki sahip veya yetkili vekil','Haciz, rehin ve borç durumu sorgulandı'];
+  var spec;
+  if(c==='Ekskavatör'||c==='Beko Loder') spec=['Hidrolik silindir ve hortumlarda yağ sızıntısı yok','Palet, zincir veya lastiklerde aşırı aşınma yok','Kol ve kova pim/burçlarında gözle görülür boşluk yok','Soğuk motor sorunsuz çalışıyor, egzoz dumanı normal','Saat göstergesi bakım kayıtlarıyla tutarlı','Kumanda kolları, klima ve ışıklar çalışıyor'];
+  else if(c==='Vinç') spec=['Halat ve kancada hasar ya da aşınma yok','Ayak (stabilizatör) ve kol hidroliğinde sızıntı yok','Yük momenti ve emniyet sistemleri çalışıyor','Periyodik kontrol raporu güncel','Saat göstergesi bakım kayıtlarıyla tutarlı'];
+  else if(c.indexOf('Beton')===0) spec=['Mikser tamburu ve kanatlarda aşınma kontrol edildi','Pompa boruları ve ağızlarında aşınma veya çatlak yok','Hidrolik pompa ve silindirlerde sızıntı yok','Şasi ve kaynak noktalarında çatlak yok','Kilometre veya saat bakım kayıtlarıyla tutarlı'];
+  else if(c==='Forklift') spec=['Mast, zincir ve çatallarda aşınma veya çatlak yok','Hidrolik sistem sızıntısız','Fren ve direksiyon sorunsuz','Akü veya motor sorunsuz çalışıyor','Saat göstergesi bakım kayıtlarıyla tutarlı'];
+  else{
+    spec=['Şasi ve kaynak noktalarında çatlak veya onarım izi yok','Motor ve şanzımanda yağ kaçağı, aşırı duman yok','Fren sistemi ve hava tankları sorunsuz','Lastik diş derinliği ve üretim yılları (DOT) uygun','Kilometre göstergesi servis kayıtlarıyla tutarlı'];
+    if(c==='Kamyon') spec.push('Kasa ve damper hidroliği sorunsuz');
+    if(c.indexOf('Kurtarıcı')===0) spec.push('Kayar kasa, vinç hidroliği ve bağlama ekipmanları sorunsuz');
+  }
+  return common.concat(spec);
+}
+function checkHtml(l){
+  var items=checklistFor(l),set=me.checks[l.id]||{},done=0;
+  items.forEach(function(_,i){if(set[i]) done++});
+  return '<div class="panel"><h3>Yerinde inceleme listesi</h3><p class="sub" style="margin:4px 0 0">Ürünü görmeye giderken işaretle. Hepsi tamamlanmadan ödeme yapma.</p>'+
+    '<div class="out" style="margin-top:10px" id="chkProg">'+done+' / '+items.length+' tamamlandı</div><div class="prog"><i id="chkBar" style="width:'+Math.round(done/items.length*100)+'%"></i></div>'+
+    '<div class="chk">'+items.map(function(t,i){return '<label class="check"><input type="checkbox" data-chk="'+i+'"'+(set[i]?' checked':'')+'>'+esc(t)+'</label>'}).join('')+'</div></div>';
+}
+
+/* ---------- İlan detayı ---------- */
+function infoRows(l){
+  var rows=[],d=distLabel(l);
+  if(isPart(l.cat)){
+    rows.push([l.cat==='Yedek parça'?'Parça numarası':'Ebat',esc(l.spec)]);
+    rows.push(['Durum',esc(l.cond)]);
+    rows.push(['Uyumlu',esc(l.compat||'–')]);
+    rows.push(['Adet',String(l.qty)]);
+  }else{
+    rows.push(['Model yılı',String(l.year)]);
+    rows.push(['Kullanım',num(l.use)+' '+unit(l)]);
+    rows.push(['Seri / şasi no',l.serial?'<span class="pill good">Doğrulandı</span>':'<span class="pill">Doğrulanmadı</span>']);
+  }
+  rows.push(['Konum',esc(l.city)+(d?' ('+d+')':'')]);
+  rows.push(['Takas',l.takas?'<span class="pill good">Kabul edilir</span>':'Belirtilmedi']);
+  rows.push(['İlan durumu',l.isNew?'Yeni yayınlandı':(l.conf===0?'Satıcı bugün doğruladı':'Satıcı '+l.conf+' gün önce "hâlâ satılık" dedi')]);
+  return rows.map(function(r){return '<tr><th>'+r[0]+'</th><td>'+r[1]+'</td></tr>'}).join('');
+}
+function openDetail(id){
+  var l=byId(id);if(!l) return;
+  curId=id;
+  var m=S[l.sel],lv=level(m),own=l.sel==='ME',f=priceFlag(l.price,l.cat),med=catMedian(l.cat,2),part=isPart(l.cat);
+  var warn='';
+  if(f==='low') warn='<div class="note bad"><b>Fiyat piyasanın çok altında.</b> Bu kategorideki ilanların ortancası '+tl(Math.round(med/1000)*1000)+'. Çok düşük fiyat ve acele ettirme, kapora dolandırıcılığında sık görülen işaretlerdir.</div>';
+  else if(f==='high') warn='<div class="note">Fiyat kategori ortancası olan '+tl(Math.round(med/1000)*1000)+' seviyesinin belirgin üstünde. Pazarlık payını sor.</div>';
+  var riskNote=lv.t==='Riskli'?'<div class="note bad"><b>Bu satıcı riskli seviyede.</b> '+m.rep+' doğrulanmış şikayet var. Bu satıcıyla işlem yapmadan önce ürünü yerinde gör ve belgeleri kontrol et.</div>':'';
+  var newNote=lv.t==='Yeni üye'?'<div class="note">Bu üyenin henüz yeterli onaylı işlemi yok, puanı oluşmadı. Ürünü yerinde görmeden ödeme yapma.</div>':'';
+  var gal;
+  if(l.photos&&l.photos.length){
+    gal='<div><div class="gal-main"><img id="galMain" src="'+l.photos[0]+'" alt="'+esc(l.brand+' '+l.model)+'"></div>'+
+      (l.photos.length>1?'<div class="gal-th">'+l.photos.map(function(p,i){return '<button type="button" data-gi="'+i+'" aria-pressed="'+(i===0)+'" aria-label="Fotoğraf '+(i+1)+'"><img src="'+p+'" alt=""></button>'}).join('')+'</div>':'')+'</div>';
+  }else gal='<div class="empty">Bu ilanda fotoğraf yok. Fotoğrafsız ilanlara dikkat et.</div>';
+  var actions=own?'<div class="note good">Bu senin ilanın. İlanı Profil sekmesinden yönetebilirsin.</div>':
+    '<div class="acts-row">'+
+     '<button class="btn" id="reveal" type="button">Telefonu göster</button>'+
+     '<span class="out" id="phone" aria-live="polite"></span>'+
+     '<button class="btn ghost" id="msg" type="button">Mesaj gönder</button>'+
+     '<button class="btn ghost" id="offerBtn" type="button" aria-expanded="false">Teklif ver</button>'+
+     '<button class="btn ghost" id="pay" type="button" disabled title="Faz 2">Emanet depozito (yakında)</button>'+
+     '<button class="btn ghost" id="report" type="button" style="margin-left:auto">İlanı şikayet et</button></div>'+
+    '<form id="offerForm" class="panel" hidden novalidate><h3>Teklif ver</h3>'+
+      '<div class="row2" style="margin-top:10px"><div class="field"><label for="offAmt">Teklifin (₺'+(part?', birim fiyat':'')+')</label><input type="number" id="offAmt" min="1" placeholder="'+Math.round(l.price*0.95/100)*100+'"></div>'+
+      '<div class="field"><label for="offNote">Not (isteğe bağlı)</label><input type="text" id="offNote" placeholder="Örn. Cumartesi görebilirim"></div></div>'+
+      '<label class="check" style="margin-top:10px"><input type="checkbox" id="offTakas">Takas da teklif ediyorum</label>'+
+      '<div class="err" id="offErr" aria-live="polite"></div>'+
+      '<button class="btn" type="submit" style="margin-top:8px">Teklifi gönder</button></form>';
+  $('sheet').innerHTML=
+   '<div class="sh-head"><div><span class="sub">'+esc(l.cat)+'</span><h2>'+esc(l.brand)+' '+esc(l.model)+'</h2><div class="price" style="font-size:32px;margin-top:6px">'+tl(l.price)+(part?'<span class="sub" style="font:400 15px var(--f-body)"> / adet</span>':'')+'</div>'+
+     (dropPct(l)?'<div class="sub">Önceki fiyat '+tl(l.prev)+' · <b>−%'+dropPct(l)+'</b></div>':'')+'</div>'+
+     '<div class="acts-row"><button type="button" class="ibtn fav" data-fav="'+l.id+'" aria-pressed="'+(!!me.favs[l.id])+'" aria-label="Favorilere ekle veya çıkar">'+ICON_FAV+'</button>'+
+     '<button type="button" class="ibtn" data-cmp="'+l.id+'" aria-pressed="'+(me.cmp.indexOf(l.id)>=0)+'" aria-label="Karşılaştırmaya ekle veya çıkar">'+ICON_CMP+'</button>'+
+     '<button class="btn ghost" id="close" type="button">Kapat</button></div></div>'+
+   gal+warn+riskNote+newNote+priceInd(l)+
+   '<div class="two">'+
+    '<div class="panel"><h3>'+(part?'Ürün bilgisi':'Makine bilgisi')+'</h3><table><tbody>'+infoRows(l)+'</tbody></table><p style="margin:12px 0 0">'+esc(l.desc||'')+'</p></div>'+
+    '<div class="panel"><h3>Satıcı</h3>'+
+      '<div style="margin:8px 0 12px"><b>'+esc(m.name)+'</b> · <span class="sub">'+m.type+' · '+esc(m.city)+'</span></div>'+
+      '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px"><span class="pill '+lv.c+'">'+lv.t+'</span>'+(m.ver?'<span class="pill good">Kimlik ve vergi doğrulandı</span>':'<span class="pill">Doğrulanmadı</span>')+(m.prem?'<span class="pill prem">Premium satıcı</span>':'')+'</div>'+
+      '<div class="field" style="gap:10px">'+
+        '<div class="score"><span class="out" style="width:110px">Satıcı puanı</span><div class="meter"><i style="width:'+((m.s||0)/5*100)+'%"></i></div><span class="out">'+sc(m.s)+'</span></div>'+
+        '<div class="score"><span class="out" style="width:110px">Alıcı puanı</span><div class="meter"><i style="width:'+((m.b||0)/5*100)+'%"></i></div><span class="out">'+sc(m.b)+'</span></div>'+
+        '<div class="sub">'+m.deals+' onaylı işlem · '+m.rep+' doğrulanmış şikayet</div>'+
+        '<button type="button" class="btn ghost sm" data-store="'+l.sel+'" style="align-self:flex-start">'+(m.type==='Kurumsal'?'Mağaza sayfası':'Satıcı sayfası')+'</button>'+
+      '</div></div>'+
+   '</div>'+
+   checkHtml(l)+
+   '<div class="panel"><h3>Güvenli alım için</h3><ul class="clean" style="margin-top:10px">'+
+     '<li>Ürünü görmeden kapora veya ön ödeme gönderme.</li>'+
+     '<li>Ruhsat, fatura ve seri/şasi numarasını makine üzerinden kontrol et.</li>'+
+     '<li>Ödemeyi satış sırasında yap ve işlemi noterde tamamla.</li>'+
+     '<li>Mesajlarda IBAN veya harici link paylaşımı engellenir. Böyle bir istek gelirse şikayet et.</li>'+
+   '</ul></div>'+actions;
+  $('overlay').hidden=false;
+  $('close').focus();
+  $('close').onclick=closeDetail;
+  if(own) return;
+  $('reveal').onclick=function(){$('phone').textContent='0500 000 00 00 (örnek numara)';this.hidden=true};
+  $('msg').onclick=function(){var t=startThread(l);closeDetail();openThread(t.id)};
+  $('offerBtn').onclick=function(){var fm=$('offerForm');fm.hidden=!fm.hidden;this.setAttribute('aria-expanded',String(!fm.hidden));if(!fm.hidden)$('offAmt').focus()};
+  $('offerForm').onsubmit=function(e){
+    e.preventDefault();
+    var amt=Number($('offAmt').value),note=$('offNote').value.trim(),tk=$('offTakas').checked;
+    if(!amt||amt<1){$('offErr').textContent='Teklif tutarını gir.';return}
+    var text='Teklifim: '+tl(amt)+(part?' (birim fiyat)':'')+(tk?', takas da olabilir':'')+'.'+(note?' '+note:'');
+    var t=startThread(l);
+    var res=sendMsg(t,text,{amt:amt});
+    if(res){$('offErr').textContent=res;return}
+    closeDetail();openThread(t.id);toast('Teklifin gönderildi.');
+  };
+  $('report').onclick=function(){var n='ŞK-'+String(Math.floor(10000+Math.random()*89999));this.disabled=true;this.textContent='Şikayet alındı, takip no: '+n};
+}
+function closeDetail(){$('overlay').hidden=true;curId=null}
+
+/* ---------- Karşılaştırma ---------- */
+function bestIdx(vals,mode){
+  var idx=-1,best=null;
+  vals.forEach(function(v,i){if(v==null) return;if(best==null||(mode==='min'?v<best:v>best)){best=v;idx=i}});
+  var same=vals.filter(function(v){return v===best}).length;
+  return (same===vals.length||best==null)?-1:idx;
+}
+function openCompare(){
+  var items=me.cmp.map(byId).filter(Boolean);
+  if(items.length<2){toast('Karşılaştırmak için en az 2 ilan seç.');return}
+  var allMach=items.every(function(l){return !isPart(l.cat)});
+  var sameUnit=allMach&&items.every(function(l){return unit(l)===unit(items[0])});
+  var rows=[];
+  function row(label,cells,best){rows.push({label:label,cells:cells,best:best==null?-1:best})}
+  row('Fiyat',items.map(function(l){return '<b>'+tl(l.price)+'</b>'}),bestIdx(items.map(function(l){return l.price}),'min'));
+  row('Model yılı',items.map(function(l){return l.year||'–'}),bestIdx(items.map(function(l){return l.year||null}),'max'));
+  row('Kullanım',items.map(function(l){return isPart(l.cat)?'–':num(l.use)+' '+unit(l)}),sameUnit?bestIdx(items.map(function(l){return l.use}),'min'):-1);
+  row('Şehir',items.map(function(l){return esc(l.city)}),-1);
+  row('Uzaklık',items.map(function(l){return distLabel(l)||'–'}),bestIdx(items.map(function(l){return distOf(l)}),'min'));
+  row('Satıcı',items.map(function(l){return esc(S[l.sel].name)}),-1);
+  row('Satıcı puanı',items.map(function(l){return sc(S[l.sel].s)}),bestIdx(items.map(function(l){return S[l.sel].s}),'max'));
+  row('Güven seviyesi',items.map(function(l){var v=level(S[l.sel]);return '<span class="pill '+v.c+'">'+v.t+'</span>'}),-1);
+  row('Seri / şasi',items.map(function(l){return isPart(l.cat)?'–':(l.serial?'<span class="pill good">Doğrulandı</span>':'Doğrulanmadı')}),-1);
+  row('Takas',items.map(function(l){return l.takas?'Kabul edilir':'Belirtilmedi'}),-1);
+  row('Piyasa fiyatı',items.map(function(l){var f=priceFlag(l.price,l.cat);return f==='low'?'<span class="pill bad">Çok düşük, dikkat</span>':f==='high'?'<span class="pill warn">Ortalamanın üstünde</span>':f==='ok'?'<span class="pill good">Normal aralıkta</span>':'–'}),-1);
+  row('Son doğrulama',items.map(function(l){return l.conf===0?'Bugün':l.conf+' gün önce'}),-1);
+  var head='<tr><th></th>'+items.map(function(l){
+    return '<th><button type="button" class="linkbtn" data-open="'+l.id+'" style="text-align:left">'+esc(l.brand+' '+l.model)+'</button><br><button type="button" class="btn ghost sm" data-cmprm="'+l.id+'">Çıkar</button></th>';
+  }).join('')+'</tr>';
+  var body=rows.map(function(r){
+    return '<tr><th>'+r.label+'</th>'+r.cells.map(function(c,i){return '<td>'+c+(i===r.best?' <span class="pill good">En iyi</span>':'')+'</td>'}).join('')+'</tr>';
+  }).join('');
+  $('sheet').innerHTML='<div class="sh-head"><h2>İlan karşılaştırma</h2><button class="btn ghost" id="close" type="button">Kapat</button></div>'+
+    '<div class="scroll"><table class="cmpt"><thead>'+head+'</thead><tbody>'+body+'</tbody></table></div>'+
+    '<p class="sub" style="margin:0">"En iyi" işareti yalnızca fiyat, yıl, kullanım, uzaklık ve satıcı puanı için konur. Ürünü yerinde görmeden karar verme.</p>';
+  $('overlay').hidden=false;
+  $('close').focus();
+  $('close').onclick=closeDetail;
+}
+
+/* ---------- Mesajlaşma ---------- */
+var IBAN_RE=/\bTR\s?\d{2}(\s?\d{4}){5}\s?\d{2}\b|\biban\b/i;
+var LINK_RE=/(https?:\/\/|www\.|wa\.me|t\.me|\.com\b|\.net\b|\.org\b)/i;
+var KAPORA_RE=/kapora|ön ödeme|on odeme|havale|\beft\b/i;
+var AUTO=['Merhaba, ürün hâlâ satılık. Yerinde görmek ister misiniz?','Belgeler hazır. Hangi gün uygun olursunuz?','Fiyatta küçük bir pazarlık payı var, yerinde konuşuruz.'];
+var AUTO_OFFER='Teklifinizi aldım, değerlendirip döneceğim. Ürünü yerinde görmenizi öneririm.';
+
+function threadOf(lid){for(var i=0;i<T.length;i++){if(T[i].lid===lid) return T[i]} return null}
+function threadById(id){for(var i=0;i<T.length;i++){if(T[i].id===id) return T[i]} return null}
+function startThread(l){
+  var t=threadOf(l.id);
+  if(t) return t;
+  t={id:nextTid++,lid:l.id,key:l.sel,msgs:[{from:'sys',text:'Konuşma başladı. Ürünü görmeden kapora veya ön ödeme gönderme.'}],unread:0,ts:++tick,dealMe:false,dealThem:false,rated:null,draftStar:0,draftTags:{},draftText:''};
+  T.push(t);
+  return t;
+}
+function checkText(text){
+  if(IBAN_RE.test(text)) return {block:'Güvenliğin için mesajlarda IBAN paylaşımı engellenir. Ödemeyi ürünü gördükten sonra, satış sırasında yap.'};
+  if(LINK_RE.test(text)) return {block:'Güvenliğin için mesajlarda harici link paylaşımı engellenir.'};
+  return {block:null,warn:KAPORA_RE.test(text)};
+}
+function sendMsg(t,text,offer){
+  var c=checkText(text);
+  if(c.block) return c.block;
+  t.msgs.push({from:'me',text:text,t:nowStr(),warn:c.warn,offer:!!offer});
+  t.ts=++tick;
+  var n=t.msgs.filter(function(m){return m.from==='them'}).length;
+  var reply=offer?AUTO_OFFER:AUTO[n%AUTO.length];
+  setTimeout(function(){
+    t.msgs.push({from:'them',text:reply,t:nowStr(),auto:true});
+    t.ts=++tick;
+    if(!(visibleView('msgs')&&activeT===t.id)) t.unread++;
+    updateBadges();
+    if(visibleView('msgs')) renderMsgs();
+  },1300);
+  return null;
+}
+function openThread(id){
+  activeT=id;
+  var t=threadById(id);if(t) t.unread=0;
+  show('msgs');
+}
+function renderMsgs(){
+  var sorted=T.slice().sort(function(a,b){return b.ts-a.ts});
+  $('msgsBox').classList.toggle('show-conv',activeT!=null);
+  if(!sorted.length){$('thrList').innerHTML='<div class="empty">Henüz mesajın yok. Bir ilanda "Mesaj gönder" ya da "Teklif ver" düğmesine bas.</div>'}
+  else $('thrList').innerHTML='<h3 style="margin-bottom:6px">Konuşmalar</h3>'+sorted.map(function(t){
+    var l=byId(t.lid),m=S[t.key],last=t.msgs[t.msgs.length-1];
+    return '<button type="button" class="thr" data-tid="'+t.id+'" aria-current="'+(t.id===activeT)+'"><b>'+esc(l?l.brand+' '+l.model:'İlan')+(t.unread?'<span class="udot" aria-label="okunmamış"></span>':'')+'</b>'+
+      '<span class="sub">'+esc(m.name)+'</span><br><span class="sub">'+esc(last.text.slice(0,60))+(last.text.length>60?'…':'')+'</span></button>';
+  }).join('');
+  renderConv();
+  updateBadges();
+}
+function dealBox(t,m){
+  if(t.rated){
+    return '<div class="note good"><b>İşlem tamamlandı ve puanın kaydedildi.</b> Satıcıyı '+sc(t.rated.rating)+' ile puanladın. Satıcı da seni 5,0 ile puanladı (örnek). Puanlar Profil ve satıcı sayfasına işlendi.</div>';
+  }
+  if(!t.dealMe){
+    return '<div class="panel" style="background:var(--bg)"><b>İşlem durumu</b><p class="sub" style="margin:4px 0 8px">Alım satım gerçekleştiyse onayla. Puan, iki taraf da onayladıktan sonra verilebilir.</p><button class="btn sm" type="button" data-deal="1">Alım satım gerçekleşti, onayla</button></div>';
+  }
+  if(!t.dealThem){
+    return '<div class="panel" style="background:var(--bg)"><b>İşlem durumu</b><p class="sub" style="margin:4px 0 0">Sen: <b>onayladın</b> · Satıcı: <b>onay bekleniyor…</b> Puan vermek için satıcının da onaylaması gerekir.</p></div>';
+  }
+  var tg=['İlana uygun çıktı','Hızlı cevap verdi','Fiyat tutarlıydı','Belgeler tamdı'];
+  return '<div class="panel" style="background:var(--bg)"><b>İki taraf da onayladı. Satıcıyı puanla</b>'+
+    '<div class="stars" role="group" aria-label="Puan" style="margin-top:8px">'+[1,2,3,4,5].map(function(n){return '<button type="button" class="star" data-star="'+n+'" aria-pressed="'+(t.draftStar>=n)+'" aria-label="'+n+' yıldız">'+(t.draftStar>=n?'★':'☆')+'</button>'}).join('')+'</div>'+
+    '<div class="chips" style="margin:8px 0">'+tg.map(function(x){return '<button type="button" class="chip" data-aspect="'+esc(x)+'" aria-pressed="'+(!!t.draftTags[x])+'">'+x+'</button>'}).join('')+'</div>'+
+    '<label class="sr" for="rvText">Yorum</label><textarea id="rvText" placeholder="Kısa yorum yaz (isteğe bağlı)">'+esc(t.draftText)+'</textarea>'+
+    '<div class="err" id="rvErr" aria-live="polite"></div>'+
+    '<button class="btn sm" type="button" data-rate="1">Puanı gönder</button></div>';
+}
+function renderConv(){
+  var box=$('thrConv'),t=activeT!=null?threadById(activeT):null;
+  if(!t){box.innerHTML='<div class="empty">Soldan bir konuşma seç.</div>';return}
+  var draft=($('msgText')||{}).value||'';
+  var l=byId(t.lid),m=S[t.key],lv=level(m);
+  box.innerHTML=
+   '<div class="acts-row" style="justify-content:space-between"><button type="button" class="linkbtn" data-back="1">← Konuşmalar</button>'+
+   '<button type="button" class="btn ghost sm" data-open="'+t.lid+'">İlanı aç</button></div>'+
+   '<h3 style="margin-top:6px">'+esc(l?l.brand+' '+l.model:'İlan')+'</h3>'+
+   '<div class="sub"><button type="button" class="linkbtn" data-store="'+t.key+'">'+esc(m.name)+'</button> <span class="pill '+lv.c+'">'+lv.t+'</span></div>'+
+   '<div class="conv-msgs" id="convMsgs" role="log" aria-label="Mesajlar" style="margin-top:10px">'+t.msgs.map(function(x){
+      if(x.from==='sys') return '<div class="bub sys">'+esc(x.text)+'</div>';
+      return '<div class="bub '+(x.from==='me'?'me':'')+(x.offer?' offer':'')+(x.warn?' warnb':'')+'">'+(x.offer?'<b>Teklif</b><br>':'')+esc(x.text)+(x.warn?'<br><b>Uyarı:</b> Ödeme konuşuluyor. Ürünü görmeden para gönderme.':'')+'<span class="tm">'+(x.from==='them'?esc(m.name)+' · ':'')+x.t+(x.auto?' · örnek otomatik yanıt':'')+'</span></div>';
+   }).join('')+'</div>'+
+   '<div style="margin-top:10px">'+dealBox(t,m)+'</div>'+
+   '<form id="msgForm" style="margin-top:10px;display:flex;flex-direction:column;gap:8px" novalidate><label class="sr" for="msgText">Mesajın</label>'+
+   '<textarea id="msgText" placeholder="Mesajını yaz. IBAN ve link paylaşılamaz."></textarea><div class="err" id="msgErr" aria-live="polite"></div>'+
+   '<div><button class="btn" type="submit">Gönder</button></div></form>';
+  $('msgText').value=draft;
+  var cm=$('convMsgs');cm.scrollTop=cm.scrollHeight;
+}
+function applyRating(m,r){
+  m.s=(m.s==null)?r:Math.round(((m.s*m.deals+r)/(m.deals+1))*100)/100;
+  m.deals++;
+}
+function submitRating(t){
+  if(!t.draftStar){$('rvErr').textContent='Önce yıldız seç.';return}
+  var txt=($('rvText').value||'').trim(),m=S[t.key];
+  var c=checkText(txt||'x');
+  if(c.block){$('rvErr').textContent=c.block;return}
+  var tags=Object.keys(t.draftTags).filter(function(k){return t.draftTags[k]});
+  applyRating(m,t.draftStar);
+  m.reviews.unshift({who:'Sen',role:'Alıcı',rating:t.draftStar,text:txt||'Yorum yazılmadı.',date:'Bugün',tags:tags});
+  t.rated={rating:t.draftStar};
+  /* Karşı tarafın puanı (örnek): satıcı seni 5 ile puanlar. */
+  var me2=S.ME;
+  me2.b=(me2.b==null)?5:Math.round(((me2.b*me2.bn+5)/(me2.bn+1))*100)/100;
+  me2.bn++;me2.deals++;
+  me2.reviews.unshift({who:m.name,role:'Satıcı',rating:5,text:'Ödeme ve teslim sorunsuz oldu.',date:'Bugün',tags:[]});
+  toast('Puanın kaydedildi. Satıcının ortalaması güncellendi.');
+  refresh();
+}
+
+/* ---------- Favoriler ve kayıtlı arama ---------- */
+function renderFavs(){
+  var saved=me.saved.length?me.saved.map(function(s){
+    var n=newCount(s),tot=filterList(s.f).length;
+    return '<div class="mine"><div style="min-width:0"><b>'+esc(filterLabel(s.f))+'</b><br><span class="sub">'+tot+' ilan'+(n?' · ':'')+(n?'<span class="pill prem">'+n+' yeni ilan</span>':'')+'</span></div>'+
+      '<div class="acts-row"><label class="check"><input type="checkbox" data-snotify="'+s.id+'"'+(s.notify?' checked':'')+'>Yeni ilan bildir</label>'+
+      '<button class="btn sm" type="button" data-srun="'+s.id+'">Çalıştır</button><button class="btn ghost sm" type="button" data-sdel="'+s.id+'">Sil</button></div></div>';
+  }).join(''):'<div class="empty">Kayıtlı aramın yok. Ara sekmesinde filtreleri seç ve "Aramayı kaydet"e bas.</div>';
+  var favIds=Object.keys(me.favs).map(Number).filter(function(id){return byId(id)});
+  var favHtml=favIds.length?'<div class="grid">'+favIds.map(function(id){
+    var l=byId(id),was=me.favs[id],drop=l.price<was;
+    return '<div>'+cardHtml(l)+(drop?'<div class="note good" style="margin-top:6px">Favoriye eklediğinden beri <b>'+tl(was-l.price)+'</b> düştü.</div>':'')+'</div>';
+  }).join('')+'</div>':'<div class="empty">Henüz favorin yok. Bir ilandaki kalp düğmesine bas.</div>';
+  $('favBox').innerHTML='<div class="panel"><h3>Kayıtlı aramalar</h3><p class="sub" style="margin:4px 0 6px">Gerçek sürümde yeni ilan çıkınca SMS, e-posta veya bildirim gelir. Prototipte burada ve menüdeki rozette gösterilir.</p>'+saved+'</div>'+
+    '<div><h2 style="margin-bottom:12px">Favori ilanlar</h2>'+favHtml+'</div>';
+}
+
+/* ---------- Mağaza ve satıcı sayfası ---------- */
+function openStore(key){storeKey=key;renderStore();show('store')}
+function renderStore(){
+  var m=S[storeKey];if(!m) return;
+  var lv=level(m),list=L.filter(function(l){return l.sel===storeKey}),revs=m.reviews||[];
+  $('storeBox').innerHTML=
+   '<button type="button" class="linkbtn" data-go="home">← Ana sayfa</button>'+
+   '<div class="panel" style="margin-top:10px"><div class="prof-head"><div class="avatar" aria-hidden="true">'+esc(m.name.charAt(0))+'</div>'+
+     '<div style="min-width:0"><h1 style="font-size:34px">'+esc(m.name)+'</h1><div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px"><span class="pill '+lv.c+'">'+lv.t+'</span>'+(m.ver?'<span class="pill good">Doğrulanmış</span>':'<span class="pill">Doğrulanmadı</span>')+(m.prem?'<span class="pill prem">Premium</span>':'')+'<span class="pill">'+(m.type==='Kurumsal'?'Mağaza':'Bireysel satıcı')+'</span></div></div></div>'+
+     '<div class="stat-grid"><div><span class="sub">Satıcı puanı</span><b>'+sc(m.s)+'</b></div><div><span class="sub">Alıcı puanı</span><b>'+sc(m.b)+'</b></div><div><span class="sub">Onaylı işlem</span><b>'+m.deals+'</b></div><div><span class="sub">Doğrulanmış şikayet</span><b>'+m.rep+'</b></div><div><span class="sub">Üyelik</span><b>'+m.since+'</b></div><div><span class="sub">Şehir</span><b>'+esc(m.city)+'</b></div></div></div>'+
+   '<div class="sect"><div class="sect-h"><h2>İlanları ('+list.length+')</h2></div>'+(list.length?'<div class="grid">'+list.map(cardHtml).join('')+'</div>':'<div class="empty">Aktif ilan yok.</div>')+'</div>'+
+   '<div class="sect"><div class="sect-h"><h2>Değerlendirmeler ('+revs.length+')</h2></div><div class="panel">'+(storeKey!=='ME'?'<p class="sub" style="margin:0 0 6px">Prototipteki örnek yorumlardır.</p>':'')+
+   (revs.length?revs.map(function(r){
+     return '<div class="rv"><div class="acts-row" style="justify-content:space-between"><b>'+esc(r.who)+' <span class="sub">('+r.role+')</span></b><span>'+stars(r.rating)+' <span class="sub">'+esc(r.date)+'</span></span></div><div>'+esc(r.text)+'</div>'+
+     (r.tags&&r.tags.length?'<div class="tags" style="margin-top:6px">'+r.tags.map(function(x){return '<span class="pill">'+esc(x)+'</span>'}).join('')+'</div>':'')+'</div>';
+   }).join(''):'<div class="empty">Henüz değerlendirme yok.</div>')+'</div></div>';
+}
+
+/* ---------- Fotoğraf yükleme ---------- */
+function readPhoto(file){return new Promise(function(res,rej){
+  var fr=new FileReader();
+  fr.onerror=function(){rej()};
+  fr.onload=function(){
+    var img=new Image();
+    img.onerror=function(){rej()};
+    img.onload=function(){
+      var max=1280,k=Math.min(1,max/Math.max(img.width,img.height));
+      var c=document.createElement('canvas');
+      c.width=Math.max(1,Math.round(img.width*k));c.height=Math.max(1,Math.round(img.height*k));
+      c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+      res(c.toDataURL('image/jpeg',0.82));
+    };
+    img.src=fr.result;
+  };
+  fr.readAsDataURL(file);
+});}
+function addFiles(files){
+  var err=$('ph-err'),max=lim().photos;err.textContent='';
+  var list=Array.prototype.slice.call(files).filter(function(f){return f.type&&f.type.indexOf('image/')===0});
+  if(!list.length){err.textContent='Sadece fotoğraf dosyaları eklenebilir.';return}
+  var room=max-photos.length;
+  var up=me.premium?'':' <button type="button" data-go="premium">Premium ile 20 fotoğraf</button>';
+  if(room<=0){err.innerHTML='En fazla '+max+' fotoğraf ekleyebilirsin.'+up;return}
+  var take=list.slice(0,room);
+  if(list.length>room) err.innerHTML='İlk '+room+' fotoğraf eklendi. En fazla '+max+' fotoğraf var.'+up;
+  Promise.all(take.map(function(f){return readPhoto(f).catch(function(){return null})})).then(function(r){
+    r.forEach(function(x){if(x) photos.push(x)});
+    if(r.some(function(x){return !x})) err.textContent='Bazı dosyalar okunamadı ve eklenmedi.';
+    renderPhotos();
+  });
+}
+function renderPhotos(){
+  $('phCount').textContent='('+photos.length+' / '+lim().photos+')';
+  $('phGrid').innerHTML=photos.map(function(p,i){
+    return '<div class="ph"><img src="'+p+'" alt="Yüklenen fotoğraf '+(i+1)+'">'+(i===0?'<span class="pill prem tg">Kapak</span>':'')+
+      '<div class="acts">'+(i===0?'<span></span>':'<button type="button" data-cover="'+i+'">Kapak yap</button>')+'<button type="button" data-rm="'+i+'">Kaldır</button></div></div>';
+  }).join('');
+}
+
+/* ---------- İlan formu ---------- */
+function setFormMode(){
+  var cat=$('f-cat').value,part=isPart(cat);
+  $('machFields').hidden=part;$('partFields').hidden=!part;
+  $('f-model-l').textContent=part?'Parça veya ürün adı':'Model';
+  $('f-spec-l').textContent=cat==='Lastik ve jant'?'Lastik ebadı':'Parça numarası';
+  $('f-spec').placeholder=cat==='Lastik ve jant'?'Örn. 315/80R22.5':'Örn. A10VO71';
+  $('f-price-l').textContent=part?'Birim fiyat (₺, KDV dahil)':'Fiyat (₺, KDV dahil)';
+  if(!part) $('f-unit').value=KMCATS[cat]?'km':'sa';
+  priceCheck();
+}
+function priceCheck(){
+  var cat=$('f-cat').value,p=Number($('f-price').value),box=$('priceCheck');
+  if(!p||isPart(cat)){box.innerHTML='';return}
+  var m=catMedian(cat,2);
+  if(!m){box.innerHTML='<div class="note good">Bu kategoride karşılaştıracak yeterli ilan yok.</div>';return}
+  var f=priceFlag(p,cat),ref=tl(Math.round(m/1000)*1000);
+  if(f==='low') box.innerHTML='<div class="note bad">Fiyat bu kategorinin ortancası olan '+ref+' seviyesinin çok altında. Yayınlanırsa ilan "fiyat çok düşük" uyarısıyla gösterilir ve incelemeye alınabilir.</div>';
+  else if(f==='high') box.innerHTML='<div class="note">Fiyat kategori ortancası olan '+ref+' seviyesinin belirgin üstünde. Alıcılar ilanı pahalı bulabilir.</div>';
+  else box.innerHTML='<div class="note good">Fiyat kategori ortancası olan '+ref+' ile uyumlu.</div>';
+}
+function myListings(){return L.filter(function(l){return l.sel==='ME'})}
+function submitForm(e){
+  e.preventDefault();
+  var cat=$('f-cat').value,part=isPart(cat),brand=$('f-brand').value.trim(),model=$('f-model').value.trim();
+  var price=Number($('f-price').value),err='',eb=$('f-err');
+  if(myListings().length>=lim().listings){
+    eb.innerHTML='Ücretsiz üyelikte aynı anda '+LIM.free.listings+' aktif ilan olabilir. <button type="button" data-go="premium">Premium ile '+LIM.prem.listings+' ilana çık</button> veya profilinden bir ilanı kapat.';
+    return;
+  }
+  var l={id:nextId++,cat:cat,brand:brand,model:model,city:$('f-city').value,price:price,sel:'ME',conf:0,serial:false,isNew:true,takas:$('f-takas').checked,desc:$('f-desc').value.trim(),photos:photos.slice()};
+  if(!brand||!model) err='Marka ve '+(part?'ürün adı':'model')+' alanlarını doldur.';
+  else if(part){
+    l.spec=$('f-spec').value.trim();l.cond=$('f-cond').value;l.compat=$('f-compat').value.trim();l.qty=Number($('f-qty').value);
+    if(!l.spec) err=(cat==='Lastik ve jant'?'Lastik ebadını':'Parça numarasını')+' gir.';
+    else if(!l.qty||l.qty<1) err='Adet gir.';
+  }else{
+    l.year=Number($('f-year').value);l.use=Number($('f-use').value);l.unit=$('f-unit').value;
+    if(!l.year||l.year<1980||l.year>2026) err='Model yılı 1980 ile 2026 arasında olmalı.';
+    else if($('f-use').value===''||l.use<0) err='Çalışma saati veya km bilgisini gir.';
+  }
+  if(!err&&(!price||price<1)) err='Fiyatı gir.';
+  if(!err&&!photos.length) err='En az 1 fotoğraf ekle. Alıcılar fotoğrafsız ilanlara güvenmez.';
+  if(!err&&!$('f-pledge').checked) err='Kapora taahhüdünü onaylaman gerekiyor.';
+  eb.textContent=err;
+  if(err) return;
+  L.push(l);
+  photos=[];
+  $('form').reset();$('priceCheck').innerHTML='';$('ph-err').textContent='';
+  $('f-city').value=S.ME.city;setFormMode();renderPhotos();
+  st=defState();syncUI();refresh();show('list');
+  toast('İlan yayınlandı. Ücret: 0 ₺');
+}
+
+/* ---------- Profil ve Premium ---------- */
+function verOk(){return me.phone&&me.id&&(S.ME.type!=='Kurumsal'||me.tax)}
+function stat(l,k){var b={v:40,p:9,m:4}[k];return b+((l.id*37+k.charCodeAt(0)*11)%90)*(k==='v'?2:1)}
+function renderProfile(){
+  var m=S.ME;m.ver=!!verOk();m.prem=me.premium;
+  var lv=level(m),mine=myListings();
+  var rows=[['phone','Telefon numarası','SMS koduyla doğrulanır'],['id','Kimlik','T.C. kimlik numarası ve selfie ile doğrulanır']];
+  if(m.type==='Kurumsal') rows.push(['tax','Vergi levhası','Şirket adıyla eşleştirilir']);
+  var ver=rows.map(function(r){
+    return '<div class="mine"><div><b>'+r[1]+'</b><br><span class="sub">'+r[2]+'</span></div>'+
+      (me[r[0]]?'<span class="pill good">Doğrulandı</span>':'<button class="btn sm" type="button" data-ver="'+r[0]+'">Doğrula</button>')+'</div>';
+  }).join('');
+  var mineHtml=mine.length?mine.map(function(l){
+    return '<div class="mine"><div style="min-width:0"><b>'+esc(l.brand)+' '+esc(l.model)+'</b>'+(l.year?' · '+l.year:'')+'<br><span class="sub">'+tl(l.price)+' · '+esc(l.city)+(featured(l)?' · Öne çıkan':'')+'</span></div>'+
+      '<div class="acts-row"><button class="btn ghost sm" type="button" data-conf="'+l.id+'">Hâlâ satılık</button>'+
+      '<button class="btn ghost sm" type="button" data-pdrop="'+l.id+'">Fiyatı %5 düşür</button>'+
+      (featured(l)?'':'<button class="btn ghost sm" type="button" data-boost="'+l.id+'">Öne çıkar</button>')+
+      '<button class="btn ghost sm" type="button" data-sold="'+l.id+'">Satıldı</button>'+
+      '<button class="btn ghost sm" type="button" data-del="'+l.id+'">Sil</button></div></div>';
+  }).join(''):'<div class="empty">Henüz ilanın yok. "İlan ver" sekmesinden ilk ilanını ekle.</div>';
+  var stats='';
+  if(me.premium&&mine.length){
+    stats='<div class="panel"><h3>İlan istatistikleri</h3><p class="sub" style="margin:4px 0 8px">Premium özelliği. Rakamlar örnektir.</p><div class="scroll"><table><thead><tr><th>İlan</th><th>Görüntülenme</th><th>Telefon</th><th>Mesaj</th></tr></thead><tbody>'+
+      mine.map(function(l){return '<tr><td>'+esc(l.brand)+' '+esc(l.model)+'</td><td>'+stat(l,'v')+'</td><td>'+stat(l,'p')+'</td><td>'+stat(l,'m')+'</td></tr>'}).join('')+'</tbody></table></div></div>';
+  }
+  var revs=m.reviews.length?m.reviews.map(function(r){
+    return '<div class="rv"><div class="acts-row" style="justify-content:space-between"><b>'+esc(r.who)+' <span class="sub">('+r.role+')</span></b><span>'+stars(r.rating)+' <span class="sub">'+esc(r.date)+'</span></span></div><div>'+esc(r.text)+'</div></div>';
+  }).join(''):'<div class="empty">Henüz değerlendirme almadın. İlk işlemden sonra burada görünür.</div>';
+  $('profileBox').innerHTML=
+   '<div class="panel"><div class="prof-head"><div class="avatar" aria-hidden="true">'+esc((m.name||'S').charAt(0).toLocaleUpperCase('tr'))+'</div>'+
+     '<div style="min-width:0"><h2>'+esc(m.name)+'</h2><div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px"><span class="pill '+lv.c+'">'+lv.t+'</span>'+(m.ver?'<span class="pill good">Doğrulanmış</span>':'<span class="pill">Doğrulanmadı</span>')+(me.premium?'<span class="pill prem">Premium</span>':'')+'<span class="pill">'+m.type+'</span></div></div>'+
+     '<button class="btn ghost sm" type="button" data-store="ME" style="margin-left:auto">Herkese açık sayfamı gör</button></div></div>'+
+   '<div class="two">'+
+     '<div class="panel"><h3>Bilgilerim</h3><div style="display:flex;flex-direction:column;gap:14px;margin-top:12px">'+
+       '<div class="field"><label for="p-name">Ad veya firma adı</label><input type="text" id="p-name" value="'+esc(m.name)+'"></div>'+
+       '<div class="field"><label for="p-type">Üyelik türü</label><select id="p-type"><option'+(m.type==='Bireysel'?' selected':'')+'>Bireysel</option><option'+(m.type==='Kurumsal'?' selected':'')+'>Kurumsal</option></select></div>'+
+       '<div class="field"><label for="p-city">Şehir (mesafe hesabında konumun olarak kullanılır)</label><select id="p-city">'+cityOpts(m.city)+'</select></div>'+
+       '<div><button class="btn" type="button" data-save="1">Kaydet</button></div></div></div>'+
+     '<div class="panel"><h3>Doğrulama</h3><p class="sub" style="margin:4px 0 4px">Doğrulanmış üyeler listede rozetle gösterilir. Prototipte doğrulama anında tamamlanır.</p>'+ver+'</div>'+
+   '</div>'+
+   '<div class="two">'+
+     '<div class="panel"><h3>Puanlarım</h3><div style="display:flex;flex-direction:column;gap:10px;margin-top:12px">'+
+       '<div class="score"><span class="out" style="width:110px">Satıcı puanı</span><div class="meter"><i style="width:'+((m.s||0)/5*100)+'%"></i></div><span class="out">'+sc(m.s)+'</span></div>'+
+       '<div class="score"><span class="out" style="width:110px">Alıcı puanı</span><div class="meter"><i style="width:'+((m.b||0)/5*100)+'%"></i></div><span class="out">'+sc(m.b)+'</span></div>'+
+       '<div class="sub">Puan, ilk 3 onaylı işlemden sonra seviyeye yansır. Şu an '+m.deals+' işlemin var.</div></div></div>'+
+     '<div class="panel'+(me.premium?' prem':'')+'"><h3>Üyelik</h3><p style="margin:10px 0 12px">'+(me.premium?'Premium üyesin. 30 aktif ilan, 20 fotoğraf ve öne çıkma özelliklerin açık.':'Ücretsiz üyesin. '+LIM.free.listings+' aktif ilan ve ilan başına '+LIM.free.photos+' fotoğraf ekleyebilirsin.')+'</p><button class="btn'+(me.premium?' ghost':'')+'" type="button" data-go="premium">'+(me.premium?'Üyeliği yönet':'Premium özelliklerini gör')+'</button></div>'+
+   '</div>'+
+   '<div class="panel"><h3>Aldığım değerlendirmeler</h3><div style="margin-top:6px">'+revs+'</div></div>'+
+   '<div class="panel"><h3>İlanlarım <span class="sub" style="font:400 15px var(--f-body)">('+mine.length+' / '+lim().listings+')</span></h3><div style="margin-top:6px">'+mineHtml+'</div></div>'+stats;
+}
+function renderPremium(){
+  $('premBtn').textContent=me.premium?'Premium’u iptal et':'Premium’a geç';
+  $('premBtn').className='btn'+(me.premium?' ghost':'');
+  $('premState').textContent=me.premium?'Premium açık (demo)':'Prototipte ödeme alınmaz';
+}
+function togglePremium(){
+  me.premium=!me.premium;S.ME.prem=me.premium;
+  if(!me.premium&&photos.length>LIM.free.photos){photos=photos.slice(0,LIM.free.photos);renderPhotos()}
+  renderPremium();refresh();renderPhotos();
+  toast(me.premium?'Premium açıldı. İlanların öne çıkar, 20 fotoğraf ekleyebilirsin.':'Premium kapatıldı.');
+}
+function trustRows(){
+  var keys=['A','D','B','E','C','H'];
+  $('trustRows').innerHTML=keys.map(function(k){var m=S[k],lv=level(m);
+    return '<tr><td>'+esc(m.name)+'</td><td>'+m.type+'</td><td>'+sc(m.s)+'</td><td>'+sc(m.b)+'</td><td>'+m.deals+'</td><td><span class="pill '+lv.c+'">'+lv.t+'</span></td></tr>';}).join('');
+}
+
+/* ---------- Olaylar ---------- */
+function curThread(){return activeT!=null?threadById(activeT):null}
+function goCat(c){
+  st=defState();st.cat=c;
+  if(KMCATS[c]) st.unit='km';
+  syncUI();show('list');
+}
+document.addEventListener('click',function(e){
+  var t;
+  if((t=e.target.closest('[data-go]'))){closeDetail();show(t.getAttribute('data-go'));return}
+  if((t=e.target.closest('[data-open]'))){openDetail(Number(t.getAttribute('data-open')));return}
+  if((t=e.target.closest('[data-fav]'))){toggleFav(Number(t.getAttribute('data-fav')));return}
+  if((t=e.target.closest('[data-cmprm]'))){
+    toggleCmp(Number(t.getAttribute('data-cmprm')));
+    if(me.cmp.length>=2) openCompare(); else closeDetail();
+    return;
+  }
+  if((t=e.target.closest('[data-cmp]'))){toggleCmp(Number(t.getAttribute('data-cmp')));return}
+  if((t=e.target.closest('[data-store]'))){closeDetail();openStore(t.getAttribute('data-store'));return}
+  if((t=e.target.closest('[data-cat-go]'))){goCat(t.getAttribute('data-cat-go'));return}
+  if((t=e.target.closest('[data-seeall]'))){sortKey=t.getAttribute('data-seeall');st=defState();syncUI();show('list');return}
+  if((t=e.target.closest('[data-gi]'))){
+    var l=byId(curId);if(!l||!l.photos) return;
+    $('galMain').src=l.photos[Number(t.getAttribute('data-gi'))];
+    document.querySelectorAll('#sheet [data-gi]').forEach(function(x){x.setAttribute('aria-pressed',String(x===t))});
+    return;
+  }
+  if(e.target.closest('#cmpGo')){openCompare();return}
+  if(e.target.closest('#cmpClear')){me.cmp=[];refresh();return}
+  /* Mesajlar */
+  if((t=e.target.closest('[data-tid]'))){activeT=Number(t.getAttribute('data-tid'));var th=curThread();if(th) th.unread=0;renderMsgs();return}
+  if(e.target.closest('[data-back]')){activeT=null;renderMsgs();return}
+  if(e.target.closest('[data-deal]')){
+    var d=curThread();if(!d) return;
+    d.dealMe=true;renderConv();
+    setTimeout(function(){
+      d.dealThem=true;
+      if(visibleView('msgs')&&activeT===d.id) renderConv();
+      toast('Satıcı da işlemi onayladı (örnek). Artık puan verebilirsin.');
+    },1500);
+    return;
+  }
+  if((t=e.target.closest('[data-star]'))){
+    var s=curThread();if(!s) return;
+    s.draftStar=Number(t.getAttribute('data-star'));
+    document.querySelectorAll('#thrConv [data-star]').forEach(function(b){
+      var on=s.draftStar>=Number(b.getAttribute('data-star'));
+      b.setAttribute('aria-pressed',String(on));b.textContent=on?'★':'☆';
+    });
+    return;
+  }
+  if((t=e.target.closest('[data-aspect]'))){
+    var a=curThread();if(!a) return;
+    var k=t.getAttribute('data-aspect');a.draftTags[k]=!a.draftTags[k];
+    t.setAttribute('aria-pressed',String(!!a.draftTags[k]));
+    return;
+  }
+  if(e.target.closest('[data-rate]')){var r=curThread();if(r) submitRating(r);return}
+  /* Kayıtlı arama */
+  if((t=e.target.closest('[data-srun]'))){
+    var id=Number(t.getAttribute('data-srun'));
+    me.saved.forEach(function(x){if(x.id===id){st=Object.assign(defState(),x.f);x.last=maxId()}});
+    syncUI();updateBadges();show('list');return;
+  }
+  if((t=e.target.closest('[data-sdel]'))){
+    var sid=Number(t.getAttribute('data-sdel'));
+    me.saved=me.saved.filter(function(x){return x.id!==sid});
+    renderFavs();updateBadges();toast('Kayıtlı arama silindi.');return;
+  }
+});
+document.addEventListener('change',function(e){
+  var t;
+  if((t=e.target.closest('[data-snotify]'))){
+    var id=Number(t.getAttribute('data-snotify'));
+    me.saved.forEach(function(x){if(x.id===id) x.notify=t.checked});
+    updateBadges();return;
+  }
+  if((t=e.target.closest('[data-chk]'))&&curId!=null){
+    var l=byId(curId),set=me.checks[curId]||(me.checks[curId]={});
+    set[Number(t.getAttribute('data-chk'))]=t.checked;
+    var items=checklistFor(l),done=0;
+    items.forEach(function(_,i){if(set[i]) done++});
+    $('chkProg').textContent=done+' / '+items.length+' tamamlandı';
+    $('chkBar').style.width=Math.round(done/items.length*100)+'%';
+  }
+});
+document.addEventListener('input',function(e){
+  if(e.target.id==='rvText'){var t=curThread();if(t) t.draftText=e.target.value}
+});
+$('thrConv').addEventListener('submit',function(e){
+  if(e.target.id!=='msgForm') return;
+  e.preventDefault();
+  var t=curThread(),text=$('msgText').value.trim();
+  if(!t||!text) return;
+  var res=sendMsg(t,text,false);
+  if(res){$('msgErr').textContent=res;return}
+  $('msgText').value='';
+  renderMsgs();
+  $('msgText').focus();
+});
+
+/* Navigasyon ve filtreler */
+document.addEventListener('click',function(e){
+  if(!e.target.closest('[data-view]'))return;
+  var b=e.target.closest('[data-view]');if(!b) return;
+  closeSideMenu();
+  var v=b.getAttribute('data-view');
+  if(v==='list'&&b.getAttribute('aria-current')==='true'){setFilters(true);$('q').focus();return}
+  if(v==='msgs') activeT=null;
+  show(v);
+});
+$('q').onfocus=function(){setFilters(true)};
+$('fToggle').onclick=function(){setFilters($('rail').hidden)};
+$('q').oninput=function(){st.q=this.value;renderList()};
+$('maxPrice').oninput=function(){st.maxPrice=Number(this.value);renderList()};
+$('useMin').oninput=function(){st.useMin=this.value;renderList()};
+$('useMax').oninput=function(){st.useMax=this.value;renderList()};
+$('yearMin').oninput=function(){st.yMin=this.value;renderList()};
+$('yearMax').oninput=function(){st.yMax=this.value;renderList()};
+$('minScore').onchange=function(){st.minScore=Number(this.value);renderList()};
+$('incNew').onchange=function(){st.incNew=this.checked;renderList()};
+$('city').onchange=function(){st.city=this.value;renderList()};
+$('near').onchange=function(){st.near=Number(this.value);renderList()};
+$('takasOnly').onchange=function(){st.takas=this.checked;renderList()};
+$('verOnly').onchange=function(){st.ver=this.checked;renderList()};
+$('hideRisk').onchange=function(){st.hide=this.checked;renderList()};
+$('sort').onchange=function(){sortKey=this.value;renderList()};
+$('reset').onclick=resetFilters;
+$('cats').onclick=function(e){
+  var b=e.target.closest('.chip');if(!b) return;
+  st.cat=b.getAttribute('data-cat');
+  if(KMCATS[st.cat]) st.unit='km';
+  else if(!isPart(st.cat)&&st.cat!=='Tümü'&&st.cat!=='Beton (mikser ve pompa)') st.unit='sa';
+  syncUI();
+};
+$('unitChips').onclick=function(e){var b=e.target.closest('.chip');if(!b) return;st.unit=b.getAttribute('data-unit');syncUnit();renderList()};
+$('searchForm').onsubmit=function(e){e.preventDefault();$('count').scrollIntoView()};
+$('homeSearch').onsubmit=function(e){e.preventDefault();var q=$('hq').value;st=defState();st.q=q;syncUI();show('list')};
+$('saveSearch').onclick=function(){
+  var lbl=filterLabel(st);
+  if(me.saved.some(function(s){return filterLabel(s.f)===lbl})){toast('Bu arama zaten kayıtlı.');return}
+  me.saved.push({id:nextSid++,f:Object.assign({},st),last:maxId(),notify:true});
+  updateBadges();renderFavs();
+  toast('Arama kaydedildi. Yeni ilan çıkınca Favoriler sekmesinde işaretlenir.');
+};
+
+/* Overlay */
+$('overlay').onclick=function(e){if(e.target===this) closeDetail()};
+document.addEventListener('keydown',function(e){if(e.key==='Escape') closeDetail()});
+
+/* Form ve fotoğraf */
+$('f-cat').onchange=setFormMode;
+$('f-price').oninput=priceCheck;
+$('form').addEventListener('submit',submitForm);
+$('premBtn').onclick=togglePremium;
+$('pickBtn').onclick=function(){$('f-files').click()};
+$('f-files').onchange=function(){addFiles(this.files);this.value=''};
+var drop=$('drop');
+['dragenter','dragover'].forEach(function(n){drop.addEventListener(n,function(e){e.preventDefault();drop.classList.add('on')})});
+['dragleave','drop'].forEach(function(n){drop.addEventListener(n,function(e){e.preventDefault();drop.classList.remove('on')})});
+drop.addEventListener('drop',function(e){if(e.dataTransfer&&e.dataTransfer.files) addFiles(e.dataTransfer.files)});
+$('phGrid').onclick=function(e){
+  var rm=e.target.closest('[data-rm]'),cv=e.target.closest('[data-cover]');
+  if(rm){photos.splice(Number(rm.getAttribute('data-rm')),1);renderPhotos()}
+  else if(cv){var i=Number(cv.getAttribute('data-cover'));var p=photos.splice(i,1)[0];photos.unshift(p);renderPhotos()}
+};
+
+/* Profil işlemleri */
+$('profileBox').onclick=function(e){
+  var t=e.target.closest('button');if(!t) return;
+  var id;
+  if(t.hasAttribute('data-save')){
+    var n=$('p-name').value.trim();
+    if(!n){toast('Ad veya firma adı boş olamaz.');return}
+    S.ME.name=n;S.ME.type=$('p-type').value;S.ME.city=$('p-city').value;
+    $('f-city').innerHTML=cityOpts(S.ME.city);
+    refresh();toast('Profil kaydedildi.');
+  }else if(t.hasAttribute('data-ver')){
+    me[t.getAttribute('data-ver')]=true;refresh();toast('Doğrulama tamamlandı (prototip).');
+  }else if(t.hasAttribute('data-conf')){
+    id=Number(t.getAttribute('data-conf'));L.forEach(function(l){if(l.id===id){l.conf=0;l.isNew=false}});refresh();toast('İlan doğrulandı. Sayaç sıfırlandı.');
+  }else if(t.hasAttribute('data-pdrop')){
+    id=Number(t.getAttribute('data-pdrop'));
+    L.forEach(function(l){if(l.id===id){l.prev=l.price;l.price=Math.max(1,Math.round(l.price*0.95/100)*100)}});
+    refresh();toast('Fiyat %5 düşürüldü. Bu ilanı favorileyenler fiyat düşüşünü görür.');
+  }else if(t.hasAttribute('data-boost')){
+    id=Number(t.getAttribute('data-boost'));L.forEach(function(l){if(l.id===id) l.boost=true});refresh();toast('İlan 7 gün öne çıkarıldı (prototipte ücret alınmaz).');
+  }else if(t.hasAttribute('data-sold')){
+    id=Number(t.getAttribute('data-sold'));L=L.filter(function(l){return l.id!==id});me.cmp=me.cmp.filter(function(x){return x!==id});delete me.favs[id];refresh();toast('İlan kapatıldı.');
+  }else if(t.hasAttribute('data-del')){
+    id=Number(t.getAttribute('data-del'));L=L.filter(function(l){return l.id!==id});me.cmp=me.cmp.filter(function(x){return x!==id});delete me.favs[id];refresh();toast('İlan silindi.');
+  }
+};
+
+/* ---------- Başlat ---------- */
+$('f-cat').innerHTML=CATS.map(function(c){return '<option>'+c+'</option>'}).join('');
+$('f-city').innerHTML=cityOpts(S.ME.city);
+T.push({id:nextTid++,lid:1,key:'A',msgs:[
+  {from:'sys',text:'Konuşma başladı. Ürünü görmeden kapora veya ön ödeme gönderme.'},
+  {from:'me',text:'Merhaba, makineyi cumartesi görmek istiyorum. Uygun musunuz?',t:'10:12'},
+  {from:'them',text:'Merhaba, cumartesi 10:00 uygundur. Belgeler hazır olacak.',t:'10:20'}],
+  unread:1,ts:++tick,dealMe:false,dealThem:false,rated:null,draftStar:0,draftTags:{},draftText:''});
+trustRows();
+syncUI();
+renderHome();renderFavs();renderPhotos();renderPremium();setFormMode();updateBadges();
+})();
+</script>
+
+<script>
+(function(){
+ const toggle=document.getElementById('menuToggle'), panel=document.getElementById('sideMenu'), backdrop=document.getElementById('menuBackdrop'), close=document.getElementById('menuClose');
+ window.closeSideMenu=function(){panel.classList.remove('open');panel.setAttribute('aria-hidden','true');panel.inert=true;backdrop.hidden=true;toggle.setAttribute('aria-expanded','false');document.body.style.overflow='';};
+ function open(){panel.inert=false;panel.classList.add('open');panel.setAttribute('aria-hidden','false');backdrop.hidden=false;toggle.setAttribute('aria-expanded','true');document.body.style.overflow='hidden';close.focus();}
+ toggle.addEventListener('click',()=>panel.classList.contains('open')?closeSideMenu():open());close.addEventListener('click',closeSideMenu);backdrop.addEventListener('click',closeSideMenu);
+ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&panel.classList.contains('open')){closeSideMenu();toggle.focus();}});
+})();
+</script>
+<script id="makinasal-jobs-script">(function(){'use strict';const $=id=>document.getElementById(id);const key='makinasal_jobs_demo_v1',replyKey='makinasal_jobs_replies_v1';const today=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};const addDays=n=>{const d=new Date(today()+'T12:00:00');d.setDate(d.getDate()+n);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};const samples=[{id:'sample1',kind:'vehicle',title:'3 hafriyat kamyonu aranıyor',city:'Samsun',date:addDays(1),days:2,qty:3,budget:8000,urgent:true,desc:'Günlük 8 saat. Şoför dahil, yakıt işverene ait. Ödeme iş bitiminde.',contact:'Platform içi mesaj'},{id:'sample2',kind:'worker',title:'Ekskavatör operatörü aranıyor',city:'Ankara',date:addDays(2),days:5,qty:1,budget:3500,urgent:false,desc:'Caterpillar 320 tecrübesi ve ilgili operatör belgesi gerekli.',contact:'Platform içi mesaj'},{id:'sample3',kind:'vehicle',title:'Lowbed nakliye ihtiyacı',city:'İstanbul',date:today(),days:1,qty:1,budget:null,urgent:true,desc:'Ekskavatör taşıması için uygun lowbed aranıyor. Güzergâh görüşülecek.',contact:'Platform içi mesaj'},{id:'sample4',kind:'available',title:'Deneyimli JCB operatörü iş arıyor',city:'Konya',date:addDays(3),days:7,qty:1,budget:null,urgent:false,desc:'Günlük veya haftalık işlerde çalışabilirim. Belgeler görüşmede paylaşılır.',contact:'Platform içi mesaj'}];let own=[],replies={};try{own=JSON.parse(localStorage.getItem(key)||'[]');replies=JSON.parse(localStorage.getItem(replyKey)||'{}');if(!Array.isArray(own))own=[]}catch(e){own=[];replies={}}const cities=['Tüm iller','Adana','Ankara','Antalya','Bursa','Gaziantep','İstanbul','İzmir','Kocaeli','Konya','Mersin','Samsun','Trabzon'];$('jobCity').innerHTML=cities.slice(1).map(x=>'<option>'+x+'</option>').join('');$('jobCityFilter').innerHTML=cities.map((x,i)=>'<option value="'+(i?x:'all')+'">'+x+'</option>').join('');$('jobDate').min=today();$('jobDate').value=addDays(1);const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));const all=()=>own.concat(samples);function render(){let a=all();$('jobTotal').textContent=a.length;$('jobUrgent').textContent=a.filter(j=>j.urgent).length;const q=$('jobSearch').value.toLocaleLowerCase('tr'),type=$('jobTypeFilter').value,time=$('jobTimeFilter').value,city=$('jobCityFilter').value;a=a.filter(j=>(type==='all'||j.kind===type)&&(city==='all'||j.city===city)&&[j.title,j.city,j.desc].join(' ').toLocaleLowerCase('tr').includes(q)&&(time==='all'||(time==='urgent'&&j.urgent)||(time==='today'&&j.date===today())||(time==='tomorrow'&&j.date===addDays(1))||(time==='week'&&j.date>=today()&&j.date<=addDays(7))));a.sort((a,b)=>Number(b.urgent)-Number(a.urgent)||a.date.localeCompare(b.date));$('jobCount').textContent=a.length+' ilan';$('jobGrid').innerHTML=a.length?a.map(j=>{const action=j.kind==='worker'?'Başvur':j.kind==='vehicle'?'Teklif ver':'İletişim talebi';const num=(replies[j.id]||[]).length;return '<article class="card job-card"><div class="job-tags">'+(j.urgent?'<span class="pill prem">⚡ ACİL</span>':'')+'<span class="pill">'+(j.kind==='worker'?'👷 Personel':j.kind==='vehicle'?'🚛 Araç / makine':'🔎 İş arıyor')+'</span>'+(String(j.id).startsWith('sample')?'<span class="pill">Örnek ilan</span>':'<span class="pill good">Bu cihazdaki ilan</span>')+'</div><h3>'+esc(j.title)+'</h3><div class="job-meta">📍 '+esc(j.city)+' · 📅 '+esc(j.date)+' · '+esc(j.days)+' gün · '+esc(j.qty)+' adet/kişi</div><p>'+esc(j.desc)+'</p><div class="job-foot"><span class="job-price">'+(j.budget?Number(j.budget).toLocaleString('tr-TR')+' ₺/gün':'Fiyat teklif üzerine')+'</span><button type="button" class="btn sm" data-job="'+esc(j.id)+'">'+action+'</button></div>'+(num?'<span class="sub">Bu cihazda kaydedilen yanıt: '+num+'</span>':'')+'</article>'}).join(''):'<div class="empty">Bu filtrelere uygun iş bulunamadı.</div>'}for(const id of ['jobSearch','jobTypeFilter','jobTimeFilter','jobCityFilter'])$(id).addEventListener(id==='jobSearch'?'input':'change',render);$('jobNewToggle').onclick=()=>{$('jobForm').hidden=!$('jobForm').hidden;if(!$('jobForm').hidden)$('jobTitle').focus()};$('jobCancel').onclick=()=>{$('jobForm').hidden=true};$('jobForm').onsubmit=e=>{e.preventDefault();const title=$('jobTitle').value.trim(),desc=$('jobDesc').value.trim();if(!title||!desc||$('jobDate').value<today()){$('jobError').textContent='Başlık, açıklama ve geçerli bir tarih girin.';return}own.unshift({id:'own'+Date.now(),kind:$('jobKind').value,title,city:$('jobCity').value,date:$('jobDate').value,days:Number($('jobDays').value),qty:Number($('jobQty').value),budget:$('jobBudget').value?Number($('jobBudget').value):null,urgent:$('jobIsUrgent').checked,desc,contact:$('jobContact').value});try{localStorage.setItem(key,JSON.stringify(own))}catch(e){$('jobError').textContent='Tarayıcı depolama alanı dolu; ilan kalıcı saklanamadı.'}e.target.reset();$('jobDate').value=addDays(1);$('jobForm').hidden=true;render();$('jobGrid').scrollIntoView({behavior:'smooth',block:'start'})};$('jobGrid').onclick=e=>{const b=e.target.closest('[data-job]');if(!b)return;const j=all().find(x=>x.id===b.dataset.job);if(!j)return;const response=prompt((j.kind==='worker'?'Başvuru mesajınızı':j.kind==='vehicle'?'Teklifinizi (fiyat ve koşullar)':'İletişim mesajınızı')+' yazın.\n\nDEMO: Mesaj gerçek kişiye gönderilmez.');if(response===null||!response.trim())return;(replies[j.id]??=[]).push({text:response.trim().slice(0,1000),date:new Date().toISOString()});try{localStorage.setItem(replyKey,JSON.stringify(replies))}catch(e){}render();alert('Demo yanıtı bu cihazda kaydedildi. Gerçek bir kullanıcıya gönderilmedi.')};render();})();</script>
+</body></html>

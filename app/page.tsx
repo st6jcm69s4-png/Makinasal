@@ -1,0 +1,1 @@
+export default function Home(){return <main><iframe title="Makinasal V6 prototipi" src="/prototip.html" style={{width:'100%',height:'100dvh',border:0,display:'block'}}/><div style={{position:'fixed',right:12,bottom:12,background:'#262b28',color:'white',padding:'6px 10px',borderRadius:8,font:'12px Arial',pointerEvents:'none'}}>Next.js başlangıç · prototip</div></main>}
