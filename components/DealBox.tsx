@@ -88,12 +88,14 @@ export function DealBox({ threadId, me, buyerId, sellerId }: { threadId: string;
       {done && review ? (
         <>
           <b>Satış tamamlandı.</b>
+          <p className="meta">İlan otomatik olarak “satıldı” işaretlendi.</p>
           <p className="meta">Verdiğin puan: <span className="stars">{stars(review.score)}</span>{review.comment ? ` — “${review.comment}”` : ''}</p>
         </>
       ) : null}
       {done && !review ? (
         <>
           <b>Satış tamamlandı. Karşı tarafı puanla:</b>
+          <p className="meta">İlan otomatik olarak “satıldı” işaretlendi.</p>
           <div className="starpick" role="radiogroup" aria-label="Puan">
             {[1, 2, 3, 4, 5].map((n) => (
               <button key={n} type="button" role="radio" aria-checked={score === n} aria-label={`${n} yıldız`}
