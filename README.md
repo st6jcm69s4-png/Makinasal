@@ -59,3 +59,6 @@ Henüz yok: giriş, ilan verme, mesajlaşma, puanlama, veritabanı bağlantısı
 - Mesajlarda IBAN ve link engellenir, "kapora / ön ödeme / havale / EFT" için uyarı çıkar (istemcide ve veritabanında).
 - Yeni mesajlar sekme açıkken 4 saniyede bir kontrol edilir.
 - Konuşma sayfasında **Satış gerçekleşti** onayı (iki taraf da onaylamalı) → ardından karşılıklı 1–5 puan ve yorum. Puanlar satıcı kartında ve güven seviyesinde görünür. Ek SQL gerekmez.
+
+## Satış sonrası (6. adım)
+- `supabase/004-satildi-otomatik.sql` — iki taraf satışı onaylayınca ilan otomatik "satıldı" olur (ve eski tamamlanmış satışların ilanları düzeltilir). SQL Editor'de bir kez çalıştırılır.
