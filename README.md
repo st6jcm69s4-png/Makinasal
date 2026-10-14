@@ -58,4 +58,4 @@ Henüz yok: giriş, ilan verme, mesajlaşma, puanlama, veritabanı bağlantısı
 - İlan detayında **Satıcıya yaz** → `/mesajlar/[id]` konuşma sayfası; `/mesajlar` gelen kutusu.
 - Mesajlarda IBAN ve link engellenir, "kapora / ön ödeme / havale / EFT" için uyarı çıkar (istemcide ve veritabanında).
 - Yeni mesajlar sekme açıkken 4 saniyede bir kontrol edilir.
-- Sıradaki: iki taraflı satış onayı ve puanlama.
+- Konuşma sayfasında **Satış gerçekleşti** onayı (iki taraf da onaylamalı) → ardından karşılıklı 1–5 puan ve yorum. Puanlar satıcı kartında ve güven seviyesinde görünür. Ek SQL gerekmez.

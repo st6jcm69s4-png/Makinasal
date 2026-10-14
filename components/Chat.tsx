@@ -3,10 +3,15 @@
 import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
 import { checkMessage } from '@/lib/messageFilter';
+import { DealBox } from './DealBox';
+import { TrustBadge } from './TrustBadge';
 import { getSupabase } from '@/lib/supabase/client';
 
 type Msg = { id: string; sender_id: string; body: string; created_at: string };
-type Info = { listingId: string; title: string; other: string };
+type Info = {
+  listingId: string; title: string; other: string; buyerId: string; sellerId: string;
+  trust: { rep: number; deals: number; s: number | null };
+};
 
 const one = <T,>(x: T | T[] | null | undefined): T | null => (Array.isArray(x) ? x[0] ?? null : x ?? null);
 const fmt = (s: string) => new Date(s).toLocaleString('tr-TR', { dateStyle: 'short', timeStyle: 'short' });
@@ -44,10 +49,19 @@ export function Chat({ threadId }: { threadId: string }) {
       if (!t) { setMissing(true); return; }
       const otherId = (t.buyer_id === uid ? t.seller_id : t.buyer_id) as string;
       const { data: p } = await supabase.from('profiles').select('full_name,store_name,is_store').eq('id', otherId).maybeSingle();
+      const { data: st } = await supabase
+        .from('user_stats').select('score,review_count,deals,reports').eq('id', otherId).maybeSingle();
       setInfo({
         listingId: t.listing_id as string,
         title: one(t.listings as { title: string } | { title: string }[] | null)?.title ?? 'İlan',
         other: (p?.is_store && p.store_name) || p?.full_name || 'Üye',
+        buyerId: t.buyer_id as string,
+        sellerId: t.seller_id as string,
+        trust: {
+          rep: Number(st?.reports ?? 0),
+          deals: Number(st?.deals ?? 0),
+          s: st && Number(st.review_count) > 0 ? Number(st.score) : null,
+        },
       });
       await loadMessages();
     })();
@@ -88,12 +102,13 @@ export function Chat({ threadId }: { threadId: string }) {
     <div className="panel chat">
       <div className="chathead">
         <div>
-          <b>{info?.other ?? '…'}</b>
+          <b>{info?.other ?? '…'}</b> {info ? <TrustBadge seller={info.trust} /> : null}
           <div className="meta">{info ? <Link href={`/ilanlar/${info.listingId}`}>{info.title}</Link> : null}</div>
         </div>
         <Link className="btn ghost" href="/mesajlar">Tüm mesajlar</Link>
       </div>
       <div className="alert high">Ürünü görmeden kapora veya ön ödeme gönderme. IBAN ve harici link paylaşımı engellenir.</div>
+      {info ? <DealBox threadId={threadId} me={me} buyerId={info.buyerId} sellerId={info.sellerId} /> : null}
       <div className="msgs" aria-live="polite">
         {msgs.length === 0 ? <p className="meta">Henüz mesaj yok. İlk mesajı sen yaz.</p> : null}
         {msgs.map((m) => (

@@ -105,8 +105,10 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
             Puan: <span className="stars">★</span> {formatScore(seller.s)} · {seller.deals} onaylı anlaşma
             {seller.rep > 0 ? ` · ${seller.rep} şikayet` : ''}
           </p>
-          {seller.reviews.slice(0, 2).map((r, i) => (
-            <p key={i} className="meta">“{r.text}” — {r.who}</p>
+          {seller.reviews.slice(0, 3).map((r, i) => (
+            <p key={i} className="meta">
+              <span className="stars">{'★'.repeat(r.rating)}</span> {r.text ? `“${r.text}” — ` : '— '}{r.who} ({r.role})
+            </p>
           ))}
           {typeof l.id === 'string' ? (
             <ContactSeller listingId={l.id} sellerId={l.sel} />

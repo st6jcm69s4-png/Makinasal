@@ -65,3 +65,9 @@ h1{font-size:24px;margin:24px 0 4px}h2{font-size:18px;margin:0 0 10px}
 .msgform input{flex:1;padding:10px;border:1px solid var(--line);border-radius:9px;font:inherit}
 .clamp{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:60ch}
 a.mylisting{color:inherit}
+.btn:disabled{opacity:.55;cursor:not-allowed}
+.dealbox{background:var(--plate);border-radius:10px;padding:12px 14px;margin:10px 0}
+.dealbox textarea{width:100%;padding:8px;border:1px solid var(--line);border-radius:9px;font:inherit;margin-top:6px}
+.starpick{display:flex;gap:4px;margin:8px 0}
+.starpick button{border:0;background:transparent;font-size:28px;line-height:1;color:#C9CFD6;cursor:pointer;padding:0 2px}
+.starpick button.on{color:#D98600}

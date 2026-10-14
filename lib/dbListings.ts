@@ -92,5 +92,25 @@ export async function fetchListingById(supabase: SupabaseClient | null, id: stri
   if (error || !data) return null;
   const listing = rowToListing(data as unknown as Row, publicUrl);
   const sellers = await loadSellers(supabase, [listing.sel]);
-  return { listing, seller: sellers[listing.sel] ?? null };
+  const seller = sellers[listing.sel] ?? null;
+  if (seller) {
+    const { data: rv } = await supabase
+      .from('reviews').select('score,comment,created_at,role,reviewer_id')
+      .eq('reviewee_id', listing.sel).order('created_at', { ascending: false }).limit(5);
+    const reviewerIds = [...new Set((rv ?? []).map((r) => r.reviewer_id as string))];
+    const names = new Map<string, string>();
+    if (reviewerIds.length > 0) {
+      const { data: ps } = await supabase.from('profiles').select('id,full_name,store_name,is_store').in('id', reviewerIds);
+      for (const p of ps ?? []) names.set(p.id as string, ((p.is_store && p.store_name) || p.full_name || 'Üye') as string);
+    }
+    seller.reviews = (rv ?? []).map((r) => ({
+      who: names.get(r.reviewer_id as string) ?? 'Üye',
+      role: r.role === 'seller' ? 'Alıcı' : 'Satıcı',
+      rating: Number(r.score),
+      text: (r.comment as string | null) ?? '',
+      date: new Date(r.created_at as string).toLocaleDateString('tr-TR'),
+      tags: [],
+    }));
+  }
+  return { listing, seller };
 }
