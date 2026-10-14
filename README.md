@@ -63,4 +63,3 @@ Henüz yok: giriş, ilan verme, mesajlaşma, puanlama, veritabanı bağlantısı
 ## Satış sonrası (6. adım)
 - `supabase/004-satildi-otomatik.sql` — iki taraf satışı onaylayınca ilan otomatik "satıldı" olur (ve eski tamamlanmış satışların ilanları düzeltilir). SQL Editor'de bir kez çalıştırılır.
 
-- `supabase/004-satis-ilan-satildi.sql` — iki taraf satışı onaylayınca ilan otomatik "satıldı" olur (bir kez çalıştırın).
