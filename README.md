@@ -52,3 +52,10 @@ Henüz yok: giriş, ilan verme, mesajlaşma, puanlama, veritabanı bağlantısı
 - `/ilan-ver` — form + fotoğraf yükleme (telefon fotoğrafları yüklemeden önce 1600px'e küçültülür).
 - `/ilanlarim` — ilanları duraklat / satıldı / sil.
 - `/ilanlar` ve `/ilanlar/[id]` artık gerçek ilanları veritabanından okur (demo ilanlar "Demo" etiketiyle altında kalır).
+
+## Mesajlaşma (5. adım)
+- `supabase/003-mesaj.sql` — mesaj uzunluğu sınırı; SQL Editor'de bir kez çalıştırılır.
+- İlan detayında **Satıcıya yaz** → `/mesajlar/[id]` konuşma sayfası; `/mesajlar` gelen kutusu.
+- Mesajlarda IBAN ve link engellenir, "kapora / ön ödeme / havale / EFT" için uyarı çıkar (istemcide ve veritabanında).
+- Yeni mesajlar sekme açıkken 4 saniyede bir kontrol edilir.
+- Sıradaki: iki taraflı satış onayı ve puanlama.

@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { ContactSeller } from '@/components/ContactSeller';
 import { TrustBadge } from '@/components/TrustBadge';
 import { LISTINGS } from '@/lib/data/listings';
 import { SELLERS } from '@/lib/data/sellers';
@@ -107,7 +108,11 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
           {seller.reviews.slice(0, 2).map((r, i) => (
             <p key={i} className="meta">“{r.text}” — {r.who}</p>
           ))}
-          <p className="meta">Mesajlaşma ve puan verme sonraki adımda eklenecek.</p>
+          {typeof l.id === 'string' ? (
+            <ContactSeller listingId={l.id} sellerId={l.sel} />
+          ) : (
+            <p className="meta">Bu bir demo ilandır; mesajlaşma yalnızca gerçek ilanlarda çalışır.</p>
+          )}
         </aside>
       </div>
     </>

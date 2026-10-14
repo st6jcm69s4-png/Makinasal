@@ -12,6 +12,7 @@ export function SiteHeader() {
           <Link href="/ilanlar" aria-current="page">İlanlar</Link>
           <Link href="/ilan-ver">İlan ver</Link>
           <Link href="/ilanlarim">İlanlarım</Link>
+          <Link href="/mesajlar">Mesajlar</Link>
           <a href="/prototip.html">Prototip</a>
         </nav>
         <UserMenu />
