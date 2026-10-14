@@ -8,9 +8,14 @@ export function ListingCard({ l, seller }: { l: Listing; seller: Seller }) {
   const usage = usageLabel(l);
   return (
     <Link href={`/ilanlar/${l.id}`} className="card">
-      <div className="ph">Fotoğraf yok (demo)</div>
+      {l.photos && l.photos.length > 0 ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img className="ph" src={l.photos[0]} alt={listingTitle(l)} loading="lazy" style={{ width: '100%', objectFit: 'cover' }} />
+      ) : (
+        <div className="ph">Fotoğraf yok</div>
+      )}
       <div className="body">
-        <div className="cat">{l.cat}</div>
+        <div className="cat">{l.cat}{l.demo ? <span className="badge" style={{ marginLeft: 6 }}>Demo</span> : null}</div>
         <div className="title">{listingTitle(l)}</div>
         <div>
           <span className="price">{formatTL(l.price)}</span>

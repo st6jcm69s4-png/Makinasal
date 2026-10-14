@@ -46,3 +46,9 @@ Henüz yok: giriş, ilan verme, mesajlaşma, puanlama, veritabanı bağlantısı
 - `/giris` — e-posta + şifre ile kayıt ve giriş (Supabase Auth). Üst menüde kullanıcı adı ve Çıkış düğmesi.
 - Kurulum: `.env.local.example` dosyasını `.env.local` olarak kopyalayıp Supabase URL ve anon anahtarını yaz. `npm install` (yeni paketler var) ve `npm run dev`.
 - Geliştirme sırasında Supabase → Authentication → Sign In / Providers → Email bölümünde "Confirm email" seçeneğini kapatırsan kayıt sonrası onay e-postası beklemezsin. Canlıya çıkmadan önce tekrar aç.
+
+## İlan verme (4. adım)
+- `supabase/002-ilan-foto.sql` — **bir kez** SQL Editor'de çalıştırılır (schema.sql'den sonra): ilan doğrulamaları, ücretsiz üyelik limitleri (3 ilan, 8 fotoğraf; premium 30/20), `listing-photos` fotoğraf deposu ve güvenlik iyileştirmeleri.
+- `/ilan-ver` — form + fotoğraf yükleme (telefon fotoğrafları yüklemeden önce 1600px'e küçültülür).
+- `/ilanlarim` — ilanları duraklat / satıldı / sil.
+- `/ilanlar` ve `/ilanlar/[id]` artık gerçek ilanları veritabanından okur (demo ilanlar "Demo" etiketiyle altında kalır).

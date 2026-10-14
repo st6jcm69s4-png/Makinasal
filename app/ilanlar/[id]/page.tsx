@@ -5,22 +5,36 @@ import { LISTINGS } from '@/lib/data/listings';
 import { SELLERS } from '@/lib/data/sellers';
 import { formatScore, formatTL } from '@/lib/format';
 import { distanceLabel } from '@/lib/geo';
+import { fetchActiveListings, fetchListingById } from '@/lib/dbListings';
 import { getListing, listingTitle, usageLabel } from '@/lib/listing';
+import { getServerSupabase } from '@/lib/supabase/server';
 import { categoryMedian, isPartCategory, priceFlag } from '@/lib/pricing';
 
 const MY_CITY = 'İstanbul'; // demo: giriş yapan kullanıcının şehri
 
-export function generateStaticParams() {
-  return LISTINGS.map((l) => ({ id: String(l.id) }));
-}
+export const dynamic = 'force-dynamic';
 
 export default async function ListingPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const l = getListing(LISTINGS, Number(id));
-  if (!l) notFound();
-  const seller = SELLERS[l.sel];
-  const flag = priceFlag(LISTINGS, l.price, l.cat);
-  const median = categoryMedian(LISTINGS, l.cat);
+  const supabase = getServerSupabase();
+  const db = await fetchActiveListings(supabase);
+  const pool = [...LISTINGS, ...db.listings];
+  let l = null as ReturnType<typeof getListing>;
+  let seller = null as (typeof SELLERS)[string] | null;
+  if (/^\d+$/.test(id)) {
+    l = getListing(LISTINGS, Number(id));
+    seller = l ? SELLERS[l.sel] : null;
+  } else {
+    const one = await fetchListingById(supabase, id);
+    l = one?.listing ?? null;
+    seller = one?.seller ?? null;
+  }
+  if (!l || !seller) {
+    notFound();
+    return null;
+  }
+  const flag = priceFlag(pool, l.price, l.cat);
+  const median = categoryMedian(pool, l.cat);
   const part = isPartCategory(l.cat);
   const usage = usageLabel(l);
 
@@ -46,7 +60,19 @@ export default async function ListingPage({ params }: { params: Promise<{ id: st
       <div className="detail">
         <div>
           <div className="panel">
-            <div className="ph" style={{ height: 220, borderRadius: 10 }}>Fotoğraf yok (demo)</div>
+            {l.photos && l.photos.length > 0 ? (
+              <div className="gallery">
+                {l.photos.map((src, i) => (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img key={src} src={src} alt={`${listingTitle(l)} fotoğraf ${i + 1}`} loading={i === 0 ? 'eager' : 'lazy'} />
+                ))}
+              </div>
+            ) : (
+              <div className="ph" style={{ height: 220, borderRadius: 10 }}>Fotoğraf yok</div>
+            )}
+            {l.status && l.status !== 'active' ? (
+              <div className="alert high">Bu ilan {l.status === 'sold' ? 'satıldı' : 'şu an yayında değil'}.</div>
+            ) : null}
             <p>
               <span className="price" style={{ fontSize: 26 }}>{formatTL(l.price)}</span>
               {l.prev && l.prev > l.price ? <span className="prev">{formatTL(l.prev)}</span> : null}

@@ -3,7 +3,10 @@ import type { Listing } from './data/types';
 import { isPartCategory } from './pricing';
 import { formatNum } from './format';
 
-export const listingTitle = (l: Listing) => [l.brand, l.model].filter(Boolean).join(' ');
+export const listingTitle = (l: Listing) => l.title || [l.brand, l.model].filter(Boolean).join(' ');
+
+/** Yeni → eski sıralaması için anahtar. Gerçek ilanlar (tarihli) demo ilanların önüne geçer. */
+export const recency = (l: Listing): number => (l.createdAt ? Date.parse(l.createdAt) : Number(l.id) || 0);
 
 /** Çalışma saati / km etiketi; parça ve lastikte boş döner. */
 export function usageLabel(l: Listing): string {
@@ -12,4 +15,4 @@ export function usageLabel(l: Listing): string {
   return `${formatNum(l.use)} ${unit}`;
 }
 
-export const getListing = (all: Listing[], id: number) => all.find((l) => l.id === id) ?? null;
+export const getListing = (all: Listing[], id: number | string) => all.find((l) => l.id === id) ?? null;

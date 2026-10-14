@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react';
 import { CATEGORIES, CITIES } from '@/lib/data/constants';
 import type { Listing, Seller } from '@/lib/data/types';
-import { listingTitle } from '@/lib/listing';
+import { listingTitle, recency } from '@/lib/listing';
 import { ListingCard } from './ListingCard';
 
 type Sort = 'new' | 'priceAsc' | 'priceDesc';
@@ -30,7 +30,7 @@ export function ListingBrowser({ listings, sellers }: { listings: Listing[]; sel
     );
     if (sort === 'priceAsc') out.sort((a, b) => a.price - b.price);
     else if (sort === 'priceDesc') out.sort((a, b) => b.price - a.price);
-    else out.sort((a, b) => b.id - a.id);
+    else out.sort((a, b) => recency(b) - recency(a));
     return out;
   }, [listings, q, cat, city, min, max, sort]);
 
@@ -72,7 +72,7 @@ export function ListingBrowser({ listings, sellers }: { listings: Listing[]; sel
           <div className="panel empty">Bu filtrelerle ilan bulunamadı.</div>
         ) : (
           <div className="grid">
-            {shown.map((l) => <ListingCard key={l.id} l={l} seller={sellers[l.sel]} />)}
+            {shown.map((l) => <ListingCard key={String(l.id)} l={l} seller={sellers[l.sel]} />)}
           </div>
         )}
       </section>
