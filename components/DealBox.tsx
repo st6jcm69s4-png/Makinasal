@@ -1,10 +1,11 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import { TAG_OPTIONS } from '@/lib/market';
 import { getSupabase } from '@/lib/supabase/client';
 
 type Deal = { buyer_confirmed: boolean; seller_confirmed: boolean; completed_at: string | null };
-type Review = { score: number; comment: string | null };
+type Review = { score: number; comment: string | null; tags?: string[] };
 
 const stars = (n: number) => '★'.repeat(n) + '☆'.repeat(5 - n);
 
@@ -18,6 +19,7 @@ export function DealBox({ threadId, me, buyerId, sellerId }: { threadId: string;
   const [error, setError] = useState('');
   const [score, setScore] = useState(0);
   const [comment, setComment] = useState('');
+  const [tags, setTags] = useState<string[]>([]);
 
   const load = useCallback(async () => {
     const supabase = getSupabase();
@@ -25,8 +27,10 @@ export function DealBox({ threadId, me, buyerId, sellerId }: { threadId: string;
     const { data: d } = await supabase
       .from('deals').select('buyer_confirmed,seller_confirmed,completed_at').eq('thread_id', threadId).maybeSingle();
     setDeal((d as Deal | null) ?? null);
-    const { data: r } = await supabase
-      .from('reviews').select('score,comment').eq('thread_id', threadId).eq('reviewer_id', me).maybeSingle();
+    let rr = await supabase
+      .from('reviews').select('score,comment,tags').eq('thread_id', threadId).eq('reviewer_id', me).maybeSingle();
+    if (rr.error) rr = await supabase.from('reviews').select('score,comment').eq('thread_id', threadId).eq('reviewer_id', me).maybeSingle();
+    const r = rr.data;
     setReview((r as Review | null) ?? null);
     setLoaded(true);
   }, [threadId, me]);
@@ -57,14 +61,16 @@ export function DealBox({ threadId, me, buyerId, sellerId }: { threadId: string;
     if (!supabase || score < 1) { setError('Önce yıldız seç.'); return; }
     setBusy(true);
     setError('');
-    const { error: err } = await supabase.from('reviews').insert({
+    const row = {
       thread_id: threadId,
       reviewer_id: me,
       reviewee_id: iAmBuyer ? sellerId : buyerId,
       role: iAmBuyer ? 'seller' : 'buyer',
       score,
       comment: comment.trim() || null,
-    });
+    };
+    let { error: err } = await supabase.from('reviews').insert({ ...row, tags });
+    if (err && /tags/.test(err.message)) ({ error: err } = await supabase.from('reviews').insert(row));
     if (err) setError(err.message);
     await load();
     setBusy(false);
@@ -80,7 +86,7 @@ export function DealBox({ threadId, me, buyerId, sellerId }: { threadId: string;
       {!done && !myOk ? (
         <>
           <b>{otherOk ? 'Karşı taraf satışı onayladı.' : 'Satış gerçekleşti mi?'}</b>
-          <p className="meta">İki taraf da onaylayınca birbirinizi puanlayabilirsiniz. Ürünü teslim aldıktan / ödemeyi aldıktan sonra onayla.</p>
+          <p className="sub">İki taraf da onaylayınca birbirinizi puanlayabilirsiniz. Ürünü teslim aldıktan / ödemeyi aldıktan sonra onayla.</p>
           <button className="btn" type="button" onClick={confirmDeal} disabled={busy}>Satış gerçekleşti</button>
         </>
       ) : null}
@@ -88,25 +94,31 @@ export function DealBox({ threadId, me, buyerId, sellerId }: { threadId: string;
       {done && review ? (
         <>
           <b>Satış tamamlandı.</b>
-          <p className="meta">İlan otomatik olarak “satıldı” işaretlendi.</p>
-          <p className="meta">Verdiğin puan: <span className="stars">{stars(review.score)}</span>{review.comment ? ` — “${review.comment}”` : ''}</p>
+          <p className="sub">İlan otomatik olarak “satıldı” işaretlendi.</p>
+          <p className="sub">Verdiğin puan: <span>{stars(review.score)}</span>{review.comment ? ` — “${review.comment}”` : ''}{review.tags && review.tags.length ? ` · ${review.tags.join(', ')}` : ''}</p>
         </>
       ) : null}
       {done && !review ? (
         <>
           <b>Satış tamamlandı. Karşı tarafı puanla:</b>
-          <p className="meta">İlan otomatik olarak “satıldı” işaretlendi.</p>
-          <div className="starpick" role="radiogroup" aria-label="Puan">
+          <p className="sub">İlan otomatik olarak “satıldı” işaretlendi.</p>
+          <div className="stars" role="radiogroup" aria-label="Puan">
             {[1, 2, 3, 4, 5].map((n) => (
               <button key={n} type="button" role="radio" aria-checked={score === n} aria-label={`${n} yıldız`}
-                className={n <= score ? 'on' : ''} onClick={() => setScore(n)}>★</button>
+                className="star" aria-pressed={n <= score} onClick={() => setScore(n)}>★</button>
+            ))}
+          </div>
+          <div className="chips" style={{ marginBottom: 8 }}>
+            {TAG_OPTIONS.map((t) => (
+              <button key={t} type="button" className="chip" aria-pressed={tags.includes(t)}
+                onClick={() => setTags((c) => (c.includes(t) ? c.filter((x) => x !== t) : [...c, t]))}>{t}</button>
             ))}
           </div>
           <textarea rows={2} maxLength={500} value={comment} onChange={(e) => setComment(e.target.value)} placeholder="Yorum (isteğe bağlı)" />
           <p><button className="btn" type="button" onClick={submitReview} disabled={busy || score < 1}>Puanı gönder</button></p>
         </>
       ) : null}
-      {error ? <div className="alert low" role="alert">{error}</div> : null}
+      {error ? <div className="err" role="alert">{error}</div> : null}
     </div>
   );
 }

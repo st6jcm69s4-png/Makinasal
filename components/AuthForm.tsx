@@ -57,7 +57,7 @@ export function AuthForm() {
   }
 
   return (
-    <form className="panel filters" onSubmit={submit} style={{ maxWidth: 420 }}>
+    <form className="panel auth" onSubmit={submit} style={{ maxWidth: 420 }}>
       <h2>{mode === 'login' ? 'Giriş yap' : 'Hesap oluştur'}</h2>
       {mode === 'register' ? (
         <>

@@ -1,12 +1,5 @@
-import { MyListings } from '@/components/MyListings';
-
-export const metadata = { title: 'İlanlarım | Makinasal' };
+import { redirect } from 'next/navigation';
 
 export default function MyListingsPage() {
-  return (
-    <>
-      <h1>İlanlarım</h1>
-      <MyListings />
-    </>
-  );
+  redirect('/profil');
 }

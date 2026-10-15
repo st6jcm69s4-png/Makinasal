@@ -224,3 +224,4 @@ select p.id,
   coalesce((select avg(score) from reviews r where r.reviewee_id = p.id and r.role = 'buyer'), 0) as buyer_score,
   (select count(*) from reviews r where r.reviewee_id = p.id and r.role = 'buyer') as buyer_reviews
 from profiles p;
+

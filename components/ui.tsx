@@ -1,10 +1,11 @@
+import type { ReactNode } from 'react';
 import type { Seller } from '@/lib/data/types';
 import { formatScore } from '@/lib/format';
 import { trustLevel } from '@/lib/trust';
 
 export const toneClass = (t: 'bad' | 'neutral' | 'good' | 'warn') => (t === 'neutral' ? '' : t);
 
-export function Pill({ cls = '', children }: { cls?: string; children: React.ReactNode }) {
+export function Pill({ cls = '', children }: { cls?: string; children: ReactNode }) {
   return <span className={`pill ${cls}`.trim()}>{children}</span>;
 }
 

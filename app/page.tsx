@@ -1,5 +1,5 @@
-import { redirect } from 'next/navigation';
+import { HomeView } from '@/components/HomeView';
 
 export default function Home() {
-  redirect('/ilanlar');
+  return <HomeView />;
 }

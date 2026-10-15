@@ -2,97 +2,101 @@
 
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
+import { LIMITS } from '@/lib/data/constants';
 import { formatTL } from '@/lib/format';
 import { getSupabase } from '@/lib/supabase/client';
+import { useMarket } from './MarketProvider';
+import { Pill } from './ui';
 
 type Row = {
-  id: string; title: string; category: string; price: number | string; city: string; status: string;
-  created_at: string; listing_photos: { path: string }[] | null;
+  id: string; title: string; brand?: string | null; model?: string | null; category: string; price: number | string; city: string; status: string;
+  year: number | null; created_at: string; boosted_until?: string | null; listing_photos: { path: string }[] | null;
 };
+type Stat = { views: number; phones: number };
 
 const STATUS: Record<string, string> = { active: 'Yayında', paused: 'Duraklatıldı', sold: 'Satıldı' };
+const COLS = 'id,title,category,price,city,status,year,created_at,listing_photos(path)';
 
 export function MyListings() {
+  const { profile, authReady, reload, toast } = useMarket();
   const [rows, setRows] = useState<Row[] | null>(null);
-  const [userId, setUserId] = useState<string | null>(null);
-  const [ready, setReady] = useState(false);
+  const [stats, setStats] = useState<Record<string, Stat>>({});
   const [error, setError] = useState('');
 
   const load = useCallback(async (uid: string) => {
     const supabase = getSupabase();
     if (!supabase) return;
-    const { data, error } = await supabase
-      .from('listings')
-      .select('id,title,category,price,city,status,created_at,listing_photos(path)')
-      .eq('seller_id', uid)
-      .neq('status', 'removed')
-      .order('created_at', { ascending: false });
-    if (error) setError(error.message);
-    else setRows(data as unknown as Row[]);
+    let res = await supabase.from('listings').select(`${COLS},brand,model,boosted_until`).eq('seller_id', uid).neq('status', 'removed').order('created_at', { ascending: false });
+    if (res.error) res = await supabase.from('listings').select(COLS).eq('seller_id', uid).neq('status', 'removed').order('created_at', { ascending: false });
+    if (res.error) { setError(res.error.message); return; }
+    const list = res.data as unknown as Row[];
+    setRows(list);
+    const st = await supabase.from('listing_stats').select('listing_id,views,phones').in('listing_id', list.map((r) => r.id));
+    const map: Record<string, Stat> = {};
+    for (const s of (st.data ?? []) as unknown as { listing_id: string; views: number; phones: number }[]) map[s.listing_id] = { views: s.views, phones: s.phones };
+    setStats(map);
   }, []);
 
-  useEffect(() => {
-    const supabase = getSupabase();
-    if (!supabase) { setReady(true); return; }
-    supabase.auth.getUser().then(({ data }) => {
-      const uid = data.user?.id ?? null;
-      setUserId(uid);
-      setReady(true);
-      if (uid) void load(uid);
-    });
-  }, [load]);
+  useEffect(() => { if (profile) void load(profile.id); }, [profile, load]);
 
-  async function setStatus(id: string, status: string) {
+  async function patch(id: string, values: Record<string, unknown>, ok?: string) {
     const supabase = getSupabase();
-    if (!supabase || !userId) return;
+    if (!supabase || !profile) return;
     setError('');
-    const { error } = await supabase.from('listings').update({ status }).eq('id', id);
-    if (error) setError(error.message);
-    await load(userId);
+    const { error: err } = await supabase.from('listings').update(values).eq('id', id);
+    if (err) setError(err.message); else if (ok) toast(ok);
+    await load(profile.id);
+    void reload();
   }
 
   async function remove(row: Row) {
     const supabase = getSupabase();
-    if (!supabase || !userId) return;
+    if (!supabase || !profile) return;
     if (!window.confirm(`"${row.title}" ilanı kalıcı olarak silinsin mi?`)) return;
     setError('');
     const paths = (row.listing_photos ?? []).map((p) => p.path);
     if (paths.length > 0) await supabase.storage.from('listing-photos').remove(paths);
-    const { error } = await supabase.from('listings').delete().eq('id', row.id);
-    if (error) setError(error.message);
-    await load(userId);
+    const { error: err } = await supabase.from('listings').delete().eq('id', row.id);
+    if (err) setError(err.message);
+    await load(profile.id);
+    void reload();
   }
 
-  if (!ready) return <div className="panel">Yükleniyor…</div>;
-  if (!getSupabase()) return <div className="panel">Supabase bağlantısı yok.</div>;
-  if (!userId) return <div className="panel">İlanlarını görmek için <Link href="/giris"><b>giriş yap</b></Link>.</div>;
-
+  if (!authReady) return <div className="panel">Yükleniyor…</div>;
+  if (!profile) return <div className="panel">İlanlarını görmek için <Link className="linkbtn" href="/giris">giriş yap</Link>.</div>;
+  const limit = profile.is_premium ? LIMITS.prem.listings : LIMITS.free.listings;
   const live = (rows ?? []).filter((r) => r.status === 'active' || r.status === 'paused').length;
   return (
     <>
-      <p className="sub">{live} / 3 ilan hakkı kullanıldı (ücretsiz üyelik). Satılan ilanlar hakkı geri açar.</p>
-      {error ? <div className="alert low" role="alert">{error}</div> : null}
+      <p className="sub">{live} / {limit} ilan hakkı kullanıldı ({profile.is_premium ? 'premium' : 'ücretsiz'} üyelik). Yayında ve duraklatılmış ilanlar hakkı kullanır; satılan ve silinen ilanlar hakkı geri açar.</p>
+      {error ? <div className="err" role="alert">{error}</div> : null}
       {rows === null ? <div className="panel">Yükleniyor…</div> : rows.length === 0 ? (
-        <div className="panel empty">Henüz ilanın yok. <Link href="/ilan-ver"><b>İlk ilanını ver</b></Link></div>
-      ) : (
-        <div className="panel">
-          {rows.map((r) => (
-            <div key={r.id} className="mylisting">
-              <div>
-                <Link href={`/ilanlar/${r.id}`}><b>{r.title}</b></Link>
-                <div className="meta">{r.category} · {r.city} · {formatTL(Number(r.price))} · {r.listing_photos?.length ?? 0} fotoğraf</div>
-              </div>
-              <div className="actions">
-                <span className={`badge ${r.status === 'active' ? 'good' : r.status === 'sold' ? '' : 'warn'}`}>{STATUS[r.status] ?? r.status}</span>
-                {r.status === 'active' ? <button className="btn ghost" onClick={() => setStatus(r.id, 'paused')}>Duraklat</button> : null}
-                {r.status === 'paused' ? <button className="btn ghost" onClick={() => setStatus(r.id, 'active')}>Yayına al</button> : null}
-                {r.status !== 'sold' ? <button className="btn ghost" onClick={() => setStatus(r.id, 'sold')}>Satıldı</button> : null}
-                <button className="btn ghost" onClick={() => remove(r)}>Sil</button>
+        <div className="empty">Henüz ilanın yok. <Link className="linkbtn" href="/ilan-ver">İlk ilanını ver</Link></div>
+      ) : rows.map((r) => {
+        const boosted = !!r.boosted_until && Date.parse(r.boosted_until) > Date.now();
+        return (
+          <div key={r.id} className="mine">
+            <div style={{ minWidth: 0 }}>
+              <Link href={`/ilanlar/${r.id}`}><b>{r.title}</b></Link>{r.year ? ` · ${r.year}` : ''}
+              <br /><span className="sub">{formatTL(Number(r.price))} · {r.city} · {r.listing_photos?.length ?? 0} fotoğraf{profile.is_premium && stats[r.id] ? ` · ${stats[r.id].views} görüntülenme, ${stats[r.id].phones} telefon` : ''}</span>
+              <div style={{ marginTop: 4, display: 'flex', gap: 6 }}>
+                <Pill cls={r.status === 'active' ? 'good' : r.status === 'sold' ? '' : 'warn'}>{STATUS[r.status] ?? r.status}</Pill>
+                {boosted || profile.is_premium ? <Pill cls="prem">Öne çıkan</Pill> : null}
               </div>
             </div>
-          ))}
-        </div>
-      )}
+            <div className="acts-row">
+              {r.status !== 'sold' ? <Link className="btn ghost sm" href={`/ilan-ver?duzenle=${r.id}`}>Düzenle</Link> : null}
+              {r.status === 'active' ? <button className="btn ghost sm" type="button" onClick={() => void patch(r.id, { confirmed_at: new Date().toISOString() }, 'İlanın “hâlâ satılık” olarak doğrulandı.')}>Hâlâ satılık</button> : null}
+              {r.status !== 'sold' ? <button className="btn ghost sm" type="button" onClick={() => void patch(r.id, { price: Math.round((Number(r.price) * 0.95) / 100) * 100 }, 'Fiyat %5 düşürüldü.')}>Fiyatı %5 düşür</button> : null}
+              {r.status === 'active' ? <button className="btn ghost sm" type="button" onClick={() => void patch(r.id, { status: 'paused' })}>Duraklat</button> : null}
+              {r.status === 'paused' ? <button className="btn ghost sm" type="button" onClick={() => void patch(r.id, { status: 'active' })}>Yayına al</button> : null}
+              {r.status !== 'sold' ? <button className="btn ghost sm" type="button" onClick={() => void patch(r.id, { status: 'sold' })}>Satıldı</button> : null}
+              {r.status !== 'sold' && !profile.is_premium ? <button className="btn ghost sm" type="button" disabled title="Ödeme açılınca">Öne çıkar (yakında)</button> : null}
+              <button className="btn ghost sm" type="button" onClick={() => void remove(r)}>Sil</button>
+            </div>
+          </div>
+        );
+      })}
     </>
   );
 }

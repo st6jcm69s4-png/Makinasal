@@ -63,3 +63,11 @@ Henüz yok: giriş, ilan verme, mesajlaşma, puanlama, veritabanı bağlantısı
 ## Satış sonrası (6. adım)
 - `supabase/004-satildi-otomatik.sql` — iki taraf satışı onaylayınca ilan otomatik "satıldı" olur (ve eski tamamlanmış satışların ilanları düzeltilir). SQL Editor'de bir kez çalıştırılır.
 
+
+## Tasarım ve tüm özellikler (7. adım)
+Lacivert + sarı tema (`app/globals.css`) ve ilk prototipteki tüm özellikler:
+- Sayfalar: `/` ana sayfa, `/ilanlar` arama (filtreler, 10 sıralama, kayıtlı arama), `/ilanlar/[id]` detay (fiyat göstergesi, inceleme listesi, telefon, mesaj, teklif, şikayet), `/karsilastir`, `/favoriler`, `/profil`, `/magaza/[id]`, `/mesajlar`, `/ilan-ver` (yeni + `?duzenle=ID`), `/premium`, `/guven`, `/yol-haritasi`.
+- `components/MarketProvider.tsx`: ilanlar, satıcılar, favoriler, karşılaştırma, kayıtlı aramalar, okunmamış mesaj sayısı.
+- `lib/market.ts`: filtre, sıralama, etiket, fiyat göstergesi, inceleme listesi. `lib/pricing.ts`: kategori medyanı.
+- `supabase/005-ozellikler.sql` Supabase SQL Editor'de çalıştırılmalı (yeni sütunlar, telefon gizliliği, istatistik, teklif, okunmamış sayacı, şikayet takibi). Çalıştırılmadan da site açılır, ama yeni alanlar boş kalır.
+- Premium, öne çıkarma ve doğrulama rozetleri kullanıcı tarafından açılamaz; ödeme ve SMS/kimlik doğrulama henüz yok.
