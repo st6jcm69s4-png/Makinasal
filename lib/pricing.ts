@@ -27,3 +27,39 @@ export function priceFlag(listings: Listing[], price: number, cat: string): Pric
   if (r > 1.6) return 'high';
   return 'ok';
 }
+
+/** Her kartta tüm listeyi taramamak için kategori bazında önceden hesaplanmış fiyat bilgisi. */
+export type PriceStats = {
+  count(cat: string): number;
+  min(cat: string): number;
+  max(cat: string): number;
+  median(cat: string, minCount?: number): number | null;
+  flag(price: number, cat: string): PriceFlag;
+};
+
+export function buildPriceStats(listings: Listing[]): PriceStats {
+  const byCat = new Map<string, number[]>();
+  for (const l of listings) {
+    const arr = byCat.get(l.cat);
+    if (arr) arr.push(l.price);
+    else byCat.set(l.cat, [l.price]);
+  }
+  const prices = (cat: string) => byCat.get(cat) ?? [];
+  const med = (cat: string, minCount = 2) => {
+    if (isPartCategory(cat)) return null;
+    const p = prices(cat);
+    return p.length >= minCount ? median(p) : null;
+  };
+  return {
+    count: (cat) => prices(cat).length,
+    min: (cat) => Math.min(...prices(cat)),
+    max: (cat) => Math.max(...prices(cat)),
+    median: med,
+    flag(price, cat) {
+      const m = med(cat);
+      if (!m) return null;
+      const r = price / m;
+      return r < 0.6 ? 'low' : r > 1.6 ? 'high' : 'ok';
+    },
+  };
+}
