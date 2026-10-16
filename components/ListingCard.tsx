@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import type { Listing } from '@/lib/data/types';
 import { formatNum, formatTL } from '@/lib/format';
 import { distanceLabel } from '@/lib/geo';
@@ -24,7 +23,7 @@ export function ListingCard({ l }: { l: Listing }) {
   const hasPhoto = !!l.photos && l.photos.length > 0;
   return (
     <article className={`card${isFeatured(l, s) ? ' feat' : ''}`}>
-      <Link href={`/ilanlar/${l.id}`} className="cm">
+      <a href={`/ilanlar/${l.id}`} className="cm">
         {hasPhoto ? (
           <div className="thumb has">
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -41,7 +40,7 @@ export function ListingCard({ l }: { l: Listing }) {
           <div className="meta">{meta.map((m, i) => <span key={i}>{m}</span>)}</div>
           <div className="tags">{tagsFor(l, s, stats).map((t, i) => <Pill key={i} cls={t.cls}>{t.text}</Pill>)}</div>
         </div>
-      </Link>
+      </a>
       <div className="card-acts">
         <button type="button" className="ibtn fav" aria-pressed={key in favs} aria-label="Favorilere ekle veya çıkar" onClick={() => void toggleFav(l)}><IconFav /></button>
         <button type="button" className="ibtn" aria-pressed={cmp.includes(key)} aria-label="Karşılaştırmaya ekle veya çıkar" onClick={() => toggleCmp(l)}><IconCmp /></button>

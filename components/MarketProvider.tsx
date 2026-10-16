@@ -1,7 +1,6 @@
 'use client';
 
 import type { QueryResult } from '@/lib/supabase/result';
-import Link from 'next/link';
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { LISTINGS } from '@/lib/data/listings';
 import { SELLERS } from '@/lib/data/sellers';
@@ -55,7 +54,8 @@ export const useMarket = () => {
 };
 
 const DEMO: Listing[] = LISTINGS.map((l) => ({ ...l, demo: true }));
-const DEMO_SELLERS = SELLERS;
+const SHOW_DEMO = process.env.NEXT_PUBLIC_DEMO_MODE === 'true';
+const DEMO_SELLERS = SHOW_DEMO ? SELLERS : {};
 
 function lsGet<T>(k: string, d: T): T {
   try { const v = localStorage.getItem(k); return v ? (JSON.parse(v) as T) : d; } catch { return d; }
@@ -183,7 +183,7 @@ export function MarketProvider({ children }: { children: ReactNode }) {
   }, [profile, refreshUnread]);
 
   const sellers = useMemo(() => ({ ...DEMO_SELLERS, ...db.sellers }), [db.sellers]);
-  const listings = useMemo(() => [...db.listings, ...DEMO], [db.listings]);
+  const listings = useMemo(() => [...db.listings, ...(SHOW_DEMO ? DEMO : [])], [db.listings]);
   const stats = useMemo(() => buildPriceStats(listings), [listings]);
   const myCity = profile?.city || 'İstanbul';
   const find = useCallback((id: string | number) => listings.find((l) => String(l.id) === String(id)) ?? null, [listings]);
@@ -301,7 +301,7 @@ export function MarketProvider({ children }: { children: ReactNode }) {
       {cmpItems.length > 0 ? (
         <div id="cmpBar" role="region" aria-label="Karşılaştırma">
           <span className="out"><b>{cmpItems.length}</b> / 3 ilan seçildi: {cmpItems.map((l) => cardTitle(l)).join(' · ')}</span>
-          {cmpItems.length >= 2 ? <Link className="btn sm" href="/karsilastir">Karşılaştır</Link> : <span className="sub">En az 2 ilan seç</span>}
+          {cmpItems.length >= 2 ? <a className="btn sm" href="/karsilastir">Karşılaştır</a> : <span className="sub">En az 2 ilan seç</span>}
           <button className="btn ghost sm" type="button" onClick={clearCmp}>Temizle</button>
         </div>
       ) : null}

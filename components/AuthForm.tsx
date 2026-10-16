@@ -1,13 +1,11 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import { useEffect, useState, type FormEvent } from 'react';
 import { getSupabase } from '@/lib/supabase/client';
 import { authError, safeAuthNext } from '@/lib/auth';
 
 type Mode = 'login' | 'register' | 'reset';
 export function AuthForm() {
-  const router = useRouter();
   const [mode, setMode] = useState<Mode>('login');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -43,11 +41,11 @@ export function AuthForm() {
         });
         if (error) setError(authError(error.message));
         else if (!data.session) setInfo('Kayıt isteği alındı. E-postana gelen onay bağlantısını bu tarayıcıda aç. Mevcut hesabın varsa giriş yapabilirsin.');
-        else { router.push(next); router.refresh(); }
+        else { window.location.assign(next); }
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email: cleanEmail, password });
         if (error) setError(authError(error.message));
-        else { router.push(next); router.refresh(); }
+        else { window.location.assign(next); }
       }
     } catch { setError('Bağlantı kurulamadı. Tekrar dene.'); }
     finally { setBusy(false); }

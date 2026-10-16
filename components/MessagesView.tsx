@@ -1,7 +1,6 @@
 'use client';
 
 import type { QueryResult } from '@/lib/supabase/result';
-import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
 import { formatTL } from '@/lib/format';
 import { checkMessage, KAPORA_RE } from '@/lib/messageFilter';
@@ -110,7 +109,7 @@ export function MessagesView({ activeId }: { activeId?: string }) {
 
   if (!authReady) return <div className="empty">Yükleniyor…</div>;
   if (!getSupabase()) return <div className="panel">Supabase bağlantısı yok.</div>;
-  if (!me) return <><h1>Mesajlar</h1><div className="panel" style={{ marginTop: 16 }}>Mesajlarını görmek için <Link className="linkbtn" href="/giris">giriş yap</Link>.</div></>;
+  if (!me) return <><h1>Mesajlar</h1><div className="panel" style={{ marginTop: 16 }}>Mesajlarını görmek için <a className="linkbtn" href="/giris">giriş yap</a>.</div></>;
 
   return (
     <>
@@ -122,25 +121,25 @@ export function MessagesView({ activeId }: { activeId?: string }) {
           {threads === null ? <div className="empty">Yükleniyor…</div> : threads.length === 0 ? (
             <div className="empty">Henüz konuşman yok. Bir ilanda <b>Mesaj gönder</b> düğmesine bas.</div>
           ) : threads.map((t) => (
-            <Link key={t.id} href={`/mesajlar/${t.id}`} className="thr" aria-current={t.id === activeId ? 'true' : undefined}>
+            <a key={t.id} href={`/mesajlar/${t.id}`} className="thr" aria-current={t.id === activeId ? 'true' : undefined}>
               <b>{t.other}{t.unread > 0 ? <span className="udot" aria-label={`${t.unread} okunmamış`} /> : null}</b>
               <span className="sub">{t.title}</span>
               <div className="sub clamp">{t.last}</div>
               <div className="sub">{fmt(t.at)}</div>
-            </Link>
+            </a>
           ))}
         </div>
         <div className="panel thr-conv">
           {!activeId ? <div className="empty">Soldan bir konuşma seç.</div> : !active ? (
-            threads === null ? <div className="empty">Yükleniyor…</div> : <div className="empty">Bu konuşma bulunamadı. <Link className="linkbtn" href="/mesajlar">Mesajlara dön</Link></div>
+            threads === null ? <div className="empty">Yükleniyor…</div> : <div className="empty">Bu konuşma bulunamadı. <a className="linkbtn" href="/mesajlar">Mesajlara dön</a></div>
           ) : (
             <>
               <div className="sh-head">
                 <div>
                   <b>{active.other}</b> {trust ? <TrustPill seller={trust} /> : null}
-                  <div className="sub"><Link className="linkbtn" href={`/ilanlar/${active.listingId}`}>{active.title}</Link></div>
+                  <div className="sub"><a className="linkbtn" href={`/ilanlar/${active.listingId}`}>{active.title}</a></div>
                 </div>
-                <Link className="btn ghost sm thr-back" href="/mesajlar">← Tüm mesajlar</Link>
+                <a className="btn ghost sm thr-back" href="/mesajlar">← Tüm mesajlar</a>
               </div>
               <div className="note" style={{ margin: '10px 0' }}>Ürünü görmeden kapora veya ön ödeme gönderme. IBAN ve harici link paylaşımı engellenir.</div>
               <DealBox threadId={active.id} me={me} buyerId={active.buyerId} sellerId={active.sellerId} />

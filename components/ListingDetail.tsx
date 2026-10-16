@@ -1,7 +1,5 @@
 'use client';
 
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { useEffect, useState, type FormEvent, type ReactNode } from 'react';
 import type { Listing, Seller } from '@/lib/data/types';
 import { fetchListingById } from '@/lib/dbListings';
@@ -19,9 +17,9 @@ import { IconCmp, IconFav, Pill, ScoreRow, toneClass } from './ui';
 const REPORT_REASONS = ['Sahte veya yanıltıcı ilan', 'Kapora / ön ödeme istiyor', 'Fiyat gerçek dışı', 'Hakaret veya taciz', 'Diğer'];
 const r1000 = (n: number) => Math.round(n / 1000) * 1000;
 
-export function ListingDetail({ id }: { id: string }) {
+export function ListingDetail({ id, initial = null }: { id: string; initial?: { listing: Listing; seller: Seller | null } | null }) {
   const { find, sellers, stats, ready, favs, toggleFav, cmp, toggleCmp, myCity, profile } = useMarket();
-  const [extra, setExtra] = useState<{ listing: Listing; seller: Seller | null } | null>(null);
+  const [extra, setExtra] = useState<{ listing: Listing; seller: Seller | null } | null>(initial);
   const [missing, setMissing] = useState(false);
   const [loadError, setLoadError] = useState('');
   const [attempt, setAttempt] = useState(0);
@@ -31,7 +29,7 @@ export function ListingDetail({ id }: { id: string }) {
   useEffect(() => {
     if (!ready || /^\d+$/.test(id)) return;
     let alive = true;
-    setExtra(null); setMissing(false); setLoadError('');
+    setMissing(false); setLoadError('');
     fetchListingById(getSupabase(), id).then((r) => { if (!alive) return; if (r) setExtra(r); else if (!fromPool) setMissing(true); })
       .catch(() => { if (alive) setLoadError('İlan yüklenemedi. Bağlantını kontrol edip tekrar dene.'); });
     return () => { alive = false; };
@@ -46,7 +44,7 @@ export function ListingDetail({ id }: { id: string }) {
   const m = (l && (current?.seller ?? sellers[l.sel])) || null;
   if (loadError && !l) return <div className="panel" role="alert">{loadError} <button className="btn" onClick={() => setAttempt(n => n + 1)}>Tekrar dene</button></div>;
   if ((!ready || (!/^\d+$/.test(id) && !missing)) && !l) return <div className="empty">Yükleniyor…</div>;
-  if (!l || !m) return missing || ready ? <div className="empty">Bu ilan bulunamadı. <Link className="linkbtn" href="/ilanlar">İlanlara dön</Link></div> : <div className="empty">Yükleniyor…</div>;
+  if (!l || !m) return missing || ready ? <div className="empty">Bu ilan bulunamadı. <a className="linkbtn" href="/ilanlar">İlanlara dön</a></div> : <div className="empty">Yükleniyor…</div>;
 
   const seller: Seller = { ...m, reviews: current?.seller?.reviews ?? m.reviews };
   const own = !!profile && l.sel === profile.id;
@@ -83,7 +81,7 @@ function Body({ l, seller: m, own, stats, favs, toggleFav, cmp, toggleCmp, myCit
 
   return (
     <>
-      <Link href="/ilanlar" className="back">← İlanlara dön</Link>
+      <a href="/ilanlar" className="back">← İlanlara dön</a>
       <div className="sh-head" style={{ marginBottom: 14 }}>
         <div>
           <span className="sub">{l.cat}{l.demo ? ' · Demo ilan' : ''}</span>
@@ -141,7 +139,7 @@ function Body({ l, seller: m, own, stats, favs, toggleFav, cmp, toggleCmp, myCit
               {m.reviews.slice(0, 2).map((r, i) => (
                 <div key={i} className="sub">{'★'.repeat(r.rating)} {r.text ? `“${r.text}” — ` : '— '}{r.who}</div>
               ))}
-              <Link className="btn ghost sm" style={{ alignSelf: 'flex-start' }} href={`/magaza/${l.sel}`}>{m.type === 'Kurumsal' ? 'Mağaza sayfası' : 'Satıcı sayfası'}</Link>
+              <a className="btn ghost sm" style={{ alignSelf: 'flex-start' }} href={`/magaza/${l.sel}`}>{m.type === 'Kurumsal' ? 'Mağaza sayfası' : 'Satıcı sayfası'}</a>
             </div>
           </div>
         </div>
@@ -159,7 +157,7 @@ function Body({ l, seller: m, own, stats, favs, toggleFav, cmp, toggleCmp, myCit
         </div>
 
         {own ? (
-          <div className="note good">Bu senin ilanın. İlanı <Link className="linkbtn" href="/profil">Profil</Link> sayfasından yönetebilirsin.</div>
+          <div className="note good">Bu senin ilanın. İlanı <a className="linkbtn" href="/profil">Profil</a> sayfasından yönetebilirsin.</div>
         ) : inactive ? null : <Actions l={l} part={part} />}
       </div>
     </>
@@ -211,7 +209,6 @@ function Checklist({ l }: { l: Listing }) {
 }
 
 function Actions({ l, part }: { l: Listing; part: boolean }) {
-  const router = useRouter();
   const { profile, authReady, toast } = useMarket();
   const [phone, setPhone] = useState('');
   const [offerOpen, setOfferOpen] = useState(false);
@@ -225,7 +222,7 @@ function Actions({ l, part }: { l: Listing; part: boolean }) {
   const [ticket, setTicket] = useState('');
   const isDemo = typeof l.id === 'number';
 
-  const needLogin = () => { toast('Bu işlem için giriş yapmalısın.'); router.push('/giris'); };
+  const needLogin = () => { toast('Bu işlem için giriş yapmalısın.'); window.location.assign('/giris'); };
 
   async function reveal() {
     if (isDemo) { setPhone('0500 000 00 00 (örnek numara)'); return; }
@@ -250,7 +247,7 @@ function Actions({ l, part }: { l: Listing; part: boolean }) {
     setBusy(true); setErr('');
     const t = await openThread();
     setBusy(false);
-    if (t) router.push(`/mesajlar/${t}`);
+    if (t) window.location.assign(`/mesajlar/${t}`);
   }
 
   async function sendOffer(e: FormEvent) {
@@ -270,7 +267,7 @@ function Actions({ l, part }: { l: Listing; part: boolean }) {
     setBusy(false);
     if (res.error) { setErr(res.error.message); return; }
     toast('Teklifin gönderildi.');
-    router.push(`/mesajlar/${t}`);
+    window.location.assign(`/mesajlar/${t}`);
   }
 
   async function report() {
@@ -298,7 +295,7 @@ function Actions({ l, part }: { l: Listing; part: boolean }) {
         <button className="btn ghost" type="button" disabled title="Faz 2">Emanet depozito (yakında)</button>
         {ticket ? <span className="pill good" style={{ marginLeft: 'auto' }}>{ticket}</span> : <button className="btn ghost" type="button" style={{ marginLeft: 'auto' }} onClick={() => setRepOpen(!repOpen)}>İlanı şikayet et</button>}
       </div>
-      {authReady && !profile ? <div className="sub">Telefon, mesaj ve teklif için <Link className="linkbtn" href="/giris">giriş yap</Link>.</div> : null}
+      {authReady && !profile ? <div className="sub">Telefon, mesaj ve teklif için <a className="linkbtn" href="/giris">giriş yap</a>.</div> : null}
       {repOpen ? (
         <div className="panel">
           <h3>İlanı şikayet et</h3>

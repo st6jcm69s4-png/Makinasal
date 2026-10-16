@@ -1,6 +1,6 @@
 'use client';
 
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useMemo, useState, type FormEvent } from 'react';
 import { CATEGORIES, CITIES } from '@/lib/data/constants';
 import { formatTL } from '@/lib/format';
@@ -8,30 +8,39 @@ import { isPartCategory } from '@/lib/pricing';
 import {
   activeFilterCount, defaultFilters, defaultUnit, filterListings, MAX_PRICE, SORTS, sortListings, type Filters, type SortKey,
 } from '@/lib/market';
+import { filtersFromParams, filtersToParams } from '@/lib/searchParams';
 import { ListingCard } from './ListingCard';
 import { useMarket } from './MarketProvider';
 
 function Browser() {
   const params = useSearchParams();
-  const router = useRouter();
   const { listings, sellers, myCity, saveSearch, ready } = useMarket();
-  const [f, setF] = useState<Filters>(() => {
-    const d = defaultFilters();
-    const cat = params.get('cat');
-    if (cat && (CATEGORIES as readonly string[]).includes(cat)) { d.cat = cat; d.unit = defaultUnit(cat); }
-    d.q = params.get('q') ?? '';
-    return d;
-  });
+  const [f, setF] = useState<Filters>(() => filtersFromParams(params));
   const [sort, setSort] = useState<SortKey>(() => (SORTS.some(([k]) => k === params.get('sort')) ? (params.get('sort') as SortKey) : 'rec'));
   const [open, setOpen] = useState(false);
+  const [page, setPage] = useState(1);
+  const paramString = params.toString();
+  useEffect(() => {
+    const next = new URLSearchParams(paramString);
+    setF(filtersFromParams(next));
+    setSort(SORTS.some(([k]) => k === next.get('sort')) ? next.get('sort') as SortKey : 'rec');
+  }, [paramString]);
+  useEffect(() => setPage(1), [f, sort]);
   const [q, setQ] = useState(f.q);
   useEffect(() => { setQ(f.q); }, [f.q]);
 
   const set = <K extends keyof Filters>(k: K, v: Filters[K]) => setF((cur) => ({ ...cur, [k]: v }));
   const shown = useMemo(() => sortListings(filterListings(listings, sellers, f, myCity), sort, sellers, myCity), [listings, sellers, f, myCity, sort]);
+  const pages = Math.max(1, Math.ceil(shown.length / 24));
+  const currentPage = Math.min(page, pages);
+  const visible = shown.slice((currentPage - 1) * 24, currentPage * 24);
   const n = activeFilterCount(f);
   const part = isPartCategory(f.cat);
-  const submit = (e: FormEvent) => { e.preventDefault(); set('q', q); router.replace('/ilanlar'); };
+  const submit = (e: FormEvent) => {
+    e.preventDefault(); const next = { ...f, q }; setF(next);
+    const query = filtersToParams(next); if (sort !== 'rec') query.set('sort', sort);
+    window.location.assign(`/ilanlar?${query.toString()}`);
+  };
   const pickCat = (c: string) => setF((cur) => ({ ...cur, cat: c, unit: c === 'Tümü' ? cur.unit : defaultUnit(c) }));
   const anyUse = f.useMin !== '' || f.useMax !== '';
 
@@ -118,7 +127,7 @@ function Browser() {
           {shown.length === 0 ? (
             <div className="empty">Bu filtrelerle ilan bulunamadı. Filtreleri gevşetmeyi dene.</div>
           ) : (
-            <div className="grid">{shown.map((l) => <ListingCard key={String(l.id)} l={l} />)}</div>
+            <><div className="grid">{visible.map((l) => <ListingCard key={String(l.id)} l={l} />)}</div>{pages > 1 ? <nav className="acts-row" aria-label="Sonuç sayfaları" style={{ marginTop: 20 }}><button className="btn ghost" disabled={currentPage <= 1} onClick={() => setPage(p => p - 1)}>Önceki</button><span role="status">{currentPage} / {pages}</span><button className="btn ghost" disabled={currentPage >= pages} onClick={() => setPage(p => p + 1)}>Sonraki</button></nav> : null}</>
           )}
         </div>
       </div>

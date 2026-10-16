@@ -37,3 +37,44 @@ const mixed = [real, { ...real, price: 200000 }, { ...real, demo: true, price: 9
 assert.equal(categoryMedian(mixed, real.cat), 150000);
 assert.equal(buildPriceStats(mixed).median(real.cat), 150000);
 console.log('Auth yönlendirmeleri ve gerçek ilan fiyatı kontrolleri geçti ✔');
+
+// Saved searches preserve every filter when opened again.
+const { filtersFromParams, filtersToParams } = await import('../lib/searchParams.ts');
+const { defaultFilters } = await import('../lib/market.ts');
+const savedFilters = { ...defaultFilters(), city: 'Ankara', q: 'Hidromek', takas: true, ver: true, incNew: false, minScore: 4, yMin: '2018', useMax: '5000', maxPrice: 3000000 };
+assert.deepEqual(filtersFromParams(filtersToParams(savedFilters)), savedFilters);
+assert.equal(filtersFromParams(new URLSearchParams('minScore=NaN&ver=no&city=invalid')).minScore, 0);
+console.log('Kayıtlı arama filtreleri kontrol edildi ✔');
+
+// Marketplace inputs: no inherited object keys, incomplete or non-finite coordinates.
+const {validKind,validCoordinates,money} = await import('../lib/network.ts');
+assert.equal(validKind('constructor'), 'job');
+assert.equal(validKind('part_request'), 'part_request');
+assert.equal(validCoordinates(null,null), true);
+assert.equal(validCoordinates(39.9,null), false);
+assert.equal(validCoordinates(NaN,32), false);
+assert.equal(validCoordinates(91,32), false);
+assert.equal(validCoordinates(39.9,32.8), true);
+assert.ok(money(9500,'gün').includes('/ gün'));
+console.log('İş ağı: tür, fiyat birimi ve konum doğrulamaları geçti ✔');
+
+const {homeSearchUrl,locationUrl}=await import('../lib/homeSearch.ts');
+assert.equal(homeSearchUrl('rental','kamyon','Ankara'),'/kiralik?q=kamyon&city=Ankara');
+assert.equal(homeSearchUrl('jobs','  ','Bogus'),'/isler');
+assert.equal(new URL('https://example.test'+homeSearchUrl('parts','pompa','İzmir')).searchParams.get('cat'),'Yedek parça');
+assert.equal(new URL('https://example.test'+homeSearchUrl('firms','A & B','Ankara')).searchParams.get('q'),'A & B');
+assert.equal(locationUrl('/sirketler','Ankara'),'/sirketler?city=Ankara');
+assert.equal(new URL('https://example.test'+homeSearchUrl('sale','x'.repeat(250),'')).searchParams.get('q').length,200);
+console.log('Ana sayfa: sekme, il, parça kategorisi ve güvenli arama adresleri geçti ✔');
+
+const {MACHINE_CATEGORIES,KM_CATEGORIES}=await import('../lib/data/constants.ts');
+const {RENTAL_MODES,rentalModeLabel}=await import('../lib/network.ts');
+assert.equal(new Set(MACHINE_CATEGORIES).size,MACHINE_CATEGORIES.length);
+for(const name of ['Manitou / teleskopik yükleyici','Mobil vinç','Paletli vinç','Fore kazık makinesi','Beton pompası','Diğer iş makinesi'])assert.ok(MACHINE_CATEGORIES.includes(name));
+assert.equal(KM_CATEGORIES.has('Damperli kamyon'),true);
+assert.equal(KM_CATEGORIES.has('Mini ekskavatör'),false);
+assert.equal(rentalModeLabel('with_operator'),'Operatörlü / şoförlü');
+assert.equal(rentalModeLabel('machine_only'),'Sadece makine / araç');
+assert.equal(rentalModeLabel(null),'Operatör / şoför durumu belirtilmedi');
+assert.equal(rentalModeLabel('constructor'),'Operatör / şoför durumu belirtilmedi');
+console.log(`Kiralama kapsamı ve ${MACHINE_CATEGORIES.length} makine türü kontrol edildi ✔`);

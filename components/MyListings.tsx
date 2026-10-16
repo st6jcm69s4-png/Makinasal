@@ -1,7 +1,6 @@
 'use client';
 
 import type { QueryResult } from '@/lib/supabase/result';
-import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 import { LIMITS } from '@/lib/data/constants';
 import { formatTL } from '@/lib/format';
@@ -63,7 +62,7 @@ export function MyListings() {
   }
 
   if (!authReady) return <div className="panel">Yükleniyor…</div>;
-  if (!profile) return <div className="panel">İlanlarını görmek için <Link className="linkbtn" href="/giris">giriş yap</Link>.</div>;
+  if (!profile) return <div className="panel">İlanlarını görmek için <a className="linkbtn" href="/giris">giriş yap</a>.</div>;
   const limit = profile.is_premium ? LIMITS.prem.listings : LIMITS.free.listings;
   const live = (rows ?? []).filter((r) => r.status === 'active' || r.status === 'paused').length;
   return (
@@ -71,13 +70,13 @@ export function MyListings() {
       <p className="sub">{live} / {limit} ilan hakkı kullanıldı ({profile.is_premium ? 'premium' : 'ücretsiz'} üyelik). Yayında ve duraklatılmış ilanlar hakkı kullanır; satılan ve silinen ilanlar hakkı geri açar.</p>
       {error ? <div className="err" role="alert">{error}</div> : null}
       {rows === null ? <div className="panel">Yükleniyor…</div> : rows.length === 0 ? (
-        <div className="empty">Henüz ilanın yok. <Link className="linkbtn" href="/ilan-ver">İlk ilanını ver</Link></div>
+        <div className="empty">Henüz ilanın yok. <a className="linkbtn" href="/ilan-ver">İlk ilanını ver</a></div>
       ) : rows.map((r) => {
         const boosted = !!r.boosted_until && Date.parse(r.boosted_until) > Date.now();
         return (
           <div key={r.id} className="mine">
             <div style={{ minWidth: 0 }}>
-              <Link href={`/ilanlar/${r.id}`}><b>{r.title}</b></Link>{r.year ? ` · ${r.year}` : ''}
+              <a href={`/ilanlar/${r.id}`}><b>{r.title}</b></a>{r.year ? ` · ${r.year}` : ''}
               <br /><span className="sub">{formatTL(Number(r.price))} · {r.city} · {r.listing_photos?.length ?? 0} fotoğraf{profile.is_premium && stats[r.id] ? ` · ${stats[r.id].views} görüntülenme, ${stats[r.id].phones} telefon` : ''}</span>
               <div style={{ marginTop: 4, display: 'flex', gap: 6 }}>
                 <Pill cls={r.status === 'active' ? 'good' : r.status === 'sold' ? '' : 'warn'}>{STATUS[r.status] ?? r.status}</Pill>
@@ -85,7 +84,7 @@ export function MyListings() {
               </div>
             </div>
             <div className="acts-row">
-              {r.status !== 'sold' ? <Link className="btn ghost sm" href={`/ilan-ver?duzenle=${r.id}`}>Düzenle</Link> : null}
+              {r.status !== 'sold' ? <a className="btn ghost sm" href={`/ilan-ver?duzenle=${r.id}`}>Düzenle</a> : null}
               {r.status === 'active' ? <button className="btn ghost sm" type="button" onClick={() => void patch(r.id, { confirmed_at: new Date().toISOString() }, 'İlanın “hâlâ satılık” olarak doğrulandı.')}>Hâlâ satılık</button> : null}
               {r.status !== 'sold' ? <button className="btn ghost sm" type="button" onClick={() => void patch(r.id, { price: Math.round((Number(r.price) * 0.95) / 100) * 100 }, 'Fiyat %5 düşürüldü.')}>Fiyatı %5 düşür</button> : null}
               {r.status === 'active' ? <button className="btn ghost sm" type="button" onClick={() => void patch(r.id, { status: 'paused' })}>Duraklat</button> : null}

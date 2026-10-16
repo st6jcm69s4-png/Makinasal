@@ -43,7 +43,7 @@ export function filterListings(all: Listing[], sellers: SellerMap, f: Filters, m
     if (!m) return false;
     if (f.cat !== 'Tümü' && l.cat !== f.cat) return false;
     if (f.city !== 'Tümü' && l.city !== f.city) return false;
-    if (l.price > f.maxPrice) return false;
+    if (f.maxPrice < MAX_PRICE && l.price > f.maxPrice) return false;
     if (!partMode) {
       if (uMin != null || uMax != null) {
         if (usageUnit(l) !== f.unit || l.use == null) return false;
