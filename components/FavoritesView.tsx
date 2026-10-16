@@ -1,7 +1,5 @@
 'use client';
 
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { filtersToParams } from '@/lib/searchParams';
 import { formatTL } from '@/lib/format';
 import { filterLabel, filterListings } from '@/lib/market';
@@ -10,7 +8,6 @@ import { useMarket } from './MarketProvider';
 import { Pill } from './ui';
 
 export function FavoritesView() {
-  const router = useRouter();
   const { listings, sellers, favs, saved, newCount, setNotify, deleteSaved, markSeen, myCity, profile, authReady } = useMarket();
   const favListings = Object.keys(favs).map((k) => listings.find((l) => String(l.id) === k)).filter((l): l is NonNullable<typeof l> => !!l);
 
@@ -19,14 +16,14 @@ export function FavoritesView() {
     if (!s) return;
     await markSeen(id);
     const p = filtersToParams(s.f);
-    router.push(`/ilanlar?${p.toString()}`);
+    window.location.assign(`/ilanlar?${p.toString()}`);
   }
 
   return (
     <>
       <h1>Favoriler</h1>
       <p className="lead">Beğendiğin ilanları ve kayıtlı aramalarını burada takip et. Fiyatı düşen ya da aramana uyan yeni ilanlar işaretlenir.</p>
-      {authReady && !profile ? <div className="note" style={{ marginTop: 14 }}>Giriş yapmadan favorilerin yalnızca bu cihazda saklanır. <Link className="linkbtn" href="/giris">Giriş yap</Link></div> : null}
+      {authReady && !profile ? <div className="note" style={{ marginTop: 14 }}>Giriş yapmadan favorilerin yalnızca bu cihazda saklanır. <a className="linkbtn" href="/giris">Giriş yap</a></div> : null}
       <div style={{ marginTop: 18, display: 'flex', flexDirection: 'column', gap: 18 }}>
         <div className="panel">
           <h3>Kayıtlı aramalar</h3>

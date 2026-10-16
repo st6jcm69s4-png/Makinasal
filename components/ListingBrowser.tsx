@@ -1,6 +1,6 @@
 'use client';
 
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useMemo, useState, type FormEvent } from 'react';
 import { CATEGORIES, CITIES } from '@/lib/data/constants';
 import { formatTL } from '@/lib/format';
@@ -14,7 +14,6 @@ import { useMarket } from './MarketProvider';
 
 function Browser() {
   const params = useSearchParams();
-  const router = useRouter();
   const { listings, sellers, myCity, saveSearch, ready } = useMarket();
   const [f, setF] = useState<Filters>(() => filtersFromParams(params));
   const [sort, setSort] = useState<SortKey>(() => (SORTS.some(([k]) => k === params.get('sort')) ? (params.get('sort') as SortKey) : 'rec'));
@@ -40,7 +39,7 @@ function Browser() {
   const submit = (e: FormEvent) => {
     e.preventDefault(); const next = { ...f, q }; setF(next);
     const query = filtersToParams(next); if (sort !== 'rec') query.set('sort', sort);
-    router.replace(`/ilanlar?${query.toString()}`, { scroll: false });
+    window.location.assign(`/ilanlar?${query.toString()}`);
   };
   const pickCat = (c: string) => setF((cur) => ({ ...cur, cat: c, unit: c === 'Tümü' ? cur.unit : defaultUnit(c) }));
   const anyUse = f.useMin !== '' || f.useMax !== '';

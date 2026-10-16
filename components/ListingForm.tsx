@@ -1,7 +1,6 @@
 'use client';
 
-import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useRef, useState, type DragEvent, type FormEvent } from 'react';
 import { CATEGORIES, CITIES, KM_CATEGORIES, LIMITS } from '@/lib/data/constants';
 import { formatTL } from '@/lib/format';
@@ -18,7 +17,6 @@ const YEAR_MAX = new Date().getFullYear() + 1;
 type Photo = { key: string; url: string; file?: File; id?: string; path?: string };
 
 function Form() {
-  const router = useRouter();
   const params = useSearchParams();
   const editId = params.get('duzenle');
   const { profile, authReady, stats, reload, toast } = useMarket();
@@ -197,7 +195,7 @@ function Form() {
       }
       await reload();
       toast(publishAfterSave ? (editId ? 'İlan güncellendi.' : 'İlan yayınlandı. Ücret: 0 ₺') : 'İlan duraklatılmış olarak kaydedildi.');
-      router.push(`/ilanlar/${id}`);
+      window.location.assign(`/ilanlar/${id}`);
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Bir hata oluştu.';
       if (savedListingId) setPartial({ id: savedListingId, message });
@@ -210,12 +208,12 @@ function Form() {
 
   if (!authReady || (profile && !loaded)) return <div className="empty">Yükleniyor…</div>;
   if (!getSupabase()) return <div className="panel">Supabase bağlantısı yok. <code>.env.local</code> dosyasını kontrol et.</div>;
-  if (!profile) return <div className="panel">İlan vermek için önce <Link className="linkbtn" href="/giris">giriş yap ya da kayıt ol</Link>.</div>;
+  if (!profile) return <div className="panel">İlan vermek için önce <a className="linkbtn" href="/giris">giriş yap ya da kayıt ol</a>.</div>;
   if (partial) {
     return (
       <div className="panel">
         <div className="note">{partial.message}</div>
-        <p style={{ display: 'flex', gap: 8 }}><a className="btn" href={`/ilan-ver?duzenle=${partial.id}`}>İlanı tamamla</a><Link className="btn ghost" href="/profil">Profil</Link></p>
+        <p style={{ display: 'flex', gap: 8 }}><a className="btn" href={`/ilan-ver?duzenle=${partial.id}`}>İlanı tamamla</a><a className="btn ghost" href="/profil">Profil</a></p>
       </div>
     );
   }

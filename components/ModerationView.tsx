@@ -1,5 +1,4 @@
 'use client';
-import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 import { getSupabase } from '@/lib/supabase/client';
 import { useMarket } from './MarketProvider';
@@ -31,8 +30,8 @@ export function ModerationView() {
   catch{setError('Bağlantı kurulamadı. Tekrar dene.');}finally{setBusy(false);}
  }
  if(!authReady||!checked)return <div className="empty">Yetki kontrol ediliyor…</div>;
- if(!admin)return <div className="panel"><h1>Yönetici erişimi gerekli</h1><p>Bu bölüm yalnızca yetkilendirilmiş moderatörler içindir.</p><Link className="btn" href="/giris">Giriş yap</Link></div>;
+ if(!admin)return <div className="panel"><h1>Yönetici erişimi gerekli</h1><p>Bu bölüm yalnızca yetkilendirilmiş moderatörler içindir.</p><a className="btn" href="/giris">Giriş yap</a></div>;
  return <><h1>Moderasyon</h1>{error?<p className="err" role="alert">{error}</p>:null}<button className="btn ghost" disabled={busy} onClick={()=>void load()}>Yenile</button>
- <section className="panel" style={{marginTop:16}}><h2>İnceleme bekleyen ilanlar</h2>{!listings.length?<p>Bekleyen ilan yok.</p>:listings.map(l=><div className="mine" key={l.id}><div><Link href={`/ilanlar/${l.id}`}>{l.title}</Link><p>{l.city} · {Number(l.price).toLocaleString('tr-TR')} ₺</p></div><div className="acts-row"><button disabled={busy} className="btn" onClick={()=>void action('listings',l.id,{moderation_status:'approved'})}>Onayla</button><button disabled={busy} className="btn ghost" onClick={()=>void action('listings',l.id,{moderation_status:'rejected',status:'paused'})}>Reddet</button></div></div>)}</section>
- <section className="panel" style={{marginTop:16}}><h2>Açık şikayetler</h2>{!reports.length?<p>Açık şikayet yok.</p>:reports.map(r=><div className="mine" key={r.id}><div><b>ŞK-{r.ticket}</b><p>{r.reason}</p>{r.listing_id?<Link href={`/ilanlar/${r.listing_id}`}>İlanı aç</Link>:null}</div><div className="acts-row"><button disabled={busy} className="btn" onClick={()=>void action('reports',r.id,{verified:true,status:'resolved'})}>Şikayeti doğrula</button><button disabled={busy} className="btn ghost" onClick={()=>void action('reports',r.id,{verified:false,status:'dismissed'})}>Geçersiz kapat</button></div></div>)}</section></>;
+ <section className="panel" style={{marginTop:16}}><h2>İnceleme bekleyen ilanlar</h2>{!listings.length?<p>Bekleyen ilan yok.</p>:listings.map(l=><div className="mine" key={l.id}><div><a href={`/ilanlar/${l.id}`}>{l.title}</a><p>{l.city} · {Number(l.price).toLocaleString('tr-TR')} ₺</p></div><div className="acts-row"><button disabled={busy} className="btn" onClick={()=>void action('listings',l.id,{moderation_status:'approved'})}>Onayla</button><button disabled={busy} className="btn ghost" onClick={()=>void action('listings',l.id,{moderation_status:'rejected',status:'paused'})}>Reddet</button></div></div>)}</section>
+ <section className="panel" style={{marginTop:16}}><h2>Açık şikayetler</h2>{!reports.length?<p>Açık şikayet yok.</p>:reports.map(r=><div className="mine" key={r.id}><div><b>ŞK-{r.ticket}</b><p>{r.reason}</p>{r.listing_id?<a href={`/ilanlar/${r.listing_id}`}>İlanı aç</a>:null}</div><div className="acts-row"><button disabled={busy} className="btn" onClick={()=>void action('reports',r.id,{verified:true,status:'resolved'})}>Şikayeti doğrula</button><button disabled={busy} className="btn ghost" onClick={()=>void action('reports',r.id,{verified:false,status:'dismissed'})}>Geçersiz kapat</button></div></div>)}</section></>;
 }

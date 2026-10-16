@@ -1,7 +1,5 @@
 'use client';
 
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { useState, type FormEvent } from 'react';
 import { CATEGORIES } from '@/lib/data/constants';
 import { formatScore } from '@/lib/format';
@@ -13,11 +11,10 @@ import { useMarket } from './MarketProvider';
 import { Avatar, Pill, toneClass } from './ui';
 
 export function HomeView() {
-  const router = useRouter();
   const { listings, sellers } = useMarket();
   const [q, setQ] = useState('');
 
-  const go = (e: FormEvent) => { e.preventDefault(); router.push(q.trim() ? `/ilanlar?q=${encodeURIComponent(q.trim())}` : '/ilanlar'); };
+  const go = (e: FormEvent) => { e.preventDefault(); window.location.assign(q.trim() ? `/ilanlar?q=${encodeURIComponent(q.trim())}` : '/ilanlar'); };
   const feat = listings.filter((l) => isFeatured(l, sellers[l.sel])).sort((a, b) => recency(b) - recency(a)).slice(0, 4);
   const drops = listings.filter((l) => dropPct(l) > 0).sort((a, b) => dropPct(b) - dropPct(a)).slice(0, 4);
   const fresh = [...listings].sort((a, b) => recency(b) - recency(a)).slice(0, 4);
@@ -35,10 +32,10 @@ export function HomeView() {
       </form>
       <div className="tiles">
         {CATEGORIES.map((c) => (
-          <Link key={c} href={`/ilanlar?cat=${encodeURIComponent(c)}`} className="tile">
+          <a key={c} href={`/ilanlar?cat=${encodeURIComponent(c)}`} className="tile">
             <span className="tn">{c}</span>
             <span className="tc">{listings.filter((l) => l.cat === c).length} ilan</span>
-          </Link>
+          </a>
         ))}
       </div>
       <Section title="Öne çıkan ilanlar" list={feat} all="rec" />
@@ -51,10 +48,10 @@ export function HomeView() {
             {stores.map(([k, m]) => {
               const lv = trustLevel(m);
               return (
-                <Link key={k} href={`/magaza/${k}`} className="store">
+                <a key={k} href={`/magaza/${k}`} className="store">
                   <Avatar name={m.name} small />
                   <span><b>{m.name}</b><br /><span className="sub">{m.city} · {listings.filter((l) => l.sel === k).length} ilan · puan {formatScore(m.s)}</span><br /><Pill cls={toneClass(lv.tone)}>{lv.label}</Pill></span>
-                </Link>
+                </a>
               );
             })}
           </div>
@@ -76,7 +73,7 @@ function Section({ title, list, all }: { title: string; list: ReturnType<typeof 
   if (list.length === 0) return null;
   return (
     <div className="sect">
-      <div className="sect-h"><h2>{title}</h2><Link className="linkbtn" href={`/ilanlar?sort=${all}`}>Tümünü gör</Link></div>
+      <div className="sect-h"><h2>{title}</h2><a className="linkbtn" href={`/ilanlar?sort=${all}`}>Tümünü gör</a></div>
       <div className="grid">{list.map((l) => <ListingCard key={String(l.id)} l={l} />)}</div>
     </div>
   );

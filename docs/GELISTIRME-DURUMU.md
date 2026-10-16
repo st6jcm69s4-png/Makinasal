@@ -49,3 +49,10 @@ Bu kayıt ilk sağlamlaştırma paketidir. Tüm özelliklerin tamamlandığı ve
 - Yardım merkezi hazırlandı; örnek ücret ve sınırsız paket vaatleri kaldırıldı.
 - Moderasyon ekranı ve buna ilişkin SQL değişikliği hazırlandı, ancak canlı migration otomatik güvenlik incelemesinde reddedildi. Yeni moderasyon yetkileri ve public itibar özetleri veritabanına uygulanmadı; yönetim akışı kullanıma hazır kabul edilmemeli.
 - Sites test yayını yalnızca hesap sahibine açık hazırlanıyor. Genel lansman, gerçek kullanıcı/e-posta ve cihaz testleri tamamlanmış sayılmaz.
+
+
+## Menü ve gezinme düzeltmesi
+- Yatay menü yerine soldan açılan, klavye ile kapatılabilen panel eklendi. Temel açma/kapama native details/summary ile JavaScript öncesinde de çalışır.
+- Sayfa bağlantıları standart HTML bağlantıları kullanır; sayfa geçişi istemci yönlendiricisine bağımlı değildir.
+- Telefona yükle bağlantıları ve tanıtım ekranı kaldırıldı; eski `/uygulama` adresi ana sayfaya yönlenir.
+- Canlı veritabanı için onay bekleyen migration bu arayüz düzenlemesinde uygulanmadı.

@@ -1,7 +1,6 @@
 import type { ReactNode } from 'react';
 import './globals.css';
 import { MarketProvider } from '@/components/MarketProvider';
-import Link from 'next/link';
 import { AppServiceWorker } from '@/components/AppInstaller';
 import { SiteHeader } from '@/components/SiteHeader';
 
@@ -28,7 +27,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           <SiteHeader />
           <main id="main-content" className="wrap">{children}</main>
         </MarketProvider>
-        <footer className="wrap" style={{ padding: '28px 0 96px' }}><nav className="acts-row" aria-label="Yardım bağlantıları"><Link href="/destek">Yardım</Link><Link href="/guven">Güvenli alışveriş</Link><Link href="/uygulama">Telefona yükle</Link></nav><p className="sub">Makinasal · Beta · Ödeme ve emanet para kabul edilmez.</p></footer>
+        <footer className="wrap" style={{ padding: '28px 0 96px' }}><nav className="acts-row" aria-label="Yardım bağlantıları"><a href="/destek">Yardım</a><a href="/guven">Güvenli alışveriş</a></nav><p className="sub">Makinasal · Beta · Ödeme ve emanet para kabul edilmez.</p></footer>
       </body>
     </html>
   );

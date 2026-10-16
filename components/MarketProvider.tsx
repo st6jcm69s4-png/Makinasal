@@ -1,7 +1,6 @@
 'use client';
 
 import type { QueryResult } from '@/lib/supabase/result';
-import Link from 'next/link';
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { LISTINGS } from '@/lib/data/listings';
 import { SELLERS } from '@/lib/data/sellers';
@@ -302,7 +301,7 @@ export function MarketProvider({ children }: { children: ReactNode }) {
       {cmpItems.length > 0 ? (
         <div id="cmpBar" role="region" aria-label="Karşılaştırma">
           <span className="out"><b>{cmpItems.length}</b> / 3 ilan seçildi: {cmpItems.map((l) => cardTitle(l)).join(' · ')}</span>
-          {cmpItems.length >= 2 ? <Link className="btn sm" href="/karsilastir">Karşılaştır</Link> : <span className="sub">En az 2 ilan seç</span>}
+          {cmpItems.length >= 2 ? <a className="btn sm" href="/karsilastir">Karşılaştır</a> : <span className="sub">En az 2 ilan seç</span>}
           <button className="btn ghost sm" type="button" onClick={clearCmp}>Temizle</button>
         </div>
       ) : null}
