@@ -57,3 +57,12 @@ assert.equal(validCoordinates(91,32), false);
 assert.equal(validCoordinates(39.9,32.8), true);
 assert.ok(money(9500,'gün').includes('/ gün'));
 console.log('İş ağı: tür, fiyat birimi ve konum doğrulamaları geçti ✔');
+
+const {homeSearchUrl,locationUrl}=await import('../lib/homeSearch.ts');
+assert.equal(homeSearchUrl('rental','kamyon','Ankara'),'/kiralik?q=kamyon&city=Ankara');
+assert.equal(homeSearchUrl('jobs','  ','Bogus'),'/isler');
+assert.equal(new URL('https://example.test'+homeSearchUrl('parts','pompa','İzmir')).searchParams.get('cat'),'Yedek parça');
+assert.equal(new URL('https://example.test'+homeSearchUrl('firms','A & B','Ankara')).searchParams.get('q'),'A & B');
+assert.equal(locationUrl('/sirketler','Ankara'),'/sirketler?city=Ankara');
+assert.equal(new URL('https://example.test'+homeSearchUrl('sale','x'.repeat(250),'')).searchParams.get('q').length,200);
+console.log('Ana sayfa: sekme, il, parça kategorisi ve güvenli arama adresleri geçti ✔');

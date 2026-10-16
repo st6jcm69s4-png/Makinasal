@@ -5,8 +5,8 @@ import { AppServiceWorker } from '@/components/AppInstaller';
 import { SiteHeader } from '@/components/SiteHeader';
 
 export const metadata = {
-  title: 'Makinasal | İş Makinesi Pazarı',
-  description: 'İş makineleri, kamyonlar, çekiciler, yedek parça ve lastik ilanları. Satıcıyı tanı, güvenle al.',
+  title: 'Makinasal | Makine, İş ve Şirket Ağı',
+  description: 'Satılık ve kiralık iş makineleri, kamyonlar, operatörler, iş ve parça talepleri. Bölgenizdeki hafriyat şirketlerini ve filolarını keşfedin.',
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

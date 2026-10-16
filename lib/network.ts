@@ -48,6 +48,7 @@ export type MarketPost = {
   created_at: string;
 };
 export type Provider = {
+  company_category: string | null;
   user_id: string;
   name: string;
   kind: keyof typeof PROVIDER_KINDS;
@@ -112,3 +113,29 @@ export function networkError(
     return "Bu işlem için yetkin yok. Hesabını ve oturumunu kontrol et.";
   return "İşlem tamamlanamadı. Bağlantını kontrol edip tekrar dene.";
 }
+
+export const COMPANY_CATEGORIES = [
+  "Hafriyat şirketi",
+  "Nakliye şirketi",
+  "Makine kiralama şirketi",
+  "Parça tedarikçisi",
+  "Diğer şirket",
+] as const;
+export const EQUIPMENT_STATUS = {
+  available: "Müsait",
+  busy: "İşte / kullanımda",
+  maintenance: "Bakımda",
+} as const;
+export type InventoryItem = {
+  id: string;
+  owner_id: string;
+  category: string;
+  brand: string;
+  model: string;
+  year: number | null;
+  quantity: number;
+  capacity: string;
+  description: string;
+  availability: keyof typeof EQUIPMENT_STATUS;
+  published: boolean;
+};

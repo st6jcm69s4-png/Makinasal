@@ -13,6 +13,8 @@ const NAV: { href: string; label: string; match: (p: string) => boolean; badge?:
   { href: '/operatorler', label: 'Kiralık operatörler', match: p => p === '/operatorler' },
   { href: '/isler', label: 'İş talepleri', match: p => p === '/isler' },
   { href: '/parca-talepleri', label: 'Parça talepleri', match: p => p === '/parca-talepleri' },
+  { href: '/sirketler', label: 'Şirketler ve filolar', match: p => p === '/sirketler' },
+  { href: '/envanterim', label: 'Şirketim ve envanterim', match: p => p === '/envanterim' },
   { href: '/firmalar', label: 'Firmalar ve parçacılar', match: p => p.startsWith('/firmalar') },
   { href: '/is-agi/hesabim', label: 'İşlerim ve tekliflerim', match: p => p === '/is-agi/hesabim' },
   { href: '/ilan-ver', label: 'İlan ver', match: p => p.startsWith('/ilan-ver') },

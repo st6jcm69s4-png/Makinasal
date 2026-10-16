@@ -35,3 +35,11 @@ Bunlar mevcut satış, itibar ve moderasyon tablolarının davranışını deği
 `supabase/tests/work_network.sql` gerçek veritabanında işlem içinde üç geçici test hesabıyla çalıştırılır ve sonunda ROLLBACK yapar; e-posta göndermez. Sahiplik sahteciliği, kendi ilanına teklif, üçüncü kişinin özel verileri görmesi/mesaj yazması, teklif verenin kendini seçmesi, iş sahibinin fiyat değiştirmesi, iki teklif seçilmesi, kapalı ilan düzenleme ve kaldırılmış ilan geçmişi kontrol edilir.
 
 `npm test` tür/koordinat/fiyat birimi kontrolleri içerir. TypeScript ve Next üretim derlemesi geçti. Tarayıcı kontrol aracı bulunmadığından gerçek tarayıcı/telefon etkileşim testi yapılmadı. Canlı e-posta akışı ve genel kullanıma açılış koşulları önceki durum belgesindeki sınırlamalara tabidir. Sanayi ustaları modülü bu sürüme dahil değildir.
+
+## Ana sayfa ve şirket filosu güncellemesi
+
+Ana sayfa Satılık/Kiralık/İşler/Parçalar/Firmalar araması, ortak il seçimi, dört hızlı işlem, kişisel iş merkezi ve gerçek verilerle bölgesel içerikler içerir. İl tercihi tarayıcıda tutulur; konum izni istenmez. Aramaya q/city parametreleri aktarılır. Yükleme hataları boş sonuçlardan ayrı gösterilir; örnek ilan veya sahte istatistik eklenmez.
+
+`/sirketler` şirket rehberidir. Firma profilindeki `company_category` alanı hafriyat/nakliye/kiralama/parça/diğer şirket sınıflandırmasını sağlar. Mevcut hafriyat, kiralama ve parçacı profilleri de rehberde gösterilir. `/envanterim` şirketin kendi ekipmanlarını yönetir. Marka, model, yıl, adet, kapasite, müsaitlik ve görünürlük belirtilir. `company_inventory` RLS ile sahibi dışındaki yazmalara kapalıdır. Hem ekipman hem şirket profili yayımlanmışsa ziyaretçiler okuyabilir. Şirket gizlenince envanter de gizlenir. Kayıtlar satış ilanı, mülkiyet doğrulaması veya rezervasyon oluşturmaz. Vitrin en son 200 ekipman grubunu gösterir ve toplamı yalnızca listelenen kayıtlar için hesaplar.
+
+`20261016214341_company_inventory.sql` canlıya uygulandı. `supabase/tests/company_inventory.sql` iki geçici kullanıcı ile sahiplik, güncelleme/silme, görünürlük, hizmet ili ve adet kısıtlarını doğruladı; test verileri geri alındı. Ana sayfa arama URL testleri, TypeScript ve üretim derlemeleri doğrulamaya dahildir. Gerçek tarayıcı/telefon etkileşim testi bu ortamda yapılamadı.

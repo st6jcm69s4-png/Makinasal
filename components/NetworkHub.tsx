@@ -7,6 +7,7 @@ import {
   PART_CATEGORIES,
 } from "@/lib/data/constants";
 import {
+  COMPANY_CATEGORIES,
   ACTIVITIES,
   POST_KINDS,
   PROVIDER_KINDS,
@@ -23,6 +24,7 @@ import {
   type Quote,
 } from "@/lib/network";
 import { useMarket } from "./MarketProvider";
+import { CompanyInventory } from "./CompanyInventory";
 
 type Client = NonNullable<ReturnType<typeof getSupabase>>;
 const client = () => getSupabase();
@@ -219,6 +221,7 @@ export function NetworkNav() {
       <a href="/operatorler">Operatörler</a>
       <a href="/isler">İş talepleri</a>
       <a href="/parca-talepleri">Parça talepleri</a>
+      <a href="/sirketler">Şirketler</a>
       <a href="/firmalar">Firma rehberi</a>
       <a href="/is-agi/hesabim">İşlerim ve tekliflerim</a>
     </nav>
@@ -235,7 +238,17 @@ export function NetworkBrowse({ kind }: { kind?: PostKind }) {
     [page, setPage] = useState(0),
     [more, setMore] = useState(false),
     [refresh, setRefresh] = useState(0);
+  const [filtersReady, setFiltersReady] = useState(false);
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const initialCity = params.get("city");
+    if (initialCity && (CITIES as readonly string[]).includes(initialCity))
+      setCity(initialCity);
+    setQ((params.get("q") || "").slice(0, 200));
+    setFiltersReady(true);
+  }, []);
+  useEffect(() => {
+    if (!filtersReady) return;
     let active = true;
     setBusy(true);
     setError("");
@@ -268,7 +281,7 @@ export function NetworkBrowse({ kind }: { kind?: PostKind }) {
     return () => {
       active = false;
     };
-  }, [kind, city, category, q, page, refresh]);
+  }, [kind, city, category, q, page, refresh, filtersReady]);
   return (
     <>
       <NetworkNav />
@@ -1322,7 +1335,11 @@ function QuoteMessages({ q }: { q: Quote }) {
   );
 }
 
-export function ProviderDirectory() {
+export function ProviderDirectory({
+  companyOnly = false,
+}: {
+  companyOnly?: boolean;
+}) {
   const [providers, setProviders] = useState<Provider[]>([]),
     [kind, setKind] = useState(""),
     [city, setCity] = useState(""),
@@ -1333,7 +1350,18 @@ export function ProviderDirectory() {
     [busy, setBusy] = useState(true),
     [error, setError] = useState(""),
     [refresh, setRefresh] = useState(0);
+  const [companyCategory, setCompanyCategory] = useState(""),
+    [filtersReady, setFiltersReady] = useState(false);
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const initialCity = params.get("city");
+    if (initialCity && (CITIES as readonly string[]).includes(initialCity))
+      setCity(initialCity);
+    setQ((params.get("q") || "").slice(0, 200));
+    setFiltersReady(true);
+  }, []);
+  useEffect(() => {
+    if (!filtersReady) return;
     let active = true;
     setBusy(true);
     setError("");
@@ -1349,6 +1377,9 @@ export function ProviderDirectory() {
       .eq("published", true)
       .order("created_at", { ascending: false })
       .range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
+    if (companyOnly)
+      query = query.or("company_category.not.is.null,kind.neq.operator");
+    if (companyCategory) query = query.eq("company_category", companyCategory);
     if (kind) query = query.eq("kind", kind);
     if (city) query = query.contains("service_cities", [city]);
     if (activity) query = query.contains("specialties", [activity]);
@@ -1366,14 +1397,28 @@ export function ProviderDirectory() {
     return () => {
       active = false;
     };
-  }, [kind, city, activity, q, page, refresh]);
+  }, [
+    kind,
+    city,
+    activity,
+    q,
+    page,
+    refresh,
+    companyOnly,
+    companyCategory,
+    filtersReady,
+  ]);
   return (
     <>
       <NetworkNav />
       <div className="network-heading">
         <div>
           <span className="eyebrow">YEREL HİZMET AĞI</span>
-          <h1>İşini yapacak firmayı bul.</h1>
+          <h1>
+            {companyOnly
+              ? "Şirketleri ve filolarını keşfet."
+              : "İşini yapacak firmayı bul."}
+          </h1>
           <p className="lead">
             Hafriyat firmaları, parçacılar, kiralama şirketleri ve operatörler.
             Hizmet verilen ile ve iş alanına göre seç.
@@ -1384,6 +1429,21 @@ export function ProviderDirectory() {
         </a>
       </div>
       <div className="network-filters">
+        <label>
+          Şirket kategorisi
+          <select
+            value={companyCategory}
+            onChange={(e) => {
+              setCompanyCategory(e.target.value);
+              setPage(0);
+            }}
+          >
+            <option value="">Tüm şirket kategorileri</option>
+            {COMPANY_CATEGORIES.map((c) => (
+              <option key={c}>{c}</option>
+            ))}
+          </select>
+        </label>
         <label>
           Firma adı
           <input
@@ -1460,7 +1520,9 @@ export function ProviderDirectory() {
         <div className="network-cards">
           {providers.map((p) => (
             <article key={p.user_id} className="panel network-card">
-              <span className="pill">{PROVIDER_KINDS[p.kind]}</span>
+              <span className="pill">
+                {p.company_category || PROVIDER_KINDS[p.kind]}
+              </span>
               <h2>
                 <a href={`/firmalar/${p.user_id}`}>{p.name}</a>
               </h2>
@@ -1477,7 +1539,7 @@ export function ProviderDirectory() {
                 Hizmet bölgeleri: {p.service_cities.join(", ")}
               </p>
               <a className="linkbtn" href={`/firmalar/${p.user_id}`}>
-                Profili incele →
+                Şirketi ve envanterini incele →
               </a>
             </article>
           ))}
@@ -1566,6 +1628,7 @@ function ProviderEditorForm() {
         ...locationData(f),
         name: String(f.get("name")).trim(),
         kind: String(f.get("kind")),
+        company_category: String(f.get("company_category") || "") || null,
         description: String(f.get("description")).trim(),
         service_cities: areas,
         specialties: activities,
@@ -1609,6 +1672,11 @@ function ProviderEditorForm() {
         Hangi bölgede, hangi işleri yaptığını göster. Aynı hesabınla ilan
         verebilir ve fiyat teklifi gönderebilirsin.
       </p>
+      <p>
+        <a className="linkbtn" href="/envanterim">
+          Şirketinin makine ve araç envanterini yönet →
+        </a>
+      </p>
       <form className="panel network-form" onSubmit={save}>
         <fieldset disabled={busy}>
           <div className="network-form-grid">
@@ -1636,6 +1704,18 @@ function ProviderEditorForm() {
               </select>
             </label>
           </div>
+          <label>
+            Şirket kategorisi
+            <select
+              name="company_category"
+              defaultValue={provider?.company_category ?? ""}
+            >
+              <option value="">Bireysel hizmet / seçilmedi</option>
+              {COMPANY_CATEGORIES.map((c) => (
+                <option key={c}>{c}</option>
+              ))}
+            </select>
+          </label>
           <label>
             Hizmetlerini anlat
             <textarea
@@ -1781,7 +1861,7 @@ export function ProviderDetail({ id }: { id: string }) {
           <div className="network-heading">
             <div>
               <span className="pill">
-                {PROVIDER_KINDS[provider.kind]}
+                {provider.company_category || PROVIDER_KINDS[provider.kind]}
                 {!provider.published ? " · Yayımlanmıyor" : ""}
               </span>
               <h1>{provider.name}</h1>
@@ -1830,6 +1910,7 @@ export function ProviderDetail({ id }: { id: string }) {
               bilgileri üyenin kendi beyanıdır.
             </p>
           </article>
+          <CompanyInventory ownerId={provider.user_id} />
           <section className="sect">
             <h2>Firmanın açık iş ağı ilanları</h2>
             {posts.length ? (
