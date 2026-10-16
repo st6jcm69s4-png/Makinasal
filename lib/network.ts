@@ -31,6 +31,7 @@ export type MarketPost = {
   owner_id: string;
   preferred_provider: string | null;
   kind: PostKind;
+  rental_mode: RentalMode | null;
   title: string;
   description: string;
   category: string;
@@ -139,3 +140,14 @@ export type InventoryItem = {
   availability: keyof typeof EQUIPMENT_STATUS;
   published: boolean;
 };
+
+export const RENTAL_MODES = {
+  with_operator: "Operatörlü / şoförlü",
+  machine_only: "Sadece makine / araç",
+} as const;
+export type RentalMode = keyof typeof RENTAL_MODES;
+export function rentalModeLabel(mode: string | null | undefined) {
+  return mode && Object.prototype.hasOwnProperty.call(RENTAL_MODES, mode)
+    ? RENTAL_MODES[mode as RentalMode]
+    : "Operatör / şoför durumu belirtilmedi";
+}

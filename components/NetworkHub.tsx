@@ -7,6 +7,8 @@ import {
   PART_CATEGORIES,
 } from "@/lib/data/constants";
 import {
+  RENTAL_MODES,
+  rentalModeLabel,
   COMPANY_CATEGORIES,
   ACTIVITIES,
   POST_KINDS,
@@ -235,6 +237,7 @@ export function NetworkBrowse({ kind }: { kind?: PostKind }) {
     [q, setQ] = useState(""),
     [city, setCity] = useState(""),
     [category, setCategory] = useState(""),
+    [rentalMode, setRentalMode] = useState(""),
     [page, setPage] = useState(0),
     [more, setMore] = useState(false),
     [refresh, setRefresh] = useState(0);
@@ -245,6 +248,9 @@ export function NetworkBrowse({ kind }: { kind?: PostKind }) {
     if (initialCity && (CITIES as readonly string[]).includes(initialCity))
       setCity(initialCity);
     setQ((params.get("q") || "").slice(0, 200));
+    const mode = params.get("rental_mode");
+    if (mode && Object.prototype.hasOwnProperty.call(RENTAL_MODES, mode))
+      setRentalMode(mode);
     setFiltersReady(true);
   }, []);
   useEffect(() => {
@@ -265,6 +271,7 @@ export function NetworkBrowse({ kind }: { kind?: PostKind }) {
       .order("created_at", { ascending: false })
       .range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
     if (kind) query = query.eq("kind", kind);
+    if (rentalMode) query = query.eq("rental_mode", rentalMode);
     if (city) query = query.eq("city", city);
     if (category) query = query.eq("category", category);
     if (q.trim())
@@ -281,7 +288,7 @@ export function NetworkBrowse({ kind }: { kind?: PostKind }) {
     return () => {
       active = false;
     };
-  }, [kind, city, category, q, page, refresh, filtersReady]);
+  }, [kind, city, category, q, page, refresh, filtersReady, rentalMode]);
   return (
     <>
       <NetworkNav />
@@ -367,6 +374,25 @@ export function NetworkBrowse({ kind }: { kind?: PostKind }) {
             ))}
           </select>
         </label>
+        {(kind === "rental_machine" || !kind) && (
+          <label>
+            Kiralama kapsamı
+            <select
+              value={rentalMode}
+              onChange={(e) => {
+                setRentalMode(e.target.value);
+                setPage(0);
+              }}
+            >
+              <option value="">Tümü (belirtilmemiş ilanlar dahil)</option>
+              {Object.entries(RENTAL_MODES).map(([k, v]) => (
+                <option key={k} value={k}>
+                  {v}
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
         <label>
           İhtiyaç / makine türü
           <select
@@ -441,6 +467,9 @@ function PostCard({ post: p }: { post: MarketPost }) {
           </span>
         )}
       </div>
+      {p.kind === "rental_machine" && (
+        <span className="pill">{rentalModeLabel(p.rental_mode)}</span>
+      )}
       <h2>
         <a href={`/is-agi/ilan/${p.id}`}>{p.title}</a>
       </h2>
@@ -527,6 +556,8 @@ function PostEditorForm() {
       const data = {
         ...locationData(f),
         kind,
+        rental_mode:
+          kind === "rental_machine" ? String(f.get("rental_mode") || "") : null,
         title: String(f.get("title")).trim(),
         description: String(f.get("description")).trim(),
         category: String(f.get("category")),
@@ -537,6 +568,16 @@ function PostEditorForm() {
         quantity: Number(f.get("quantity")),
         specs: String(f.get("specs") || "").trim(),
       };
+      if (
+        kind === "rental_machine" &&
+        !Object.prototype.hasOwnProperty.call(
+          RENTAL_MODES,
+          data.rental_mode ?? "",
+        )
+      )
+        throw new Error(
+          "Operatörlü / şoförlü veya sadece makine / araç seçeneğini belirt.",
+        );
       if (
         data.end_date &&
         (!data.start_date || data.end_date < data.start_date)
@@ -622,6 +663,39 @@ function PostEditorForm() {
               </select>
             </label>
           </div>
+          {kind === "rental_machine" && (
+            <fieldset className="rental-scope">
+              <legend>Kiralama kapsamı</legend>
+              <p className="sub">
+                Gösterdiğin fiyatın operatör / şoför içerip içermediğini açıkça
+                seç.
+              </p>
+              {Object.entries(RENTAL_MODES).map(([k, v]) => (
+                <label key={k}>
+                  <input
+                    type="radio"
+                    name="rental_mode"
+                    value={k}
+                    required
+                    defaultChecked={post?.rental_mode === k}
+                  />
+                  <span>
+                    <b>{v}</b>
+                    <small>
+                      {k === "with_operator"
+                        ? "Makine veya araç, operatörü / şoförü ile verilir."
+                        : "Operatör veya şoför bedeli bu ilandaki fiyata dahil değildir."}
+                    </small>
+                  </span>
+                </label>
+              ))}
+              <p className="sub">
+                Yakıt, nakliye, çalışma saati ve KDV koşullarını açıklamada
+                ayrıca belirt. Her iki şekilde de kiralıyorsan kapsamı ve fiyatı
+                farklı iki ilan açabilirsin.
+              </p>
+            </fieldset>
+          )}
           <label>
             Başlık
             <input
@@ -877,8 +951,19 @@ export function PostDetail({ id }: { id: string }) {
       <div className="network-detail">
         <article className="panel">
           <h2>İlanın ayrıntıları</h2>
+          {post.kind === "rental_machine" && (
+            <p className="rental-detail-scope">
+              {rentalModeLabel(post.rental_mode)}
+            </p>
+          )}
           <p className="network-text">{post.description}</p>
           <dl className="network-facts">
+            {post.kind === "rental_machine" && (
+              <>
+                <dt>Kiralama kapsamı</dt>
+                <dd>{rentalModeLabel(post.rental_mode)}</dd>
+              </>
+            )}
             <dt>Tür</dt>
             <dd>{post.category}</dd>
             <dt>Miktar</dt>

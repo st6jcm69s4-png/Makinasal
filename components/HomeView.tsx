@@ -18,6 +18,7 @@ import {
   dateLabel,
   money,
   POST_KINDS,
+  rentalModeLabel,
   PROVIDER_KINDS,
   type MarketPost,
   type Provider,
@@ -732,6 +733,11 @@ function HomePost({ p }: { p: MarketPost }) {
         {POST_KINDS[p.kind]}
       </span>
       <h3>{p.title}</h3>
+      {p.kind === "rental_machine" && (
+        <span className="home-rental-scope">
+          {rentalModeLabel(p.rental_mode)}
+        </span>
+      )}
       <p className="home-card-location">
         <Icon type="pin" />
         {p.city}

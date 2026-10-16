@@ -66,3 +66,15 @@ assert.equal(new URL('https://example.test'+homeSearchUrl('firms','A & B','Ankar
 assert.equal(locationUrl('/sirketler','Ankara'),'/sirketler?city=Ankara');
 assert.equal(new URL('https://example.test'+homeSearchUrl('sale','x'.repeat(250),'')).searchParams.get('q').length,200);
 console.log('Ana sayfa: sekme, il, parça kategorisi ve güvenli arama adresleri geçti ✔');
+
+const {MACHINE_CATEGORIES,KM_CATEGORIES}=await import('../lib/data/constants.ts');
+const {RENTAL_MODES,rentalModeLabel}=await import('../lib/network.ts');
+assert.equal(new Set(MACHINE_CATEGORIES).size,MACHINE_CATEGORIES.length);
+for(const name of ['Manitou / teleskopik yükleyici','Mobil vinç','Paletli vinç','Fore kazık makinesi','Beton pompası','Diğer iş makinesi'])assert.ok(MACHINE_CATEGORIES.includes(name));
+assert.equal(KM_CATEGORIES.has('Damperli kamyon'),true);
+assert.equal(KM_CATEGORIES.has('Mini ekskavatör'),false);
+assert.equal(rentalModeLabel('with_operator'),'Operatörlü / şoförlü');
+assert.equal(rentalModeLabel('machine_only'),'Sadece makine / araç');
+assert.equal(rentalModeLabel(null),'Operatör / şoför durumu belirtilmedi');
+assert.equal(rentalModeLabel('constructor'),'Operatör / şoför durumu belirtilmedi');
+console.log(`Kiralama kapsamı ve ${MACHINE_CATEGORIES.length} makine türü kontrol edildi ✔`);

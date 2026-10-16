@@ -265,14 +265,7 @@ export function CompanyInventory({
                   defaultValue={editing?.category ?? ""}
                 >
                   <option value="">Tür seç</option>
-                  {[
-                    ...MACHINE_CATEGORIES,
-                    "Lowbed",
-                    "Dozer",
-                    "Greyder",
-                    "Silindir",
-                    "Diğer",
-                  ].map((c) => (
+                  {[...MACHINE_CATEGORIES, "Diğer"].map((c) => (
                     <option key={c}>{c}</option>
                   ))}
                 </select>
