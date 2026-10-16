@@ -19,9 +19,9 @@ import { IconCmp, IconFav, Pill, ScoreRow, toneClass } from './ui';
 const REPORT_REASONS = ['Sahte veya yanıltıcı ilan', 'Kapora / ön ödeme istiyor', 'Fiyat gerçek dışı', 'Hakaret veya taciz', 'Diğer'];
 const r1000 = (n: number) => Math.round(n / 1000) * 1000;
 
-export function ListingDetail({ id }: { id: string }) {
+export function ListingDetail({ id, initial = null }: { id: string; initial?: { listing: Listing; seller: Seller | null } | null }) {
   const { find, sellers, stats, ready, favs, toggleFav, cmp, toggleCmp, myCity, profile } = useMarket();
-  const [extra, setExtra] = useState<{ listing: Listing; seller: Seller | null } | null>(null);
+  const [extra, setExtra] = useState<{ listing: Listing; seller: Seller | null } | null>(initial);
   const [missing, setMissing] = useState(false);
   const [loadError, setLoadError] = useState('');
   const [attempt, setAttempt] = useState(0);
@@ -31,7 +31,7 @@ export function ListingDetail({ id }: { id: string }) {
   useEffect(() => {
     if (!ready || /^\d+$/.test(id)) return;
     let alive = true;
-    setExtra(null); setMissing(false); setLoadError('');
+    setMissing(false); setLoadError('');
     fetchListingById(getSupabase(), id).then((r) => { if (!alive) return; if (r) setExtra(r); else if (!fromPool) setMissing(true); })
       .catch(() => { if (alive) setLoadError('İlan yüklenemedi. Bağlantını kontrol edip tekrar dene.'); });
     return () => { alive = false; };

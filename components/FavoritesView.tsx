@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { filtersToParams } from '@/lib/searchParams';
 import { formatTL } from '@/lib/format';
 import { filterLabel, filterListings } from '@/lib/market';
 import { ListingCard } from './ListingCard';
@@ -17,9 +18,7 @@ export function FavoritesView() {
     const s = saved.find((x) => x.id === id);
     if (!s) return;
     await markSeen(id);
-    const p = new URLSearchParams();
-    if (s.f.cat !== 'Tümü') p.set('cat', s.f.cat);
-    if (s.f.q) p.set('q', s.f.q);
+    const p = filtersToParams(s.f);
     router.push(`/ilanlar?${p.toString()}`);
   }
 

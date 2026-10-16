@@ -55,7 +55,8 @@ export const useMarket = () => {
 };
 
 const DEMO: Listing[] = LISTINGS.map((l) => ({ ...l, demo: true }));
-const DEMO_SELLERS = SELLERS;
+const SHOW_DEMO = process.env.NEXT_PUBLIC_DEMO_MODE === 'true';
+const DEMO_SELLERS = SHOW_DEMO ? SELLERS : {};
 
 function lsGet<T>(k: string, d: T): T {
   try { const v = localStorage.getItem(k); return v ? (JSON.parse(v) as T) : d; } catch { return d; }
@@ -183,7 +184,7 @@ export function MarketProvider({ children }: { children: ReactNode }) {
   }, [profile, refreshUnread]);
 
   const sellers = useMemo(() => ({ ...DEMO_SELLERS, ...db.sellers }), [db.sellers]);
-  const listings = useMemo(() => [...db.listings, ...DEMO], [db.listings]);
+  const listings = useMemo(() => [...db.listings, ...(SHOW_DEMO ? DEMO : [])], [db.listings]);
   const stats = useMemo(() => buildPriceStats(listings), [listings]);
   const myCity = profile?.city || 'İstanbul';
   const find = useCallback((id: string | number) => listings.find((l) => String(l.id) === String(id)) ?? null, [listings]);

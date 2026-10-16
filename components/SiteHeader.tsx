@@ -12,9 +12,9 @@ const NAV: { href: string; label: string; match: (p: string) => boolean; badge?:
   { href: '/mesajlar', label: 'Mesajlar', match: (p) => p.startsWith('/mesajlar'), badge: 'unread' },
   { href: '/favoriler', label: 'Favoriler', match: (p) => p.startsWith('/favoriler'), badge: 'favs' },
   { href: '/profil', label: 'Profil', match: (p) => p.startsWith('/profil') || p.startsWith('/ilanlarim') },
-  { href: '/premium', label: 'Premium', match: (p) => p.startsWith('/premium') },
+  { href: '/premium', label: 'Üyelik', match: (p) => p.startsWith('/premium') },
   { href: '/guven', label: 'Güven sistemi', match: (p) => p.startsWith('/guven') },
-  { href: '/yol-haritasi', label: 'Yol haritası', match: (p) => p.startsWith('/yol-haritasi') },
+  { href: '/uygulama', label: 'Telefona yükle', match: (p) => p.startsWith('/uygulama') },
 ];
 
 export function SiteHeader() {

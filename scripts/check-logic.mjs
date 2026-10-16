@@ -37,3 +37,11 @@ const mixed = [real, { ...real, price: 200000 }, { ...real, demo: true, price: 9
 assert.equal(categoryMedian(mixed, real.cat), 150000);
 assert.equal(buildPriceStats(mixed).median(real.cat), 150000);
 console.log('Auth yönlendirmeleri ve gerçek ilan fiyatı kontrolleri geçti ✔');
+
+// Saved searches preserve every filter when opened again.
+const { filtersFromParams, filtersToParams } = await import('../lib/searchParams.ts');
+const { defaultFilters } = await import('../lib/market.ts');
+const savedFilters = { ...defaultFilters(), city: 'Ankara', q: 'Hidromek', takas: true, ver: true, incNew: false, minScore: 4, yMin: '2018', useMax: '5000', maxPrice: 3000000 };
+assert.deepEqual(filtersFromParams(filtersToParams(savedFilters)), savedFilters);
+assert.equal(filtersFromParams(new URLSearchParams('minScore=NaN&ver=no&city=invalid')).minScore, 0);
+console.log('Kayıtlı arama filtreleri kontrol edildi ✔');
