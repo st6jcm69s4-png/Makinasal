@@ -126,13 +126,13 @@ function Form() {
     if (!brand.trim() || !model.trim()) return setError(`Marka ve ${part ? 'ürün adı' : 'model'} alanlarını doldur.`);
     if (part) {
       if (!spec.trim()) return setError(`${cat === 'Lastik ve jant' ? 'Lastik ebadını' : 'Parça numarasını'} gir.`);
-      if (!(Number(qty) >= 1)) return setError('Adet gir.');
+      if (!Number.isSafeInteger(Number(qty)) || Number(qty) < 1) return setError('Adet gir.');
     } else {
-      if (!yearNum || yearNum < 1980 || yearNum > YEAR_MAX) return setError(`Model yılı 1980 ile ${YEAR_MAX} arasında olmalı.`);
-      if (usage === '') return setError('Çalışma saati veya km bilgisini gir.');
+      if (!yearNum || !Number.isInteger(yearNum) || yearNum < 1980 || yearNum > YEAR_MAX) return setError(`Model yılı 1980 ile ${YEAR_MAX} arasında olmalı.`);
+      if (usage === '' || !Number.isSafeInteger(Number(usage)) || Number(usage) < 0) return setError('Çalışma saati veya km bilgisini sıfır ya da pozitif tam sayı olarak gir.');
     }
     if (!city) return setError('Şehir seç.');
-    if (!(priceNum > 0)) return setError('Fiyatı gir.');
+    if (!Number.isFinite(priceNum) || priceNum <= 0 || priceNum > 999999999999.99) return setError('Fiyatı gir.');
     if (photos.length === 0) return setError('En az 1 fotoğraf ekle. Alıcılar fotoğrafsız ilanlara güvenmez.');
     if (!pledge) return setError('Kapora taahhüdünü onaylaman gerekiyor.');
 
@@ -187,7 +187,7 @@ function Form() {
     }
   }
 
-  if (!authReady || !loaded) return <div className="empty">Yükleniyor…</div>;
+  if (!authReady || (profile && !loaded)) return <div className="empty">Yükleniyor…</div>;
   if (!getSupabase()) return <div className="panel">Supabase bağlantısı yok. <code>.env.local</code> dosyasını kontrol et.</div>;
   if (!profile) return <div className="panel">İlan vermek için önce <Link className="linkbtn" href="/giris">giriş yap ya da kayıt ol</Link>.</div>;
   if (partial) {

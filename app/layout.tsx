@@ -17,9 +17,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@600;700&family=Noto+Sans:wght@400;500;600&display=swap" />
       </head>
       <body>
+        <a className="skip-link" href="#main-content">Ana içeriğe geç</a>
         <MarketProvider>
           <SiteHeader />
-          <main className="wrap">{children}</main>
+          <main id="main-content" className="wrap">{children}</main>
         </MarketProvider>
       </body>
     </html>

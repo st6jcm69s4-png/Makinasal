@@ -1,5 +1,6 @@
 'use client';
 
+import type { QueryResult } from '@/lib/supabase/result';
 import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
 import { formatTL } from '@/lib/format';
@@ -31,7 +32,7 @@ export function MessagesView({ activeId }: { activeId?: string }) {
     const supabase = getSupabase();
     if (!supabase || !me) return;
     const { data: ts, error: tErr } = await supabase.from('threads').select('id,listing_id,buyer_id,seller_id,created_at,listings(title)').or(`buyer_id.eq.${me},seller_id.eq.${me}`);
-    if (tErr) { setError(tErr.message); return; }
+    if (tErr) { setError('Konuşmalar yüklenemedi. Lütfen tekrar dene.'); setThreads([]); return; }
     const list = ts ?? [];
     if (list.length === 0) { setThreads([]); return; }
     const otherIds = [...new Set(list.map((t) => (t.buyer_id === me ? t.seller_id : t.buyer_id) as string))];
@@ -63,14 +64,15 @@ export function MessagesView({ activeId }: { activeId?: string }) {
   const loadMsgs = useCallback(async () => {
     const supabase = getSupabase();
     if (!supabase || !activeId) return;
-    let res = await supabase.from('messages').select('id,sender_id,body,created_at,kind,offer_amount').eq('thread_id', activeId).order('created_at', { ascending: true });
+    let res: QueryResult = await supabase.from('messages').select('id,sender_id,body,created_at,kind,offer_amount').eq('thread_id', activeId).order('created_at', { ascending: true });
     if (res.error) res = await supabase.from('messages').select('id,sender_id,body,created_at').eq('thread_id', activeId).order('created_at', { ascending: true });
+    if (res.error) { setError('Mesajlar yüklenemedi. Lütfen tekrar dene.'); return; }
     if (res.data) setMsgs(res.data as Msg[]);
     await supabase.rpc('mark_thread_read', { p_thread: activeId });
     void refreshUnread();
   }, [activeId, refreshUnread]);
 
-  useEffect(() => { void loadThreads(); }, [loadThreads]);
+  useEffect(() => { setThreads(null); setMsgs([]); setText(''); setError(''); if (me) void loadThreads(); }, [loadThreads, me]);
   useEffect(() => { setMsgs([]); setTrust(null); setError(''); if (activeId && me) void loadMsgs(); }, [activeId, me, loadMsgs]);
   useEffect(() => {
     if (!me) return;

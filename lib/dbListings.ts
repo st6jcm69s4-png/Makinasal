@@ -1,3 +1,4 @@
+import type { QueryResult } from '@/lib/supabase/result';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Listing, Review, Seller } from './data/types';
 
@@ -73,9 +74,9 @@ type Stat = {
 export async function loadSellers(supabase: SupabaseClient, ids: string[]): Promise<Record<string, Seller>> {
   const out: Record<string, Seller> = {};
   if (ids.length === 0) return out;
-  let pr = await supabase.from('profiles').select(SELLER_FULL).in('id', ids);
+  let pr: QueryResult = await supabase.from('profiles').select(SELLER_FULL).in('id', ids);
   if (pr.error) pr = await supabase.from('profiles').select(SELLER_BASE).in('id', ids);
-  let sr = await supabase.from('user_stats')
+  let sr: QueryResult = await supabase.from('user_stats')
     .select('id,score,review_count,deals,reports,seller_score,seller_reviews,buyer_score,buyer_reviews').in('id', ids);
   if (sr.error) sr = await supabase.from('user_stats').select('id,score,review_count,deals,reports').in('id', ids);
   const statById = new Map<string, Stat>();
@@ -126,7 +127,7 @@ export async function fetchActiveListings(supabase: SupabaseClient | null): Prom
 
 /** Bir kullanıcının aldığı değerlendirmeler (en yeni önce). */
 export async function fetchReviews(supabase: SupabaseClient, userId: string, limit = 20): Promise<Review[]> {
-  let res = await supabase.from('reviews').select('score,comment,created_at,role,reviewer_id,tags')
+  let res: QueryResult = await supabase.from('reviews').select('score,comment,created_at,role,reviewer_id,tags')
     .eq('reviewee_id', userId).order('created_at', { ascending: false }).limit(limit);
   if (res.error) {
     res = await supabase.from('reviews').select('score,comment,created_at,role,reviewer_id')

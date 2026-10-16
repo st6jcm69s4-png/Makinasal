@@ -1,5 +1,6 @@
 'use client';
 
+import type { QueryResult } from '@/lib/supabase/result';
 import Link from 'next/link';
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { LISTINGS } from '@/lib/data/listings';
@@ -113,14 +114,14 @@ export function MarketProvider({ children }: { children: ReactNode }) {
       setSaved(lsGet<SavedSearch[]>('mk-saved', []).map((s) => ({ ...s, local: true })));
       return;
     }
-    let fr = await supabase.from('favorites').select('listing_id,price_at_save').eq('user_id', uid);
+    let fr: QueryResult = await supabase.from('favorites').select('listing_id,price_at_save').eq('user_id', uid);
     if (fr.error) fr = await supabase.from('favorites').select('listing_id').eq('user_id', uid);
     const out: Record<string, number> = { ...localFavs };
     for (const r of (fr.data ?? []) as unknown as { listing_id: string; price_at_save?: number | string | null }[]) {
       out[r.listing_id] = r.price_at_save != null ? Number(r.price_at_save) : 0;
     }
     setFavs(out);
-    let sr = await supabase.from('saved_searches').select('id,query,notify,last_seen_at,created_at').eq('user_id', uid);
+    let sr: QueryResult = await supabase.from('saved_searches').select('id,query,notify,last_seen_at,created_at').eq('user_id', uid);
     if (sr.error) sr = await supabase.from('saved_searches').select('id,query,created_at').eq('user_id', uid);
     setSaved(((sr.data ?? []) as unknown as { id: string; query: { f?: Filters }; notify?: boolean; last_seen_at?: string; created_at: string }[])
       .filter((r) => r.query?.f)
@@ -149,10 +150,20 @@ export function MarketProvider({ children }: { children: ReactNode }) {
       if (u) void refreshUnread(); else setUnread(0);
       setAuthReady(true);
     };
-    supabase.auth.getUser().then(({ data }) => apply(data.user));
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => { void apply(session?.user); });
-    return () => sub.subscription.unsubscribe();
-  }, [reload, loadProfile, loadUserData, refreshUnread]);
+    let disposed = false;
+    let pending: ReturnType<typeof setTimeout> | undefined;
+    // Supabase API calls must run after the auth callback releases its lock.
+    const schedule = (u: { id: string; email?: string | null } | null) => {
+      clearTimeout(pending);
+      pending = setTimeout(() => {
+        if (!disposed) void apply(u).catch(() => {
+          if (!disposed) { setAuthReady(true); toast('Hesap bilgileri yüklenemedi. Sayfayı yenileyerek tekrar dene.'); }
+        });
+      }, 0);
+    };
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => { schedule(session?.user ?? null); });
+    return () => { disposed = true; clearTimeout(pending); sub.subscription.unsubscribe(); };
+  }, [reload, loadProfile, loadUserData, refreshUnread, toast]);
 
   useEffect(() => {
     if (!profile) return;
@@ -231,16 +242,20 @@ export function MarketProvider({ children }: { children: ReactNode }) {
     const row: Record<string, unknown> = {};
     if (patch.notify !== undefined) row.notify = patch.notify;
     if (patch.lastSeen !== undefined) row.last_seen_at = patch.lastSeen;
-    await supabase?.from('saved_searches').update(row).eq('id', id);
-  }, [saved, profile]);
+    const result = await supabase?.from('saved_searches').update(row).eq('id', id).eq('user_id', profile.id);
+    if (result?.error) { await loadUserData(profile.id); toast('Arama güncellenemedi. Tekrar dene.'); }
+  }, [saved, profile, loadUserData, toast]);
 
   const deleteSaved = useCallback(async (id: string) => {
     const s = saved.find((x) => x.id === id);
     setSaved((cur) => cur.filter((x) => x.id !== id));
     if (!s) return;
     if (s.local || !profile) lsSet('mk-saved', lsGet<SavedSearch[]>('mk-saved', []).filter((x) => x.id !== id));
-    else await getSupabase()?.from('saved_searches').delete().eq('id', id);
-  }, [saved, profile]);
+    else {
+      const result = await getSupabase()?.from('saved_searches').delete().eq('id', id).eq('user_id', profile.id);
+      if (result?.error) { await loadUserData(profile.id); toast('Arama silinemedi. Tekrar dene.'); }
+    }
+  }, [saved, profile, loadUserData, toast]);
 
   const setNotify = useCallback((id: string, on: boolean) => patchSaved(id, { notify: on }), [patchSaved]);
   const markSeen = useCallback((id: string) => patchSaved(id, { lastSeen: new Date().toISOString() }), [patchSaved]);

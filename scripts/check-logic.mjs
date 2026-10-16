@@ -1,7 +1,8 @@
 // Kural doğrulaması: node --experimental-strip-types --import ./scripts/ts-resolve.mjs scripts/check-logic.mjs
 import assert from 'node:assert/strict';
 import { trustLevel } from '../lib/trust.ts';
-import { priceFlag } from '../lib/pricing.ts';
+import { safeAuthNext } from '../lib/auth.ts';
+import { priceFlag, categoryMedian, buildPriceStats } from '../lib/pricing.ts';
 import { checkMessage } from '../lib/messageFilter.ts';
 import { LISTINGS } from '../lib/data/listings.ts';
 import { SELLERS } from '../lib/data/sellers.ts';
@@ -23,3 +24,16 @@ assert.equal(priceFlag(LISTINGS, 1, 'Yedek parça'), null);
 assert.ok(distanceKm('Ankara', 'İstanbul') > 330 && distanceKm('Ankara', 'İstanbul') < 360);
 for (const l of LISTINGS) assert.ok(SELLERS[l.sel], `satıcı yok: ${l.sel}`);
 console.log('Tüm kontroller geçti ✔', LISTINGS.length, 'ilan');
+
+// Email callback destinations must stay on this site.
+for (const unsafe of ['https://evil.example', '//evil.example', '/\\evil.example', '/auth/callback?code=secret', '/\n/evil.example']) {
+  assert.equal(safeAuthNext(unsafe), '/ilanlar');
+}
+assert.equal(safeAuthNext('/ilan-ver?duzenle=123'), '/ilan-ver?duzenle=123');
+assert.equal(safeAuthNext('/sifre-yenile'), '/sifre-yenile');
+// Synthetic prices must never affect the benchmark for real listings.
+const real = { ...LISTINGS[0], demo: false, price: 100000 };
+const mixed = [real, { ...real, price: 200000 }, { ...real, demo: true, price: 9000000 }];
+assert.equal(categoryMedian(mixed, real.cat), 150000);
+assert.equal(buildPriceStats(mixed).median(real.cat), 150000);
+console.log('Auth yönlendirmeleri ve gerçek ilan fiyatı kontrolleri geçti ✔');

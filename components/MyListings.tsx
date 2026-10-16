@@ -1,5 +1,6 @@
 'use client';
 
+import type { QueryResult } from '@/lib/supabase/result';
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 import { LIMITS } from '@/lib/data/constants';
@@ -26,7 +27,7 @@ export function MyListings() {
   const load = useCallback(async (uid: string) => {
     const supabase = getSupabase();
     if (!supabase) return;
-    let res = await supabase.from('listings').select(`${COLS},brand,model,boosted_until`).eq('seller_id', uid).neq('status', 'removed').order('created_at', { ascending: false });
+    let res: QueryResult = await supabase.from('listings').select(`${COLS},brand,model,boosted_until`).eq('seller_id', uid).neq('status', 'removed').order('created_at', { ascending: false });
     if (res.error) res = await supabase.from('listings').select(COLS).eq('seller_id', uid).neq('status', 'removed').order('created_at', { ascending: false });
     if (res.error) { setError(res.error.message); return; }
     const list = res.data as unknown as Row[];
