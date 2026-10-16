@@ -23,13 +23,15 @@ export function HomeView() {
 
   return (
     <>
-      <h1>Makineni bul, <mark>satıcıyı tanı.</mark></h1>
-      <p className="lead">İş makineleri, kamyonlar, çekiciler, yedek parça ve lastik. Her ilanda satıcının güven seviyesi, fiyat kontrolü ve son doğrulama tarihi görünür.</p>
+      <h1>Makineni bul, <mark>işini büyüt.</mark></h1>
+      <p className="lead">Satılık ve kiralık makineler, operatörler, iş fırsatları ve yedek parçalar. İşini paylaş, teklif al; bölgendeki hafriyat firmasını ve parçacını bul.</p>
       <form className="searchbar" role="search" onSubmit={go}>
         <label className="sr" htmlFor="hq">Marka veya model ara</label>
         <input type="text" id="hq" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Marka veya model ara. Örn. Hidromek, Scania, 315/80R22.5" />
         <button className="btn" type="submit">Ara</button>
       </form>
+      <div className="network-home-links"><a href="/kiralik">Kiralık makine</a><a href="/operatorler">Operatör bul</a><a href="/isler">İş bul / İş ver</a><a href="/parca-talepleri">Parça iste / Fiyat ver</a><a href="/firmalar">Hafriyat firmaları ve parçacılar</a></div>
+      <h2>Satılık makineler ve parçalar</h2>
       <div className="tiles">
         {CATEGORIES.map((c) => (
           <a key={c} href={`/ilanlar?cat=${encodeURIComponent(c)}`} className="tile">

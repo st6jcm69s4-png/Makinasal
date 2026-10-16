@@ -45,3 +45,15 @@ const savedFilters = { ...defaultFilters(), city: 'Ankara', q: 'Hidromek', takas
 assert.deepEqual(filtersFromParams(filtersToParams(savedFilters)), savedFilters);
 assert.equal(filtersFromParams(new URLSearchParams('minScore=NaN&ver=no&city=invalid')).minScore, 0);
 console.log('Kayıtlı arama filtreleri kontrol edildi ✔');
+
+// Marketplace inputs: no inherited object keys, incomplete or non-finite coordinates.
+const {validKind,validCoordinates,money} = await import('../lib/network.ts');
+assert.equal(validKind('constructor'), 'job');
+assert.equal(validKind('part_request'), 'part_request');
+assert.equal(validCoordinates(null,null), true);
+assert.equal(validCoordinates(39.9,null), false);
+assert.equal(validCoordinates(NaN,32), false);
+assert.equal(validCoordinates(91,32), false);
+assert.equal(validCoordinates(39.9,32.8), true);
+assert.ok(money(9500,'gün').includes('/ gün'));
+console.log('İş ağı: tür, fiyat birimi ve konum doğrulamaları geçti ✔');

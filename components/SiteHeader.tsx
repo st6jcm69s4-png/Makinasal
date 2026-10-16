@@ -8,6 +8,13 @@ import { useMarket } from './MarketProvider';
 const NAV: { href: string; label: string; match: (p: string) => boolean; badge?: 'unread' | 'favs' }[] = [
   { href: '/', label: 'Ana sayfa', match: p => p === '/' },
   { href: '/ilanlar', label: 'İlanlarda ara', match: p => p.startsWith('/ilanlar') && !p.startsWith('/ilanlarim') || p.startsWith('/karsilastir') || p.startsWith('/magaza') },
+  { href: '/is-agi', label: 'İş ağı', match: p => p === '/is-agi' },
+  { href: '/kiralik', label: 'Kiralık makineler', match: p => p === '/kiralik' },
+  { href: '/operatorler', label: 'Kiralık operatörler', match: p => p === '/operatorler' },
+  { href: '/isler', label: 'İş talepleri', match: p => p === '/isler' },
+  { href: '/parca-talepleri', label: 'Parça talepleri', match: p => p === '/parca-talepleri' },
+  { href: '/firmalar', label: 'Firmalar ve parçacılar', match: p => p.startsWith('/firmalar') },
+  { href: '/is-agi/hesabim', label: 'İşlerim ve tekliflerim', match: p => p === '/is-agi/hesabim' },
   { href: '/ilan-ver', label: 'İlan ver', match: p => p.startsWith('/ilan-ver') },
   { href: '/ilanlarim', label: 'İlanlarım', match: p => p.startsWith('/ilanlarim') },
   { href: '/mesajlar', label: 'Mesajlar', match: p => p.startsWith('/mesajlar'), badge: 'unread' },
