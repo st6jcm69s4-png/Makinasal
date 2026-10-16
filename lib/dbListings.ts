@@ -1,3 +1,4 @@
+import type { QueryResult } from '@/lib/supabase/result';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Listing, Review, Seller } from './data/types';
 
@@ -73,9 +74,9 @@ type Stat = {
 export async function loadSellers(supabase: SupabaseClient, ids: string[]): Promise<Record<string, Seller>> {
   const out: Record<string, Seller> = {};
   if (ids.length === 0) return out;
-  let pr = await supabase.from('profiles').select(SELLER_FULL).in('id', ids);
+  let pr: QueryResult = await supabase.from('profiles').select(SELLER_FULL).in('id', ids);
   if (pr.error) pr = await supabase.from('profiles').select(SELLER_BASE).in('id', ids);
-  let sr = await supabase.from('user_stats')
+  let sr: QueryResult = await supabase.from('user_stats')
     .select('id,score,review_count,deals,reports,seller_score,seller_reviews,buyer_score,buyer_reviews').in('id', ids);
   if (sr.error) sr = await supabase.from('user_stats').select('id,score,review_count,deals,reports').in('id', ids);
   const statById = new Map<string, Stat>();
@@ -109,15 +110,14 @@ export async function loadSellers(supabase: SupabaseClient, ids: string[]): Prom
 
 export type DbData = { listings: Listing[]; sellers: Record<string, Seller> };
 
-/** Yayındaki gerçek ilanlar. Hata olursa boş döner (site demo verisiyle açılır). */
+/** Yayındaki ilanlar; bağlantı hatası boş sonuçtan ayrı ele alınır. */
 export async function fetchActiveListings(supabase: SupabaseClient | null): Promise<DbData> {
   if (!supabase) return { listings: [], sellers: {} };
   const publicUrl = photoUrlFn(supabase);
   const { data, error } = await selectListings(supabase, (cols) =>
     supabase.from('listings').select(cols).eq('status', 'active').order('created_at', { ascending: false }).limit(300));
   if (error || !data) {
-    console.error('İlanlar okunamadı:', error?.message);
-    return { listings: [], sellers: {} };
+    throw new Error('İlanlar yüklenemedi. Bağlantını kontrol edip tekrar dene.');
   }
   const listings = (data as unknown as Row[]).map((r) => rowToListing(r, publicUrl));
   const sellers = await loadSellers(supabase, [...new Set(listings.map((l) => l.sel))]);
@@ -126,7 +126,7 @@ export async function fetchActiveListings(supabase: SupabaseClient | null): Prom
 
 /** Bir kullanıcının aldığı değerlendirmeler (en yeni önce). */
 export async function fetchReviews(supabase: SupabaseClient, userId: string, limit = 20): Promise<Review[]> {
-  let res = await supabase.from('reviews').select('score,comment,created_at,role,reviewer_id,tags')
+  let res: QueryResult = await supabase.from('reviews').select('score,comment,created_at,role,reviewer_id,tags')
     .eq('reviewee_id', userId).order('created_at', { ascending: false }).limit(limit);
   if (res.error) {
     res = await supabase.from('reviews').select('score,comment,created_at,role,reviewer_id')
@@ -153,7 +153,8 @@ export async function fetchReviews(supabase: SupabaseClient, userId: string, lim
 export async function fetchListingById(supabase: SupabaseClient | null, id: string): Promise<{ listing: Listing; seller: Seller | null } | null> {
   if (!supabase) return null;
   const { data, error } = await selectListings(supabase, (cols) => supabase.from('listings').select(cols).eq('id', id).maybeSingle());
-  if (error || !data) return null;
+  if (error) throw new Error('İlan yüklenemedi. Lütfen tekrar dene.');
+  if (!data) return null;
   const listing = rowToListing(data as unknown as Row, photoUrlFn(supabase));
   const sellers = await loadSellers(supabase, [listing.sel]);
   const seller = sellers[listing.sel] ?? null;

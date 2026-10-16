@@ -26,6 +26,7 @@ function Form() {
   const maxListings = profile?.is_premium ? LIMITS.prem.listings : LIMITS.free.listings;
 
   const [loaded, setLoaded] = useState(!editId);
+  const [publishAfterSave, setPublishAfterSave] = useState(!editId);
   const [cat, setCat] = useState('');
   const [brand, setBrand] = useState('');
   const [model, setModel] = useState('');
@@ -48,7 +49,7 @@ function Form() {
   const [busy, setBusy] = useState(false);
   const [progress, setProgress] = useState('');
   const [error, setError] = useState('');
-  const [partial, setPartial] = useState<{ id: string; failed: number } | null>(null);
+  const [partial, setPartial] = useState<{ id: string; message: string } | null>(null);
   const fileRef = useRef<HTMLInputElement | null>(null);
   const photosRef = useRef<Photo[]>([]);
   photosRef.current = photos;
@@ -75,6 +76,7 @@ function Form() {
       setUnit(r.usage_unit === 'km' ? 'km' : 'saat'); setSpec((r.spec as string) ?? ''); setCond((r.cond as string) ?? 'Sıfır');
       setCompat((r.compat as string) ?? ''); setQty(r.qty ? String(r.qty) : ''); setTakas(!!r.takas); setSerial(!!r.serial_declared);
       setDesc((r.description as string) ?? ''); setPledge(true);
+      setPublishAfterSave(r.status === 'active');
       const ph = ((r.listing_photos as { id: string; path: string; position: number }[]) ?? []).sort((a, b) => a.position - b.position);
       setPhotos(ph.map((p) => ({ key: p.id, id: p.id, path: p.path, url: supabase.storage.from('listing-photos').getPublicUrl(p.path).data.publicUrl })));
       setLoaded(true);
@@ -84,7 +86,7 @@ function Form() {
   const pickCat = (c: string) => { setCat(c); setUnit(KM_CATEGORIES.has(c) ? 'km' : 'saat'); };
 
   function addFiles(list: FileList | null) {
-    if (!list) return;
+    if (!list || busy) return;
     setError('');
     const next = [...photos];
     for (const file of Array.from(list)) {
@@ -118,6 +120,7 @@ function Form() {
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
+    if (busy) return;
     setError('');
     const supabase = getSupabase();
     if (!supabase || !profile) { setError('İlan vermek için giriş yapmalısın.'); return; }
@@ -126,24 +129,25 @@ function Form() {
     if (!brand.trim() || !model.trim()) return setError(`Marka ve ${part ? 'ürün adı' : 'model'} alanlarını doldur.`);
     if (part) {
       if (!spec.trim()) return setError(`${cat === 'Lastik ve jant' ? 'Lastik ebadını' : 'Parça numarasını'} gir.`);
-      if (!(Number(qty) >= 1)) return setError('Adet gir.');
+      if (!Number.isSafeInteger(Number(qty)) || Number(qty) < 1) return setError('Adet gir.');
     } else {
-      if (!yearNum || yearNum < 1980 || yearNum > YEAR_MAX) return setError(`Model yılı 1980 ile ${YEAR_MAX} arasında olmalı.`);
-      if (usage === '') return setError('Çalışma saati veya km bilgisini gir.');
+      if (!yearNum || !Number.isInteger(yearNum) || yearNum < 1980 || yearNum > YEAR_MAX) return setError(`Model yılı 1980 ile ${YEAR_MAX} arasında olmalı.`);
+      if (usage === '' || !Number.isSafeInteger(Number(usage)) || Number(usage) < 0) return setError('Çalışma saati veya km bilgisini sıfır ya da pozitif tam sayı olarak gir.');
     }
     if (!city) return setError('Şehir seç.');
-    if (!(priceNum > 0)) return setError('Fiyatı gir.');
+    if (!Number.isFinite(priceNum) || priceNum <= 0 || priceNum > 999999999999.99) return setError('Fiyatı gir.');
     if (photos.length === 0) return setError('En az 1 fotoğraf ekle. Alıcılar fotoğrafsız ilanlara güvenmez.');
     if (!pledge) return setError('Kapora taahhüdünü onaylaman gerekiyor.');
 
     setBusy(true);
+    let savedListingId: string | null = null;
     try {
       if (!editId) {
         const { count } = await supabase.from('listings').select('id', { count: 'exact', head: true }).eq('seller_id', profile.id).in('status', ['active', 'paused']);
         if ((count ?? 0) >= maxListings) throw new Error(`${profile.is_premium ? 'Premium' : 'Ücretsiz'} üyelikte aynı anda ${maxListings} ilan olabilir. Profilinden bir ilanı satıldı yap ya da sil${profile.is_premium ? '' : ', veya Premium sayfasına bak'}.`);
       }
       const base = {
-        kind, category: cat, title: `${brand.trim()} ${model.trim()}`, description: desc.trim(), price: priceNum, city,
+        status: 'paused', kind, category: cat, title: `${brand.trim()} ${model.trim()}`, description: desc.trim(), price: priceNum, city,
         year: part ? null : yearNum, usage_value: !part && usage !== '' ? Number(usage) : null, usage_unit: !part && usage !== '' ? unit : null,
         spec: part ? spec.trim() : null, cond: part ? cond : null, compat: part && compat.trim() ? compat.trim() : null, qty: part ? Number(qty) : null,
       };
@@ -155,52 +159,70 @@ function Form() {
       if (res.error && /brand|model|takas|serial_declared/.test(res.error.message)) res = await write(base); // 005 henüz çalıştırılmadıysa
       if (res.error || !res.data) throw new Error(res.error?.message ?? 'İlan kaydedilemedi');
       const id = res.data.id as string;
+      savedListingId = id;
 
       // Silinen eski fotoğraflar
       if (removed.length > 0) {
-        await supabase.storage.from('listing-photos').remove(removed.map((p) => p.path!).filter(Boolean));
-        await supabase.from('listing_photos').delete().in('id', removed.map((p) => p.id!));
+        const unlink = await supabase.from('listing_photos').delete().in('id', removed.map((p) => p.id!));
+        if (unlink.error) throw new Error('Eski fotoğraflar kaldırılamadı. İlan yayına alınmadı.');
+        const cleanup = await supabase.storage.from('listing-photos').remove(removed.map((p) => p.path!).filter(Boolean));
+        if (cleanup.error) throw new Error('Eski fotoğraf dosyaları temizlenemedi. İlan yayına alınmadı.');
       }
       let failed = 0;
       for (let i = 0; i < photos.length; i++) {
         const p = photos[i];
         setProgress(`Fotoğraflar kaydediliyor (${i + 1}/${photos.length})…`);
         try {
-          if (p.id) { await supabase.from('listing_photos').update({ position: i }).eq('id', p.id); continue; }
+          if (p.id) {
+            const position = await supabase.from('listing_photos').update({ position: i }).eq('id', p.id);
+            if (position.error) throw position.error;
+            continue;
+          }
           const blob = await resizeImage(p.file!);
-          const path = `${profile.id}/${id}/${i}-${Date.now()}.jpg`;
+          const path = `${profile.id}/${id}/${crypto.randomUUID()}.jpg`;
           const up = await supabase.storage.from('listing-photos').upload(path, blob, { contentType: 'image/jpeg' });
           if (up.error) throw up.error;
           const link = await supabase.from('listing_photos').insert({ listing_id: id, path, position: i });
-          if (link.error) throw link.error;
+          if (link.error) {
+            await supabase.storage.from('listing-photos').remove([path]);
+            throw link.error;
+          }
         } catch { failed++; }
       }
       void reload();
-      if (failed > 0) { setPartial({ id, failed }); return; }
-      toast(editId ? 'İlan güncellendi.' : 'İlan yayınlandı. Ücret: 0 ₺');
+      if (failed > 0) { setPartial({ id, message: `${failed} fotoğraf kaydedilemedi. İlanın duraklatılmış olarak saklandı; fotoğrafları tamamlayıp yayına alabilirsin.` }); return; }
+      if (publishAfterSave) {
+        const published = await supabase.from('listings').update({ status: 'active' }).eq('id', id).eq('seller_id', profile.id);
+        if (published.error) throw new Error('İlan kaydedildi ancak yayına alınamadı. Düzenleyerek tekrar dene.');
+      }
+      await reload();
+      toast(publishAfterSave ? (editId ? 'İlan güncellendi.' : 'İlan yayınlandı. Ücret: 0 ₺') : 'İlan duraklatılmış olarak kaydedildi.');
       router.push(`/ilanlar/${id}`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Bir hata oluştu.');
+      const message = err instanceof Error ? err.message : 'Bir hata oluştu.';
+      if (savedListingId) setPartial({ id: savedListingId, message });
+      else setError(message);
     } finally {
       setBusy(false);
       setProgress('');
     }
   }
 
-  if (!authReady || !loaded) return <div className="empty">Yükleniyor…</div>;
+  if (!authReady || (profile && !loaded)) return <div className="empty">Yükleniyor…</div>;
   if (!getSupabase()) return <div className="panel">Supabase bağlantısı yok. <code>.env.local</code> dosyasını kontrol et.</div>;
   if (!profile) return <div className="panel">İlan vermek için önce <Link className="linkbtn" href="/giris">giriş yap ya da kayıt ol</Link>.</div>;
   if (partial) {
     return (
       <div className="panel">
-        <div className="note">İlanın kaydedildi ama {partial.failed} fotoğraf yüklenemedi. Profilinden ilanı düzenleyip tekrar deneyebilirsin.</div>
-        <p style={{ display: 'flex', gap: 8 }}><Link className="btn" href={`/ilanlar/${partial.id}`}>İlana git</Link><Link className="btn ghost" href="/profil">Profil</Link></p>
+        <div className="note">{partial.message}</div>
+        <p style={{ display: 'flex', gap: 8 }}><a className="btn" href={`/ilan-ver?duzenle=${partial.id}`}>İlanı tamamla</a><Link className="btn ghost" href="/profil">Profil</Link></p>
       </div>
     );
   }
 
   return (
-    <form className="panel" style={{ marginTop: 18, display: 'flex', flexDirection: 'column', gap: 18 }} onSubmit={onSubmit} noValidate>
+    <form className="panel" aria-busy={busy} style={{ marginTop: 18, display: 'flex', flexDirection: 'column', gap: 18 }} onSubmit={onSubmit} noValidate>
+      <fieldset disabled={busy} style={{ border: 0, padding: 0, margin: 0, minWidth: 0, display: 'contents' }}>
       <div className="row2">
         <div className="field"><label htmlFor="f-cat">Kategori</label>
           <select id="f-cat" value={cat} onChange={(e) => pickCat(e.target.value)}><option value="">Seç…</option>{CATEGORIES.map((c) => <option key={c}>{c}</option>)}</select></div>
@@ -261,12 +283,14 @@ function Form() {
 
       <div className="field"><label htmlFor="f-desc">Açıklama</label><textarea id="f-desc" rows={5} maxLength={4000} value={desc} onChange={(e) => setDesc(e.target.value)} placeholder="Bakım geçmişi, belgeler, takas durumu" /></div>
       <label className="check"><input type="checkbox" checked={pledge} onChange={(e) => setPledge(e.target.checked)} />Alıcı ürünü görmeden kapora veya ön ödeme istemeyeceğimi kabul ediyorum.</label>
+      <label className="check"><input type="checkbox" checked={publishAfterSave} onChange={(e) => setPublishAfterSave(e.target.checked)} />Fotoğraflar tamamlanınca ilanı yayına al</label>
       {error ? <div className="err" role="alert">{error}</div> : null}
       {progress ? <div className="sub" role="status">{progress}</div> : null}
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, alignItems: 'center' }}>
-        <button className="btn" type="submit" disabled={busy}>{busy ? 'Kaydediliyor…' : editId ? 'Değişiklikleri kaydet' : 'İlanı yayınla'}</button>
+        <button className="btn" type="submit" disabled={busy}>{busy ? 'Kaydediliyor…' : editId ? 'Değişiklikleri kaydet' : publishAfterSave ? 'İlanı yayınla' : 'Taslak olarak kaydet'}</button>
         <span className="sub">İlan ücreti: 0 ₺ · 30 günde bir &quot;hâlâ satılık mı?&quot; sorulur</span>
       </div>
+      </fieldset>
     </form>
   );
 }

@@ -1,4 +1,13 @@
-# Makinasal — Next.js başlangıç projesi
+# Makinasal — İş Makinesi Pazarı
+
+Güncel geliştirme ve doğrulama durumu: [docs/GELISTIRME-DURUMU.md](docs/GELISTIRME-DURUMU.md).
+
+## Güncel çalıştırma
+Node.js 22+ ile `npm ci`, `npm run dev`. Kontroller: `npm test`, `npm run typecheck`, `npm run build`.
+
+Giriş/kayıt, şifre sıfırlama, ilanlar, favoriler, mesajlaşma ve profil Supabase ile çalışır. `.env.local.example` içindeki herkese açık Supabase değişkenlerini tanımlayın. Auth yönlendirme listesinde sitenin `/auth/callback` adresi olmalıdır.
+
+Aşağıdaki adımlar projenin tarihsel gelişim notlarıdır; güncel kapsam için yukarıdaki durum dosyasını kullanın.
 
 ## Çalıştırma
 1. Node.js LTS yükle.

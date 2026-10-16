@@ -1,5 +1,6 @@
 'use client';
 
+import type { QueryResult } from '@/lib/supabase/result';
 import Link from 'next/link';
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { LISTINGS } from '@/lib/data/listings';
@@ -64,6 +65,7 @@ function lsSet(k: string, v: unknown) { try { localStorage.setItem(k, JSON.strin
 export function MarketProvider({ children }: { children: ReactNode }) {
   const [db, setDb] = useState<{ listings: Listing[]; sellers: Record<string, Seller> }>({ listings: [], sellers: {} });
   const [ready, setReady] = useState(false);
+  const [loadError, setLoadError] = useState('');
   const [authReady, setAuthReady] = useState(false);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [favs, setFavs] = useState<Record<string, number>>({});
@@ -72,6 +74,7 @@ export function MarketProvider({ children }: { children: ReactNode }) {
   const [unread, setUnread] = useState(0);
   const [msg, setMsg] = useState('');
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const sessionVersion = useRef(0);
 
   const toast = useCallback((m: string) => {
     setMsg(m);
@@ -80,12 +83,14 @@ export function MarketProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const reload = useCallback(async () => {
-    const d = await fetchActiveListings(getSupabase());
-    setDb(d);
-    setReady(true);
+    try {
+      const d = await fetchActiveListings(getSupabase());
+      setDb(d); setLoadError('');
+    } catch { setLoadError('Güncel ilanlar yüklenemedi. Görünen ilanlar güncel olmayabilir.'); }
+    finally { setReady(true); }
   }, []);
 
-  const loadProfile = useCallback(async (uid: string | null, email = '') => {
+  const loadProfile = useCallback(async (uid: string | null, email = '', version = sessionVersion.current) => {
     const supabase = getSupabase();
     if (!supabase || !uid) { setProfile(null); return; }
     let res = await supabase.from('profiles')
@@ -94,6 +99,7 @@ export function MarketProvider({ children }: { children: ReactNode }) {
       res = await supabase.from('profiles')
         .select('id,full_name,city,is_store,store_name,is_premium,verified_phone,created_at').eq('id', uid).maybeSingle();
     }
+    if (version !== sessionVersion.current) return;
     const p = res.data as Record<string, unknown> | null;
     setProfile({
       id: uid, email,
@@ -105,7 +111,7 @@ export function MarketProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
-  const loadUserData = useCallback(async (uid: string | null) => {
+  const loadUserData = useCallback(async (uid: string | null, version = sessionVersion.current) => {
     const supabase = getSupabase();
     const localFavs = lsGet<Record<string, number>>('mk-favs', {});
     if (!supabase || !uid) {
@@ -113,15 +119,17 @@ export function MarketProvider({ children }: { children: ReactNode }) {
       setSaved(lsGet<SavedSearch[]>('mk-saved', []).map((s) => ({ ...s, local: true })));
       return;
     }
-    let fr = await supabase.from('favorites').select('listing_id,price_at_save').eq('user_id', uid);
+    let fr: QueryResult = await supabase.from('favorites').select('listing_id,price_at_save').eq('user_id', uid);
     if (fr.error) fr = await supabase.from('favorites').select('listing_id').eq('user_id', uid);
     const out: Record<string, number> = { ...localFavs };
     for (const r of (fr.data ?? []) as unknown as { listing_id: string; price_at_save?: number | string | null }[]) {
       out[r.listing_id] = r.price_at_save != null ? Number(r.price_at_save) : 0;
     }
+    if (version !== sessionVersion.current) return;
     setFavs(out);
-    let sr = await supabase.from('saved_searches').select('id,query,notify,last_seen_at,created_at').eq('user_id', uid);
+    let sr: QueryResult = await supabase.from('saved_searches').select('id,query,notify,last_seen_at,created_at').eq('user_id', uid);
     if (sr.error) sr = await supabase.from('saved_searches').select('id,query,created_at').eq('user_id', uid);
+    if (version !== sessionVersion.current) return;
     setSaved(((sr.data ?? []) as unknown as { id: string; query: { f?: Filters }; notify?: boolean; last_seen_at?: string; created_at: string }[])
       .filter((r) => r.query?.f)
       .map((r) => ({
@@ -144,15 +152,29 @@ export function MarketProvider({ children }: { children: ReactNode }) {
     void reload();
     const supabase = getSupabase();
     if (!supabase) { void loadUserData(null); setAuthReady(true); return; }
-    const apply = async (u: { id: string; email?: string | null } | null | undefined) => {
-      await Promise.all([loadProfile(u?.id ?? null, u?.email ?? ''), loadUserData(u?.id ?? null)]);
+    const apply = async (u: { id: string; email?: string | null } | null | undefined, version: number) => {
+      await Promise.all([loadProfile(u?.id ?? null, u?.email ?? '', version), loadUserData(u?.id ?? null, version)]);
+      if (version !== sessionVersion.current) return;
       if (u) void refreshUnread(); else setUnread(0);
       setAuthReady(true);
     };
-    supabase.auth.getUser().then(({ data }) => apply(data.user));
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => { void apply(session?.user); });
-    return () => sub.subscription.unsubscribe();
-  }, [reload, loadProfile, loadUserData, refreshUnread]);
+    let disposed = false;
+    let pending: ReturnType<typeof setTimeout> | undefined;
+    // Supabase API calls must run after the auth callback releases its lock.
+    const schedule = (u: { id: string; email?: string | null } | null) => {
+      const version = ++sessionVersion.current;
+      clearTimeout(pending);
+      pending = setTimeout(() => {
+        if (!disposed) void apply(u, version).catch(() => {
+          if (!disposed) { setAuthReady(true); toast('Hesap bilgileri yüklenemedi. Sayfayı yenileyerek tekrar dene.'); }
+        });
+      }, 0);
+    };
+    const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event !== 'TOKEN_REFRESHED') schedule(session?.user ?? null);
+    });
+    return () => { disposed = true; sessionVersion.current++; clearTimeout(pending); sub.subscription.unsubscribe(); };
+  }, [reload, loadProfile, loadUserData, refreshUnread, toast]);
 
   useEffect(() => {
     if (!profile) return;
@@ -231,16 +253,20 @@ export function MarketProvider({ children }: { children: ReactNode }) {
     const row: Record<string, unknown> = {};
     if (patch.notify !== undefined) row.notify = patch.notify;
     if (patch.lastSeen !== undefined) row.last_seen_at = patch.lastSeen;
-    await supabase?.from('saved_searches').update(row).eq('id', id);
-  }, [saved, profile]);
+    const result = await supabase?.from('saved_searches').update(row).eq('id', id).eq('user_id', profile.id);
+    if (result?.error) { await loadUserData(profile.id); toast('Arama güncellenemedi. Tekrar dene.'); }
+  }, [saved, profile, loadUserData, toast]);
 
   const deleteSaved = useCallback(async (id: string) => {
     const s = saved.find((x) => x.id === id);
     setSaved((cur) => cur.filter((x) => x.id !== id));
     if (!s) return;
     if (s.local || !profile) lsSet('mk-saved', lsGet<SavedSearch[]>('mk-saved', []).filter((x) => x.id !== id));
-    else await getSupabase()?.from('saved_searches').delete().eq('id', id);
-  }, [saved, profile]);
+    else {
+      const result = await getSupabase()?.from('saved_searches').delete().eq('id', id).eq('user_id', profile.id);
+      if (result?.error) { await loadUserData(profile.id); toast('Arama silinemedi. Tekrar dene.'); }
+    }
+  }, [saved, profile, loadUserData, toast]);
 
   const setNotify = useCallback((id: string, on: boolean) => patchSaved(id, { notify: on }), [patchSaved]);
   const markSeen = useCallback((id: string) => patchSaved(id, { lastSeen: new Date().toISOString() }), [patchSaved]);
@@ -270,6 +296,7 @@ export function MarketProvider({ children }: { children: ReactNode }) {
   const cmpItems = cmp.map((k) => find(k)).filter((x): x is Listing => !!x);
   return (
     <MarketCtx.Provider value={value}>
+      {loadError ? <div className="wrap"><div className="note bad" role="alert">{loadError} <button className="btn ghost sm" type="button" onClick={() => void reload()}>Tekrar dene</button></div></div> : null}
       {children}
       {cmpItems.length > 0 ? (
         <div id="cmpBar" role="region" aria-label="Karşılaştırma">

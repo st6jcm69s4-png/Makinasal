@@ -23,28 +23,34 @@ export function ListingDetail({ id }: { id: string }) {
   const { find, sellers, stats, ready, favs, toggleFav, cmp, toggleCmp, myCity, profile } = useMarket();
   const [extra, setExtra] = useState<{ listing: Listing; seller: Seller | null } | null>(null);
   const [missing, setMissing] = useState(false);
+  const [loadError, setLoadError] = useState('');
+  const [attempt, setAttempt] = useState(0);
   const fromPool = find(id);
 
   // Havuzda olmayan (satıldı/duraklatıldı) gerçek ilanı doğrudan çek; satıcı yorumlarını da getir
   useEffect(() => {
     if (!ready || /^\d+$/.test(id)) return;
     let alive = true;
-    fetchListingById(getSupabase(), id).then((r) => { if (!alive) return; if (r) setExtra(r); else if (!fromPool) setMissing(true); });
+    setExtra(null); setMissing(false); setLoadError('');
+    fetchListingById(getSupabase(), id).then((r) => { if (!alive) return; if (r) setExtra(r); else if (!fromPool) setMissing(true); })
+      .catch(() => { if (alive) setLoadError('İlan yüklenemedi. Bağlantını kontrol edip tekrar dene.'); });
     return () => { alive = false; };
-  }, [id, ready, fromPool]);
+  }, [id, ready, fromPool, attempt]);
 
   useEffect(() => {
     if (!/^\d+$/.test(id)) void getSupabase()?.rpc('track_view', { p_listing: id });
   }, [id]);
 
-  const l = extra?.listing ?? fromPool;
-  const m = (l && (extra?.seller ?? sellers[l.sel])) || null;
-  if (!ready && !l) return <div className="empty">Yükleniyor…</div>;
+  const current = extra?.listing.id === id ? extra : null;
+  const l = current?.listing ?? fromPool;
+  const m = (l && (current?.seller ?? sellers[l.sel])) || null;
+  if (loadError && !l) return <div className="panel" role="alert">{loadError} <button className="btn" onClick={() => setAttempt(n => n + 1)}>Tekrar dene</button></div>;
+  if ((!ready || (!/^\d+$/.test(id) && !missing)) && !l) return <div className="empty">Yükleniyor…</div>;
   if (!l || !m) return missing || ready ? <div className="empty">Bu ilan bulunamadı. <Link className="linkbtn" href="/ilanlar">İlanlara dön</Link></div> : <div className="empty">Yükleniyor…</div>;
 
-  const seller: Seller = { ...m, reviews: extra?.seller?.reviews ?? m.reviews };
+  const seller: Seller = { ...m, reviews: current?.seller?.reviews ?? m.reviews };
   const own = !!profile && l.sel === profile.id;
-  return <Body l={l} seller={seller} own={own} stats={stats} favs={favs} toggleFav={toggleFav} cmp={cmp} toggleCmp={toggleCmp} myCity={myCity} />;
+  return <Body key={l.id} l={l} seller={seller} own={own} stats={stats} favs={favs} toggleFav={toggleFav} cmp={cmp} toggleCmp={toggleCmp} myCity={myCity} />;
 }
 
 type BodyProps = {

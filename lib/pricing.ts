@@ -12,7 +12,9 @@ export function median(a: number[]): number {
 /** Kategori medyanı. Parça/lastikte hesaplanmaz; yeterli ilan yoksa null. */
 export function categoryMedian(listings: Listing[], cat: string, minCount = 2): number | null {
   if (isPartCategory(cat)) return null;
-  const prices = listings.filter((l) => l.cat === cat).map((l) => l.price);
+  const live = listings.filter((l) => !l.demo);
+  const source = live.length ? live : listings;
+  const prices = source.filter((l) => l.cat === cat && Number.isFinite(l.price) && l.price > 0).map((l) => l.price);
   return prices.length >= minCount ? median(prices) : null;
 }
 
@@ -39,7 +41,9 @@ export type PriceStats = {
 
 export function buildPriceStats(listings: Listing[]): PriceStats {
   const byCat = new Map<string, number[]>();
-  for (const l of listings) {
+  const live = listings.filter((l) => !l.demo);
+  for (const l of live.length ? live : listings) {
+    if (!Number.isFinite(l.price) || l.price <= 0) continue;
     const arr = byCat.get(l.cat);
     if (arr) arr.push(l.price);
     else byCat.set(l.cat, [l.price]);

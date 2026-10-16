@@ -1,5 +1,6 @@
 'use client';
 
+import type { QueryResult } from '@/lib/supabase/result';
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 import { LIMITS } from '@/lib/data/constants';
@@ -26,9 +27,9 @@ export function MyListings() {
   const load = useCallback(async (uid: string) => {
     const supabase = getSupabase();
     if (!supabase) return;
-    let res = await supabase.from('listings').select(`${COLS},brand,model,boosted_until`).eq('seller_id', uid).neq('status', 'removed').order('created_at', { ascending: false });
+    let res: QueryResult = await supabase.from('listings').select(`${COLS},brand,model,boosted_until`).eq('seller_id', uid).neq('status', 'removed').order('created_at', { ascending: false });
     if (res.error) res = await supabase.from('listings').select(COLS).eq('seller_id', uid).neq('status', 'removed').order('created_at', { ascending: false });
-    if (res.error) { setError(res.error.message); return; }
+    if (res.error) { setError('İlanların yüklenemedi. Lütfen tekrar dene.'); setRows([]); return; }
     const list = res.data as unknown as Row[];
     setRows(list);
     const st = await supabase.from('listing_stats').select('listing_id,views,phones').in('listing_id', list.map((r) => r.id));
@@ -52,12 +53,11 @@ export function MyListings() {
   async function remove(row: Row) {
     const supabase = getSupabase();
     if (!supabase || !profile) return;
-    if (!window.confirm(`"${row.title}" ilanı kalıcı olarak silinsin mi?`)) return;
+    if (!window.confirm(`"${row.title}" ilanı kaldırılsın mı? İşlem ve değerlendirme geçmişi korunur.`)) return;
     setError('');
-    const paths = (row.listing_photos ?? []).map((p) => p.path);
-    if (paths.length > 0) await supabase.storage.from('listing-photos').remove(paths);
-    const { error: err } = await supabase.from('listings').delete().eq('id', row.id);
-    if (err) setError(err.message);
+    const { data, error: err } = await supabase.from('listings').update({ status: 'removed' }).eq('id', row.id).eq('seller_id', profile.id).select('id').maybeSingle();
+    if (err || !data) { setError('İlan kaldırılamadı. Tekrar dene.'); return; }
+    toast('İlan kaldırıldı. İşlem geçmişin korunuyor.');
     await load(profile.id);
     void reload();
   }
@@ -92,7 +92,7 @@ export function MyListings() {
               {r.status === 'paused' ? <button className="btn ghost sm" type="button" onClick={() => void patch(r.id, { status: 'active' })}>Yayına al</button> : null}
               {r.status !== 'sold' ? <button className="btn ghost sm" type="button" onClick={() => void patch(r.id, { status: 'sold' })}>Satıldı</button> : null}
               {r.status !== 'sold' && !profile.is_premium ? <button className="btn ghost sm" type="button" disabled title="Ödeme açılınca">Öne çıkar (yakında)</button> : null}
-              <button className="btn ghost sm" type="button" onClick={() => void remove(r)}>Sil</button>
+              <button className="btn ghost sm" type="button" onClick={() => void remove(r)}>İlanı kaldır</button>
             </div>
           </div>
         );
