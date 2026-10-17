@@ -125,3 +125,16 @@ assert.equal(validRegion('Ankara', 'Kadıköy'), false);
 assert.equal(validRegion('', 'Sincan'), false);
 assert.equal(validRegion('constructor', ''), false);
 console.log('Profil: Türkçe ad biçimi, 81 il / 973 ilçe ve bölge doğrulaması geçti ✔');
+
+const {passwordValid,normalizePhone,parseAuthOptions}=await import('../lib/accountSecurity.ts');
+for(const weak of ['Ab1!','abcdefgh!1','ABCDEFGH!1','Abcdefgh!','Abcdefgh1','Abcdefg1 ','Abcdefg1\n'])assert.equal(passwordValid(weak),false,weak);
+for(const strong of ['Abcdef1!','İstanbul1.','Işık2026!'])assert.equal(passwordValid(strong),true);
+assert.equal(passwordValid('Aa1!'+ 'x'.repeat(125)),false);
+for(const raw of ['0555 123 45 67','+90 (555) 123-45-67','00905551234567','905551234567','5551234567'])assert.equal(normalizePhone(raw),'+905551234567');
+for(const raw of ['+445551234567','0532123','02121234567','5551234567x'])assert.equal(normalizePhone(raw),'');
+assert.equal(parseAuthOptions({external:{email:true,phone:false},mailer_autoconfirm:true,phone_autoconfirm:false}).registration,false);
+assert.equal(parseAuthOptions({external:{email:true,phone:true},mailer_autoconfirm:false,phone_autoconfirm:true}).registration,false);
+assert.equal(parseAuthOptions({external:{email:true,phone:true},mailer_autoconfirm:false,phone_autoconfirm:false}).registration,true);
+assert.equal(parseAuthOptions({external:{email:true,phone:true},mailer_autoconfirm:false,phone_autoconfirm:false,disable_signup:true}).registration,false);
+assert.equal(parseAuthOptions({}).registration,false);
+console.log('Hesap güvenliği: şifre koşulları, telefon normalizasyonu ve gerçek sağlayıcı uygunluğu geçti ✔');

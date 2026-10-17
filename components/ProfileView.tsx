@@ -68,7 +68,7 @@ export function ProfileView() {
   const seller: Seller = me ?? { name: display, type: profile.is_store ? 'Kurumsal' : 'Bireysel', ver: false, s: null, b: null, deals: 0, rep: 0, city: profile.city, since: new Date(profile.created_at).getFullYear(), reviews: [] };
   const lv = trustLevel(seller);
   const ver: [string, string, boolean][] = [
-    ['Telefon numarası', 'Numaran kayıtlı. SMS koduyla doğrulama altyapısı sonraki aşamada açılacak.', profile.verified_phone],
+    ['Telefon numarası', 'E-posta ve telefon doğrulamalarını hesap güvenliği sayfasından yönet.', profile.verified_phone],
     ['Kimlik', 'T.C. kimlik ve selfie ile doğrulama sonraki aşamada açılacak.', profile.verified_id],
   ];
   if (profile.is_store) ver.push(['Vergi levhası', 'Şirket adıyla eşleştirme sonraki aşamada açılacak.', profile.verified_tax]);
@@ -111,7 +111,7 @@ export function ProfileView() {
             </div>
           </div>
           <div className="panel">
-            <h3>Doğrulama</h3>
+            <h3>Doğrulama</h3><p><a className="btn ghost sm" href="/hesap-dogrula">E-posta ve telefonu doğrula</a></p>
             <p className="sub" style={{ margin: '4px 0 4px' }}>Doğrulanmış üyeler listede rozetle gösterilir. Rozet kendi kendine verilemez.</p>
             {ver.map(([t, d, ok]) => (
               <div key={t} className="mine"><div><b>{t}</b><br /><span className="sub">{d}</span></div>{ok ? <Pill cls="good">Doğrulandı</Pill> : <Pill>Bekliyor</Pill>}</div>

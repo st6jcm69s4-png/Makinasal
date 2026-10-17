@@ -2,7 +2,8 @@
 
 import { useEffect, useState, type FormEvent } from 'react';
 import { getSupabase } from '@/lib/supabase/client';
-import { authError } from '@/lib/auth';
+import { passwordValid } from '@/lib/accountSecurity';
+import { PasswordRules } from './PasswordRules';
 
 export function PasswordResetForm() {
   const [ready, setReady] = useState(false);
@@ -26,13 +27,14 @@ export function PasswordResetForm() {
   async function submit(e: FormEvent) {
     e.preventDefault();
     if (busy) return;
+    if (!passwordValid(password)) { setError('Şifre aşağıdaki güvenlik koşullarının tamamını karşılamalı.'); return; }
     if (password !== confirmation) { setError('Şifreler eşleşmiyor.'); return; }
     const client = getSupabase();
     if (!client) return;
     setBusy(true); setError('');
     try {
-      const { error } = await client.auth.updateUser({ password });
-      if (error) setError(authError(error.message)); else setDone(true);
+      const response = await fetch('/api/auth/password',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password})});
+      const result = await response.json(); if(!response.ok) setError(result.error || 'Şifre güncellenemedi.'); else setDone(true);
     } catch { setError('Bağlantı kurulamadı. Tekrar dene.'); }
     finally { setBusy(false); }
   }
@@ -43,9 +45,10 @@ export function PasswordResetForm() {
   return <form className="panel auth" style={{ maxWidth: 420 }} onSubmit={submit}>
     <h1>Yeni şifre belirle</h1>
     <label htmlFor="new-password">Yeni şifre (en az 8 karakter)</label>
-    <input id="new-password" type="password" minLength={8} required autoComplete="new-password" value={password} onChange={e => setPassword(e.target.value)} />
+    <input id="new-password" type="password" minLength={8} maxLength={128} required autoComplete="new-password" value={password} onChange={e => setPassword(e.target.value)} />
+    <PasswordRules value={password} />
     <label htmlFor="confirm-password">Yeni şifre tekrar</label>
-    <input id="confirm-password" type="password" minLength={8} required autoComplete="new-password" value={confirmation} onChange={e => setConfirmation(e.target.value)} />
+    <input id="confirm-password" type="password" minLength={8} maxLength={128} required autoComplete="new-password" value={confirmation} onChange={e => setConfirmation(e.target.value)} />
     {error ? <p className="err" role="alert">{error}</p> : null}
     <p><button className="btn" disabled={busy}>{busy ? 'Kaydediliyor…' : 'Şifreyi güncelle'}</button></p>
   </form>;

@@ -60,7 +60,7 @@ export function SiteHeader() {
       <a className="drawer-backdrop" href={path} tabIndex={-1} aria-label="Menüyü kapat" onClick={e => { e.preventDefault(); close(); }} />
       <aside id="site-drawer" className="site-drawer" aria-label="Gezinme menüsü">
         <div className="drawer-heading"><div><b>Makinasal</b><p>İş makinesi pazarı</p></div><a className="drawer-close" href={path} aria-label="Menüyü kapat" onClick={e => { e.preventDefault(); close(); }}>×</a></div>
-        <div className="drawer-account">{profile ? <><b>{label}</b><span>Hesabını ve ilanlarını yönet</span></> : <><b>Makinasal’a hoş geldin</b><a className="btn sm" href="/giris">Giriş yap / Kayıt ol</a></>}</div>
+        <div className="drawer-account">{profile ? <><a className="drawer-profile-link" href="/profil" aria-label={`${label}, profilimi aç`}><b>{label}</b><span aria-hidden="true">→</span></a><span>Hesabını ve ilanlarını yönet</span></> : <><b>Makinasal’a hoş geldin</b><a className="btn sm" href="/giris">Giriş yap / Kayıt ol</a></>}</div>
         <nav aria-label="Ana menü">{NAV.map(n => {
           const count = n.badge === 'unread' ? unread : n.badge === 'favs' ? favNews : 0;
           // Real document links continue to work if the SPA router is unavailable.

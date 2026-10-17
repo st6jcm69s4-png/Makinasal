@@ -15,6 +15,9 @@ export function authError(message: string): string {
   if (m.includes('already registered')) return 'Bu e-posta ile bir hesap var. Giriş yapmayı dene.';
   if (m.includes('email not confirmed')) return 'Gelen kutundaki bağlantıyla e-postanı onayla.';
   if (m.includes('same_password')) return 'Öncekinden farklı bir şifre belirle.';
+  if (m.includes('provider') && (m.includes('disabled') || m.includes('not enabled'))) return 'Bu giriş yöntemi şu anda kullanılamıyor.';
+  if (m.includes('otp') || m.includes('token') || m.includes('expired')) return 'Doğrulama kodu veya bağlantısı geçersiz ya da süresi dolmuş. Yeni bir kod iste.';
+  if (m.includes('phone')) return 'Telefon işlemi tamamlanamadı. Numarayı kontrol edip tekrar dene.';
   if (m.includes('password')) return 'Şifren güvenlik koşullarını karşılamıyor. Daha uzun ve güçlü bir şifre dene.';
   if (m.includes('rate limit') || m.includes('too many')) return 'Çok fazla deneme yapıldı. Biraz bekleyip tekrar dene.';
   return 'İşlem tamamlanamadı. Bağlantını kontrol edip tekrar dene.';
