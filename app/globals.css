@@ -263,3 +263,7 @@ a.btn{display:inline-block;text-align:center;text-decoration:none}
 
 .drawer-signout .btn:is(:hover,:focus-visible){background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
 .btn:not(.ghost):hover{filter:brightness(.93)}
+
+.registration-region{margin:22px 0;padding:18px;border:1px solid var(--line);border-radius:12px;background:var(--bg)}.registration-region h3{font-size:19px;line-height:1.4}.registration-region>.sub{font-size:12px;margin:8px 0 16px}.registration-region>.btn{margin-top:14px}.region-fields{display:grid;gap:12px}.region-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.region-fields label{display:block;margin:0 0 6px}.region-fields input[readonly]{background:var(--plate);cursor:default}.region-fields select:disabled{opacity:.65;cursor:not-allowed}.profile-bio{margin:20px 0;padding-top:18px;border-top:1px solid var(--line)}.profile-bio h2{font-size:20px}.profile-bio p{white-space:pre-wrap;overflow-wrap:anywhere;margin:8px 0 0}@media(max-width:420px){.region-grid{grid-template-columns:1fr}}
+
+.network-form-grid>.region-fields{grid-column:1/-1}

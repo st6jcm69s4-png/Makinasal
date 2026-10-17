@@ -1,5 +1,6 @@
 'use client';
 
+import { formatPersonName } from '@/lib/profile';
 import type { QueryResult } from '@/lib/supabase/result';
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { LISTINGS } from '@/lib/data/listings';
@@ -12,7 +13,7 @@ import { buildPriceStats, type PriceStats } from '@/lib/pricing';
 import { getSupabase } from '@/lib/supabase/client';
 
 export type Profile = {
-  id: string; email: string; full_name: string; city: string; is_store: boolean; store_name: string;
+  id: string; email: string; full_name: string; city: string; district: string; bio: string; company_bio: string; is_store: boolean; store_name: string;
   is_premium: boolean; verified_phone: boolean; verified_id: boolean; verified_tax: boolean; created_at: string;
 };
 export type SavedSearch = { id: string; f: Filters; notify: boolean; lastSeen: string; local?: boolean };
@@ -94,16 +95,17 @@ export function MarketProvider({ children }: { children: ReactNode }) {
     const supabase = getSupabase();
     if (!supabase || !uid) { setProfile(null); return; }
     let res = await supabase.from('profiles')
-      .select('id,full_name,city,is_store,store_name,is_premium,verified_phone,verified_id,verified_tax,created_at').eq('id', uid).maybeSingle();
+      .select('id,full_name,city,district,bio,company_bio,is_store,store_name,is_premium,verified_phone,verified_id,verified_tax,created_at').eq('id', uid).maybeSingle();
     if (res.error) {
       res = await supabase.from('profiles')
-        .select('id,full_name,city,is_store,store_name,is_premium,verified_phone,created_at').eq('id', uid).maybeSingle();
+        .select('id,full_name,city,district,bio,company_bio,is_store,store_name,is_premium,verified_phone,created_at').eq('id', uid).maybeSingle();
     }
     if (version !== sessionVersion.current) return;
     const p = res.data as Record<string, unknown> | null;
     setProfile({
       id: uid, email,
-      full_name: (p?.full_name as string) ?? '', city: (p?.city as string) ?? '',
+      full_name: formatPersonName((p?.full_name as string) ?? ''), city: (p?.city as string) ?? '',
+      district: (p?.district as string) ?? '', bio: (p?.bio as string) ?? '', company_bio: (p?.company_bio as string) ?? '',
       is_store: !!p?.is_store, store_name: (p?.store_name as string) ?? '',
       is_premium: !!p?.is_premium, verified_phone: !!p?.verified_phone,
       verified_id: !!p?.verified_id, verified_tax: !!p?.verified_tax,

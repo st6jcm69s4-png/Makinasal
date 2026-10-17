@@ -48,13 +48,15 @@ export function StoreView({ id }: { id: string }) {
             </div>
           </div>
         </div>
+        {m.bio && <section className="profile-bio"><h2>Hakkımda</h2><p>{m.bio}</p></section>}
+        {m.type === 'Kurumsal' && m.companyBio && <section className="profile-bio"><h2>Şirket hakkında</h2><p>{m.companyBio}</p></section>}
         <div className="stat-grid">
           <div><span className="sub">Satıcı puanı</span><b>{formatScore(m.s)}</b></div>
           <div><span className="sub">Alıcı puanı</span><b>{formatScore(m.b)}</b></div>
           <div><span className="sub">Onaylı işlem</span><b>{m.deals}</b></div>
           <div><span className="sub">Doğrulanmış şikayet</span><b>{m.rep}</b></div>
           <div><span className="sub">Üyelik</span><b>{m.since}</b></div>
-          <div><span className="sub">Şehir</span><b>{m.city || '–'}</b></div>
+          <div><span className="sub">Şehir</span><b>{[m.city, m.district].filter(Boolean).join(' / ') || '–'}</b></div>
         </div>
       </div>
       <div className="sect">

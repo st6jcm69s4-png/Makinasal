@@ -1,11 +1,13 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { CITIES, LIMITS } from '@/lib/data/constants';
+import { LIMITS } from '@/lib/data/constants';
 import type { Review, Seller } from '@/lib/data/types';
 import { fetchReviews, loadSellers } from '@/lib/dbListings';
 import { getSupabase } from '@/lib/supabase/client';
 import { trustLevel } from '@/lib/trust';
+import { capitalizeName, formatPersonName, validRegion } from '@/lib/profile';
+import { RegionFields } from './RegionFields';
 import { MyListings } from './MyListings';
 import { useMarket } from './MarketProvider';
 import { Avatar, Pill, ScoreRow, Stars, toneClass } from './ui';
@@ -18,13 +20,16 @@ export function ProfileView() {
   const [store, setStore] = useState(false);
   const [storeName, setStoreName] = useState('');
   const [city, setCity] = useState('');
+  const [district, setDistrict] = useState('');
+  const [bio, setBio] = useState('');
+  const [companyBio, setCompanyBio] = useState('');
   const [phone, setPhone] = useState('');
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
 
   useEffect(() => {
     if (!profile) return;
-    setName(profile.full_name); setStore(profile.is_store); setStoreName(profile.store_name); setCity(profile.city);
+    setName(formatPersonName(profile.full_name)); setDistrict(profile.district); setBio(profile.bio); setCompanyBio(profile.company_bio); setStore(profile.is_store); setStoreName(profile.store_name); setCity(profile.city);
     const supabase = getSupabase();
     if (!supabase) return;
     void loadSellers(supabase, [profile.id]).then((m) => setMe(m[profile.id] ?? null));
@@ -46,9 +51,11 @@ export function ProfileView() {
     const cleanPhone = phone.replace(/[\s()-]/g, '');
     if (cleanPhone && !/^(\+90|0)?5\d{9}$/.test(cleanPhone)) { setErr('Telefon numarasını 05XX XXX XX XX biçiminde yaz.'); return; }
     if (store && !storeName.trim()) { setErr('Kurumsal üyelikte firma adı gerekli.'); return; }
+    if (formatPersonName(name).length < 2) { setErr('Ad soyadını en az 2 karakter olarak gir.'); return; }
+    if (!validRegion(city, district)) { setErr('İl ve ilçe seçimini kontrol et.'); return; }
     setBusy(true); setErr('');
     const { error } = await supabase.from('profiles').update({
-      full_name: name.trim(), city: city || null, is_store: store, store_name: store ? storeName.trim() : null, phone: cleanPhone || null,
+      full_name: formatPersonName(name), city: city || null, district, bio: bio.trim(), company_bio: companyBio.trim(), is_store: store, store_name: store ? storeName.trim() : null, phone: cleanPhone || null,
     }).eq('id', profile!.id);
     setBusy(false);
     if (error) { setErr(error.message); return; }
@@ -90,12 +97,13 @@ export function ProfileView() {
           <div className="panel">
             <h3>Bilgilerim</h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginTop: 12 }}>
-              <div className="field"><label htmlFor="p-name">Ad soyad</label><input type="text" id="p-name" value={name} maxLength={80} onChange={(e) => setName(e.target.value)} /></div>
+              <div className="field"><label htmlFor="p-name">Ad soyad</label><input type="text" id="p-name" value={name} maxLength={80} onChange={(e) => setName(capitalizeName(e.target.value))} onBlur={() => setName(formatPersonName(name))} autoCapitalize="words" /></div>
               <div className="field"><label htmlFor="p-type">Üyelik türü</label>
                 <select id="p-type" value={store ? 'k' : 'b'} onChange={(e) => setStore(e.target.value === 'k')}><option value="b">Bireysel</option><option value="k">Kurumsal (mağaza)</option></select></div>
               {store ? <div className="field"><label htmlFor="p-store">Firma / mağaza adı</label><input type="text" id="p-store" value={storeName} maxLength={80} onChange={(e) => setStoreName(e.target.value)} /></div> : null}
-              <div className="field"><label htmlFor="p-city">Şehir (mesafe hesabında konumun olarak kullanılır)</label>
-                <select id="p-city" value={city} onChange={(e) => setCity(e.target.value)}><option value="">Seçilmedi</option>{CITIES.map((c) => <option key={c}>{c}</option>)}</select></div>
+              <RegionFields city={city} district={district} onChange={r => { setCity(r.city); setDistrict(r.district); }} />
+              <div className="field"><label htmlFor="p-bio">Hakkımda</label><textarea id="p-bio" value={bio} maxLength={500} rows={3} onChange={e => setBio(e.target.value)} placeholder="Kendini, deneyimini ve çalıştığın alanları kısaca anlat." /><small className="sub">{bio.length}/500 · Herkese açık profilinde görünür.</small></div>
+              {store && <div className="field"><label htmlFor="p-company-bio">Şirket açıklaması</label><textarea id="p-company-bio" value={companyBio} maxLength={1000} rows={4} onChange={e => setCompanyBio(e.target.value)} placeholder="Örn. Ankara ve çevresinde temel kazısı, hafriyat ve moloz nakliyesi yapıyoruz." /><small className="sub">{companyBio.length}/1000 · İş alanlarını ve hizmet verdiğin bölgeleri belirt.</small><a className="linkbtn" href="/firma-kaydi">Şirketin hizmet alanlarını ve bölgelerini düzenle →</a></div>}
               <div className="field"><label htmlFor="p-phone">Telefon (yalnızca giriş yapmış alıcılar &quot;Telefonu göster&quot; deyince görür)</label>
                 <input type="text" id="p-phone" inputMode="tel" value={phone} placeholder="05XX XXX XX XX" onChange={(e) => setPhone(e.target.value)} /></div>
               {err ? <div className="err" role="alert">{err}</div> : null}

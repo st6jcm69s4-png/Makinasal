@@ -1,5 +1,6 @@
 "use client";
 
+import { formatPersonName } from "@/lib/profile";
 import {
   useEffect,
   useRef,
@@ -404,7 +405,7 @@ export function HomeView() {
           <div>
             <span className="home-small-label">İŞ MERKEZİN</span>
             <h2>
-              Merhaba, {profile.full_name?.split(" ")[0] || "tekrar hoş geldin"}
+              Merhaba, {formatPersonName(profile.full_name || "").split(" ")[0] || "tekrar hoş geldin"}
               .
             </h2>
           </div>

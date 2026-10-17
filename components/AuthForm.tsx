@@ -3,11 +3,15 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { getSupabase } from '@/lib/supabase/client';
 import { authError, safeAuthNext } from '@/lib/auth';
+import { capitalizeName, formatPersonName, validRegion } from '@/lib/profile';
+import { RegionFields } from './RegionFields';
 
 type Mode = 'login' | 'register' | 'reset';
 export function AuthForm() {
   const [mode, setMode] = useState<Mode>('login');
   const [name, setName] = useState('');
+  const [region, setRegion] = useState({ city: '', district: '' });
+  const [skipRegion, setSkipRegion] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [busy, setBusy] = useState(false);
@@ -36,8 +40,9 @@ export function AuthForm() {
         else setInfo('Bu e-posta ile bir hesap varsa şifre sıfırlama bağlantısı gönderildi. Gelen kutunu ve spam klasörünü kontrol et. Bağlantıyı bu tarayıcıda aç.');
       } else if (mode === 'register') {
         if (name.trim().length < 2) { setError('Ad soyadını en az 2 karakter olarak gir.'); return; }
+        if (!validRegion(region.city, region.district)) { setError('Lütfen seçtiğin ile ait bir ilçe seç.'); return; }
         const { data, error } = await supabase.auth.signUp({ email: cleanEmail, password,
-          options: { data: { full_name: name.trim() }, emailRedirectTo: callback.toString() },
+          options: { data: { full_name: formatPersonName(name), city: region.city, district: region.district }, emailRedirectTo: callback.toString() },
         });
         if (error) setError(authError(error.message));
         else if (!data.session) setInfo('Kayıt isteği alındı. E-postana gelen onay bağlantısını bu tarayıcıda aç. Mevcut hesabın varsa giriş yapabilirsin.');
@@ -54,11 +59,16 @@ export function AuthForm() {
   if (!supabase) return <div className="panel" role="status">Hesap hizmeti şu anda kullanılamıyor. Lütfen daha sonra tekrar dene.</div>;
   return <form className="panel auth" onSubmit={submit} style={{ maxWidth: 420 }}>
     <h2>{mode === 'login' ? 'Giriş yap' : mode === 'register' ? 'Hesap oluştur' : 'Şifremi unuttum'}</h2>
-    {mode === 'register' ? <><label htmlFor="name">Ad soyad</label><input id="name" value={name} onChange={e => setName(e.target.value)} required minLength={2} maxLength={80} autoComplete="name" /></> : null}
+    {mode === 'register' ? <><label htmlFor="name">Ad soyad</label><input id="name" value={name} onChange={e => setName(capitalizeName(e.target.value))} onBlur={() => setName(formatPersonName(name))} autoCapitalize="words" required minLength={2} maxLength={80} autoComplete="name" /></> : null}
     <label htmlFor="email">E-posta</label>
     <input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)} required autoComplete="email" />
     {mode !== 'reset' ? <><label htmlFor="pw">Şifre{mode === 'register' ? ' (en az 8 karakter)' : ''}</label>
       <input id="pw" type="password" value={password} onChange={e => setPassword(e.target.value)} required minLength={mode === 'register' ? 8 : 1} autoComplete={mode === 'login' ? 'current-password' : 'new-password'} /></> : null}
+    {mode === 'register' && <section className="registration-region" aria-label="Bölge seçimi">
+      <h3>Size daha iyi hizmet verebilmemiz için bölgenizi seçin</h3>
+      <p className="sub">İsteğe bağlıdır. Daha sonra Profil → Bilgilerim bölümünden değiştirebilirsin.</p>
+      {skipRegion ? <><p className="sub">Bölge seçimi atlandı.</p><button type="button" className="btn ghost sm" onClick={() => setSkipRegion(false)}>Bölge seç</button></> : <><RegionFields {...region} onChange={setRegion} /><button type="button" className="btn ghost sm" onClick={() => { setRegion({ city: '', district: '' }); setSkipRegion(true); }}>Şimdilik atla</button></>}
+    </section>}
     {error ? <div className="alert low" role="alert">{error}</div> : null}
     {info ? <div className="alert high" role="status">{info}</div> : null}
     <p><button className="btn" type="submit" disabled={busy}>{busy ? 'Bekleyin…' : mode === 'login' ? 'Giriş yap' : mode === 'register' ? 'Kayıt ol' : 'Sıfırlama bağlantısı gönder'}</button></p>

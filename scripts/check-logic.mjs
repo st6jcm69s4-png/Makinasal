@@ -106,3 +106,22 @@ assert.deepEqual(filtersFromParams(filtersToParams(selectedFilters)),selectedFil
 const fixture=[{...LISTINGS[0],cat:'Lastikli ekskavatör',brand:'Caterpillar'},{...LISTINGS[0],id:'another',cat:'Mobil vinç',brand:'Caterpillar'}];
 assert.equal(filterListings(fixture,SELLERS,selectedFilters,'Ankara').length,1);
 console.log(`Katalog: ${catalog.CATEGORY_GROUPS.length} başlık, ${catalog.ALL_BRANDS.length} marka; alt tür ve marka eşleşmeleri geçti ✔`);
+
+const { formatPersonName, capitalizeName, validRegion, districtsFor, TURKEY_REGIONS } = await import('../lib/profile.ts');
+assert.equal(formatPersonName('  alperen   eker  '), 'Alperen Eker');
+assert.equal(formatPersonName('İBRAHİM IŞIK'), 'İbrahim Işık');
+assert.equal(formatPersonName('ışıl şen-ayşe'), 'Işıl Şen-Ayşe');
+assert.equal(capitalizeName('alperen '), 'Alperen ');
+assert.equal(Object.keys(TURKEY_REGIONS).length, 81);
+assert.equal(Object.values(TURKEY_REGIONS).flat().length, 973);
+const { CITIES } = await import('../lib/data/constants.ts');
+for (const city of CITIES) assert.ok(districtsFor(city).length > 0, city);
+assert.ok(districtsFor('Samsun').includes('Çarşamba'));
+assert.ok(districtsFor('Ankara').includes('Sincan'));
+assert.equal(validRegion('', ''), true);
+assert.equal(validRegion('Ankara', ''), true);
+assert.equal(validRegion('Ankara', 'Sincan'), true);
+assert.equal(validRegion('Ankara', 'Kadıköy'), false);
+assert.equal(validRegion('', 'Sincan'), false);
+assert.equal(validRegion('constructor', ''), false);
+console.log('Profil: Türkçe ad biçimi, 81 il / 973 ilçe ve bölge doğrulaması geçti ✔');

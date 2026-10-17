@@ -27,6 +27,7 @@ import {
   type Quote,
 } from "@/lib/network";
 import { useMarket } from "./MarketProvider";
+import { RegionFields } from "./RegionFields";
 import { CompanyInventory } from "./CompanyInventory";
 import { CategoryOptions, BrandField } from "./CatalogControls";
 import { categoryValues, canonicalBrand } from "@/lib/machineryCatalog";
@@ -98,6 +99,7 @@ function LocationFields({
   lat?: number | null;
   lng?: number | null;
 }) {
+  const [region, setRegion] = useState({ city, district });
   const [pos, setPos] = useState({
     lat: lat === null ? "" : String(lat),
     lng: lng === null ? "" : String(lng),
@@ -106,25 +108,7 @@ function LocationFields({
   const [busy, setBusy] = useState(false);
   return (
     <>
-      <label>
-        İl
-        <select name="city" required defaultValue={city}>
-          <option value="">İl seç</option>
-          {CITIES.map((c) => (
-            <option key={c}>{c}</option>
-          ))}
-        </select>
-      </label>
-      <label>
-        İlçe / çalışma bölgesi
-        <input
-          name="district"
-          maxLength={120}
-          defaultValue={district}
-          placeholder="Örn. Sincan, OSB"
-          required
-        />
-      </label>
+      <RegionFields {...region} onChange={setRegion} required />
       <div className="network-location">
         <p className="sub">
           İl ve ilçe herkese görünür. İstersen harita konumu ekle; eklediğin
@@ -810,7 +794,7 @@ function PostEditorForm() {
           <div className="network-form-grid">
             <LocationFields
               city={post?.city ?? profile?.city}
-              district={post?.district}
+              district={post?.district ?? profile?.district}
               lat={post?.lat}
               lng={post?.lng}
             />
@@ -1885,7 +1869,7 @@ function ProviderEditorForm() {
             </select>
           </label>
           <label>
-            Hizmetlerini anlat
+            Şirket / hizmet açıklaması
             <textarea
               name="description"
               minLength={20}
@@ -1893,13 +1877,13 @@ function ProviderEditorForm() {
               required
               rows={5}
               defaultValue={provider?.description ?? ""}
-              placeholder="Ekipman, kapasite, deneyim ve sunduğun hizmetler"
+              placeholder="Şirketinizi tanıtın: iş alanları, hizmet verdiğiniz il ve ilçeler, ekipman, kapasite ve deneyim."
             />
           </label>
           <div className="network-form-grid">
             <LocationFields
               city={provider?.city ?? profile?.city}
-              district={provider?.district}
+              district={provider?.district ?? profile?.district}
               lat={provider?.lat}
               lng={provider?.lng}
             />

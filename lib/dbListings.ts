@@ -63,8 +63,8 @@ async function selectListings(supabase: SupabaseClient, build: (cols: string) =>
   return build(BASE);
 }
 
-const SELLER_FULL = 'id,full_name,store_name,is_store,is_premium,verified_phone,verified_id,verified_tax,city,created_at';
-const SELLER_BASE = 'id,full_name,store_name,is_store,is_premium,verified_phone,city,created_at';
+const SELLER_FULL = 'id,full_name,store_name,is_store,is_premium,verified_phone,verified_id,verified_tax,city,district,bio,company_bio,created_at';
+const SELLER_BASE = 'id,full_name,store_name,is_store,is_premium,verified_phone,city,district,bio,company_bio,created_at';
 
 type Stat = {
   id: string; score: number | string; review_count: number | string; deals: number | string; reports: number | string;
@@ -100,7 +100,7 @@ export async function loadSellers(supabase: SupabaseClient, ids: string[]): Prom
       bn: buyerN,
       deals: Number(st?.deals ?? 0),
       rep: Number(st?.reports ?? 0),
-      city: (p.city as string | null) ?? '',
+      city: (p.city as string | null) ?? '', district: (p.district as string) ?? '', bio: (p.bio as string) ?? '', companyBio: (p.company_bio as string) ?? '',
       since: new Date(p.created_at as string).getFullYear(),
       reviews: [],
     };

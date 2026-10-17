@@ -17,6 +17,9 @@ export type Seller = {
   /** Moderatörün doğruladığı şikayet sayısı */
   rep: number;
   city: string;
+  district?: string;
+  bio?: string;
+  companyBio?: string;
   since: number;
   reviews: Review[];
 };
