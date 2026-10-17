@@ -67,3 +67,8 @@ Katalog oluşturulurken başvurulan kaynak örnekleri (ürün kapsamı ve günce
 - https://www.lectura-specs.in/en-in/specs/forklifts/telehandlers
 - https://www.lectura-specs.in/en-in/specs/transportation/trucks
 - https://www.lectura-specs.com/en/specs/agricultural-machinery
+
+## Kiralık merkezi ve menü
+Ana menüde İlan ver, İlanlarım, Mesajlar, İşlerim ve tekliflerim, Favoriler ve Profil üst sıradadır. Kiralık tek giriş noktasıdır. `/kiralik` makine/araç kiralama ve operatör/usta bölümlerini içerir. `/kiralik?bolum=personel` doğrudan personel bölümünü açar; eski `/operatorler` adresi buraya yönlenir. Makine türü, şehir ve marka filtreleri URL üzerinden korunur. Personel ilanlarında `personnel_role` alanı operatör, şoför veya usta değerini saklar; eski ilanlarda boş kalır ve tümü seçildiğinde listelenir. Personel filtresi makine kiralama sonuçlarına uygulanmaz.
+
+Personel yetki ve doğrulama testleri: `supabase/tests/rental_personnel.sql` (transaction sonunda rollback). Mevcut `user_stats` görünümü güvenlik uyarısı bu düzenlemenin kapsamı dışındadır: https://supabase.com/docs/guides/database/database-linter?lint=0010_security_definer_view

@@ -1,9 +1,11 @@
 export const POST_KINDS = {
   rental_machine: "Kiralık iş makinesi / kamyon",
-  rental_operator: "Kiralık operatör",
+  rental_operator: "Operatör ve ustalar",
   job: "İş talebi",
   part_request: "Parça talebi",
 } as const;
+export const PERSONNEL_ROLES = { operator: "Operatör", driver: "Kamyon / tır şoförü", mechanic: "Usta / servis" } as const;
+export type PersonnelRole = keyof typeof PERSONNEL_ROLES;
 export type PostKind = keyof typeof POST_KINDS;
 export const PROVIDER_KINDS = {
   excavation: "Hafriyat firması",
@@ -32,6 +34,7 @@ export type MarketPost = {
   preferred_provider: string | null;
   kind: PostKind;
   rental_mode: RentalMode | null;
+  personnel_role: PersonnelRole | null;
   brand: string;
   model: string;
   title: string;

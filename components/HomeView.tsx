@@ -356,7 +356,7 @@ export function HomeView() {
         <div className="home-popular">
           <span>Hızlı keşfet</span>
           <a href={locationUrl("/kiralik", city)}>Kiralık makineler</a>
-          <a href={locationUrl("/operatorler", city)}>Operatörler</a>
+          <a href={`/kiralik?bolum=personel${city ? "&city=" + encodeURIComponent(city) : ""}`}>Operatör ve ustalar</a>
           <a href="/parca-talepleri">Parça talepleri</a>
         </div>
       </section>

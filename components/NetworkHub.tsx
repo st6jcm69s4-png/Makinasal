@@ -8,6 +8,7 @@ import {
 } from "@/lib/data/constants";
 import {
   RENTAL_MODES,
+  PERSONNEL_ROLES,
   rentalModeLabel,
   COMPANY_CATEGORIES,
   ACTIVITIES,
@@ -221,8 +222,7 @@ export function NetworkNav() {
   return (
     <nav className="network-nav" aria-label="İş ağı">
       <a href="/is-agi">Tüm iş ağı</a>
-      <a href="/kiralik">Kiralık makineler</a>
-      <a href="/operatorler">Operatörler</a>
+      <a href="/kiralik">Kiralık</a>
       <a href="/isler">İş talepleri</a>
       <a href="/parca-talepleri">Parça talepleri</a>
       <a href="/sirketler">Şirketler</a>
@@ -232,7 +232,10 @@ export function NetworkNav() {
   );
 }
 const PAGE_SIZE = 24;
-export function NetworkBrowse({ kind }: { kind?: PostKind }) {
+export function NetworkBrowse({ kind: fixedKind, rentalHub = false }: { kind?: PostKind; rentalHub?: boolean }) {
+  const [rentalKind, setRentalKind] = useState<PostKind>("rental_machine");
+  const [personnelRole, setPersonnelRole] = useState("");
+  const kind = rentalHub ? rentalKind : fixedKind;
   const [posts, setPosts] = useState<MarketPost[]>([]),
     [error, setError] = useState(""),
     [busy, setBusy] = useState(true),
@@ -247,6 +250,9 @@ export function NetworkBrowse({ kind }: { kind?: PostKind }) {
   const [filtersReady, setFiltersReady] = useState(false);
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
+    if (rentalHub && params.get("bolum") === "personel") setRentalKind("rental_operator");
+    const role = params.get("personnel_role");
+    if (role && Object.prototype.hasOwnProperty.call(PERSONNEL_ROLES, role)) setPersonnelRole(role);
     const initialCity = params.get("city");
     if (initialCity && (CITIES as readonly string[]).includes(initialCity))
       setCity(initialCity);
@@ -277,7 +283,8 @@ export function NetworkBrowse({ kind }: { kind?: PostKind }) {
       .order("created_at", { ascending: false })
       .range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
     if (kind) query = query.eq("kind", kind);
-    if (rentalMode) query = query.eq("rental_mode", rentalMode);
+    if (rentalMode && kind !== "rental_operator") query = query.eq("rental_mode", rentalMode);
+    if (kind === "rental_operator" && personnelRole) query = query.eq("personnel_role", personnelRole);
     if (city) query = query.eq("city", city);
     if (category) query = query.in("category", categoryValues(category));
     if (brand.trim())
@@ -299,15 +306,27 @@ export function NetworkBrowse({ kind }: { kind?: PostKind }) {
     return () => {
       active = false;
     };
-  }, [kind, city, category, q, page, refresh, filtersReady, rentalMode, brand]);
+  }, [kind, city, category, q, page, refresh, filtersReady, rentalMode, brand, personnelRole]);
+  useEffect(() => {
+    if (!rentalHub || !filtersReady) return;
+    const params = new URLSearchParams();
+    if (kind === "rental_operator") params.set("bolum", "personel");
+    if (city) params.set("city", city);
+    if (q) params.set("q", q);
+    if (category) params.set("cat", category);
+    if (brand) params.set("brand", brand);
+    if (kind === "rental_machine" && rentalMode) params.set("rental_mode", rentalMode);
+    if (kind === "rental_operator" && personnelRole) params.set("personnel_role", personnelRole);
+    window.history.replaceState(null, "", `/kiralik${params.size ? "?" + params.toString() : ""}`);
+  }, [rentalHub, filtersReady, kind, city, q, category, brand, rentalMode, personnelRole]);
   return (
     <>
-      <NetworkNav />
+      {!rentalHub && <NetworkNav />}
       <div className="network-heading">
         <div>
           <span className="eyebrow">MAKİNASAL İŞ AĞI</span>
           <h1>
-            {kind ? POST_KINDS[kind] : "İş bul. Ekibini bul. İşini yaptır."}
+            {rentalHub ? "Kiralık" : kind ? POST_KINDS[kind] : "İş bul. Ekibini bul. İşini yaptır."}
           </h1>
           <p className="lead">
             {kind === "part_request"
@@ -317,7 +336,7 @@ export function NetworkBrowse({ kind }: { kind?: PostKind }) {
                 : kind === "rental_machine"
                   ? "İşine uygun makine ve kamyonu konumuna göre kirala."
                   : kind === "rental_operator"
-                    ? "Makine türüne ve çalışma bölgesine göre operatör bul."
+                    ? "Makine veya kamyon türüne göre operatör, şoför ve usta bul."
                     : "Kiralık makineler, operatörler, iş fırsatları, parçalar ve yerel firmalar aynı yerde."}
           </p>
         </div>
@@ -327,10 +346,18 @@ export function NetworkBrowse({ kind }: { kind?: PostKind }) {
             : kind === "job"
               ? "İş talebi aç"
               : kind
-                ? "Kiralık ilanı ver"
+                ? kind === "rental_operator" ? "Hizmet ilanı ver" : "Kiralık ilanı ver"
                 : "İş ağı ilanı ver"}
         </a>
       </div>
+      {rentalHub && <section className="rental-categories" aria-label="Kiralama bölümleri">
+        <button type="button" className={kind === "rental_machine" ? "selected" : ""} aria-pressed={kind === "rental_machine"} onClick={() => { setRentalKind("rental_machine"); setPage(0); }}>
+          <b>Makine ve araç kiralama</b><span>İş makineleri, kamyonlar, vinçler ve tüm ekipmanlar</span>
+        </button>
+        <button type="button" className={kind === "rental_operator" ? "selected" : ""} aria-pressed={kind === "rental_operator"} onClick={() => { setRentalKind("rental_operator"); setPage(0); }}>
+          <b>Operatör ve ustalar</b><span>Makine operatörü, kamyon şoförü ve teknik ustalar</span>
+        </button>
+      </section>}
       {!kind && (
         <div className="network-portals">
           {Object.entries(POST_KINDS).map(([k, v], i) => (
@@ -338,7 +365,7 @@ export function NetworkBrowse({ kind }: { kind?: PostKind }) {
               className="panel"
               key={k}
               href={
-                ["/kiralik", "/operatorler", "/isler", "/parca-talepleri"][i]
+                ["/kiralik", "/kiralik?bolum=personel", "/isler", "/parca-talepleri"][i]
               }
             >
               <span className="network-number">0{i + 1}</span>
@@ -358,6 +385,7 @@ export function NetworkBrowse({ kind }: { kind?: PostKind }) {
           </a>
         </div>
       )}
+      {rentalHub && <p className="sub">Önce makine veya araç türünü seç; ardından konum, marka ve hizmet kapsamıyla sonuçları daralt.</p>}
       <div className="network-filters">
         <label>
           Başlıkta ara
@@ -385,6 +413,10 @@ export function NetworkBrowse({ kind }: { kind?: PostKind }) {
             ))}
           </select>
         </label>
+        {kind === "rental_operator" && <label>Hizmet türü<select value={personnelRole} onChange={e => { setPersonnelRole(e.target.value); setPage(0); }}>
+          <option value="">Operatör, şoför ve ustaların tümü</option>
+          {Object.entries(PERSONNEL_ROLES).map(([key, label]) => <option key={key} value={key}>{label}</option>)}
+        </select></label>}
         {(kind === "rental_machine" || !kind) && (
           <label>
             Kiralama kapsamı
@@ -405,7 +437,7 @@ export function NetworkBrowse({ kind }: { kind?: PostKind }) {
           </label>
         )}
         <label>
-          İhtiyaç / makine türü
+          {rentalHub ? "Makine / araç türü" : "İhtiyaç / makine türü"}
           <select
             value={category}
             onChange={(e) => {
@@ -415,7 +447,7 @@ export function NetworkBrowse({ kind }: { kind?: PostKind }) {
             }}
           >
             <option value="">Tüm türler</option>
-            <CategoryOptions includeOther allowGroups />
+            <CategoryOptions includeParts={!rentalHub} includeOther={!rentalHub} allowGroups />
           </select>
         </label>
         <BrandField
@@ -428,6 +460,7 @@ export function NetworkBrowse({ kind }: { kind?: PostKind }) {
           label="Marka filtresi (isteğe bağlı)"
         />
       </div>
+      {rentalHub && <div className="acts-row"><button type="button" className="btn ghost" onClick={() => { setQ(""); setCity(""); setCategory(""); setBrand(""); setRentalMode(""); setPersonnelRole(""); setPage(0); }}>Filtreleri temizle</button><span className="sub" role="status">{busy ? "Sonuçlar yükleniyor…" : `${posts.length}${more ? "+" : ""} ilan bu sayfada`}</span></div>}
       <ErrorBox error={error} />
       {error && (
         <button className="btn ghost" onClick={() => setRefresh((x) => x + 1)}>
@@ -486,6 +519,7 @@ function PostCard({ post: p }: { post: MarketPost }) {
           </span>
         )}
       </div>
+      {p.kind === "rental_operator" && <span className="pill">{p.personnel_role ? PERSONNEL_ROLES[p.personnel_role] : "Hizmet türü belirtilmedi"}</span>}
       {p.kind === "rental_machine" && (
         <span className="pill">{rentalModeLabel(p.rental_mode)}</span>
       )}
@@ -580,6 +614,7 @@ function PostEditorForm() {
         kind,
         rental_mode:
           kind === "rental_machine" ? String(f.get("rental_mode") || "") : null,
+        personnel_role: kind === "rental_operator" ? String(f.get("personnel_role") || "") : null,
         title: String(f.get("title")).trim(),
         description: String(f.get("description")).trim(),
         category: String(f.get("category")),
@@ -592,6 +627,7 @@ function PostEditorForm() {
         quantity: Number(f.get("quantity")),
         specs: String(f.get("specs") || "").trim(),
       };
+      if (kind === "rental_operator" && !Object.prototype.hasOwnProperty.call(PERSONNEL_ROLES, data.personnel_role ?? "")) throw new Error("Operatör, şoför veya usta hizmet türünü seç.");
       if (
         kind === "rental_machine" &&
         !Object.prototype.hasOwnProperty.call(
@@ -680,7 +716,7 @@ function PostEditorForm() {
                 onChange={(e) => setCategory(e.target.value)}
               >
                 <option value="">Tür seç</option>
-                <CategoryOptions includeOther />
+                <CategoryOptions includeParts={kind === "part_request" || kind === "job"} includeOther={kind === "part_request" || kind === "job"} />
               </select>
             </label>
           </div>
@@ -700,6 +736,10 @@ function PostEditorForm() {
               />
             </label>
           </div>
+          {kind === "rental_operator" && <label>Hizmet türü<select name="personnel_role" required defaultValue={post?.personnel_role ?? ""}>
+            <option value="">Hizmet türünü seç</option>
+            {Object.entries(PERSONNEL_ROLES).map(([key, label]) => <option value={key} key={key}>{label}</option>)}
+          </select></label>}
           {kind === "rental_machine" && (
             <fieldset className="rental-scope">
               <legend>Kiralama kapsamı</legend>
@@ -794,7 +834,7 @@ function PostEditorForm() {
               {kind === "part_request"
                 ? "Adet"
                 : kind === "rental_operator"
-                  ? "Operatör sayısı"
+                  ? "Kişi sayısı"
                   : "Araç / makine sayısı"}
               <input
                 name="quantity"
@@ -988,6 +1028,7 @@ export function PostDetail({ id }: { id: string }) {
       <div className="network-detail">
         <article className="panel">
           <h2>İlanın ayrıntıları</h2>
+          {post.kind === "rental_operator" && <p className="pill">{post.personnel_role ? PERSONNEL_ROLES[post.personnel_role] : "Hizmet türü belirtilmedi"}</p>}
           {post.kind === "rental_machine" && (
             <p className="rental-detail-scope">
               {rentalModeLabel(post.rental_mode)}
