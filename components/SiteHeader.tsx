@@ -66,11 +66,11 @@ export function SiteHeader() {
           // Real document links continue to work if the SPA router is unavailable.
           return <a key={n.href} href={n.href} aria-current={n.match(path) ? 'page' : undefined}><span>{n.label}</span>{count > 0 ? <span className="nb" aria-label={`${count} yeni`}>{count}</span> : null}</a>;
         })}</nav>
-        {profile ? <button className="btn ghost" type="button" onClick={async () => {
+        {profile ? <div className="drawer-signout"><button className="btn ghost" type="button" onClick={async () => {
           const result = await getSupabase()?.auth.signOut();
           if (result?.error) { toast('Çıkış yapılamadı. Tekrar dene.'); return; }
           window.location.assign('/');
-        }}>Çıkış yap</button> : null}
+        }}>Çıkış yap</button></div> : null}
       </aside>
     </details>
     <a href="/" className="logo" aria-label="Makinasal ana sayfa"><svg className="gear" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><circle cx="12" cy="12" r="4" /><path d="M12 2v3m0 14v3M2 12h3m14 0h3M5 5l2 2m10 10 2 2M5 19l2-2M17 7l2-2" /></svg><span>Makinasal<small>İş makinesi pazarı</small></span></a>
