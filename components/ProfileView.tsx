@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { CITIES, LIMITS } from '@/lib/data/constants';
 import type { Review, Seller } from '@/lib/data/types';
@@ -37,7 +36,7 @@ export function ProfileView() {
   if (!profile) return (
     <>
       <h1>Profil</h1>
-      <div className="panel" style={{ marginTop: 16 }}>Profilini görmek için <Link className="linkbtn" href="/giris">giriş yap</Link>.</div>
+      <div className="panel" style={{ marginTop: 16 }}>Profilini görmek için <a className="linkbtn" href="/giris">giriş yap</a>.</div>
     </>
   );
 
@@ -84,7 +83,7 @@ export function ProfileView() {
                 <Pill>{seller.type}</Pill>
               </div>
             </div>
-            <Link className="btn ghost sm" style={{ marginLeft: 'auto' }} href={`/magaza/${profile.id}`}>Herkese açık sayfamı gör</Link>
+            <a className="btn ghost sm" style={{ marginLeft: 'auto' }} href={`/magaza/${profile.id}`}>Herkese açık sayfamı gör</a>
           </div>
         </div>
         <div className="two">
@@ -123,7 +122,7 @@ export function ProfileView() {
           <div className={`panel${profile.is_premium ? ' prem' : ''}`}>
             <h3>Üyelik</h3>
             <p style={{ margin: '10px 0 12px' }}>{profile.is_premium ? 'Premium üyesin. 30 aktif ilan, 20 fotoğraf ve öne çıkma özelliklerin açık.' : `Ücretsiz üyesin. ${LIMITS.free.listings} aktif ilan ve ilan başına ${LIMITS.free.photos} fotoğraf ekleyebilirsin.`}</p>
-            <Link className={`btn${profile.is_premium ? ' ghost' : ''}`} href="/premium">{profile.is_premium ? 'Üyeliği yönet' : 'Premium özelliklerini gör'}</Link>
+            <a className={`btn${profile.is_premium ? ' ghost' : ''}`} href="/premium">{profile.is_premium ? 'Üyeliği yönet' : 'Premium özelliklerini gör'}</a>
           </div>
         </div>
         <div className="panel">
@@ -139,7 +138,7 @@ export function ProfileView() {
           </div>
         </div>
         <div className="panel">
-          <div className="sect-h" style={{ marginBottom: 0 }}><h3>İlanlarım</h3><Link className="btn sm" href="/ilan-ver">Yeni ilan ver</Link></div>
+          <div className="sect-h" style={{ marginBottom: 0 }}><h3>İlanlarım</h3><a className="btn sm" href="/ilan-ver">Yeni ilan ver</a></div>
           <div style={{ marginTop: 6 }}><MyListings /></div>
         </div>
       </div>

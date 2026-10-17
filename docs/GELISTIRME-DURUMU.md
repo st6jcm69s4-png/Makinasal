@@ -38,3 +38,21 @@
 
 ## Kapsam
 Bu kayıt ilk sağlamlaştırma paketidir. Tüm özelliklerin tamamlandığı veya sitenin yeni sürümünün yayınlandığı anlamına gelmez.
+
+
+## Üretim beta hazırlığı — ikinci paket
+- Demo verileri varsayılan olarak kapatıldı; istenirse `NEXT_PUBLIC_DEMO_MODE=true` ile yalnızca tanıtım ortamında açılır.
+- Kayıtlı aramalar artık şehir, fiyat, yıl, kullanım, güven ve diğer filtreleriyle yeniden açılır. Paylaşılabilir URL ve 24 sonuçluk sayfalama eklendi.
+- Varsayılan fiyat filtresinin pahalı makineleri gizlemesi düzeltildi.
+- Genel çevrimdışı ekranı, gerçek PNG simgeleri, manifest ve telefona ekleme rehberi eklendi. Özel veri önbelleğe alınmaz; bu davranış birim testinde kontrol edilir.
+- İlan detayına sunucu tarafından başlık/açıklama ve başlangıç verisi eklendi.
+- Yardım merkezi hazırlandı; örnek ücret ve sınırsız paket vaatleri kaldırıldı.
+- Moderasyon ekranı ve buna ilişkin SQL değişikliği hazırlandı, ancak canlı migration otomatik güvenlik incelemesinde reddedildi. Yeni moderasyon yetkileri ve public itibar özetleri veritabanına uygulanmadı; yönetim akışı kullanıma hazır kabul edilmemeli.
+- Sites test yayını yalnızca hesap sahibine açık hazırlanıyor. Genel lansman, gerçek kullanıcı/e-posta ve cihaz testleri tamamlanmış sayılmaz.
+
+
+## Menü ve gezinme düzeltmesi
+- Yatay menü yerine soldan açılan, klavye ile kapatılabilen panel eklendi. Temel açma/kapama native details/summary ile JavaScript öncesinde de çalışır.
+- Sayfa bağlantıları standart HTML bağlantıları kullanır; sayfa geçişi istemci yönlendiricisine bağımlı değildir.
+- Telefona yükle bağlantıları ve tanıtım ekranı kaldırıldı; eski `/uygulama` adresi ana sayfaya yönlenir.
+- Canlı veritabanı için onay bekleyen migration bu arayüz düzenlemesinde uygulanmadı.

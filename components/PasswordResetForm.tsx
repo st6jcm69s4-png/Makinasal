@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import { useEffect, useState, type FormEvent } from 'react';
 import { getSupabase } from '@/lib/supabase/client';
 import { authError } from '@/lib/auth';
@@ -39,8 +38,8 @@ export function PasswordResetForm() {
   }
 
   if (!ready) return <div className="empty" role="status">Bağlantı doğrulanıyor…</div>;
-  if (done) return <div className="panel"><h1>Şifren güncellendi</h1><p role="status">Yeni şifrenle giriş yapabilirsin.</p><Link className="btn" href="/profil">Hesabıma git</Link></div>;
-  if (!allowed) return <div className="panel"><h1>Bağlantı geçersiz veya süresi dolmuş</h1><p>Şifre sıfırlama bağlantısını istediğin tarayıcıda aç veya yeni bir bağlantı iste.</p><Link className="btn" href="/giris">Giriş sayfasına dön</Link></div>;
+  if (done) return <div className="panel"><h1>Şifren güncellendi</h1><p role="status">Yeni şifrenle giriş yapabilirsin.</p><a className="btn" href="/profil">Hesabıma git</a></div>;
+  if (!allowed) return <div className="panel"><h1>Bağlantı geçersiz veya süresi dolmuş</h1><p>Şifre sıfırlama bağlantısını istediğin tarayıcıda aç veya yeni bir bağlantı iste.</p><a className="btn" href="/giris">Giriş sayfasına dön</a></div>;
   return <form className="panel auth" style={{ maxWidth: 420 }} onSubmit={submit}>
     <h1>Yeni şifre belirle</h1>
     <label htmlFor="new-password">Yeni şifre (en az 8 karakter)</label>

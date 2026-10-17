@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import type { ReactNode } from 'react';
 import type { Listing } from '@/lib/data/types';
 import { formatNum, formatScore, formatTL } from '@/lib/format';
@@ -20,7 +19,7 @@ export function CompareView() {
     return (
       <>
         <h1>İlan karşılaştırma</h1>
-        <div className="empty" style={{ marginTop: 16 }}>Karşılaştırmak için en az 2 ilan seç. İlan kartlarındaki <b>⇅</b> düğmesine bas. <Link className="linkbtn" href="/ilanlar">İlanlara git</Link></div>
+        <div className="empty" style={{ marginTop: 16 }}>Karşılaştırmak için en az 2 ilan seç. İlan kartlarındaki <b>⇅</b> düğmesine bas. <a className="linkbtn" href="/ilanlar">İlanlara git</a></div>
       </>
     );
   }
@@ -47,7 +46,7 @@ export function CompareView() {
         <table className="cmpt">
           <thead>
             <tr><th></th>{items.map((l) => (
-              <th key={l.id}><Link className="linkbtn" href={`/ilanlar/${l.id}`}>{cardTitle(l)}</Link><br /><button type="button" className="btn ghost sm" onClick={() => removeCmp(String(l.id))}>Çıkar</button></th>
+              <th key={l.id}><a className="linkbtn" href={`/ilanlar/${l.id}`}>{cardTitle(l)}</a><br /><button type="button" className="btn ghost sm" onClick={() => removeCmp(String(l.id))}>Çıkar</button></th>
             ))}</tr>
           </thead>
           <tbody>

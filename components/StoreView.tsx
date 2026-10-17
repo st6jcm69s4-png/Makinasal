@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import type { Listing, Seller } from '@/lib/data/types';
 import { fetchReviews, fetchSellerListings, loadSellers } from '@/lib/dbListings';
@@ -31,11 +30,11 @@ export function StoreView({ id }: { id: string }) {
   const m = isDemo ? sellers[id] : remote?.seller;
   const list = isDemo ? listings.filter((l) => l.sel === id) : remote?.list ?? [];
   if (!ready || (!isDemo && !remote)) return <div className="empty">Yükleniyor…</div>;
-  if (!m) return <div className="empty">Satıcı bulunamadı. <Link className="linkbtn" href="/">Ana sayfa</Link></div>;
+  if (!m) return <div className="empty">Satıcı bulunamadı. <a className="linkbtn" href="/">Ana sayfa</a></div>;
   const lv = trustLevel(m);
   return (
     <>
-      <Link className="linkbtn" href="/">← Ana sayfa</Link>
+      <a className="linkbtn" href="/">← Ana sayfa</a>
       <div className="panel" style={{ marginTop: 10 }}>
         <div className="prof-head">
           <Avatar name={m.name} />

@@ -1,7 +1,8 @@
-import type { Listing } from './data/types';
+import type { Listing } from "./data/types";
 
-const PART_CATEGORIES = ['Yedek parça', 'Lastik ve jant'];
-export const isPartCategory = (cat: string) => PART_CATEGORIES.includes(cat);
+const PART_CATEGORIES = ["Yedek parça", "Lastik ve jant"];
+export const isPartCategory = (cat: string) =>
+  cat === "group:parts" || PART_CATEGORIES.includes(cat);
 
 export function median(a: number[]): number {
   const b = [...a].sort((x, y) => x - y);
@@ -10,24 +11,34 @@ export function median(a: number[]): number {
 }
 
 /** Kategori medyanı. Parça/lastikte hesaplanmaz; yeterli ilan yoksa null. */
-export function categoryMedian(listings: Listing[], cat: string, minCount = 2): number | null {
+export function categoryMedian(
+  listings: Listing[],
+  cat: string,
+  minCount = 2,
+): number | null {
   if (isPartCategory(cat)) return null;
   const live = listings.filter((l) => !l.demo);
   const source = live.length ? live : listings;
-  const prices = source.filter((l) => l.cat === cat && Number.isFinite(l.price) && l.price > 0).map((l) => l.price);
+  const prices = source
+    .filter((l) => l.cat === cat && Number.isFinite(l.price) && l.price > 0)
+    .map((l) => l.price);
   return prices.length >= minCount ? median(prices) : null;
 }
 
-export type PriceFlag = 'low' | 'high' | 'ok' | null;
+export type PriceFlag = "low" | "high" | "ok" | null;
 
 /** fiyat/medyan <0.6 → düşük (dolandırıcılık uyarısı), >1.6 → yüksek */
-export function priceFlag(listings: Listing[], price: number, cat: string): PriceFlag {
+export function priceFlag(
+  listings: Listing[],
+  price: number,
+  cat: string,
+): PriceFlag {
   const m = categoryMedian(listings, cat);
   if (!m) return null;
   const r = price / m;
-  if (r < 0.6) return 'low';
-  if (r > 1.6) return 'high';
-  return 'ok';
+  if (r < 0.6) return "low";
+  if (r > 1.6) return "high";
+  return "ok";
 }
 
 /** Her kartta tüm listeyi taramamak için kategori bazında önceden hesaplanmış fiyat bilgisi. */
@@ -63,7 +74,7 @@ export function buildPriceStats(listings: Listing[]): PriceStats {
       const m = med(cat);
       if (!m) return null;
       const r = price / m;
-      return r < 0.6 ? 'low' : r > 1.6 ? 'high' : 'ok';
+      return r < 0.6 ? "low" : r > 1.6 ? "high" : "ok";
     },
   };
 }
