@@ -5,13 +5,14 @@ import type { Listing, Review, Seller } from './data/types';
 const BASE =
   'id,seller_id,kind,category,title,description,price,city,year,usage_value,usage_unit,spec,cond,compat,qty,status,created_at,listing_photos(path,position)';
 // 005-ozellikler.sql çalıştırılmışsa gelen ek sütunlar
-const EXTRA = 'brand,model,takas,serial_declared,prev_price,confirmed_at,boosted_until';
+const EXTRA = 'equipment_category,part_group,brand,model,takas,serial_declared,prev_price,confirmed_at,boosted_until';
 
 type Row = {
   id: string; seller_id: string; kind: string; category: string; title: string; description: string;
   price: number | string; city: string; year: number | null; usage_value: number | null; usage_unit: string | null;
   spec: string | null; cond: string | null; compat: string | null; qty: number | null; status: string; created_at: string;
   listing_photos: { path: string; position: number }[] | null;
+  equipment_category?: string | null;part_group?: string | null;
   brand?: string | null; model?: string | null; takas?: boolean | null; serial_declared?: boolean | null;
   prev_price?: number | string | null; confirmed_at?: string | null; boosted_until?: string | null;
 };
@@ -45,6 +46,7 @@ export function rowToListing(row: Row, publicUrl: (path: string) => string): Lis
     spec: row.spec ?? undefined,
     cond: row.cond ?? undefined,
     compat: row.compat ?? undefined,
+    equipmentCategory:row.equipment_category??undefined,partGroup:row.part_group??undefined,
     qty: row.qty ?? undefined,
     photos,
     status: row.status,

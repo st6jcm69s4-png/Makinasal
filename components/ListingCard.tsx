@@ -5,6 +5,7 @@ import { formatNum, formatTL } from '@/lib/format';
 import { distanceLabel } from '@/lib/geo';
 import { cardTitle, listingKey, listingTitle, usageLabel } from '@/lib/listing';
 import { isFeatured, tagsFor } from '@/lib/market';
+import { partGroupLabel } from '@/lib/parts';
 import { isPartCategory } from '@/lib/pricing';
 import { useMarket } from './MarketProvider';
 import { IconCmp, IconFav, Pill } from './ui';
@@ -16,7 +17,7 @@ export function ListingCard({ l }: { l: Listing }) {
   const part = isPartCategory(l.cat);
   const d = distanceLabel(myCity, l.city);
   const meta: string[] = [];
-  if (part) { if (l.spec) meta.push(l.cat === 'Yedek parça' ? `Parça no: ${l.spec}` : l.spec); if (l.cond) meta.push(`${l.cond}${l.qty ? ` · ${formatNum(l.qty)} adet` : ''}`); }
+  if (part) { if(l.equipmentCategory)meta.push(l.equipmentCategory);if(l.partGroup)meta.push(partGroupLabel(l.partGroup)); if (l.spec) meta.push(l.cat === 'Yedek parça' ? `Parça no: ${l.spec}` : l.spec); if (l.cond) meta.push(`${l.cond}${l.qty ? ` · ${formatNum(l.qty)} adet` : ''}`); }
   else if (usageLabel(l)) meta.push(usageLabel(l));
   meta.push(l.city + (d ? ` · ${d}` : ''));
   if (s) meta.push(s.name);

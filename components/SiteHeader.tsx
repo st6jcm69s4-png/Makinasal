@@ -14,13 +14,14 @@ const NAV: { href: string; label: string; match: (p: string) => boolean; badge?:
   { href: '/favoriler', label: 'Favoriler', match: p => p.startsWith('/favoriler'), badge: 'favs' },
   { href: '/profil', label: 'Profil', match: p => p.startsWith('/profil') },
   { href: '/ilanlar', label: 'İlanlarda ara', match: p => p.startsWith('/ilanlar') && !p.startsWith('/ilanlarim') || p.startsWith('/karsilastir') || p.startsWith('/magaza') },
-  { href: '/is-agi', label: 'İş ağı', match: p => p === '/is-agi' },
+  { href: '/is-ve-hizmetler', label: 'İş ve hizmetler', match: p => p === '/is-ve-hizmetler' || p === '/is-agi' },
   { href: '/kiralik', label: 'Kiralık', match: p => p === '/kiralik' || p === '/operatorler' },
   { href: '/isler', label: 'İş talepleri', match: p => p === '/isler' },
   { href: '/parca-talepleri', label: 'Parça talepleri', match: p => p === '/parca-talepleri' },
   { href: '/sirketler', label: 'Şirketler ve filolar', match: p => p === '/sirketler' },
   { href: '/envanterim', label: 'Şirketim ve envanterim', match: p => p === '/envanterim' },
-  { href: '/firmalar', label: 'Firmalar ve parçacılar', match: p => p.startsWith('/firmalar') },
+  { href: '/yedek-parca', label: 'Yedek parça', match: p => p.startsWith('/yedek-parca') },
+  { href: '/odemeler', label: 'Ödemeler', match: p => p.startsWith('/odeme') },
   { href: '/premium', label: 'Üyelik', match: p => p.startsWith('/premium') },
   { href: '/guven', label: 'Güvenli alışveriş', match: p => p.startsWith('/guven') },
   { href: '/destek', label: 'Yardım', match: p => p.startsWith('/destek') },
@@ -60,7 +61,7 @@ export function SiteHeader() {
       <a className="drawer-backdrop" href={path} tabIndex={-1} aria-label="Menüyü kapat" onClick={e => { e.preventDefault(); close(); }} />
       <aside id="site-drawer" className="site-drawer" aria-label="Gezinme menüsü">
         <div className="drawer-heading"><div><b>Makinasal</b><p>İş makinesi pazarı</p></div><a className="drawer-close" href={path} aria-label="Menüyü kapat" onClick={e => { e.preventDefault(); close(); }}>×</a></div>
-        <div className="drawer-account">{profile ? <><a className="drawer-profile-link" href="/profil" aria-label={`${label}, profilimi aç`}><b>{label}</b><span aria-hidden="true">→</span></a><span>Hesabını ve ilanlarını yönet</span></> : <><b>Makinasal’a hoş geldin</b><a className="btn sm" href="/giris">Giriş yap / Kayıt ol</a></>}</div>
+        <div className="drawer-account">{profile ? <><a className="drawer-profile-link" href="/profil" aria-label={`${label}, profilimi aç`}><b>{label}</b></a><a className="drawer-profile-sub" href="/profil">Profil</a></> : <><b>Makinasal’a hoş geldin</b><a className="btn sm" href="/giris">Giriş yap / Kayıt ol</a></>}</div>
         <nav aria-label="Ana menü">{NAV.map(n => {
           const count = n.badge === 'unread' ? unread : n.badge === 'favs' ? favNews : 0;
           // Real document links continue to work if the SPA router is unavailable.

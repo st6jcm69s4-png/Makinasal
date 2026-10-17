@@ -204,13 +204,13 @@ function locationData(f: FormData) {
 }
 export function NetworkNav() {
   return (
-    <nav className="network-nav" aria-label="İş ağı">
-      <a href="/is-agi">Tüm iş ağı</a>
+    <nav className="network-nav" aria-label="İş ve hizmetler">
+      <a href="/is-ve-hizmetler">İş ve hizmetler</a>
       <a href="/kiralik">Kiralık</a>
       <a href="/isler">İş talepleri</a>
       <a href="/parca-talepleri">Parça talepleri</a>
       <a href="/sirketler">Şirketler</a>
-      <a href="/firmalar">Firma rehberi</a>
+      <a href="/yedek-parca">Yedek parça</a>
       <a href="/is-agi/hesabim">İşlerim ve tekliflerim</a>
     </nav>
   );
@@ -308,7 +308,7 @@ export function NetworkBrowse({ kind: fixedKind, rentalHub = false }: { kind?: P
       {!rentalHub && <NetworkNav />}
       <div className="network-heading">
         <div>
-          <span className="eyebrow">MAKİNASAL İŞ AĞI</span>
+          <span className="eyebrow">MAKİNASAL</span>
           <h1>
             {rentalHub ? "Kiralık" : kind ? POST_KINDS[kind] : "İş bul. Ekibini bul. İşini yaptır."}
           </h1>
@@ -331,7 +331,7 @@ export function NetworkBrowse({ kind: fixedKind, rentalHub = false }: { kind?: P
               ? "İş talebi aç"
               : kind
                 ? kind === "rental_operator" ? "Hizmet ilanı ver" : "Kiralık ilanı ver"
-                : "İş ağı ilanı ver"}
+                : "İlan oluştur"}
         </a>
       </div>
       {rentalHub && <section className="rental-categories" aria-label="Kiralama bölümleri">
@@ -357,14 +357,14 @@ export function NetworkBrowse({ kind: fixedKind, rentalHub = false }: { kind?: P
               <span className="linkbtn">İlanları incele →</span>
             </a>
           ))}
-          <a className="panel" href="/firmalar">
+          <a className="panel" href="/sirketler">
             <span className="network-number">05</span>
-            <h2>Hafriyat firmaları ve parçacılar</h2>
+            <h2>Şirketler ve hizmetleri</h2>
             <span className="linkbtn">Bölgendeki firmayı bul →</span>
           </a>
           <a className="panel" href="/firma-kaydi">
             <span className="network-number">06</span>
-            <h2>Firmanı iş ağına ekle</h2>
+            <h2>Şirketini ekle</h2>
             <span className="linkbtn">Hizmet bölgelerini belirle →</span>
           </a>
         </div>
@@ -663,7 +663,7 @@ function PostEditorForm() {
   return (
     <>
       <NetworkNav />
-      <h1>{post ? "İlanını düzenle" : "İş ağı ilanı oluştur"}</h1>
+      <h1>{post ? "İlanını düzenle" : "İş veya hizmet ilanı oluştur"}</h1>
       {preferred && (
         <p className="panel">
           Bu talep seçtiğin firmanın hesabında da görünecek. İlan herkese açık
@@ -1292,6 +1292,7 @@ function QuoteCard({
         </strong>
       </div>
       <p className="network-text">{q.note}</p>
+      {own && q.status==='accepted' && q.price_unit==='toplam' && <p><a className="btn ghost" href={'/odeme?teklif='+q.id}>Güvenli ödeme seçenekleri</a></p>}
       <ErrorBox error={error} />
       {open && q.status === "pending" && (
         <div className="network-actions">
@@ -1572,7 +1573,7 @@ export function ProviderDirectory({
               : "İşini yapacak firmayı bul."}
           </h1>
           <p className="lead">
-            Hafriyat firmaları, parçacılar, kiralama şirketleri ve operatörler.
+            Hafriyat, nakliye, kiralama ve diğer alanlarda çalışan şirketler.
             Hizmet verilen ile ve iş alanına göre seç.
           </p>
         </div>
@@ -2058,13 +2059,13 @@ export function ProviderDetail({ id }: { id: string }) {
             </div>
             <p className="sub">
               Talebin herkese açık yayımlanır. Tercih ettiğin firma talebi kendi
-              iş ağı hesabında görür. Diğer üyeler de teklif verebilir. Profil
+              işlerim ve tekliflerim sayfasında görür. Diğer üyeler de teklif verebilir. Profil
               bilgileri üyenin kendi beyanıdır.
             </p>
           </article>
           <CompanyInventory ownerId={provider.user_id} />
           <section className="sect">
-            <h2>Firmanın açık iş ağı ilanları</h2>
+            <h2>Şirketin açık ilanları</h2>
             {posts.length ? (
               <div className="network-cards">
                 {posts.map((p) => (
@@ -2186,7 +2187,7 @@ function NetworkAccountData() {
           ) : (
             <p>Henüz doğrudan bir talep gelmedi.</p>
           )}
-          <h2>İş ağı ilanlarım</h2>
+          <h2>İş ve hizmet ilanlarım</h2>
           {posts.length ? (
             <div className="network-cards">
               {posts.map((p) => (

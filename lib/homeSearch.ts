@@ -20,14 +20,14 @@ export const HOME_TABS = [
   },
   {
     id: "parts",
-    label: "Parçalar",
-    route: "/ilanlar",
+    label: "Yedek parça",
+    route: "/yedek-parca",
     placeholder: "Parça adı, model veya kod ara",
   },
   {
     id: "firms",
-    label: "Firmalar",
-    route: "/firmalar",
+    label: "Şirketler",
+    route: "/sirketler",
     placeholder: "Firma veya hizmet sağlayıcı adı ara",
   },
 ] as const;
@@ -37,7 +37,7 @@ export function homeSearchUrl(tab: HomeTab, q: string, city: string) {
   const params = new URLSearchParams();
   if (q.trim()) params.set("q", q.trim().slice(0, 200));
   if ((CITIES as readonly string[]).includes(city)) params.set("city", city);
-  if (tab === "parts") params.set("cat", "Yedek parça");
+
   return item.route + (params.size ? "?" + params : "");
 }
 export function locationUrl(route: string, city: string) {

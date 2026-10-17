@@ -269,7 +269,7 @@ export function HomeView() {
           <p>
             Al, sat, kirala. İşini paylaş, fiyat al.
             <br />
-            Hafriyatçıdan parçacıya, ihtiyacın olan bağlantıyı burada bul.
+            Makine, yedek parça ve işini yapacak hizmeti burada bul.
           </p>
         </div>
         <div className="home-search-box">
@@ -345,9 +345,6 @@ export function HomeView() {
                   ))}
                 </select>
               </label>
-              {tab === "parts" && (
-                <input type="hidden" name="cat" value="Yedek parça" />
-              )}
               <button className="btn" type="submit">
                 Ara <Icon type="arrow" />
               </button>

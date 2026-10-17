@@ -1,5 +1,6 @@
 'use client';
 
+import { partGroupLabel } from '@/lib/parts';
 import { useEffect, useState, type FormEvent, type ReactNode } from 'react';
 import type { Listing, Seller } from '@/lib/data/types';
 import { fetchListingById } from '@/lib/dbListings';
@@ -122,7 +123,7 @@ function Body({ l, seller: m, own, stats, favs, toggleFav, cmp, toggleCmp, myCit
           <div className="panel">
             <h3>{part ? 'Ürün bilgisi' : 'Makine bilgisi'}</h3>
             <table><tbody>{rows.map(([k, v]) => <tr key={k}><th>{k}</th><td>{v}</td></tr>)}</tbody></table>
-            {l.desc ? <p style={{ margin: '12px 0 0', whiteSpace: 'pre-wrap' }}>{l.desc}</p> : null}
+            {l.equipmentCategory && <p className="sub">{l.equipmentCategory} · {partGroupLabel(l.partGroup)}</p>}{l.desc ? <p style={{ margin: '12px 0 0', whiteSpace: 'pre-wrap' }}>{l.desc}</p> : null}
           </div>
           <div className="panel">
             <h3>Satıcı</h3>

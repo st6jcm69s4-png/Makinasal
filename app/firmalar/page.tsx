@@ -1,2 +1,2 @@
-import { ProviderDirectory } from '@/components/NetworkHub';
-export default function Page() { return <ProviderDirectory/>; }
+import { redirect } from "next/navigation";
+export default function Page(){redirect('/sirketler');}

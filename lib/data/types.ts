@@ -54,5 +54,7 @@ export type Listing = {
   spec?: string;
   cond?: string;
   compat?: string;
+  equipmentCategory?: string;
+  partGroup?: string;
   qty?: number;
 };

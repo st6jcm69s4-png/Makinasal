@@ -61,7 +61,8 @@ console.log('İş ağı: tür, fiyat birimi ve konum doğrulamaları geçti ✔'
 const {homeSearchUrl,locationUrl}=await import('../lib/homeSearch.ts');
 assert.equal(homeSearchUrl('rental','kamyon','Ankara'),'/kiralik?q=kamyon&city=Ankara');
 assert.equal(homeSearchUrl('jobs','  ','Bogus'),'/isler');
-assert.equal(new URL('https://example.test'+homeSearchUrl('parts','pompa','İzmir')).searchParams.get('cat'),'Yedek parça');
+assert.equal(new URL('https://example.test'+homeSearchUrl('parts','pompa','İzmir')).pathname,'/yedek-parca');
+assert.equal(new URL('https://example.test'+homeSearchUrl('parts','pompa','İzmir')).searchParams.get('city'),'İzmir');
 assert.equal(new URL('https://example.test'+homeSearchUrl('firms','A & B','Ankara')).searchParams.get('q'),'A & B');
 assert.equal(locationUrl('/sirketler','Ankara'),'/sirketler?city=Ankara');
 assert.equal(new URL('https://example.test'+homeSearchUrl('sale','x'.repeat(250),'')).searchParams.get('q').length,200);
@@ -138,3 +139,38 @@ assert.equal(parseAuthOptions({external:{email:true,phone:true},mailer_autoconfi
 assert.equal(parseAuthOptions({external:{email:true,phone:true},mailer_autoconfirm:false,phone_autoconfirm:false,disable_signup:true}).registration,false);
 assert.equal(parseAuthOptions({}).registration,false);
 console.log('Hesap güvenliği: şifre koşulları, telefon normalizasyonu ve gerçek sağlayıcı uygunluğu geçti ✔');
+
+const {PART_GROUPS,partGroupsFor,validPartGroup,partsSearchText}=await import('../lib/parts.ts');
+assert.equal(new Set(PART_GROUPS.map(g=>g.id)).size,PART_GROUPS.length);
+assert.ok(partGroupsFor('Kamyon').some(g=>g.id==='brakes'));
+assert.ok(!partGroupsFor('Kamyon').some(g=>g.id==='undercarriage'));
+assert.ok(partGroupsFor('Ekskavatör').some(g=>g.id==='undercarriage'));
+assert.equal(validPartGroup('constructor'),false);
+assert.equal(partsSearchText('A10VO71,price.gt.1%').includes(','),false);
+assert.equal(homeSearchUrl('parts','pompa','Ankara'),'/yedek-parca?q=pompa&city=Ankara');
+assert.equal(new URL('https://example.test'+homeSearchUrl('firms','','Ankara')).pathname,'/sirketler');
+const {toMinor,priceText,safeHostedPaymentUrl,paymentResultStatus}=await import('../lib/paymentRules.ts');
+assert.equal(toMinor('125.55'),12555);assert.equal(toMinor('0.01'),1);assert.equal(priceText(12555),'125.55');
+for(const bad of ['NaN','-1','1e3','1.999','0','99999999999999999999'])assert.throws(()=>toMinor(bad));
+assert.equal(safeHostedPaymentUrl('https://sandbox-cpp.iyzipay.com?token=x','sandbox'),'https://sandbox-cpp.iyzipay.com/?token=x');
+for(const bad of ['javascript:alert(1)','https://sandbox-cpp.iyzipay.com.evil.test','https://user:secret@sandbox-cpp.iyzipay.com','http://sandbox-cpp.iyzipay.com','https://cpp.iyzipay.com'])assert.equal(safeHostedPaymentUrl(bad,'sandbox'),null);
+assert.equal(paymentResultStatus({status:'success',paymentStatus:'SUCCESS',fraudStatus:1}),'paid');
+assert.equal(paymentResultStatus({status:'success',paymentStatus:'SUCCESS',fraudStatus:0}),'review');
+assert.equal(paymentResultStatus({status:'success',paymentStatus:'SUCCESS',fraudStatus:-1}),'failed');
+assert.equal(paymentResultStatus({status:'success',paymentStatus:'PENDING'}),'pending');
+assert.throws(()=>paymentResultStatus({status:'failure'}));
+const {iyzicoAuthorization,verifyHostedWebhook}=await import('../lib/iyzico.ts');
+const {createHmac}=await import('node:crypto');
+const expectedSig=createHmac('sha256','test-secret').update('random/payment/test'+JSON.stringify({test:1})).digest('hex');
+assert.equal(await iyzicoAuthorization('test-api','test-secret','random','/payment/test',JSON.stringify({test:1})),'IYZWSv2 '+Buffer.from('apiKey:test-api&randomKey:random&signature:'+expectedSig).toString('base64'));
+const notification={iyziEventType:'CHECKOUT_FORM_AUTH',iyziPaymentId:123,token:'test-token',paymentConversationId:'test-order',status:'SUCCESS'};
+const hookSignature=createHmac('sha256','test-secret').update('test-secretCHECKOUT_FORM_AUTH123test-tokentest-orderSUCCESS').digest('hex');
+assert.equal(await verifyHostedWebhook(notification,hookSignature,'test-secret'),true);
+assert.equal(await verifyHostedWebhook({...notification,status:'FAILURE'},hookSignature,'test-secret'),false);
+assert.equal(await verifyHostedWebhook(notification,'0'.repeat(64),'test-secret'),false);
+console.log('Parça filtresi, para tutarı, güvenilir ödeme adresi, HMAC ve sahte bildirim kontrolleri geçti ✔');
+
+const {readBoundedText}=await import('../lib/http.ts');
+assert.equal(await readBoundedText(new Request('https://example.test',{method:'POST',body:'abcd'}),4),'abcd');
+await assert.rejects(()=>readBoundedText(new Request('https://example.test',{method:'POST',body:'abcde'}),4));
+console.log('İstek boyutu sınırı gerçek gövde üzerinde doğrulandı ✔');

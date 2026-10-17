@@ -1,0 +1,6 @@
+import {readBoundedText} from "@/lib/http";
+import {NextRequest,NextResponse} from "next/server";
+import {authRequest,sameOrigin} from "@/lib/authRequest";
+import {paymentAdmin,confirmCheckout} from "@/lib/paymentServer";
+import {UUID} from "@/lib/paymentRules";
+export async function POST(request:NextRequest){const fail=(status:number)=>NextResponse.json({error:'Ödeme sonucu şu anda doğrulanamadı. Yeniden ödeme başlatma; daha sonra tekrar kontrol et.'},{status});if(!sameOrigin(request))return fail(403);try{const raw=await readBoundedText(request,1000);if(raw.length>1000)return fail(400);const {orderId}=JSON.parse(raw);if(!UUID.test(orderId))return fail(400);const db=authRequest(request,NextResponse.json({}));const {data}=await db.auth.getUser();if(!data.user)return fail(401);const {data:own}=await db.from('payment_orders').select('id,status').eq('id',orderId).maybeSingle();if(!own)return fail(403);if(own.status==='paid'||own.status==='failed')return NextResponse.json({status:own.status});const {data:order}=await paymentAdmin().from('payment_orders').select('provider_token').eq('id',orderId).single();if(!order?.provider_token)return fail(409);const status=await confirmCheckout(orderId,order.provider_token,'manual-reconcile');return NextResponse.json({status},{headers:{'Cache-Control':'no-store'}});}catch{return fail(503);}}

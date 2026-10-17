@@ -1,2 +1,2 @@
-import { NetworkBrowse } from '@/components/NetworkHub';
-export default function Page() { return <NetworkBrowse/>; }
+import { redirect } from "next/navigation";
+export default function Page(){redirect('/is-ve-hizmetler');}

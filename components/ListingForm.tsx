@@ -14,6 +14,8 @@ import { formatTL } from "@/lib/format";
 import { resizeImage } from "@/lib/image";
 import { isPartCategory } from "@/lib/pricing";
 import { getSupabase } from "@/lib/supabase/client";
+import { partGroupsFor,validPartGroup } from "@/lib/parts";
+import { MACHINE_CATEGORIES } from "@/lib/data/constants";
 import { canonicalBrand } from "@/lib/machineryCatalog";
 import { CategoryOptions, BrandField } from "./CatalogControls";
 import { useMarket } from "./MarketProvider";
@@ -54,6 +56,8 @@ function Form() {
   const [unit, setUnit] = useState<"saat" | "km">("saat");
   const [spec, setSpec] = useState("");
   const [cond, setCond] = useState("Sıfır");
+  const [equipmentCategory,setEquipmentCategory] = useState("");
+  const [partGroup,setPartGroup] = useState("");
   const [compat, setCompat] = useState("");
   const [qty, setQty] = useState("");
   const [takas, setTakas] = useState(false);
@@ -88,6 +92,7 @@ function Form() {
         ? "tire"
         : "machine";
 
+  useEffect(()=>{if(editId)return;const c=params.get('cat');if(c==='Yedek parça'||c==='Lastik ve jant')setCat(c);const e=params.get('equipment')||'';if((MACHINE_CATEGORIES as readonly string[]).includes(e))setEquipmentCategory(e);const p=params.get('part')||'';if(validPartGroup(p))setPartGroup(p);},[editId,params]);
   // Şehri profilden varsayılan al
   useEffect(() => {
     if (profile && !city && !editId) setCity(profile.city);
@@ -122,6 +127,7 @@ function Form() {
       setSpec((r.spec as string) ?? "");
       setCond((r.cond as string) ?? "Sıfır");
       setCompat((r.compat as string) ?? "");
+      setEquipmentCategory((r.equipment_category as string) ?? "");setPartGroup((r.part_group as string) ?? "");
       setQty(r.qty ? String(r.qty) : "");
       setTakas(!!r.takas);
       setSerial(!!r.serial_declared);
@@ -241,6 +247,7 @@ function Form() {
         `Marka ve ${part ? "ürün adı" : "model"} alanlarını doldur.`,
       );
     if (part) {
+      if (!(MACHINE_CATEGORIES as readonly string[]).includes(equipmentCategory) || !validPartGroup(partGroup)) return setError("Parçanın makine / araç türünü ve parça grubunu seç.");
       if (!spec.trim())
         return setError(
           `${cat === "Lastik ve jant" ? "Lastik ebadını" : "Parça numarasını"} gir.`,
@@ -306,6 +313,7 @@ function Form() {
         cond: part ? cond : null,
         compat: part && compat.trim() ? compat.trim() : null,
         qty: part ? Number(qty) : null,
+        equipment_category:part?equipmentCategory:null,part_group:part?partGroup:null,
       };
       const extra = {
         brand: canonicalBrand(brand),
@@ -497,7 +505,7 @@ function Form() {
           </div>
           <div className="field">
             <BrandField
-              category={cat}
+              category={part ? equipmentCategory : cat}
               id="f-brand"
               value={brand}
               onChange={setBrand}
@@ -558,6 +566,7 @@ function Form() {
             </div>
           </div>
         ) : null}
+        {part && <div className="row2"><div className="field"><label htmlFor="part-equipment">Parça hangi makine / araç için?</label><select id="part-equipment" value={equipmentCategory} onChange={e=>{setEquipmentCategory(e.target.value);setPartGroup('');}}><option value="">Makine veya araç seç</option><CategoryOptions includeParts={false}/></select></div><div className="field"><label htmlFor="part-group">Parça grubu</label><select id="part-group" value={partGroup} onChange={e=>setPartGroup(e.target.value)}><option value="">Parça grubu seç</option>{partGroupsFor(equipmentCategory).map(g=><option key={g.id} value={g.id}>{g.label}</option>)}</select></div></div>}
         {part ? (
           <div className="row2">
             <div className="field">

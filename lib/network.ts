@@ -9,7 +9,7 @@ export type PersonnelRole = keyof typeof PERSONNEL_ROLES;
 export type PostKind = keyof typeof POST_KINDS;
 export const PROVIDER_KINDS = {
   excavation: "Hafriyat firması",
-  supplier: "Parçacı",
+  supplier: "Yedek parça satışı",
   operator: "Operatör",
   rental: "Makine kiralama",
 } as const;
