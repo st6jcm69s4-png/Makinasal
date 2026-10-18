@@ -3,14 +3,14 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Listing, Review, Seller } from './data/types';
 
 const BASE =
-  'id,seller_id,kind,category,title,description,price,city,year,usage_value,usage_unit,spec,cond,compat,qty,status,created_at,listing_photos(path,position)';
+  'id,seller_id,kind,category,title,description,price,city,year,usage_value,usage_unit,spec,cond,compat,qty,status,moderation_status,created_at,listing_photos(path,position)';
 // 005-ozellikler.sql çalıştırılmışsa gelen ek sütunlar
 const EXTRA = 'equipment_category,part_group,brand,model,takas,serial_declared,prev_price,confirmed_at,boosted_until';
 
 type Row = {
   id: string; seller_id: string; kind: string; category: string; title: string; description: string;
   price: number | string; city: string; year: number | null; usage_value: number | null; usage_unit: string | null;
-  spec: string | null; cond: string | null; compat: string | null; qty: number | null; status: string; created_at: string;
+  spec: string | null; cond: string | null; compat: string | null; qty: number | null; status: string; moderation_status?: 'pending'|'approved'|'rejected'; created_at: string;
   listing_photos: { path: string; position: number }[] | null;
   equipment_category?: string | null;part_group?: string | null;
   brand?: string | null; model?: string | null; takas?: boolean | null; serial_declared?: boolean | null;
@@ -50,6 +50,7 @@ export function rowToListing(row: Row, publicUrl: (path: string) => string): Lis
     qty: row.qty ?? undefined,
     photos,
     status: row.status,
+    moderation:row.moderation_status,
     createdAt: row.created_at,
     isNew: Date.now() - created < 3 * DAY,
   };
@@ -117,7 +118,7 @@ export async function fetchActiveListings(supabase: SupabaseClient | null): Prom
   if (!supabase) return { listings: [], sellers: {} };
   const publicUrl = photoUrlFn(supabase);
   const { data, error } = await selectListings(supabase, (cols) =>
-    supabase.from('listings').select(cols).eq('status', 'active').order('created_at', { ascending: false }).limit(300));
+    supabase.from('listings').select(cols).eq('status', 'active').eq('moderation_status','approved').order('created_at', { ascending: false }).limit(300));
   if (error || !data) {
     throw new Error('İlanlar yüklenemedi. Bağlantını kontrol edip tekrar dene.');
   }
@@ -167,7 +168,7 @@ export async function fetchListingById(supabase: SupabaseClient | null, id: stri
 /** Bir satıcının tüm yayındaki ilanları (mağaza sayfası). */
 export async function fetchSellerListings(supabase: SupabaseClient, sellerId: string): Promise<Listing[]> {
   const { data } = await selectListings(supabase, (cols) =>
-    supabase.from('listings').select(cols).eq('seller_id', sellerId).eq('status', 'active').order('created_at', { ascending: false }));
+    supabase.from('listings').select(cols).eq('seller_id', sellerId).eq('status', 'active').eq('moderation_status','approved').order('created_at', { ascending: false }));
   return ((data ?? []) as unknown as Row[]).map((r) => rowToListing(r, photoUrlFn(supabase)));
 }
 

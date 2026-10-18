@@ -1,3 +1,5 @@
+import {notificationHref} from '../lib/notificationLinks.ts';
+import {rowToListing} from '../lib/dbListings.ts';
 import assert from 'node:assert/strict';
 import {csvRecords,parseCsv,importValues} from '../lib/bulkImport.ts';
 import {searchRequest} from '../lib/searchRequest.ts';
@@ -20,3 +22,11 @@ assert.equal(routeLabel('/mesajlar/abc'),'/mesajlar/[id]');
 assert.equal(legalReady(),false);
 await assert.rejects(()=>readBoundedText(new Request('https://example.invalid',{method:'POST',body:'x'.repeat(10)}),5));
 console.log('Launch foundations: CSV parsing/draft validation, server search parameters, SEO escaping/noindex, telemetry redaction, legal gate and body limits passed ✔');
+
+const id='10000000-0000-4000-8000-000000000001';
+assert.equal(notificationHref('/mesajlar/'+id),'/mesajlar/'+id);
+assert.equal(notificationHref('/ilanlar/'+id),'/ilanlar/'+id);
+for(const url of ['//evil.invalid','https://evil.invalid','javascript:alert(1)','/mesajlar/'+id+'?next=//evil.invalid','/ilanlar/invalid','/\\evil.invalid'])assert.equal(notificationHref(url),'/bildirimler');
+const pending=rowToListing({id,seller_id:id,category:'Ekskavatör',title:'Draft',price:1000,city:'Ankara',status:'active',moderation_status:'pending',created_at:'2026-10-18T00:00:00Z',listing_photos:[]},path=>path);
+assert.equal(pending.moderation,'pending');
+console.log('Moderation row mapping and safe notification destinations passed ✔');

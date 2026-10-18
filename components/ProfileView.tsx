@@ -151,7 +151,7 @@ export function ProfileView() {
         </div>
         <div className="panel">
           <div className="sect-h" style={{ marginBottom: 0 }}><h3>{tr("İlanlarım")}</h3><a className="btn sm" href="/ilan-ver">{tr("Yeni ilan ver")}</a></div>
-          <div style={{ marginTop: 6 }}><MyListings /></div>
+          <div style={{ marginTop: 6 }}><MyListings key={profile.id} /></div>
         </div>
       </div>
     </>

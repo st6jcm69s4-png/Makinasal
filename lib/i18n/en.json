@@ -1335,5 +1335,15 @@
   "Kullanım koşullarını kabul etmelisin.": "You must accept the terms of use.",
   "Kullanım koşullarını kabul ediyorum.": "I accept the terms of use.",
   "Güvenlik kontrolünü tamamla.": "Complete the security check.",
-  "Karşılaştırma ilanları yüklenemedi.": "Comparison listings could not be loaded."
+  "Karşılaştırma ilanları yüklenemedi.": "Comparison listings could not be loaded.",
+  "İnceleme bekliyor": "Awaiting review",
+  "İlan onaylanmadı": "Listing not approved",
+  "İncelemeye gönder": "Submit for review",
+  "İlan değişikliği incelemeye gönderildi.": "Listing changes were submitted for review.",
+  "İlan incelemeye gönderildi. Onaylandığında yayımlanacak.": "Listing submitted for review. It will be published after approval.",
+  "Fotoğraflar tamamlanınca ilanı incelemeye gönder": "Submit the listing for review after all photos are saved",
+  "Fiyat değişikliği incelemeye gönderildi.": "Price change submitted for review.",
+  "İlan inceleme bekliyor. Onaylanana kadar yalnızca sen ve moderatörler görebilir.": "The listing is awaiting review. Only you and moderators can see it until approval.",
+  "İlan onaylanmadı. Bilgileri düzenleyerek yeniden incelemeye gönderebilirsin.": "The listing was not approved. Edit it to submit it for review again.",
+  "Daha eski bildirimleri yükle": "Load older notifications"
 }

@@ -423,8 +423,8 @@ function Form() {
       toast(
         publishAfterSave
           ? editId
-            ? "İlan güncellendi."
-            : "İlan yayınlandı. Ücret: 0 ₺"
+            ? "İlan değişikliği incelemeye gönderildi."
+            : "İlan incelemeye gönderildi. Onaylandığında yayımlanacak."
           : "İlan duraklatılmış olarak kaydedildi.",
       );
       window.location.assign(`/ilanlar/${id}`);
@@ -755,7 +755,7 @@ function Form() {
             checked={publishAfterSave}
             onChange={(e) => setPublishAfterSave(e.target.checked)}
           />
-          {tr("Fotoğraflar tamamlanınca ilanı yayına al")}</label>
+          {tr("Fotoğraflar tamamlanınca ilanı incelemeye gönder")}</label>
         {error ? (
           <div className="err" role="alert">
             {tr(error)}
@@ -780,7 +780,7 @@ function Form() {
               : editId
                 ? tr("Değişiklikleri kaydet")
                 : publishAfterSave
-                  ? tr("İlanı yayınla")
+                  ? tr("İncelemeye gönder")
                   : tr("Taslak olarak kaydet")}
           </button>
           <span className="sub">

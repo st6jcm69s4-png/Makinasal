@@ -25,6 +25,7 @@ export type Seller = {
 };
 
 export type Listing = {
+  moderation?: 'pending'|'approved'|'rejected';
   id: number | string;
   cat: string;
   brand?: string;

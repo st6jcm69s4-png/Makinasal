@@ -23,10 +23,8 @@ Bordo menü, profil bağlantıları, kiralık makine/personel merkezi, makineye 
 ## Doğrulama
 `npm test`, `npm run typecheck`, Next üretim derlemesi, Vinext tür kontrolü/üretim derlemesi ve `supabase/tests/message_history.sql` kullanılır. Veritabanı testleri geçici kayıtları transaction sonunda geri alır. Kapsam: 300 üzeri önizleme, katılımcı dışı erişim reddi, 50 mesajlık sayfalar, aynı timestamp imleci; birim testleri: 150 kayıt birleştirme, yinelenen mesaj, eski favori, ağ hatası ve bozuk API yanıtı.
 
-## 18 Ekim 2026 — son birleştirilmiş durum
+## 18 Ekim 2026 — 23:20 güncellemesi
 
-Sunucu taraflı arama, tüm filtre/sıralama/count ve 24 sonuçluk sayfalama; 325 ilanla rollback testi geçti. SEO özel-beta noindex kapısı ve parçalı haritalarla tamamlandı. Hukuki taslaklar, çerez tercihi, bildirim özetleri, CSV/XML taslak aktarımı, CAPTCHA ve gözlemlenebilirlik bağlantıları eklendi. Önceki hukuki URL'ler yönlendirilir; bildirim geçmişi ve Plausible hazırlığı korunur.
+Moderasyon/RLS, itibar özetleri, kalıcı bildirimler ve doğrudan veritabanı istek sınırları kullanıcının onayıyla canlıya uygulandı. Onaysız ilanlar telefon ve genel aramadan da gizlenir. Sahip kendi taslağını görebilir; ilan formu/profil gerçek inceleme durumunu gösterir. Bildirim geçmişi sayfalanır ve hesap değişiminde sıfırlanır.
 
-**Veritabanında yalnızca arama migrasyonu uygulandı. Moderasyon/RLS ve kalıcı bildirim/rate-limit migrasyonları uygulanmadı.** Canlı moderasyon işlemi otomatik onay incelemesinde reddedildi. Sızdırılmış şifre koruması, gerçek sağlayıcılar ve hukuk onayı bekliyor. SMS/e-posta/push gönderimi, tahsilat, mobil uygulama, ortaklıklar ve otomatik fotoğraf silme etkin değildir.
-
-Ayrıntılar ve kurulum: `docs/CANLIYA-HAZIRLIK-2026-10-18.md`. `app/sitemap.ts` tek-parça alternatifi yerine `app/sitemap.xml/route.ts` kullanılır. `lib/legalDraftReference.ts` önceki taslağın arşividir; güncel kullanıcı sayfaları `app/hukuki/[slug]/page.tsx` içindedir.
+Altı SQL test paketi rollback ile geçti; geçici veri kalmadı. `user_stats` invoker ve anonim sayaç erişimi doğrulandı. Yönetici ataması için hesap e-postası, sağlayıcılar ve hukuk onayı bekleniyor; kayıt ve gerçek tahsilat kapalıdır. Tam durum ve kalan bağımlılıklar `docs/CANLIYA-HAZIRLIK-2026-10-18.md` içindedir.

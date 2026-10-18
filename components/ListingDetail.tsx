@@ -38,11 +38,11 @@ export function ListingDetail({ id, initial = null }: { id: string; initial?: { 
     fetchListingById(getSupabase(), id).then((r) => { if (!alive) return; if (r) setExtra(r); else if (!fromPool) setMissing(true); })
       .catch(() => { if (alive) setLoadError('İlan yüklenemedi. Bağlantını kontrol edip tekrar dene.'); });
     return () => { alive = false; };
-  }, [id, ready, fromPool, attempt]);
+  }, [id, ready, fromPool, attempt,profile?.id]);
 
   useEffect(() => {
     if (!/^\d+$/.test(id)) void getSupabase()?.rpc('track_view', { p_listing: id });
-  }, [id]);
+  }, [id,profile?.id]);
 
   const current = extra?.listing.id === id ? extra : null;
   const l = current?.listing ?? fromPool;
@@ -102,6 +102,7 @@ function Body({ l, seller: m, own, stats, favs, toggleFav, cmp, toggleCmp, myCit
         </div>
       </div>
 
+      {own&&l.moderation&&l.moderation!=='approved'?<p className="note" role="status">{tr(l.moderation==='pending'?'İlan inceleme bekliyor. Onaylanana kadar yalnızca sen ve moderatörler görebilir.':'İlan onaylanmadı. Bilgileri düzenleyerek yeniden incelemeye gönderebilirsin.')}</p>:null}
       {inactive ? <div className="note bad" style={{ marginBottom: 14 }}>{tr("Bu ilan ")}{l.status === 'sold' ? tr("satıldı") : tr("şu an yayında değil")}.</div> : null}
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>

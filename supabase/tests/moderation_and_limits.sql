@@ -1,5 +1,4 @@
--- Run only on a local/staging clone after BOTH pending migrations are installed.
--- This has not been executed against production: production DDL approval is pending.
+-- Rollback-only integration test, run after moderation and write-limit migrations.
 begin;
 insert into auth.users(id,email,raw_user_meta_data) values
 ('bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb','moderation-seller@example.invalid','{}'),
@@ -12,6 +11,7 @@ values('bbbbbbbb-1111-4111-8111-bbbbbbbbbbbb',auth.uid(),'machine','Ekskavatör'
 do $$begin
  if public.is_moderator() then raise exception 'FAIL user_metadata admin escalation';end if;
  if not exists(select 1 from public.listings where id='bbbbbbbb-1111-4111-8111-bbbbbbbbbbbb' and moderation_status='pending') then raise exception 'FAIL owner bypass';end if;
+ if (public.search_listings('{"q":"Moderation fixture"}')->>'total')::int<>0 then raise exception 'FAIL owner pending draft leaked into public search';end if;
  update public.listings set moderation_status='approved' where id='bbbbbbbb-1111-4111-8111-bbbbbbbbbbbb';
  if not exists(select 1 from public.listings where id='bbbbbbbb-1111-4111-8111-bbbbbbbbbbbb' and moderation_status='pending') then raise exception 'FAIL owner self-approval';end if;
 end $$;
@@ -36,3 +36,5 @@ do $$declare i int;begin
  if has_schema_privilege('authenticated','makinasal_private','usage') then raise exception 'FAIL exposed private schema';end if;
 end $$;
 rollback;
+
+select 'PASS: moderation ownership, outsider isolation, trusted admin claims, reputation visibility and rate counter; rolled back' result;

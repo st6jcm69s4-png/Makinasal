@@ -11,13 +11,13 @@ import { useMarket } from './MarketProvider';
 import { Pill } from './ui';
 
 type Row = {
-  id: string; title: string; brand?: string | null; model?: string | null; category: string; price: number | string; city: string; status: string;
+  id: string; title: string; brand?: string | null; model?: string | null; category: string; price: number | string; city: string; status: string; moderation_status?:'pending'|'approved'|'rejected';
   year: number | null; created_at: string; boosted_until?: string | null; listing_photos: { path: string }[] | null;
 };
 type Stat = { views: number; phones: number };
 
 const STATUS: Record<string, string> = { active: 'Yayında', paused: 'Duraklatıldı', sold: 'Satıldı' };
-const COLS = 'id,title,category,price,city,status,year,created_at,listing_photos(path)';
+const COLS = 'id,title,category,price,city,status,moderation_status,year,created_at,listing_photos(path)';
 
 export function MyListings() {
   const { t: tr, language } = useLanguage();
@@ -83,16 +83,16 @@ export function MyListings() {
               <a href={`/ilanlar/${r.id}`}><b>{r.title}</b></a>{r.year ? ` · ${r.year}` : ''}
               <br /><span className="sub">{formatTL(Number(r.price), language)} · {r.city} · {r.listing_photos?.length ?? 0} {tr(" fotoğraf")}{profile.is_premium && stats[r.id] ? tr(" · {0} görüntülenme, {1} telefon", {"0":stats[r.id].views,"1":stats[r.id].phones}) : ''}</span>
               <div style={{ marginTop: 4, display: 'flex', gap: 6 }}>
-                <Pill cls={r.status === 'active' ? 'good' : r.status === 'sold' ? '' : 'warn'}>{tr(STATUS[r.status] ?? r.status)}</Pill>
+                <Pill cls={r.status === 'active'&&r.moderation_status==='approved' ? 'good' : r.status === 'sold' ? '' : 'warn'}>{tr(r.moderation_status==='pending'?'İnceleme bekliyor':r.moderation_status==='rejected'?'İlan onaylanmadı':STATUS[r.status] ?? r.status)}</Pill>
                 {boosted || profile.is_premium ? <Pill cls="prem">{tr("Öne çıkan")}</Pill> : null}
               </div>
             </div>
             <div className="acts-row">
               {r.status !== 'sold' ? <a className="btn ghost sm" href={`/ilan-ver?duzenle=${r.id}`}>{tr("Düzenle")}</a> : null}
-              {r.status === 'active' ? <button className="btn ghost sm" type="button" onClick={() => void patch(r.id, { confirmed_at: new Date().toISOString() }, 'İlanın “hâlâ satılık” olarak doğrulandı.')}>{tr("Hâlâ satılık")}</button> : null}
-              {r.status !== 'sold' ? <button className="btn ghost sm" type="button" onClick={() => void patch(r.id, { price: Math.round((Number(r.price) * 0.95) / 100) * 100 }, 'Fiyat %5 düşürüldü.')}>{tr("Fiyatı %5 düşür")}</button> : null}
+              {r.status === 'active'&&r.moderation_status==='approved' ? <button className="btn ghost sm" type="button" onClick={() => void patch(r.id, { confirmed_at: new Date().toISOString() }, 'İlanın “hâlâ satılık” olarak doğrulandı.')}>{tr("Hâlâ satılık")}</button> : null}
+              {r.status !== 'sold' ? <button className="btn ghost sm" type="button" onClick={() => void patch(r.id, { price: Math.round((Number(r.price) * 0.95) / 100) * 100 }, 'Fiyat değişikliği incelemeye gönderildi.')}>{tr("Fiyatı %5 düşür")}</button> : null}
               {r.status === 'active' ? <button className="btn ghost sm" type="button" onClick={() => void patch(r.id, { status: 'paused' })}>{tr("Duraklat")}</button> : null}
-              {r.status === 'paused' ? <button className="btn ghost sm" type="button" onClick={() => void patch(r.id, { status: 'active' })}>{tr("Yayına al")}</button> : null}
+              {r.status === 'paused'&&r.moderation_status!=='rejected' ? <button className="btn ghost sm" type="button" onClick={() => void patch(r.id, { status: 'active' })}>{tr("Yayına al")}</button> : null}
               {r.status !== 'sold' ? <button className="btn ghost sm" type="button" onClick={() => void patch(r.id, { status: 'sold' })}>{tr("Satıldı")}</button> : null}
               {r.status !== 'sold' && !profile.is_premium ? <button className="btn ghost sm" type="button" disabled title={tr("Ödeme açılınca")}>{tr("Öne çıkar (yakında)")}</button> : null}
               <button className="btn ghost sm" type="button" onClick={() => void remove(r)}>{tr("İlanı kaldır")}</button>
