@@ -1,6 +1,6 @@
 'use client';
 import { SearchAutocomplete } from './SearchAutocomplete';
-import { LanguageSwitcher, useLanguage } from "@/components/LanguageProvider";
+import { useLanguage } from "@/components/LanguageProvider";
 
 
 import { useEffect, useRef, useState } from 'react';
@@ -68,7 +68,6 @@ export function SiteHeader() {
       <aside id="site-drawer" className="site-drawer" aria-label={tr("Gezinme menüsü")}>
         <div className="drawer-heading"><div><b>{tr("Makinasal")}</b><p>{tr("İş makinesi pazarı")}</p></div><a className="drawer-close" href={path} aria-label={tr("Menüyü kapat")} onClick={e => { e.preventDefault(); close(); }}>×</a></div>
         <div className={'drawer-account'+(profile?' signed-in':'')}>{profile ? <><a className="drawer-profile-link" href="/profil" aria-label={tr("{0}, profilimi aç", {"0":label})}><b>{label}</b></a><a className="drawer-profile-sub" href="/profil" aria-current={path.startsWith('/profil') ? 'page' : undefined}>{tr("Profil")}</a></> : <><b>{tr("Makinasal’a hoş geldin")}</b><a className="btn sm" href="/giris">{tr("Giriş yap / Kayıt ol")}</a></>}</div>
-        <LanguageSwitcher />
         <nav aria-label={tr("Ana menü")}>{NAV.map(n => {
           const count = n.badge === 'unread' ? unread : n.badge === 'favs' ? favNews : 0;
           // Real document links continue to work if the SPA router is unavailable.
