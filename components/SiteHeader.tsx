@@ -88,7 +88,7 @@ export function SiteHeader() {
     </form>
     <div className="header-actions">
       <a className="header-home" href="/" onClick={close}>{tr('Ana sayfa')}</a>
-      <a className="btn sm" href="/ilan-ver" onClick={close}>{tr('İlan ver')}</a>
+      <a className="header-account" href="/ilan-ver" onClick={close}>{tr('İlan ver')}</a>
       <a className="header-account" href="/profil" onClick={close}>{tr('Hesabım')}</a>
     </div>
   </div></header>;
