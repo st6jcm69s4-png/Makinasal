@@ -1,3 +1,6 @@
+"use client";
+
+import { useLanguage } from "@/components/LanguageProvider";
 import type { ReactNode } from 'react';
 import type { Seller } from '@/lib/data/types';
 import { formatScore } from '@/lib/format';
@@ -6,24 +9,32 @@ import { trustLevel } from '@/lib/trust';
 export const toneClass = (t: 'bad' | 'neutral' | 'good' | 'warn') => (t === 'neutral' ? '' : t);
 
 export function Pill({ cls = '', children }: { cls?: string; children: ReactNode }) {
+  const { t: tr, language } = useLanguage();
+
   return <span className={`pill ${cls}`.trim()}>{children}</span>;
 }
 
 export function TrustPill({ seller }: { seller: Pick<Seller, 'rep' | 'deals' | 's'> }) {
+  const { t: tr, language } = useLanguage();
+
   const t = trustLevel(seller);
-  return <Pill cls={toneClass(t.tone)}>{t.label}</Pill>;
+  return <Pill cls={toneClass(t.tone)}>{tr(t.label)}</Pill>;
 }
 
 export function Stars({ n }: { n: number }) {
-  return <span aria-label={`${n} yıldız`}>{'★'.repeat(n)}{'☆'.repeat(5 - n)}</span>;
+  const { t: tr, language } = useLanguage();
+
+  return <span aria-label={tr("{0} yıldız", {"0":n})}>{'★'.repeat(n)}{'☆'.repeat(5 - n)}</span>;
 }
 
 export function ScoreRow({ label, value }: { label: string; value: number | null | undefined }) {
+  const { t: tr, language } = useLanguage();
+
   return (
     <div className="score">
-      <span className="out" style={{ width: 110 }}>{label}</span>
+      <span className="out" style={{ width: 110 }}>{tr(label)}</span>
       <div className="meter"><i style={{ width: `${((value ?? 0) / 5) * 100}%` }} /></div>
-      <span className="out">{formatScore(value)}</span>
+      <span className="out">{formatScore(value, language)}</span>
     </div>
   );
 }
@@ -36,5 +47,7 @@ export const IconCmp = () => (
 );
 
 export function Avatar({ name, small }: { name: string; small?: boolean }) {
+  const { t: tr, language } = useLanguage();
+
   return <div className={`avatar${small ? ' sm' : ''}`} aria-hidden="true">{(name || 'S').charAt(0).toLocaleUpperCase('tr')}</div>;
 }

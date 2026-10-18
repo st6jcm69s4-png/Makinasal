@@ -1,3 +1,4 @@
+import { Text } from "@/components/LanguageProvider";
 export default function NotFound() {
-  return <div className="panel"><h1>Sayfa bulunamadı</h1><p>Bağlantı değişmiş veya sayfa kaldırılmış olabilir.</p><a className="btn" href="/ilanlar">İlanları incele</a></div>;
+  return <div className="panel"><h1><Text value={"Sayfa bulunamadı"} /></h1><p><Text value={"Bağlantı değişmiş veya sayfa kaldırılmış olabilir."} /></p><a className="btn" href="/ilanlar"><Text value={"İlanları incele"} /></a></div>;
 }

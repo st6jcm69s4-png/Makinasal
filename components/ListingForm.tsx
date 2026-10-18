@@ -1,4 +1,6 @@
 "use client";
+import { useLanguage } from "@/components/LanguageProvider";
+
 
 import { useSearchParams } from "next/navigation";
 import {
@@ -34,6 +36,8 @@ type Photo = {
 };
 
 function Form() {
+  const { t: tr, language } = useLanguage();
+
   const params = useSearchParams();
   const editId = params.get("duzenle");
   const { profile, authReady, stats, reload, toast } = useMarket();
@@ -212,7 +216,7 @@ function Form() {
       };
     else {
       const f = stats.flag(priceNum, cat),
-        ref = formatTL(Math.round(med / 1000) * 1000);
+        ref = formatTL(Math.round(med / 1000) * 1000, language);
       priceNote =
         f === "low"
           ? {
@@ -435,20 +439,18 @@ function Form() {
   }
 
   if (!authReady || (profile && !loaded))
-    return <div className="empty">Yükleniyor…</div>;
+    return <div className="empty">{tr("Yükleniyor…")}</div>;
   if (!getSupabase())
     return (
       <div className="panel">
-        Supabase bağlantısı yok. <code>.env.local</code> dosyasını kontrol et.
-      </div>
+        {tr("Supabase bağlantısı yok. ")}<code>{tr(".env.local")}</code> {tr(" dosyasını kontrol et.")}</div>
     );
   if (!profile)
     return (
       <div className="panel">
-        İlan vermek için önce{" "}
+        {tr("İlan vermek için önce")}{" "}
         <a className="linkbtn" href="/giris">
-          giriş yap ya da kayıt ol
-        </a>
+          {tr("giriş yap ya da kayıt ol")}</a>
         .
       </div>
     );
@@ -458,11 +460,9 @@ function Form() {
         <div className="note">{partial.message}</div>
         <p style={{ display: "flex", gap: 8 }}>
           <a className="btn" href={`/ilan-ver?duzenle=${partial.id}`}>
-            İlanı tamamla
-          </a>
+            {tr("İlanı tamamla")}</a>
           <a className="btn ghost" href="/profil">
-            Profil
-          </a>
+            {tr("Profil")}</a>
         </p>
       </div>
     );
@@ -493,13 +493,13 @@ function Form() {
       >
         <div className="row2">
           <div className="field">
-            <label htmlFor="f-cat">Kategori</label>
+            <label htmlFor="f-cat">{tr("Kategori")}</label>
             <select
               id="f-cat"
               value={cat}
               onChange={(e) => pickCat(e.target.value)}
             >
-              <option value="">Seç…</option>
+              <option value="">{tr("Seç…")}</option>
               <CategoryOptions />
             </select>
           </div>
@@ -514,7 +514,7 @@ function Form() {
           </div>
           <div className="field">
             <label htmlFor="f-model">
-              {part ? "Parça veya ürün adı" : "Model"}
+              {part ? tr("Parça veya ürün adı") : tr("Model")}
             </label>
             <input
               type="text"
@@ -522,14 +522,14 @@ function Form() {
               value={model}
               maxLength={80}
               onChange={(e) => setModel(e.target.value)}
-              placeholder={part ? "Örn. Hidrolik pompa" : "Örn. HMK 220 LC"}
+              placeholder={part ? tr("Örn. Hidrolik pompa") : tr("Örn. HMK 220 LC")}
             />
           </div>
         </div>
         {cat && !part ? (
           <div className="row2">
             <div className="field">
-              <label htmlFor="f-year">Model yılı</label>
+              <label htmlFor="f-year">{tr("Model yılı")}</label>
               <input
                 type="number"
                 id="f-year"
@@ -541,7 +541,7 @@ function Form() {
               />
             </div>
             <div className="field">
-              <label htmlFor="f-use">Kullanım</label>
+              <label htmlFor="f-use">{tr("Kullanım")}</label>
               <div
                 className="row-mm"
                 style={{ gridTemplateColumns: "1fr 96px" }}
@@ -555,23 +555,23 @@ function Form() {
                   placeholder="6500"
                 />
                 <select
-                  aria-label="Birim"
+                  aria-label={tr("Birim")}
                   value={unit}
                   onChange={(e) => setUnit(e.target.value as "saat" | "km")}
                 >
-                  <option value="saat">saat</option>
-                  <option value="km">km</option>
+                  <option value="saat">{tr("saat")}</option>
+                  <option value="km">{tr("km")}</option>
                 </select>
               </div>
             </div>
           </div>
         ) : null}
-        {part && <div className="row2"><div className="field"><label htmlFor="part-equipment">Parça hangi makine / araç için?</label><select id="part-equipment" value={equipmentCategory} onChange={e=>{setEquipmentCategory(e.target.value);setPartGroup('');}}><option value="">Makine veya araç seç</option><CategoryOptions includeParts={false}/></select></div><div className="field"><label htmlFor="part-group">Parça grubu</label><select id="part-group" value={partGroup} onChange={e=>setPartGroup(e.target.value)}><option value="">Parça grubu seç</option>{partGroupsFor(equipmentCategory).map(g=><option key={g.id} value={g.id}>{g.label}</option>)}</select></div></div>}
+        {part && <div className="row2"><div className="field"><label htmlFor="part-equipment">{tr("Parça hangi makine / araç için?")}</label><select id="part-equipment" value={equipmentCategory} onChange={e=>{setEquipmentCategory(e.target.value);setPartGroup('');}}><option value="">{tr("Makine veya araç seç")}</option><CategoryOptions includeParts={false}/></select></div><div className="field"><label htmlFor="part-group">{tr("Parça grubu")}</label><select id="part-group" value={partGroup} onChange={e=>setPartGroup(e.target.value)}><option value="">{tr("Parça grubu seç")}</option>{partGroupsFor(equipmentCategory).map(g=><option key={g.id} value={g.id}>{tr(g.label)}</option>)}</select></div></div>}
         {part ? (
           <div className="row2">
             <div className="field">
               <label htmlFor="f-spec">
-                {cat === "Lastik ve jant" ? "Lastik ebadı" : "Parça numarası"}
+                {cat === "Lastik ve jant" ? tr("Lastik ebadı") : tr("Parça numarası")}
               </label>
               <input
                 type="text"
@@ -579,34 +579,34 @@ function Form() {
                 value={spec}
                 onChange={(e) => setSpec(e.target.value)}
                 placeholder={
-                  cat === "Lastik ve jant" ? "Örn. 315/80R22.5" : "Örn. A10VO71"
+                  cat === "Lastik ve jant" ? tr("Örn. 315/80R22.5") : tr("Örn. A10VO71")
                 }
               />
             </div>
             <div className="field">
-              <label htmlFor="f-cond">Durum</label>
+              <label htmlFor="f-cond">{tr("Durum")}</label>
               <select
                 id="f-cond"
                 value={cond}
                 onChange={(e) => setCond(e.target.value)}
               >
                 {CONDITIONS.map((c) => (
-                  <option key={c}>{c}</option>
+                  <option key={c} value={c}>{tr(c)}</option>
                 ))}
               </select>
             </div>
             <div className="field">
-              <label htmlFor="f-compat">Uyumlu makine veya araç</label>
+              <label htmlFor="f-compat">{tr("Uyumlu makine veya araç")}</label>
               <input
                 type="text"
                 id="f-compat"
                 value={compat}
                 onChange={(e) => setCompat(e.target.value)}
-                placeholder="Örn. Hidromek HMK 220 LC"
+                placeholder={tr("Örn. Hidromek HMK 220 LC")}
               />
             </div>
             <div className="field">
-              <label htmlFor="f-qty">Adet</label>
+              <label htmlFor="f-qty">{tr("Adet")}</label>
               <input
                 type="number"
                 id="f-qty"
@@ -620,22 +620,21 @@ function Form() {
         ) : null}
         <div className="row2">
           <div className="field">
-            <label htmlFor="f-city">Şehir</label>
+            <label htmlFor="f-city">{tr("Şehir")}</label>
             <select
               id="f-city"
               value={city}
               onChange={(e) => setCity(e.target.value)}
             >
-              <option value="">Seç…</option>
+              <option value="">{tr("Seç…")}</option>
               {CITIES.map((c) => (
-                <option key={c}>{c}</option>
+                <option key={c} value={c}>{tr(c)}</option>
               ))}
             </select>
           </div>
           <div className="field">
             <label htmlFor="f-price">
-              {part ? "Birim fiyat" : "Fiyat"} (₺, KDV dahil)
-            </label>
+              {part ? tr("Birim fiyat") : tr("Fiyat")} {tr(" (₺, KDV dahil)")}</label>
             <input
               type="number"
               id="f-price"
@@ -655,8 +654,7 @@ function Form() {
             checked={takas}
             onChange={(e) => setTakas(e.target.checked)}
           />
-          Takas kabul ederim
-        </label>
+          {tr("Takas kabul ederim")}</label>
         {cat && !part ? (
           <label className="check">
             <input
@@ -664,14 +662,12 @@ function Form() {
               checked={serial}
               onChange={(e) => setSerial(e.target.checked)}
             />
-            Seri / şasi numarasını alıcıya göstereceğim (ilanda &quot;beyan
-            edildi&quot; olarak görünür)
-          </label>
+            {tr("Seri / şasi numarasını alıcıya göstereceğim (ilanda \"beyan edildi\" olarak görünür)")}</label>
         ) : null}
 
         <div className="field">
           <span className="lbl">
-            Fotoğraflar{" "}
+            {tr("Fotoğraflar")}{" "}
             <span className="out">
               {photos.length} / {maxPhotos}
             </span>
@@ -685,14 +681,13 @@ function Form() {
             onDragLeave={() => setDrag(false)}
             onDrop={onDrop}
           >
-            <span>Fotoğrafları buraya sürükle veya telefondan seç</span>
+            <span>{tr("Fotoğrafları buraya sürükle veya telefondan seç")}</span>
             <button
               type="button"
               className="btn ghost sm"
               onClick={() => fileRef.current?.click()}
             >
-              Fotoğraf seç
-            </button>
+              {tr("Fotoğraf seç")}</button>
             <input
               ref={fileRef}
               type="file"
@@ -700,39 +695,35 @@ function Form() {
               accept="image/jpeg,image/png,image/webp"
               multiple
               tabIndex={-1}
-              aria-label="Fotoğraf seç"
+              aria-label={tr("Fotoğraf seç")}
               onChange={(e) => {
                 addFiles(e.target.files);
                 e.target.value = "";
               }}
             />
             <span className="sub">
-              Makinenin dört yönünden, kabin içinden, saat göstergesinden ve
-              seri plakasından çek. İlk fotoğraf kapak olur.
-            </span>
+              {tr("Makinenin dört yönünden, kabin içinden, saat göstergesinden ve seri plakasından çek. İlk fotoğraf kapak olur.")}</span>
           </div>
           {photos.length > 0 ? (
             <div className="ph-grid">
               {photos.map((p, i) => (
                 <div key={p.key} className="ph">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={p.url} alt={`Fotoğraf ${i + 1}`} />
-                  {i === 0 ? <span className="pill prem tg">Kapak</span> : null}
+                  <img src={p.url} alt={tr("Fotoğraf {0}", {"0":i + 1})} />
+                  {i === 0 ? <span className="pill prem tg">{tr("Kapak")}</span> : null}
                   <div className="acts">
                     {i > 0 ? (
                       <button type="button" onClick={() => makeCover(i)}>
-                        Kapak yap
-                      </button>
+                        {tr("Kapak yap")}</button>
                     ) : (
                       <span />
                     )}
                     <button
                       type="button"
                       onClick={() => removePhoto(i)}
-                      aria-label={`Fotoğraf ${i + 1} kaldır`}
+                      aria-label={tr("Fotoğraf {0} kaldır", {"0":i + 1})}
                     >
-                      Kaldır
-                    </button>
+                      {tr("Kaldır")}</button>
                   </div>
                 </div>
               ))}
@@ -741,14 +732,14 @@ function Form() {
         </div>
 
         <div className="field">
-          <label htmlFor="f-desc">Açıklama</label>
+          <label htmlFor="f-desc">{tr("Açıklama")}</label>
           <textarea
             id="f-desc"
             rows={5}
             maxLength={4000}
             value={desc}
             onChange={(e) => setDesc(e.target.value)}
-            placeholder="Bakım geçmişi, belgeler, takas durumu"
+            placeholder={tr("Bakım geçmişi, belgeler, takas durumu")}
           />
         </div>
         <label className="check">
@@ -757,20 +748,17 @@ function Form() {
             checked={pledge}
             onChange={(e) => setPledge(e.target.checked)}
           />
-          Alıcı ürünü görmeden kapora veya ön ödeme istemeyeceğimi kabul
-          ediyorum.
-        </label>
+          {tr("Alıcı ürünü görmeden kapora veya ön ödeme istemeyeceğimi kabul ediyorum.")}</label>
         <label className="check">
           <input
             type="checkbox"
             checked={publishAfterSave}
             onChange={(e) => setPublishAfterSave(e.target.checked)}
           />
-          Fotoğraflar tamamlanınca ilanı yayına al
-        </label>
+          {tr("Fotoğraflar tamamlanınca ilanı yayına al")}</label>
         {error ? (
           <div className="err" role="alert">
-            {error}
+            {tr(error)}
           </div>
         ) : null}
         {progress ? (
@@ -788,16 +776,15 @@ function Form() {
         >
           <button className="btn" type="submit" disabled={busy}>
             {busy
-              ? "Kaydediliyor…"
+              ? tr("Kaydediliyor…")
               : editId
-                ? "Değişiklikleri kaydet"
+                ? tr("Değişiklikleri kaydet")
                 : publishAfterSave
-                  ? "İlanı yayınla"
-                  : "Taslak olarak kaydet"}
+                  ? tr("İlanı yayınla")
+                  : tr("Taslak olarak kaydet")}
           </button>
           <span className="sub">
-            İlan ücreti: 0 ₺ · 30 günde bir &quot;hâlâ satılık mı?&quot; sorulur
-          </span>
+            {tr("İlan ücreti: 0 ₺ · 30 günde bir \"hâlâ satılık mı?\" sorulur")}</span>
         </div>
       </fieldset>
     </form>
@@ -805,8 +792,10 @@ function Form() {
 }
 
 export function ListingForm() {
+  const { t: tr, language } = useLanguage();
+
   return (
-    <Suspense fallback={<div className="empty">Yükleniyor…</div>}>
+    <Suspense fallback={<div className="empty">{tr("Yükleniyor…")}</div>}>
       <Form />
     </Suspense>
   );

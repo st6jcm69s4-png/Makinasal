@@ -1,3 +1,6 @@
+import { cookies } from 'next/headers';
+import { LanguageProvider, SiteFooter, Text } from '@/components/LanguageProvider';
+import { LANGUAGE_COOKIE, validLanguage } from '@/lib/i18n';
 import type { ReactNode } from 'react';
 import './globals.css';
 import { MarketProvider } from '@/components/MarketProvider';
@@ -9,9 +12,10 @@ export const metadata = {
   description: 'Satılık ve kiralık iş makineleri, kamyonlar, operatörler, iş ve parça talepleri. Bölgenizdeki hafriyat şirketlerini ve filolarını keşfedin.',
 };
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+export default async function RootLayout({ children }: { children: ReactNode }) {
+  const language = validLanguage((await cookies()).get(LANGUAGE_COOKIE)?.value);
   return (
-    <html lang="tr">
+    <html lang={language}>
       <head>
         <link rel="manifest" href="/manifest.webmanifest" />
         <link rel="apple-touch-icon" href="/icons/icon-192.png" />
@@ -21,13 +25,15 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@600;700&family=Noto+Sans:wght@400;500;600&display=swap" />
       </head>
       <body>
-        <a className="skip-link" href="#main-content">Ana içeriğe geç</a>
+        <LanguageProvider initialLanguage={language}>
+        <a className="skip-link" href="#main-content"><Text value="Ana içeriğe geç" /></a>
         <AppServiceWorker />
         <MarketProvider>
           <SiteHeader />
           <main id="main-content" className="wrap">{children}</main>
         </MarketProvider>
-        <footer className="wrap" style={{ padding: '28px 0 96px' }}><nav className="acts-row" aria-label="Yardım bağlantıları"><a href="/destek">Yardım</a><a href="/guven">Güvenli alışveriş</a></nav><p className="sub">Makinasal · Beta · Ödeme ve emanet para kabul edilmez.</p></footer>
+        <SiteFooter />
+        </LanguageProvider>
       </body>
     </html>
   );

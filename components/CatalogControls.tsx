@@ -1,4 +1,6 @@
 "use client";
+import { useLanguage } from "@/components/LanguageProvider";
+
 import { useId, useMemo, useState } from "react";
 import {
   CATEGORY_GROUPS,
@@ -15,25 +17,27 @@ export function CategoryOptions({
   allowGroups?: boolean;
   includeOther?: boolean;
 }) {
+  const { t: tr, language } = useLanguage();
+
   return (
     <>
       {CATEGORY_GROUPS.filter((g) => includeParts || g.id !== "parts").map(
         (g) => (
-          <optgroup key={g.id} label={g.label}>
+          <optgroup key={g.id} label={tr(g.label)}>
             {allowGroups && g.categories.length > 1 && g.id !== "parts" && (
               <option value={`group:${g.id}`}>
-                Tüm {g.label.toLocaleLowerCase("tr-TR")}
+                {tr("Tüm ")}{tr(g.label)}
               </option>
             )}
             {g.categories.map((c) => (
               <option key={c} value={c}>
-                {c}
+                {tr(c)}
               </option>
             ))}
           </optgroup>
         ),
       )}
-      {includeOther && <option value="Diğer">Diğer</option>}
+      {includeOther && <option value="Diğer">{tr("Diğer")}</option>}
     </>
   );
 }
@@ -44,22 +48,23 @@ export function CategoryFilterList({
   value: string;
   onChange: (v: string) => void;
 }) {
+  const { t: tr, language } = useLanguage();
+
   const [q, setQ] = useState("");
   const query = q.trim().toLocaleLowerCase("tr-TR");
   return (
     <div className="catalog-tree">
       <label className="sr" htmlFor="category-list-search">
-        Makine türü ara
-      </label>
+        {tr("Makine türü ara")}</label>
       <input
         id="category-list-search"
         type="search"
         value={q}
         onChange={(e) => setQ(e.target.value)}
-        placeholder="Tür ara: ekskavatör, vinç…"
+        placeholder={tr("Tür ara: ekskavatör, vinç…")}
       />
       <p className="catalog-selected">
-        Seçili: <b>{categoryLabel(value)}</b>
+        {tr("Seçili: ")}<b>{tr(categoryLabel(value))}</b>
       </p>
       <button
         type="button"
@@ -67,14 +72,13 @@ export function CategoryFilterList({
         aria-pressed={value === "Tümü"}
         onClick={() => onChange("Tümü")}
       >
-        Tüm makine ve parçalar
-      </button>
+        {tr("Tüm makine ve parçalar")}</button>
       <div className="catalog-tree-scroll">
         {CATEGORY_GROUPS.map((g) => {
-          const cats = g.label.toLocaleLowerCase("tr-TR").includes(query)
+          const cats = (g.label.toLocaleLowerCase("tr-TR").includes(query) || tr(g.label).toLowerCase().includes(query))
             ? [...g.categories]
             : g.categories.filter((c) =>
-                c.toLocaleLowerCase("tr-TR").includes(query),
+                (c.toLocaleLowerCase("tr-TR").includes(query) || tr(c).toLowerCase().includes(query)),
               );
           if (!cats.length) return null;
           const selected =
@@ -87,7 +91,7 @@ export function CategoryFilterList({
               aria-pressed={selected}
               onClick={() => onChange(g.categories[0])}
             >
-              {g.label}
+              {tr(g.label)}
             </button>
           ) : (
             <details
@@ -96,7 +100,7 @@ export function CategoryFilterList({
               className={selected ? "has-selection" : ""}
             >
               <summary>
-                {g.label}
+                {tr(g.label)}
                 <span>{g.categories.length}</span>
               </summary>
               <ul>
@@ -107,8 +111,7 @@ export function CategoryFilterList({
                       aria-pressed={value === "group:" + g.id}
                       onClick={() => onChange("group:" + g.id)}
                     >
-                      Tümünü göster
-                    </button>
+                      {tr("Tümünü göster")}</button>
                   </li>
                 )}
                 {cats.map((c) => (
@@ -151,6 +154,8 @@ export function BrandField({
   required?: boolean;
   observed?: string[];
 }) {
+  const { t: tr, language } = useLanguage();
+
   const uid = useId();
   const inputId = id ?? `brand-${uid}`;
   const [local, setLocal] = useState(defaultValue),
@@ -172,7 +177,7 @@ export function BrandField({
   );
   return (
     <div className="catalog-brand">
-      <label htmlFor={inputId}>{label}</label>
+      <label htmlFor={inputId}>{tr(label)}</label>
       <input
         id={inputId}
         type="text"
@@ -182,7 +187,7 @@ export function BrandField({
         onChange={(e) => set(e.target.value)}
         maxLength={100}
         required={required}
-        placeholder="Marka seç veya yaz"
+        placeholder={tr("Marka seç veya yaz")}
         autoComplete="off"
       />
       <datalist id={`${inputId}-options`}>
@@ -191,16 +196,15 @@ export function BrandField({
         ))}
       </datalist>
       <details>
-        <summary>{brands.length} marka önerisini listele</summary>
+        <summary>{brands.length} {tr(" marka önerisini listele")}</summary>
         <label className="sr" htmlFor={`${inputId}-find`}>
-          Marka listesinde ara
-        </label>
+          {tr("Marka listesinde ara")}</label>
         <input
           id={`${inputId}-find`}
           type="search"
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder="Marka adını bul…"
+          placeholder={tr("Marka adını bul…")}
         />
         <ul>
           {shown.map((b) => (
@@ -221,14 +225,11 @@ export function BrandField({
         </ul>
         {shown.length === 0 && (
           <p className="sub">
-            Listede yok. Markayı üstteki alana yazabilirsin.
-          </p>
+            {tr("Listede yok. Markayı üstteki alana yazabilirsin.")}</p>
         )}
       </details>
       <small>
-        Listede olmayan markayı yazabilirsin. Öneriler güncel ve eski marka
-        adlarını içerir.
-      </small>
+        {tr("Listede olmayan markayı yazabilirsin. Öneriler güncel ve eski marka adlarını içerir.")}</small>
     </div>
   );
 }

@@ -1,3 +1,4 @@
-export const formatTL = (n: number) => `${Number(n).toLocaleString('tr-TR')} ₺`;
-export const formatNum = (n: number) => Number(n).toLocaleString('tr-TR');
-export const formatScore = (x: number | null | undefined) => (x == null ? '–' : x.toFixed(1).replace('.', ','));
+import { localeFor, type Language } from './i18n/index';
+export const formatTL = (n: number, language: Language = 'tr') => `${Number(n).toLocaleString(localeFor(language))} ₺`;
+export const formatNum = (n: number, language: Language = 'tr') => Number(n).toLocaleString(localeFor(language));
+export const formatScore = (x: number | null | undefined, language: Language = 'tr') => x == null ? '–' : x.toLocaleString(localeFor(language), {minimumFractionDigits:1, maximumFractionDigits:1});

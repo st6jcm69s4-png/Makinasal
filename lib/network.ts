@@ -1,3 +1,4 @@
+import { translate, localeFor, type Language } from './i18n/index';
 export const POST_KINDS = {
   rental_machine: "Kiralık iş makinesi / kamyon",
   rental_operator: "Operatör ve ustalar",
@@ -85,19 +86,19 @@ export const QUOTE_STATUS = {
   declined: "Reddedildi",
   withdrawn: "Geri çekildi",
 };
-export function money(amount: number | string | null, unit = "toplam") {
+export function money(amount: number | string | null, unit = "toplam", language: Language = "tr") {
   return amount == null
-    ? "Bütçe belirtilmedi"
-    : `${Number(amount).toLocaleString("tr-TR", { maximumFractionDigits: 2 })} ₺${unit === "toplam" ? " toplam" : ` / ${unit}`}`;
+    ? translate("Bütçe belirtilmedi",language)
+    : `${Number(amount).toLocaleString(localeFor(language), { maximumFractionDigits: 2 })} ₺${unit === "toplam" ? " " + translate("toplam",language) : ` / ${translate(unit,language)}`}`;
 }
 export function validKind(value: string | null): PostKind {
   return value && Object.prototype.hasOwnProperty.call(POST_KINDS, value)
     ? (value as PostKind)
     : "job";
 }
-export function dateLabel(value: string | null) {
+export function dateLabel(value: string | null, language: Language = "tr") {
   if (!value) return "";
-  return new Date(value + "T12:00:00").toLocaleDateString("tr-TR");
+  return new Date(value + "T12:00:00").toLocaleDateString(localeFor(language));
 }
 export function validCoordinates(lat: number | null, lng: number | null) {
   return (
@@ -113,6 +114,7 @@ export function validCoordinates(lat: number | null, lng: number | null) {
 export function networkError(
   error: { code?: string; message?: string } | null,
 ) {
+  if (error?.message?.includes("MESSAGE_PROFANITY")) return "Küfür veya hakaret içeren mesaj gönderilemez. Lütfen mesajını düzenle.";
   if (error?.code === "23505")
     return "Bu ilana zaten teklif verdin veya bu iş için bir teklif seçilmiş. Sayfayı yenile.";
   if (error?.code === "42501")

@@ -1,4 +1,6 @@
 "use client";
+import { useLanguage } from "@/components/LanguageProvider";
+
 import { useEffect, useState, type FormEvent } from "react";
 import { MACHINE_CATEGORIES } from "@/lib/data/constants";
 import {
@@ -17,6 +19,8 @@ export function CompanyInventory({
   ownerId?: string;
   manage?: boolean;
 }) {
+  const { t: tr, language } = useLanguage();
+
   const { profile, authReady } = useMarket();
   const id = ownerId ?? profile?.id;
   const [category, setCategory] = useState("");
@@ -167,30 +171,29 @@ export function CompanyInventory({
   }
   const canManage = manage && !!profile && profile.id === id;
   if (!authReady || loading)
-    return <p role="status">Şirket envanteri yükleniyor…</p>;
+    return <p role="status">{tr("Şirket envanteri yükleniyor…")}</p>;
   if (manage && !profile)
     return (
       <div className="panel">
-        <h1>Şirketin ve envanterin</h1>
-        <p>Şirket profilini ve ekipmanlarını yönetmek için giriş yap.</p>
+        <h1>{tr("Şirketin ve envanterin")}</h1>
+        <p>{tr("Şirket profilini ve ekipmanlarını yönetmek için giriş yap.")}</p>
         <a className="btn" href="/giris">
-          Giriş yap / Kayıt ol
-        </a>
+          {tr("Giriş yap / Kayıt ol")}</a>
       </div>
     );
   return (
     <section className="company-inventory">
       <div className="home-section-heading">
         <div>
-          <span className="home-small-label">ŞİRKET FİLOSU</span>
+          <span className="home-small-label">{tr("ŞİRKET FİLOSU")}</span>
           {manage ? (
             <h1>
               {providerName
                 ? `${providerName} — Envanterim`
-                : "Şirketim ve envanterim"}
+                : tr("Şirketim ve envanterim")}
             </h1>
           ) : (
-            <h2>Makine ve araç envanteri</h2>
+            <h2>{tr("Makine ve araç envanteri")}</h2>
           )}
         </div>
         {canManage && providerExists && (
@@ -203,52 +206,42 @@ export function CompanyInventory({
               setShowForm(true);
             }}
           >
-            + Ekipman ekle
-          </button>
+            {tr("+ Ekipman ekle")}</button>
         )}
       </div>
       {error && (
         <div className="network-error" role="alert">
-          {error}
+          {tr(error)}
           <button
             className="btn ghost sm"
             onClick={() => setRefresh((x) => x + 1)}
           >
-            Tekrar dene
-          </button>
+            {tr("Tekrar dene")}</button>
         </div>
       )}
       {manage && (
         <>
           <p className="lead">
-            Sahip olduğun makineleri ve araçları şirket vitrininde göster. Bu
-            kayıtlar satılık veya kiralık ilanı oluşturmaz.
-          </p>
+            {tr("Sahip olduğun makineleri ve araçları şirket vitrininde göster. Bu kayıtlar satılık veya kiralık ilanı oluşturmaz.")}</p>
           <div className="network-actions">
             <a className="btn ghost sm" href="/firma-kaydi">
-              Şirket profilini düzenle
-            </a>
+              {tr("Şirket profilini düzenle")}</a>
             {providerExists && (
               <a className="btn ghost sm" href={`/firmalar/${id}`}>
-                Şirket vitrinini gör ↗
-              </a>
+                {tr("Şirket vitrinini gör ↗")}</a>
             )}
             <a className="btn ghost sm" href="/sirketler">
-              Şirket rehberi
-            </a>
+              {tr("Şirket rehberi")}</a>
           </div>
         </>
       )}
       {!providerExists && !error && manage && (
         <div className="panel home-empty">
-          <h2>Önce şirket profilini oluştur</h2>
+          <h2>{tr("Önce şirket profilini oluştur")}</h2>
           <p>
-            Şirket adını, kategorisini ve hizmet bölgelerini ekledikten sonra
-            filonu tanımlayabilirsin.
-          </p>
+            {tr("Şirket adını, kategorisini ve hizmet bölgelerini ekledikten sonra filonu tanımlayabilirsin.")}</p>
           <a className="btn" href="/firma-kaydi">
-            Şirket profili oluştur →
-          </a>
+            {tr("Şirket profili oluştur →")}</a>
         </div>
       )}
       {canManage && providerExists && showForm && (
@@ -258,18 +251,17 @@ export function CompanyInventory({
           onSubmit={save}
           key={editing?.id ?? "new"}
         >
-          <h2>{editing ? "Ekipmanı düzenle" : "Envantere ekipman ekle"}</h2>
+          <h2>{editing ? tr("Ekipmanı düzenle") : tr("Envantere ekipman ekle")}</h2>
           <fieldset disabled={busy}>
             <div className="network-form-grid">
               <label>
-                Makine / araç türü
-                <select
+                {tr("Makine / araç türü")}<select
                   name="category"
                   required
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
                 >
-                  <option value="">Tür seç</option>
+                  <option value="">{tr("Tür seç")}</option>
                   <CategoryOptions includeParts={false} includeOther />
                 </select>
               </label>
@@ -279,18 +271,16 @@ export function CompanyInventory({
                 defaultValue={editing?.brand ?? ""}
               />
               <label>
-                Model
-                <input
+                {tr("Model")}<input
                   name="model"
                   required
                   maxLength={120}
                   defaultValue={editing?.model ?? ""}
-                  placeholder="Örn. SY215C"
+                  placeholder={tr("Örn. SY215C")}
                 />
               </label>
               <label>
-                Model yılı
-                <input
+                {tr("Model yılı")}<input
                   type="number"
                   name="year"
                   min={1950}
@@ -299,8 +289,7 @@ export function CompanyInventory({
                 />
               </label>
               <label>
-                Adet
-                <input
+                {tr("Adet")}<input
                   type="number"
                   name="quantity"
                   min={1}
@@ -310,31 +299,28 @@ export function CompanyInventory({
                 />
               </label>
               <label>
-                Kapasite / özellik
-                <input
+                {tr("Kapasite / özellik")}<input
                   name="capacity"
                   maxLength={200}
                   defaultValue={editing?.capacity ?? ""}
-                  placeholder="Örn. 22 ton / 1 m³ kova"
+                  placeholder={tr("Örn. 22 ton / 1 m³ kova")}
                 />
               </label>
               <label>
-                Durum
-                <select
+                {tr("Durum")}<select
                   name="availability"
                   defaultValue={editing?.availability ?? "available"}
                 >
                   {Object.entries(EQUIPMENT_STATUS).map(([k, v]) => (
                     <option key={k} value={k}>
-                      {v}
+                      {tr(v)}
                     </option>
                   ))}
                 </select>
               </label>
             </div>
             <label>
-              Açıklama
-              <textarea
+              {tr("Açıklama")}<textarea
                 name="description"
                 maxLength={1500}
                 rows={3}
@@ -347,15 +333,12 @@ export function CompanyInventory({
                 name="published"
                 defaultChecked={editing?.published ?? true}
               />
-              Bu ekipmanı şirket profilimde göster
-            </label>
+              {tr("Bu ekipmanı şirket profilimde göster")}</label>
             <p className="sub">
-              Plaka, şasi numarası veya özel belge eklemene gerek yok. Şirket
-              profilin gizliyse envanterin de diğer ziyaretçilere görünmez.
-            </p>
+              {tr("Plaka, şasi numarası veya özel belge eklemene gerek yok. Şirket profilin gizliyse envanterin de diğer ziyaretçilere görünmez.")}</p>
             <div className="network-actions">
               <button className="btn" type="submit">
-                {busy ? "Kaydediliyor…" : "Ekipmanı kaydet"}
+                {busy ? tr("Kaydediliyor…") : tr("Ekipmanı kaydet")}
               </button>
               <button
                 className="btn ghost"
@@ -366,8 +349,7 @@ export function CompanyInventory({
                   setShowForm(false);
                 }}
               >
-                Vazgeç
-              </button>
+                {tr("Vazgeç")}</button>
             </div>
           </fieldset>
         </form>
@@ -376,32 +358,32 @@ export function CompanyInventory({
         <>
           <div className="inventory-summary">
             <strong>{items.reduce((sum, i) => sum + i.quantity, 0)}</strong>
-            <span>listelenen araç / makine · {items.length} ekipman grubu</span>
+            <span>{tr("listelenen araç / makine · ")}{items.length} {tr(" ekipman grubu")}</span>
           </div>
           <div className="inventory-grid">
             {items.map((item) => (
               <article className="inventory-card" key={item.id}>
                 <div className="inventory-card-top">
-                  <span>{item.category}</span>
+                  <span>{tr(item.category)}</span>
                   <span className={`inventory-status ${item.availability}`}>
-                    {EQUIPMENT_STATUS[item.availability]}
+                    {tr(EQUIPMENT_STATUS[item.availability])}
                   </span>
                 </div>
                 <h3>{[item.brand, item.model].filter(Boolean).join(" ")}</h3>
                 <dl>
                   <div>
-                    <dt>Adet</dt>
+                    <dt>{tr("Adet")}</dt>
                     <dd>{item.quantity}</dd>
                   </div>
                   {item.year && (
                     <div>
-                      <dt>Yıl</dt>
+                      <dt>{tr("Yıl")}</dt>
                       <dd>{item.year}</dd>
                     </div>
                   )}
                   {item.capacity && (
                     <div>
-                      <dt>Kapasite</dt>
+                      <dt>{tr("Kapasite")}</dt>
                       <dd>{item.capacity}</dd>
                     </div>
                   )}
@@ -413,8 +395,8 @@ export function CompanyInventory({
                   <>
                     <p className="sub">
                       {item.published
-                        ? "Profilde gösteriliyor (şirket profilin yayımlanmışsa)"
-                        : "Gizli — yalnızca sen görürsün"}
+                        ? tr("Profilde gösteriliyor (şirket profilin yayımlanmışsa)")
+                        : tr("Gizli — yalnızca sen görürsün")}
                     </p>
                     <div className="network-actions">
                       <button
@@ -426,15 +408,13 @@ export function CompanyInventory({
                           setShowForm(true);
                         }}
                       >
-                        Düzenle
-                      </button>
+                        {tr("Düzenle")}</button>
                       <button
                         className="btn ghost sm"
                         disabled={busy}
                         onClick={() => remove(item)}
                       >
-                        Sil
-                      </button>
+                        {tr("Sil")}</button>
                     </div>
                   </>
                 )}
@@ -442,7 +422,7 @@ export function CompanyInventory({
             ))}
           </div>
           {items.length === 200 && (
-            <p className="sub">En son 200 ekipman grubu gösteriliyor.</p>
+            <p className="sub">{tr("En son 200 ekipman grubu gösteriliyor.")}</p>
           )}
         </>
       ) : (
@@ -451,17 +431,15 @@ export function CompanyInventory({
           <div className="home-empty">
             <p>
               {manage
-                ? "Henüz envanter eklemedin. İlk makinen veya kamyonunla başla."
-                : "Şirket henüz görünür bir ekipman kaydı eklememiş."}
+                ? tr("Henüz envanter eklemedin. İlk makinen veya kamyonunla başla.")
+                : tr("Şirket henüz görünür bir ekipman kaydı eklememiş.")}
             </p>
           </div>
         )
       )}
       {!manage && items.length > 0 && (
         <p className="sub">
-          Envanter ve müsaitlik bilgileri şirketin kendi beyanıdır. İş öncesinde
-          güncel durumu doğrulayın.
-        </p>
+          {tr("Envanter ve müsaitlik bilgileri şirketin kendi beyanıdır. İş öncesinde güncel durumu doğrulayın.")}</p>
       )}
     </section>
   );

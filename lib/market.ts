@@ -1,3 +1,4 @@
+import { translate, type Language } from './i18n/index';
 import {categoryValues} from "./machineryCatalog";
 import {
   brandMatches,
@@ -178,22 +179,23 @@ export function sortListings(
   return r;
 }
 
-export function filterLabel(f: Filters): string {
+export function filterLabel(f: Filters, language: Language = "tr"): string {
+  const tr = (value: string) => translate(value, language);
   const p: string[] = [];
   if (f.brand) p.push(f.brand);
-  if (f.cat !== "Tümü") p.push(categoryLabel(f.cat));
+  if (f.cat !== "Tümü") p.push(tr(categoryLabel(f.cat)));
   if (f.q.trim()) p.push(`"${f.q.trim()}"`);
   if (f.city !== "Tümü") p.push(f.city);
-  if (f.near > 0) p.push(`${f.near} km içinde`);
+  if (f.near > 0) p.push(language === "en" ? `within ${f.near} km` : `${f.near} km içinde`);
   if (f.yMin !== "" || f.yMax !== "")
-    p.push(`yıl ${f.yMin || "…"}–${f.yMax || "…"}`);
+    p.push(`${language === "en" ? "year" : "yıl"} ${f.yMin || "…"}–${f.yMax || "…"}`);
   if (f.useMin !== "" || f.useMax !== "")
     p.push(`${f.useMin || "0"}–${f.useMax || "…"} ${f.unit}`);
-  if (f.minScore > 0) p.push(`puan ${String(f.minScore).replace(".", ",")}+`);
-  if (f.maxPrice < MAX_PRICE) p.push(`en çok ${formatTL(f.maxPrice)}`);
-  if (f.takas) p.push("takas olur");
-  if (f.ver) p.push("doğrulanmış");
-  return p.length ? p.join(" · ") : "Tüm ilanlar";
+  if (f.minScore > 0) p.push(`${language === "en" ? "rating" : "puan"} ${String(f.minScore).replace(".", language === "en" ? "." : ",")}+`);
+  if (f.maxPrice < MAX_PRICE) p.push(`${language === "en" ? "up to" : "en çok"} ${formatTL(f.maxPrice, language)}`);
+  if (f.takas) p.push(tr("Takas olur"));
+  if (f.ver) p.push(tr("Doğrulanmış"));
+  return p.length ? p.join(" · ") : tr("Tüm ilanlar");
 }
 
 export function activeFilterCount(f: Filters): number {
@@ -225,6 +227,7 @@ export function tagsFor(
   l: Listing,
   s: Seller | undefined,
   stats: PriceStats,
+  language: Language = "tr",
 ): Tag[] {
   const t: Tag[] = [];
   if (s) {
@@ -233,7 +236,7 @@ export function tagsFor(
     t.push({ cls: lv.tone === "neutral" ? "" : lv.tone, text: lv.label });
     if (s.ver) t.push({ cls: "good", text: "Doğrulanmış satıcı" });
   }
-  if (dropPct(l)) t.push({ cls: "good", text: `Fiyatı düştü −%${dropPct(l)}` });
+  if (dropPct(l)) t.push({ cls: "good", text: translate("Fiyatı düştü −%{0}", language, {0:dropPct(l)}) });
   if (l.takas) t.push({ cls: "", text: "Takas olur" });
   const f = stats.flag(l.price, l.cat);
   if (f === "low") t.push({ cls: "bad", text: "Fiyat çok düşük, dikkat" });
@@ -242,9 +245,9 @@ export function tagsFor(
   else
     t.push({
       cls: "",
-      text: l.conf === 0 ? "Bugün doğrulandı" : `${l.conf} gün önce doğrulandı`,
+      text: l.conf === 0 ? "Bugün doğrulandı" : translate("{0} gün önce doğrulandı", language, {0:l.conf}),
     });
-  return t;
+  return t.map(tag => ({...tag, text: translate(tag.text,language)}));
 }
 
 export type PriceIndicator =

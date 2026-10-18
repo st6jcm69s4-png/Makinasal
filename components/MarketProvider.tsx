@@ -1,4 +1,6 @@
 'use client';
+import { useLanguage } from "@/components/LanguageProvider";
+
 
 import { formatPersonName } from '@/lib/profile';
 import type { QueryResult } from '@/lib/supabase/result';
@@ -69,6 +71,8 @@ function lsGet<T>(k: string, d: T): T {
 function lsSet(k: string, v: unknown) { try { localStorage.setItem(k, JSON.stringify(v)); } catch { /* özel pencere vb. */ } }
 
 export function MarketProvider({ children }: { children: ReactNode }) {
+  const { t: tr, language } = useLanguage();
+
   const [db, setDb] = useState<{ listings: Listing[]; sellers: Record<string, Seller> }>({ listings: [], sellers: {} });
   const [ready, setReady] = useState(false);
   const [loadError, setLoadError] = useState('');
@@ -188,7 +192,7 @@ export function MarketProvider({ children }: { children: ReactNode }) {
       clearTimeout(pending);
       pending = setTimeout(() => {
         if (!disposed) void apply(u, version).catch(() => {
-          if (!disposed) { setAuthReady(true); toast('Hesap bilgileri yüklenemedi. Sayfayı yenileyerek tekrar dene.'); }
+          if (!disposed) { setAuthReady(true); toast("Hesap bilgileri yüklenemedi. Sayfayı yenileyerek tekrar dene."); }
         });
       }, 0);
     };
@@ -237,7 +241,7 @@ export function MarketProvider({ children }: { children: ReactNode }) {
         const local = lsGet<Record<string, number>>('mk-favs', {});
         if (on) local[key] = price; else delete local[key];
         lsSet('mk-favs', local);
-        if (!profile) toast('Favoriler bu cihazda saklanıyor. Hesap favorilerini görmek için giriş yap.');
+        if (!profile) toast("Favoriler bu cihazda saklanıyor. Hesap favorilerini görmek için giriş yap.");
         return;
       }
       const supabase = getSupabase();
@@ -249,7 +253,7 @@ export function MarketProvider({ children }: { children: ReactNode }) {
     } catch {
       if (version === sessionVersion.current) {
         setFavs(current => { const next = { ...current }; if (previous === undefined) delete next[key]; else next[key] = previous; return next; });
-        toast('Favori değişikliği kaydedilemedi. Tekrar dene.');
+        toast("Favori değişikliği kaydedilemedi. Tekrar dene.");
       }
     } finally { favoriteWrites.current.delete(key); }
   }, [favs, profile, toast]);
@@ -262,7 +266,7 @@ export function MarketProvider({ children }: { children: ReactNode }) {
     setCmp((cur) => {
       let next: string[];
       if (cur.includes(key)) next = cur.filter((k) => k !== key);
-      else if (cur.length >= 3) { toast('En fazla 3 ilan karşılaştırılabilir.'); return cur; }
+      else if (cur.length >= 3) { toast("En fazla 3 ilan karşılaştırılabilir."); return cur; }
       else next = [...cur, key];
       persistCmp(next);
       return next;
@@ -283,7 +287,7 @@ export function MarketProvider({ children }: { children: ReactNode }) {
       lsSet('mk-saved', next);
       setSaved(next.map((s) => ({ ...s, local: true })));
     }
-    toast('Arama kaydedildi. Favoriler sekmesinde görebilirsin.');
+    toast("Arama kaydedildi. Favoriler sekmesinde görebilirsin.");
   }, [profile, toast, loadUserData]);
 
   const patchSaved = useCallback(async (id: string, patch: Partial<{ notify: boolean; lastSeen: string }>) => {
@@ -300,7 +304,7 @@ export function MarketProvider({ children }: { children: ReactNode }) {
     if (patch.notify !== undefined) row.notify = patch.notify;
     if (patch.lastSeen !== undefined) row.last_seen_at = patch.lastSeen;
     const result = await supabase?.from('saved_searches').update(row).eq('id', id).eq('user_id', profile.id);
-    if (result?.error) { await loadUserData(profile.id); toast('Arama güncellenemedi. Tekrar dene.'); }
+    if (result?.error) { await loadUserData(profile.id); toast("Arama güncellenemedi. Tekrar dene."); }
   }, [saved, profile, loadUserData, toast]);
 
   const deleteSaved = useCallback(async (id: string) => {
@@ -310,7 +314,7 @@ export function MarketProvider({ children }: { children: ReactNode }) {
     if (s.local || !profile) lsSet('mk-saved', lsGet<SavedSearch[]>('mk-saved', []).filter((x) => x.id !== id));
     else {
       const result = await getSupabase()?.from('saved_searches').delete().eq('id', id).eq('user_id', profile.id);
-      if (result?.error) { await loadUserData(profile.id); toast('Arama silinemedi. Tekrar dene.'); }
+      if (result?.error) { await loadUserData(profile.id); toast("Arama silinemedi. Tekrar dene."); }
     }
   }, [saved, profile, loadUserData, toast]);
 
@@ -346,16 +350,16 @@ export function MarketProvider({ children }: { children: ReactNode }) {
   const cmpItems = cmp.map((k) => find(k)).filter((x): x is Listing => !!x);
   return (
     <MarketCtx.Provider value={value}>
-      {loadError ? <div className="wrap"><div className="note bad" role="alert">{loadError} <button className="btn ghost sm" type="button" onClick={() => void reload()}>Tekrar dene</button></div></div> : null}
+      {loadError ? <div className="wrap"><div className="note bad" role="alert">{tr(loadError)} <button className="btn ghost sm" type="button" onClick={() => void reload()}>{tr("Tekrar dene")}</button></div></div> : null}
       {children}
       {cmpItems.length > 0 ? (
-        <div id="cmpBar" role="region" aria-label="Karşılaştırma">
-          <span className="out"><b>{cmpItems.length}</b> / 3 ilan seçildi: {cmpItems.map((l) => cardTitle(l)).join(' · ')}</span>
-          {cmpItems.length >= 2 ? <a className="btn sm" href="/karsilastir">Karşılaştır</a> : <span className="sub">En az 2 ilan seç</span>}
-          <button className="btn ghost sm" type="button" onClick={clearCmp}>Temizle</button>
+        <div id="cmpBar" role="region" aria-label={tr("Karşılaştırma")}>
+          <span className="out"><b>{cmpItems.length}</b> {tr(" / 3 ilan seçildi: ")}{cmpItems.map((l) => cardTitle(l)).join(' · ')}</span>
+          {cmpItems.length >= 2 ? <a className="btn sm" href="/karsilastir">{tr("Karşılaştır")}</a> : <span className="sub">{tr("En az 2 ilan seç")}</span>}
+          <button className="btn ghost sm" type="button" onClick={clearCmp}>{tr("Temizle")}</button>
         </div>
       ) : null}
-      {msg ? <div id="toast" role="status">{msg}</div> : null}
+      {msg ? <div id="toast" role="status">{tr(msg)}</div> : null}
     </MarketCtx.Provider>
   );
 }

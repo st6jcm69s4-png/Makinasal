@@ -1,4 +1,7 @@
 "use client";
+import { useLanguage } from "@/components/LanguageProvider";
+
+import { checkMessage } from '@/lib/messageFilter';
 import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 import { getSupabase } from "@/lib/supabase/client";
 import {
@@ -35,23 +38,26 @@ import { categoryValues, canonicalBrand } from "@/lib/machineryCatalog";
 type Client = NonNullable<ReturnType<typeof getSupabase>>;
 const client = () => getSupabase();
 function ErrorBox({ error }: { error: string }) {
+  const { t: tr, language } = useLanguage();
+
   return error ? (
     <p className="network-error" role="alert">
-      {error}
+      {tr(error)}
     </p>
   ) : null;
 }
 function Login({ children }: { children: ReactNode }) {
+  const { t: tr, language } = useLanguage();
+
   const { profile, authReady } = useMarket();
   return !authReady ? (
-    <p role="status">Hesabın yükleniyor…</p>
+    <p role="status">{tr("Hesabın yükleniyor…")}</p>
   ) : !profile ? (
     <div className="panel">
-      <h2>Hesabınla devam et</h2>
-      <p>İlan açmak, teklif vermek ve mesajlaşmak için giriş yap.</p>
+      <h2>{tr("Hesabınla devam et")}</h2>
+      <p>{tr("İlan açmak, teklif vermek ve mesajlaşmak için giriş yap.")}</p>
       <a className="btn" href="/giris">
-        Giriş yap / Kayıt ol
-      </a>
+        {tr("Giriş yap / Kayıt ol")}</a>
     </div>
   ) : (
     <>{children}</>
@@ -67,6 +73,8 @@ function Place({
     lng: number | null;
   };
 }) {
+  const { t: tr, language } = useLanguage();
+
   return (
     <span>
       {item.city}
@@ -81,8 +89,7 @@ function Place({
             rel="noopener noreferrer"
             href={`https://www.openstreetmap.org/?mlat=${item.lat}&mlon=${item.lng}#map=14/${item.lat}/${item.lng}`}
           >
-            Haritada gör ↗
-          </a>
+            {tr("Haritada gör ↗")}</a>
         </>
       ) : null}
     </span>
@@ -99,6 +106,8 @@ function LocationFields({
   lat?: number | null;
   lng?: number | null;
 }) {
+  const { t: tr, language } = useLanguage();
+
   const [region, setRegion] = useState({ city, district });
   const [pos, setPos] = useState({
     lat: lat === null ? "" : String(lat),
@@ -111,9 +120,7 @@ function LocationFields({
       <RegionFields {...region} onChange={setRegion} required />
       <div className="network-location">
         <p className="sub">
-          İl ve ilçe herkese görünür. İstersen harita konumu ekle; eklediğin
-          koordinatlar da ilanında herkese açık yayımlanır.
-        </p>
+          {tr("İl ve ilçe herkese görünür. İstersen harita konumu ekle; eklediğin koordinatlar da ilanında herkese açık yayımlanır.")}</p>
         <button
           className="btn ghost sm"
           type="button"
@@ -143,7 +150,7 @@ function LocationFields({
             );
           }}
         >
-          {busy ? "Konum alınıyor…" : "Mevcut konumumu ekle"}
+          {busy ? tr("Konum alınıyor…") : tr("Mevcut konumumu ekle")}
         </button>
         {pos.lat && (
           <button
@@ -151,13 +158,11 @@ function LocationFields({
             className="btn ghost sm"
             onClick={() => setPos({ lat: "", lng: "" })}
           >
-            Harita konumunu kaldır
-          </button>
+            {tr("Harita konumunu kaldır")}</button>
         )}
         <div className="network-form-grid">
           <label>
-            Enlem (isteğe bağlı)
-            <input
+            {tr("Enlem (isteğe bağlı)")}<input
               type="number"
               step="any"
               min={-90}
@@ -169,8 +174,7 @@ function LocationFields({
             />
           </label>
           <label>
-            Boylam (isteğe bağlı)
-            <input
+            {tr("Boylam (isteğe bağlı)")}<input
               type="number"
               step="any"
               min={-180}
@@ -203,20 +207,24 @@ function locationData(f: FormData) {
   return data;
 }
 export function NetworkNav() {
+  const { t: tr, language } = useLanguage();
+
   return (
-    <nav className="network-nav" aria-label="İş ve hizmetler">
-      <a href="/is-ve-hizmetler">İş ve hizmetler</a>
-      <a href="/kiralik">Kiralık</a>
-      <a href="/isler">İş talepleri</a>
-      <a href="/parca-talepleri">Parça talepleri</a>
-      <a href="/sirketler">Şirketler</a>
-      <a href="/yedek-parca">Yedek parça</a>
-      <a href="/is-agi/hesabim">İşlerim ve tekliflerim</a>
+    <nav className="network-nav" aria-label={tr("İş ve hizmetler")}>
+      <a href="/is-ve-hizmetler">{tr("İş ve hizmetler")}</a>
+      <a href="/kiralik">{tr("Kiralık")}</a>
+      <a href="/isler">{tr("İş talepleri")}</a>
+      <a href="/parca-talepleri">{tr("Parça talepleri")}</a>
+      <a href="/sirketler">{tr("Şirketler")}</a>
+      <a href="/yedek-parca">{tr("Yedek parça")}</a>
+      <a href="/is-agi/hesabim">{tr("İşlerim ve tekliflerim")}</a>
     </nav>
   );
 }
 const PAGE_SIZE = 24;
 export function NetworkBrowse({ kind: fixedKind, rentalHub = false }: { kind?: PostKind; rentalHub?: boolean }) {
+  const { t: tr, language } = useLanguage();
+
   const [rentalKind, setRentalKind] = useState<PostKind>("rental_machine");
   const [personnelRole, setPersonnelRole] = useState("");
   const kind = rentalHub ? rentalKind : fixedKind;
@@ -308,38 +316,38 @@ export function NetworkBrowse({ kind: fixedKind, rentalHub = false }: { kind?: P
       {!rentalHub && <NetworkNav />}
       <div className="network-heading">
         <div>
-          <span className="eyebrow">MAKİNASAL</span>
+          <span className="eyebrow">{tr("MAKİNASAL")}</span>
           <h1>
-            {rentalHub ? "Kiralık" : kind ? POST_KINDS[kind] : "İş bul. Ekibini bul. İşini yaptır."}
+            {rentalHub ? tr("Kiralık") : kind ? POST_KINDS[kind] : tr("İş bul. Ekibini bul. İşini yaptır.")}
           </h1>
           <p className="lead">
             {kind === "part_request"
-              ? "Aradığın parçayı yaz; elinde olanlar fiyatıyla teklif versin."
+              ? tr("Aradığın parçayı yaz; elinde olanlar fiyatıyla teklif versin.")
               : kind === "job"
-                ? "İşin konumunu, tarihini ve ihtiyacını paylaş; gelen fiyatları karşılaştır."
+                ? tr("İşin konumunu, tarihini ve ihtiyacını paylaş; gelen fiyatları karşılaştır.")
                 : kind === "rental_machine"
-                  ? "İşine uygun makine ve kamyonu konumuna göre kirala."
+                  ? tr("İşine uygun makine ve kamyonu konumuna göre kirala.")
                   : kind === "rental_operator"
-                    ? "Makine veya kamyon türüne göre operatör, şoför ve usta bul."
-                    : "Kiralık makineler, operatörler, iş fırsatları, parçalar ve yerel firmalar aynı yerde."}
+                    ? tr("Makine veya kamyon türüne göre operatör, şoför ve usta bul.")
+                    : tr("Kiralık makineler, operatörler, iş fırsatları, parçalar ve yerel firmalar aynı yerde.")}
           </p>
         </div>
         <a className="btn" href={`/is-agi/yeni?kind=${kind ?? "job"}`}>
           {kind === "part_request"
-            ? "Parça talebi aç"
+            ? tr("Parça talebi aç")
             : kind === "job"
-              ? "İş talebi aç"
+              ? tr("İş talebi aç")
               : kind
-                ? kind === "rental_operator" ? "Hizmet ilanı ver" : "Kiralık ilanı ver"
-                : "İlan oluştur"}
+                ? kind === "rental_operator" ? tr("Hizmet ilanı ver") : tr("Kiralık ilanı ver")
+                : tr("İlan oluştur")}
         </a>
       </div>
-      {rentalHub && <section className="rental-categories" aria-label="Kiralama bölümleri">
+      {rentalHub && <section className="rental-categories" aria-label={tr("Kiralama bölümleri")}>
         <button type="button" className={kind === "rental_machine" ? "selected" : ""} aria-pressed={kind === "rental_machine"} onClick={() => { setRentalKind("rental_machine"); setPage(0); }}>
-          <b>Makine ve araç kiralama</b><span>İş makineleri, kamyonlar, vinçler ve tüm ekipmanlar</span>
+          <b>{tr("Makine ve araç kiralama")}</b><span>{tr("İş makineleri, kamyonlar, vinçler ve tüm ekipmanlar")}</span>
         </button>
         <button type="button" className={kind === "rental_operator" ? "selected" : ""} aria-pressed={kind === "rental_operator"} onClick={() => { setRentalKind("rental_operator"); setPage(0); }}>
-          <b>Operatör ve ustalar</b><span>Makine operatörü, kamyon şoförü ve teknik ustalar</span>
+          <b>{tr("Operatör ve ustalar")}</b><span>{tr("Makine operatörü, kamyon şoförü ve teknik ustalar")}</span>
         </button>
       </section>}
       {!kind && (
@@ -354,74 +362,71 @@ export function NetworkBrowse({ kind: fixedKind, rentalHub = false }: { kind?: P
             >
               <span className="network-number">0{i + 1}</span>
               <h2>{v}</h2>
-              <span className="linkbtn">İlanları incele →</span>
+              <span className="linkbtn">{tr("İlanları incele →")}</span>
             </a>
           ))}
           <a className="panel" href="/sirketler">
             <span className="network-number">05</span>
-            <h2>Şirketler ve hizmetleri</h2>
-            <span className="linkbtn">Bölgendeki firmayı bul →</span>
+            <h2>{tr("Şirketler ve hizmetleri")}</h2>
+            <span className="linkbtn">{tr("Bölgendeki firmayı bul →")}</span>
           </a>
           <a className="panel" href="/firma-kaydi">
             <span className="network-number">06</span>
-            <h2>Şirketini ekle</h2>
-            <span className="linkbtn">Hizmet bölgelerini belirle →</span>
+            <h2>{tr("Şirketini ekle")}</h2>
+            <span className="linkbtn">{tr("Hizmet bölgelerini belirle →")}</span>
           </a>
         </div>
       )}
-      {rentalHub && <p className="sub">Önce makine veya araç türünü seç; ardından konum, marka ve hizmet kapsamıyla sonuçları daralt.</p>}
+      {rentalHub && <p className="sub">{tr("Önce makine veya araç türünü seç; ardından konum, marka ve hizmet kapsamıyla sonuçları daralt.")}</p>}
       <div className="network-filters">
         <label>
-          Başlıkta ara
-          <input
+          {tr("Başlıkta ara")}<input
             value={q}
             onChange={(e) => {
               setQ(e.target.value);
               setPage(0);
             }}
-            placeholder="Kamyon, ekskavatör, parça…"
+            placeholder={tr("Kamyon, ekskavatör, parça…")}
           />
         </label>
         <label>
-          Konum
-          <select
+          {tr("Konum")}<select
             value={city}
             onChange={(e) => {
               setCity(e.target.value);
               setPage(0);
             }}
           >
-            <option value="">Tüm iller</option>
+            <option value="">{tr("Tüm iller")}</option>
             {CITIES.map((c) => (
-              <option key={c}>{c}</option>
+              <option key={c} value={c}>{tr(c)}</option>
             ))}
           </select>
         </label>
-        {kind === "rental_operator" && <label>Hizmet türü<select value={personnelRole} onChange={e => { setPersonnelRole(e.target.value); setPage(0); }}>
-          <option value="">Operatör, şoför ve ustaların tümü</option>
-          {Object.entries(PERSONNEL_ROLES).map(([key, label]) => <option key={key} value={key}>{label}</option>)}
+        {kind === "rental_operator" && <label>{tr("Hizmet türü")}<select value={personnelRole} onChange={e => { setPersonnelRole(e.target.value); setPage(0); }}>
+          <option value="">{tr("Operatör, şoför ve ustaların tümü")}</option>
+          {Object.entries(PERSONNEL_ROLES).map(([key, label]) => <option key={key} value={key}>{tr(label)}</option>)}
         </select></label>}
         {(kind === "rental_machine" || !kind) && (
           <label>
-            Kiralama kapsamı
-            <select
+            {tr("Kiralama kapsamı")}<select
               value={rentalMode}
               onChange={(e) => {
                 setRentalMode(e.target.value);
                 setPage(0);
               }}
             >
-              <option value="">Tümü (belirtilmemiş ilanlar dahil)</option>
+              <option value="">{tr("Tümü (belirtilmemiş ilanlar dahil)")}</option>
               {Object.entries(RENTAL_MODES).map(([k, v]) => (
                 <option key={k} value={k}>
-                  {v}
+                  {tr(v)}
                 </option>
               ))}
             </select>
           </label>
         )}
         <label>
-          {rentalHub ? "Makine / araç türü" : "İhtiyaç / makine türü"}
+          {rentalHub ? tr("Makine / araç türü") : tr("İhtiyaç / makine türü")}
           <select
             value={category}
             onChange={(e) => {
@@ -430,7 +435,7 @@ export function NetworkBrowse({ kind: fixedKind, rentalHub = false }: { kind?: P
               setPage(0);
             }}
           >
-            <option value="">Tüm türler</option>
+            <option value="">{tr("Tüm türler")}</option>
             <CategoryOptions includeParts={!rentalHub} includeOther={!rentalHub} allowGroups />
           </select>
         </label>
@@ -441,22 +446,21 @@ export function NetworkBrowse({ kind: fixedKind, rentalHub = false }: { kind?: P
             setBrand(v);
             setPage(0);
           }}
-          label="Marka filtresi (isteğe bağlı)"
+          label={tr("Marka filtresi (isteğe bağlı)")}
         />
       </div>
-      {rentalHub && <div className="acts-row"><button type="button" className="btn ghost" onClick={() => { setQ(""); setCity(""); setCategory(""); setBrand(""); setRentalMode(""); setPersonnelRole(""); setPage(0); }}>Filtreleri temizle</button><span className="sub" role="status">{busy ? "Sonuçlar yükleniyor…" : `${posts.length}${more ? "+" : ""} ilan bu sayfada`}</span></div>}
+      {rentalHub && <div className="acts-row"><button type="button" className="btn ghost" onClick={() => { setQ(""); setCity(""); setCategory(""); setBrand(""); setRentalMode(""); setPersonnelRole(""); setPage(0); }}>{tr("Filtreleri temizle")}</button><span className="sub" role="status">{busy ? tr("Sonuçlar yükleniyor…") : tr("{0}{1} ilan bu sayfada", {"0":posts.length,"1":more ? "+" : ""})}</span></div>}
       <ErrorBox error={error} />
       {error && (
         <button className="btn ghost" onClick={() => setRefresh((x) => x + 1)}>
-          Tekrar dene
-        </button>
+          {tr("Tekrar dene")}</button>
       )}
       {busy ? (
-        <p role="status">İlanlar yükleniyor…</p>
+        <p role="status">{tr("İlanlar yükleniyor…")}</p>
       ) : !error && posts.length === 0 ? (
         <div className="panel network-empty">
-          <h2>Bu aramada henüz ilan yok</h2>
-          <p>Filtreleri değiştir veya ilk ilanı sen aç.</p>
+          <h2>{tr("Bu aramada henüz ilan yok")}</h2>
+          <p>{tr("Filtreleri değiştir veya ilk ilanı sen aç.")}</p>
         </div>
       ) : (
         <div className="network-cards">
@@ -471,41 +475,40 @@ export function NetworkBrowse({ kind: fixedKind, rentalHub = false }: { kind?: P
           disabled={page === 0 || busy}
           onClick={() => setPage((p) => p - 1)}
         >
-          Önceki
-        </button>
-        <span>Sayfa {page + 1}</span>
+          {tr("Önceki")}</button>
+        <span>{tr("Sayfa ")}{page + 1}</span>
         <button
           className="btn ghost"
           disabled={!more || busy}
           onClick={() => setPage((p) => p + 1)}
         >
-          Sonraki
-        </button>
+          {tr("Sonraki")}</button>
       </div>
       <p className="sub">
-        Satılık makine ve parçalar için{" "}
+        {tr("Satılık makine ve parçalar için")}{" "}
         <a className="linkbtn" href="/ilanlar">
-          satılık ilanlara git
-        </a>
+          {tr("satılık ilanlara git")}</a>
         .
       </p>
     </>
   );
 }
 function PostCard({ post: p }: { post: MarketPost }) {
+  const { t: tr, language } = useLanguage();
+
   return (
     <article className="panel network-card">
       <div>
-        <span className="pill">{POST_KINDS[p.kind]}</span>
+        <span className="pill">{tr(POST_KINDS[p.kind])}</span>
         {p.status !== "open" && (
           <span className="pill">
-            {p.status === "closed" ? "Kapalı" : "Kaldırıldı"}
+            {p.status === "closed" ? tr("Kapalı") : tr("Kaldırıldı")}
           </span>
         )}
       </div>
-      {p.kind === "rental_operator" && <span className="pill">{p.personnel_role ? PERSONNEL_ROLES[p.personnel_role] : "Hizmet türü belirtilmedi"}</span>}
+      {p.kind === "rental_operator" && <span className="pill">{p.personnel_role ? PERSONNEL_ROLES[p.personnel_role] : tr("Hizmet türü belirtilmedi")}</span>}
       {p.kind === "rental_machine" && (
-        <span className="pill">{rentalModeLabel(p.rental_mode)}</span>
+        <span className="pill">{tr(rentalModeLabel(p.rental_mode))}</span>
       )}
       <h2>
         <a href={`/is-agi/ilan/${p.id}`}>{p.title}</a>
@@ -518,22 +521,23 @@ function PostCard({ post: p }: { post: MarketPost }) {
         {p.description.length > 160 ? "…" : ""}
       </p>
       <p className="sub">
-        {p.category}
+        {tr(p.category)}
         {p.brand ? ` · ${p.brand} ${p.model || ""}` : ""} · {p.quantity}{" "}
-        {p.kind === "rental_operator" ? "kişi" : "adet"}
+        {p.kind === "rental_operator" ? tr("kişi") : tr("adet")}
         {p.start_date
-          ? ` · ${dateLabel(p.start_date)}${p.end_date ? ` – ${dateLabel(p.end_date)}` : ""}`
+          ? ` · ${dateLabel(p.start_date, language)}${p.end_date ? ` – ${dateLabel(p.end_date, language)}` : ""}`
           : ""}
       </p>
-      <strong className="network-price">{money(p.price, p.price_unit)}</strong>
+      <strong className="network-price">{money(p.price, p.price_unit, language)}</strong>
       <a className="linkbtn" href={`/is-agi/ilan/${p.id}`}>
-        Ayrıntı ve teklifler →
-      </a>
+        {tr("Ayrıntı ve teklifler →")}</a>
     </article>
   );
 }
 
 export function PostEditor() {
+  const { t: tr, language } = useLanguage();
+
   return (
     <Login>
       <PostEditorForm />
@@ -541,6 +545,8 @@ export function PostEditor() {
   );
 }
 function PostEditorForm() {
+  const { t: tr, language } = useLanguage();
+
   const { profile } = useMarket();
   const [kind, setKind] = useState<PostKind>("job"),
     [post, setPost] = useState<MarketPost | null>(null),
@@ -651,7 +657,7 @@ function PostEditorForm() {
       setBusy(false);
     }
   }
-  if (loading) return <p role="status">İlan hazırlanıyor…</p>;
+  if (loading) return <p role="status">{tr("İlan hazırlanıyor…")}</p>;
   if (
     error &&
     !post &&
@@ -663,43 +669,37 @@ function PostEditorForm() {
   return (
     <>
       <NetworkNav />
-      <h1>{post ? "İlanını düzenle" : "İş veya hizmet ilanı oluştur"}</h1>
+      <h1>{post ? tr("İlanını düzenle") : tr("İş veya hizmet ilanı oluştur")}</h1>
       {preferred && (
         <p className="panel">
-          Bu talep seçtiğin firmanın hesabında da görünecek. İlan herkese açık
-          olacak; diğer üyeler de teklif verebilir.
-        </p>
+          {tr("Bu talep seçtiğin firmanın hesabında da görünecek. İlan herkese açık olacak; diğer üyeler de teklif verebilir.")}</p>
       )}
       <p className="lead">
-        İhtiyacını açıkça anlat. Konum ve tarihler doğru teklifleri bulmanı
-        kolaylaştırır.
-      </p>
+        {tr("İhtiyacını açıkça anlat. Konum ve tarihler doğru teklifleri bulmanı kolaylaştırır.")}</p>
       <form className="panel network-form" onSubmit={save}>
         <fieldset disabled={busy}>
           <div className="network-form-grid">
             <label>
-              İlan türü
-              <select
+              {tr("İlan türü")}<select
                 value={kind}
                 disabled={!!post}
                 onChange={(e) => setKind(e.target.value as PostKind)}
               >
                 {Object.entries(POST_KINDS).map(([k, v]) => (
                   <option key={k} value={k}>
-                    {v}
+                    {tr(v)}
                   </option>
                 ))}
               </select>
             </label>
             <label>
-              Makine / parça türü
-              <select
+              {tr("Makine / parça türü")}<select
                 name="category"
                 required
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
               >
-                <option value="">Tür seç</option>
+                <option value="">{tr("Tür seç")}</option>
                 <CategoryOptions includeParts={kind === "part_request" || kind === "job"} includeOther={kind === "part_request" || kind === "job"} />
               </select>
             </label>
@@ -709,28 +709,25 @@ function PostEditorForm() {
               category={category}
               name="brand"
               defaultValue={post?.brand ?? ""}
-              label="Marka (isteğe bağlı)"
+              label={tr("Marka (isteğe bağlı)")}
             />
             <label>
-              Model / seri (isteğe bağlı)
-              <input
+              {tr("Model / seri (isteğe bağlı)")}<input
                 name="model"
                 maxLength={120}
                 defaultValue={post?.model ?? ""}
               />
             </label>
           </div>
-          {kind === "rental_operator" && <label>Hizmet türü<select name="personnel_role" required defaultValue={post?.personnel_role ?? ""}>
-            <option value="">Hizmet türünü seç</option>
-            {Object.entries(PERSONNEL_ROLES).map(([key, label]) => <option value={key} key={key}>{label}</option>)}
+          {kind === "rental_operator" && <label>{tr("Hizmet türü")}<select name="personnel_role" required defaultValue={post?.personnel_role ?? ""}>
+            <option value="">{tr("Hizmet türünü seç")}</option>
+            {Object.entries(PERSONNEL_ROLES).map(([key, label]) => <option value={key} key={key}>{tr(label)}</option>)}
           </select></label>}
           {kind === "rental_machine" && (
             <fieldset className="rental-scope">
-              <legend>Kiralama kapsamı</legend>
+              <legend>{tr("Kiralama kapsamı")}</legend>
               <p className="sub">
-                Gösterdiğin fiyatın operatör / şoför içerip içermediğini açıkça
-                seç.
-              </p>
+                {tr("Gösterdiğin fiyatın operatör / şoför içerip içermediğini açıkça seç.")}</p>
               {Object.entries(RENTAL_MODES).map(([k, v]) => (
                 <label key={k}>
                   <input
@@ -744,22 +741,18 @@ function PostEditorForm() {
                     <b>{v}</b>
                     <small>
                       {k === "with_operator"
-                        ? "Makine veya araç, operatörü / şoförü ile verilir."
-                        : "Operatör veya şoför bedeli bu ilandaki fiyata dahil değildir."}
+                        ? tr("Makine veya araç, operatörü / şoförü ile verilir.")
+                        : tr("Operatör veya şoför bedeli bu ilandaki fiyata dahil değildir.")}
                     </small>
                   </span>
                 </label>
               ))}
               <p className="sub">
-                Yakıt, nakliye, çalışma saati ve KDV koşullarını açıklamada
-                ayrıca belirt. Her iki şekilde de kiralıyorsan kapsamı ve fiyatı
-                farklı iki ilan açabilirsin.
-              </p>
+                {tr("Yakıt, nakliye, çalışma saati ve KDV koşullarını açıklamada ayrıca belirt. Her iki şekilde de kiralıyorsan kapsamı ve fiyatı farklı iki ilan açabilirsin.")}</p>
             </fieldset>
           )}
           <label>
-            Başlık
-            <input
+            {tr("Başlık")}<input
               name="title"
               required
               minLength={5}
@@ -767,16 +760,15 @@ function PostEditorForm() {
               defaultValue={post?.title ?? ""}
               placeholder={
                 kind === "job"
-                  ? "Örn. Ankara’da 4 günlük hafriyat kamyonu işi"
+                  ? tr("Örn. Ankara’da 4 günlük hafriyat kamyonu işi")
                   : kind === "part_request"
-                    ? "Örn. JCB 3CX hidrolik pompa arıyorum"
-                    : "Örn. Günlük kiralık 20 ton ekskavatör"
+                    ? tr("Örn. JCB 3CX hidrolik pompa arıyorum")
+                    : tr("Örn. Günlük kiralık 20 ton ekskavatör")
               }
             />
           </label>
           <label>
-            Açıklama
-            <textarea
+            {tr("Açıklama")}<textarea
               name="description"
               required
               minLength={20}
@@ -788,7 +780,7 @@ function PostEditorForm() {
                   ? `Tercih ettiğim firma: ${requested}\n\nİşin ayrıntıları: `
                   : "")
               }
-              placeholder="İşin kapsamı, araç kapasitesi, çalışma saatleri, nakliye, yakıt, operatör ve KDV dahil mi?"
+              placeholder={tr("İşin kapsamı, araç kapasitesi, çalışma saatleri, nakliye, yakıt, operatör ve KDV dahil mi?")}
             />
           </label>
           <div className="network-form-grid">
@@ -799,16 +791,14 @@ function PostEditorForm() {
               lng={post?.lng}
             />
             <label>
-              Başlangıç / ihtiyaç tarihi
-              <input
+              {tr("Başlangıç / ihtiyaç tarihi")}<input
                 type="date"
                 name="start_date"
                 defaultValue={post?.start_date ?? ""}
               />
             </label>
             <label>
-              Bitiş tarihi
-              <input
+              {tr("Bitiş tarihi")}<input
                 type="date"
                 name="end_date"
                 defaultValue={post?.end_date ?? ""}
@@ -816,10 +806,10 @@ function PostEditorForm() {
             </label>
             <label>
               {kind === "part_request"
-                ? "Adet"
+                ? tr("Adet")
                 : kind === "rental_operator"
-                  ? "Kişi sayısı"
-                  : "Araç / makine sayısı"}
+                  ? tr("Kişi sayısı")
+                  : tr("Araç / makine sayısı")}
               <input
                 name="quantity"
                 type="number"
@@ -831,8 +821,8 @@ function PostEditorForm() {
             </label>
             <label>
               {kind.startsWith("rental")
-                ? "Kiralama bedeli (₺)"
-                : "Bütçe (₺, isteğe bağlı)"}
+                ? tr("Kiralama bedeli (₺)")
+                : tr("Bütçe (₺, isteğe bağlı)")}
               <input
                 name="price"
                 type="number"
@@ -844,8 +834,7 @@ function PostEditorForm() {
               />
             </label>
             <label>
-              Fiyat birimi
-              <select
+              {tr("Fiyat birimi")}<select
                 name="price_unit"
                 defaultValue={
                   post?.price_unit ??
@@ -853,15 +842,15 @@ function PostEditorForm() {
                 }
               >
                 {UNITS.map((u) => (
-                  <option key={u}>{u}</option>
+                  <option key={u} value={u}>{tr(u)}</option>
                 ))}
               </select>
             </label>
           </div>
           <label>
             {kind === "part_request"
-              ? "Marka, model, parça / OEM kodu ve uyumluluk"
-              : "Kapasite, deneyim ve teknik özellikler"}
+              ? tr("Marka, model, parça / OEM kodu ve uyumluluk")
+              : tr("Kapasite, deneyim ve teknik özellikler")}
             <textarea
               name="specs"
               maxLength={1000}
@@ -870,17 +859,14 @@ function PostEditorForm() {
             />
           </label>
           <p className="sub">
-            İlanın herkese açık olur. Şifre, kimlik veya banka bilgisi paylaşma.
-            Teklif seçimi ödeme ya da sözleşme oluşturmaz; ayrıntıları
-            karşılıklı doğrulayın.
-          </p>
+            {tr("İlanın herkese açık olur. Şifre, kimlik veya banka bilgisi paylaşma. Teklif seçimi ödeme ya da sözleşme oluşturmaz; ayrıntıları karşılıklı doğrulayın.")}</p>
           <ErrorBox error={error} />
           <button className="btn" type="submit">
             {busy
-              ? "Kaydediliyor…"
+              ? tr("Kaydediliyor…")
               : post
-                ? "Değişiklikleri kaydet"
-                : "İlanı yayımla"}
+                ? tr("Değişiklikleri kaydet")
+                : tr("İlanı yayımla")}
           </button>
         </fieldset>
       </form>
@@ -889,6 +875,8 @@ function PostEditorForm() {
 }
 
 export function PostDetail({ id }: { id: string }) {
+  const { t: tr, language } = useLanguage();
+
   const { profile, authReady } = useMarket();
   const [post, setPost] = useState<MarketPost | null>(null),
     [quotes, setQuotes] = useState<Quote[]>([]),
@@ -967,15 +955,14 @@ export function PostDetail({ id }: { id: string }) {
     if (r.error) setError(networkError(r.error));
     else setRefresh((x) => x + 1);
   }
-  if (busy) return <p role="status">İlan ve teklifler yükleniyor…</p>;
+  if (busy) return <p role="status">{tr("İlan ve teklifler yükleniyor…")}</p>;
   if (!post)
     return (
       <>
         <NetworkNav />
         <ErrorBox error={error} />
         <button className="btn ghost" onClick={() => setRefresh((x) => x + 1)}>
-          Tekrar dene
-        </button>
+          {tr("Tekrar dene")}</button>
       </>
     );
   const own = profile?.id === post.owner_id;
@@ -987,12 +974,12 @@ export function PostDetail({ id }: { id: string }) {
       <div className="network-heading">
         <div>
           <span className="pill">
-            {POST_KINDS[post.kind]} ·{" "}
+            {tr(POST_KINDS[post.kind])} ·{" "}
             {post.status === "open"
-              ? "Açık"
+              ? tr("Açık")
               : post.status === "closed"
-                ? "Kapalı"
-                : "Kaldırıldı"}
+                ? tr("Kapalı")
+                : tr("Kaldırıldı")}
           </span>
           <h1>{post.title}</h1>
           <p className="lead">
@@ -1000,56 +987,53 @@ export function PostDetail({ id }: { id: string }) {
           </p>
         </div>
         <strong className="network-price">
-          {money(post.price, post.price_unit)}
+          {money(post.price, post.price_unit, language)}
         </strong>
       </div>
       <ErrorBox error={error} />
       {error && (
         <button className="btn ghost" onClick={() => setRefresh((x) => x + 1)}>
-          Tekrar dene
-        </button>
+          {tr("Tekrar dene")}</button>
       )}
       <div className="network-detail">
         <article className="panel">
-          <h2>İlanın ayrıntıları</h2>
-          {post.kind === "rental_operator" && <p className="pill">{post.personnel_role ? PERSONNEL_ROLES[post.personnel_role] : "Hizmet türü belirtilmedi"}</p>}
+          <h2>{tr("İlanın ayrıntıları")}</h2>
+          {post.kind === "rental_operator" && <p className="pill">{post.personnel_role ? PERSONNEL_ROLES[post.personnel_role] : tr("Hizmet türü belirtilmedi")}</p>}
           {post.kind === "rental_machine" && (
             <p className="rental-detail-scope">
-              {rentalModeLabel(post.rental_mode)}
+              {tr(rentalModeLabel(post.rental_mode))}
             </p>
           )}
           <p className="network-text">{post.description}</p>
           <dl className="network-facts">
             {post.kind === "rental_machine" && (
               <>
-                <dt>Kiralama kapsamı</dt>
-                <dd>{rentalModeLabel(post.rental_mode)}</dd>
+                <dt>{tr("Kiralama kapsamı")}</dt>
+                <dd>{tr(rentalModeLabel(post.rental_mode))}</dd>
               </>
             )}
-            <dt>Tür</dt>
-            <dd>{post.category}</dd>
-            <dt>Marka / model</dt>
+            <dt>{tr("Tür")}</dt>
+            <dd>{tr(post.category)}</dd>
+            <dt>{tr("Marka / model")}</dt>
             <dd>
               {[post.brand, post.model].filter(Boolean).join(" ") ||
-                "Belirtilmedi"}
+                tr("Belirtilmedi")}
             </dd>
-            <dt>Miktar</dt>
+            <dt>{tr("Miktar")}</dt>
             <dd>{post.quantity}</dd>
-            <dt>Başlangıç</dt>
-            <dd>{dateLabel(post.start_date) || "Görüşülecek"}</dd>
-            <dt>Bitiş</dt>
-            <dd>{dateLabel(post.end_date) || "Görüşülecek"}</dd>
-            <dt>Teknik özellikler</dt>
-            <dd className="network-text">{post.specs || "Belirtilmedi"}</dd>
+            <dt>{tr("Başlangıç")}</dt>
+            <dd>{dateLabel(post.start_date, language) || tr("Görüşülecek")}</dd>
+            <dt>{tr("Bitiş")}</dt>
+            <dd>{dateLabel(post.end_date, language) || tr("Görüşülecek")}</dd>
+            <dt>{tr("Teknik özellikler")}</dt>
+            <dd className="network-text">{post.specs || tr("Belirtilmedi")}</dd>
           </dl>
           <a className="linkbtn" href={`/firmalar/${post.owner_id}`}>
-            İlan sahibinin firma / hizmet profili →
-          </a>
+            {tr("İlan sahibinin firma / hizmet profili →")}</a>
           {own && (
             <div className="network-actions">
               <a className="btn ghost sm" href={`/is-agi/yeni?edit=${id}`}>
-                Düzenle
-              </a>
+                {tr("Düzenle")}</a>
               <button
                 className="btn ghost sm"
                 disabled={acting}
@@ -1057,7 +1041,7 @@ export function PostDetail({ id }: { id: string }) {
                   changeStatus(post.status === "open" ? "closed" : "open")
                 }
               >
-                {post.status === "open" ? "İlanı kapat" : "Yeniden aç"}
+                {post.status === "open" ? tr("İlanı kapat") : tr("Yeniden aç")}
               </button>
               {post.status !== "removed" && (
                 <button
@@ -1065,8 +1049,7 @@ export function PostDetail({ id }: { id: string }) {
                   disabled={acting}
                   onClick={() => changeStatus("removed")}
                 >
-                  Yayından kaldır
-                </button>
+                  {tr("Yayından kaldır")}</button>
               )}
             </div>
           )}
@@ -1074,44 +1057,40 @@ export function PostDetail({ id }: { id: string }) {
         <aside className="panel">
           <h2>
             {own
-              ? "Teklifleri yönet"
+              ? tr("Teklifleri yönet")
               : post.kind === "part_request"
-                ? "Elinde bu parça var mı?"
+                ? tr("Elinde bu parça var mı?")
                 : post.kind.startsWith("rental")
-                  ? "Kiralama için iletişime geç"
-                  : "Bu işi yapabilir misin?"}
+                  ? tr("Kiralama için iletişime geç")
+                  : tr("Bu işi yapabilir misin?")}
           </h2>
           <p>
-            Fiyatın toplam mı, günlük mü olduğunu belirt. Nakliye, yakıt, KDV,
-            müsaitlik ve kapsamı teklif notunda açıkla.
-          </p>
+            {tr("Fiyatın toplam mı, günlük mü olduğunu belirt. Nakliye, yakıt, KDV, müsaitlik ve kapsamı teklif notunda açıkla.")}</p>
           <p className="sub">
-            Teklifler ve mesajlar yalnızca iki tarafça görülür. Seçim ödeme
-            oluşturmaz; ödeme altyapısı yoktur.
-          </p>
+            {tr("Teklifler ve mesajlar yalnızca iki tarafça görülür. Seçim ödeme oluşturmaz; ödeme altyapısı yoktur.")}</p>
           {!own && !mine && post.status === "open" && (
             <Login>
               <QuoteForm post={post} onSaved={() => setRefresh((x) => x + 1)} />
             </Login>
           )}
           {!own && !mine && post.status !== "open" && (
-            <p>Bu ilan yeni tekliflere kapalı.</p>
+            <p>{tr("Bu ilan yeni tekliflere kapalı.")}</p>
           )}
           {own && (
             <p>
-              {quotes.length} teklif ·{" "}
+              {quotes.length} {tr(" teklif ·")}{" "}
               {selected
-                ? "Bir teklif seçildi. İş tamamlandıysa ilanı kapatabilirsin."
-                : "Gelen teklifleri aşağıda karşılaştır."}
+                ? tr("Bir teklif seçildi. İş tamamlandıysa ilanı kapatabilirsin.")
+                : tr("Gelen teklifleri aşağıda karşılaştır.")}
             </p>
           )}
         </aside>
       </div>
       <section className="sect">
-        <h2>{own ? "Gelen teklifler" : "Teklifim ve mesajlarım"}</h2>
+        <h2>{own ? tr("Gelen teklifler") : tr("Teklifim ve mesajlarım")}</h2>
         {profile && quotes.length === 0 && (
           <p className="sub">
-            {own ? "Henüz teklif gelmedi." : "Henüz teklif vermedin."}
+            {own ? tr("Henüz teklif gelmedi.") : tr("Henüz teklif vermedin.")}
           </p>
         )}
         {quotes.map((q) => (
@@ -1137,6 +1116,8 @@ function QuoteForm({
   onSaved: () => void;
   existing?: Quote;
 }) {
+  const { t: tr, language } = useLanguage();
+
   const { profile } = useMarket();
   const [error, setError] = useState(""),
     [busy, setBusy] = useState(false);
@@ -1178,8 +1159,7 @@ function QuoteForm({
     <form className="network-form" onSubmit={save}>
       <fieldset disabled={busy}>
         <label>
-          Adın / firma adın
-          <input
+          {tr("Adın / firma adın")}<input
             name="display_name"
             required
             minLength={2}
@@ -1192,8 +1172,8 @@ function QuoteForm({
         </label>
         <label>
           {post.kind.startsWith("rental")
-            ? "Önerdiğin kiralama bedeli (₺)"
-            : "Teklif tutarın (₺)"}
+            ? tr("Önerdiğin kiralama bedeli (₺)")
+            : tr("Teklif tutarın (₺)")}
           <input
             type="number"
             name="amount"
@@ -1205,37 +1185,35 @@ function QuoteForm({
           />
         </label>
         <label>
-          Fiyat birimi
-          <select
+          {tr("Fiyat birimi")}<select
             name="price_unit"
             defaultValue={existing?.price_unit ?? post.price_unit}
           >
             {UNITS.map((u) => (
-              <option key={u}>{u}</option>
+              <option key={u} value={u}>{tr(u)}</option>
             ))}
           </select>
         </label>
         <label>
-          Açıklama / müsaitlik
-          <textarea
+          {tr("Açıklama / müsaitlik")}<textarea
             name="note"
             required
             minLength={10}
             maxLength={3000}
             rows={4}
             defaultValue={existing?.note ?? ""}
-            placeholder="Kapsam, tarih, KDV ve teslimat dahil mi?"
+            placeholder={tr("Kapsam, tarih, KDV ve teslimat dahil mi?")}
           />
         </label>
         <ErrorBox error={error} />
         <button className="btn" type="submit">
           {busy
-            ? "Gönderiliyor…"
+            ? tr("Gönderiliyor…")
             : existing
-              ? "Teklifi güncelle"
+              ? tr("Teklifi güncelle")
               : post.kind === "part_request"
-                ? "Bende var — teklif gönder"
-                : "Teklif / kiralama talebi gönder"}
+                ? tr("Bende var — teklif gönder")
+                : tr("Teklif / kiralama talebi gönder")}
         </button>
       </fieldset>
     </form>
@@ -1254,6 +1232,8 @@ function QuoteCard({
   selected: boolean;
   onSaved: () => void;
 }) {
+  const { t: tr, language } = useLanguage();
+
   const [error, setError] = useState(""),
     [busy, setBusy] = useState(false),
     [edit, setEdit] = useState(false);
@@ -1261,7 +1241,7 @@ function QuoteCard({
     if (
       status === "accepted" &&
       !window.confirm(
-        "Bu teklifi seçmek istiyor musun? Seçim geri alınamaz ve ödeme oluşturmaz. Kapsamı mesajla doğrula.",
+        tr("Bu teklifi seçmek istiyor musun? Seçim geri alınamaz ve ödeme oluşturmaz. Kapsamı mesajla doğrula."),
       )
     )
       return;
@@ -1281,18 +1261,17 @@ function QuoteCard({
       <div className="network-heading">
         <div>
           <h3>{q.display_name}</h3>
-          <span className="pill">{QUOTE_STATUS[q.status]}</span>
+          <span className="pill">{tr(QUOTE_STATUS[q.status])}</span>
           <a className="linkbtn" href={`/firmalar/${q.bidder_id}`}>
             {" "}
-            Hizmet profili ↗
-          </a>
+            {tr("Hizmet profili ↗")}</a>
         </div>
         <strong className="network-price">
-          {money(q.amount, q.price_unit)}
+          {money(q.amount, q.price_unit, language)}
         </strong>
       </div>
       <p className="network-text">{q.note}</p>
-      {own && q.status==='accepted' && q.price_unit==='toplam' && <p><a className="btn ghost" href={'/odeme?teklif='+q.id}>Güvenli ödeme seçenekleri</a></p>}
+      {own && q.status==='accepted' && q.price_unit==='toplam' && <p><a className="btn ghost" href={'/odeme?teklif='+q.id}>{tr("Güvenli ödeme seçenekleri")}</a></p>}
       <ErrorBox error={error} />
       {open && q.status === "pending" && (
         <div className="network-actions">
@@ -1303,28 +1282,24 @@ function QuoteCard({
                 disabled={busy || selected}
                 onClick={() => action("accepted")}
               >
-                Bu teklifi seç
-              </button>
+                {tr("Bu teklifi seç")}</button>
               <button
                 className="btn ghost sm"
                 disabled={busy}
                 onClick={() => action("declined")}
               >
-                Reddet
-              </button>
+                {tr("Reddet")}</button>
             </>
           ) : (
             <>
               <button className="btn ghost sm" onClick={() => setEdit(!edit)}>
-                Teklifi düzenle
-              </button>
+                {tr("Teklifi düzenle")}</button>
               <button
                 className="btn ghost sm"
                 disabled={busy}
                 onClick={() => action("withdrawn")}
               >
-                Geri çek
-              </button>
+                {tr("Geri çek")}</button>
             </>
           )}
         </div>
@@ -1343,6 +1318,8 @@ function QuoteCard({
   );
 }
 function QuoteEditLoader({ q, onSaved }: { q: Quote; onSaved: () => void }) {
+  const { t: tr, language } = useLanguage();
+
   const [p, setP] = useState<MarketPost | null>(null);
   useEffect(() => {
     void client()
@@ -1355,10 +1332,12 @@ function QuoteEditLoader({ q, onSaved }: { q: Quote; onSaved: () => void }) {
   return p ? (
     <QuoteForm post={p} existing={q} onSaved={onSaved} />
   ) : (
-    <p>İlan yükleniyor…</p>
+    <p>{tr("İlan yükleniyor…")}</p>
   );
 }
 function QuoteMessages({ q }: { q: Quote }) {
+  const { t: tr, language } = useLanguage();
+
   const { profile } = useMarket();
   const [messages, setMessages] = useState<
       { id: string; sender_id: string; body: string; created_at: string }[]
@@ -1394,7 +1373,9 @@ function QuoteMessages({ q }: { q: Quote }) {
   }, [q.id, show, refresh, limit]);
   async function send(e: FormEvent) {
     e.preventDefault();
-    if (!profile || !text.trim()) return;
+    if (!profile || !text.trim() || busy) return;
+    const check = checkMessage(text.trim());
+    if (check.block) { setError(check.block); return; }
     setBusy(true);
     const r = await client()!
       .from("market_quote_messages")
@@ -1414,7 +1395,7 @@ function QuoteMessages({ q }: { q: Quote }) {
         aria-expanded={show}
         onClick={() => setShow(!show)}
       >
-        {show ? "Mesajları gizle" : "Özel mesajlar"}
+        {show ? tr("Mesajları gizle") : tr("Özel mesajlar")}
       </button>
       {show && (
         <>
@@ -1423,15 +1404,13 @@ function QuoteMessages({ q }: { q: Quote }) {
               className="btn ghost sm"
               onClick={() => setRefresh((x) => x + 1)}
             >
-              Mesajları yenile
-            </button>
+              {tr("Mesajları yenile")}</button>
             {more && (
               <button
                 className="btn ghost sm"
                 onClick={() => setLimit((x) => x + 50)}
               >
-                Önceki mesajları yükle
-              </button>
+                {tr("Önceki mesajları yükle")}</button>
             )}
           </div>
           <ErrorBox error={error} />
@@ -1443,10 +1422,10 @@ function QuoteMessages({ q }: { q: Quote }) {
               >
                 <b>
                   {m.sender_id === profile?.id
-                    ? "Sen"
+                    ? tr("Sen")
                     : m.sender_id === q.bidder_id
                       ? q.display_name
-                      : "İlan sahibi"}
+                      : tr("İlan sahibi")}
                 </b>
                 <p className="network-text">{m.body}</p>
                 <time dateTime={m.created_at}>
@@ -1457,14 +1436,12 @@ function QuoteMessages({ q }: { q: Quote }) {
           </ol>
           {messages.length === 0 && !error && (
             <p className="sub">
-              Henüz mesaj yok. Kapsamı ve tarihleri burada netleştirin.
-            </p>
+              {tr("Henüz mesaj yok. Kapsamı ve tarihleri burada netleştirin.")}</p>
           )}
           {["pending", "accepted"].includes(q.status) ? (
             <form className="network-form" onSubmit={send}>
               <label>
-                Özel mesaj
-                <textarea
+                {tr("Özel mesaj")}<textarea
                   value={text}
                   onChange={(e) => setText(e.target.value)}
                   required
@@ -1473,14 +1450,12 @@ function QuoteMessages({ q }: { q: Quote }) {
                 />
               </label>
               <button className="btn sm" disabled={busy || !text.trim()}>
-                {busy ? "Gönderiliyor…" : "Mesaj gönder"}
+                {busy ? tr("Gönderiliyor…") : tr("Mesaj gönder")}
               </button>
             </form>
           ) : (
             <p className="sub">
-              Sonuçlanmış tekliflerde mesaj geçmişi korunur; yeni mesaj
-              gönderilemez.
-            </p>
+              {tr("Sonuçlanmış tekliflerde mesaj geçmişi korunur; yeni mesaj gönderilemez.")}</p>
           )}
         </>
       )}
@@ -1493,6 +1468,8 @@ export function ProviderDirectory({
 }: {
   companyOnly?: boolean;
 }) {
+  const { t: tr, language } = useLanguage();
+
   const [providers, setProviders] = useState<Provider[]>([]),
     [kind, setKind] = useState(""),
     [city, setCity] = useState(""),
@@ -1566,92 +1543,84 @@ export function ProviderDirectory({
       <NetworkNav />
       <div className="network-heading">
         <div>
-          <span className="eyebrow">YEREL HİZMET AĞI</span>
+          <span className="eyebrow">{tr("YEREL HİZMET AĞI")}</span>
           <h1>
             {companyOnly
-              ? "Şirketleri ve filolarını keşfet."
-              : "İşini yapacak firmayı bul."}
+              ? tr("Şirketleri ve filolarını keşfet.")
+              : tr("İşini yapacak firmayı bul.")}
           </h1>
           <p className="lead">
-            Hafriyat, nakliye, kiralama ve diğer alanlarda çalışan şirketler.
-            Hizmet verilen ile ve iş alanına göre seç.
-          </p>
+            {tr("Hafriyat, nakliye, kiralama ve diğer alanlarda çalışan şirketler. Hizmet verilen ile ve iş alanına göre seç.")}</p>
         </div>
         <a className="btn" href="/firma-kaydi">
-          Firma / hizmet profili oluştur
-        </a>
+          {tr("Firma / hizmet profili oluştur")}</a>
       </div>
       <div className="network-filters">
         <label>
-          Şirket kategorisi
-          <select
+          {tr("Şirket kategorisi")}<select
             value={companyCategory}
             onChange={(e) => {
               setCompanyCategory(e.target.value);
               setPage(0);
             }}
           >
-            <option value="">Tüm şirket kategorileri</option>
+            <option value="">{tr("Tüm şirket kategorileri")}</option>
             {COMPANY_CATEGORIES.map((c) => (
-              <option key={c}>{c}</option>
+              <option key={c} value={c}>{tr(c)}</option>
             ))}
           </select>
         </label>
         <label>
-          Firma adı
-          <input
+          {tr("Firma adı")}<input
             value={q}
             onChange={(e) => {
               setQ(e.target.value);
               setPage(0);
             }}
-            placeholder="Firma ara"
+            placeholder={tr("Firma ara")}
           />
         </label>
         <label>
-          Firma türü
-          <select
+          {tr("Firma türü")}<select
             value={kind}
             onChange={(e) => {
               setKind(e.target.value);
               setPage(0);
             }}
           >
-            <option value="">Tüm türler</option>
+            <option value="">{tr("Tüm türler")}</option>
             {Object.entries(PROVIDER_KINDS).map(([k, v]) => (
               <option value={k} key={k}>
-                {v}
+                {tr(v)}
               </option>
             ))}
           </select>
         </label>
         <label>
-          Hizmet verilen il
-          <select
+          {tr("Hizmet verilen il")}<select
             value={city}
             onChange={(e) => {
               setCity(e.target.value);
               setPage(0);
             }}
           >
-            <option value="">Tüm iller</option>
+            <option value="">{tr("Tüm iller")}</option>
             {CITIES.map((c) => (
-              <option key={c}>{c}</option>
+              <option key={c} value={c}>{tr(c)}</option>
             ))}
           </select>
         </label>
         <label>
-          İş alanı
-          <select
+          {tr("İş alanı")}<select
             value={activity}
             onChange={(e) => {
               setActivity(e.target.value);
               setPage(0);
             }}
           >
-            <option value="">Tüm alanlar</option>
+            <option value="">{tr("Tüm alanlar")}</option>
             {ACTIVITIES.map((c) => (
-              <option key={c}>{c}</option>
+              <option key={c} value={c}>{tr(c)}</option>
             ))}
           </select>
         </label>
@@ -1659,15 +1628,14 @@ export function ProviderDirectory({
       <ErrorBox error={error} />
       {error && (
         <button className="btn ghost" onClick={() => setRefresh((x) => x + 1)}>
-          Tekrar dene
-        </button>
+          {tr("Tekrar dene")}</button>
       )}
       {busy ? (
-        <p role="status">Firmalar yükleniyor…</p>
+        <p role="status">{tr("Firmalar yükleniyor…")}</p>
       ) : !error && providers.length === 0 ? (
         <div className="panel network-empty">
-          <h2>Bu bölgede henüz kayıt yok</h2>
-          <p>Filtreleri değiştir veya firmanı rehbere ekle.</p>
+          <h2>{tr("Bu bölgede henüz kayıt yok")}</h2>
+          <p>{tr("Filtreleri değiştir veya firmanı rehbere ekle.")}</p>
         </div>
       ) : (
         <div className="network-cards">
@@ -1689,11 +1657,10 @@ export function ProviderDirectory({
                 ))}
               </div>
               <p className="sub">
-                Hizmet bölgeleri: {p.service_cities.join(", ")}
+                {tr("Hizmet bölgeleri: ")}{p.service_cities.join(", ")}
               </p>
               <a className="linkbtn" href={`/firmalar/${p.user_id}`}>
-                Şirketi ve envanterini incele →
-              </a>
+                {tr("Şirketi ve envanterini incele →")}</a>
             </article>
           ))}
         </div>
@@ -1704,25 +1671,23 @@ export function ProviderDirectory({
           disabled={!page || busy}
           onClick={() => setPage((x) => x - 1)}
         >
-          Önceki
-        </button>
-        <span>Sayfa {page + 1}</span>
+          {tr("Önceki")}</button>
+        <span>{tr("Sayfa ")}{page + 1}</span>
         <button
           className="btn ghost"
           disabled={!more || busy}
           onClick={() => setPage((x) => x + 1)}
         >
-          Sonraki
-        </button>
+          {tr("Sonraki")}</button>
       </div>
       <p className="sub">
-        Firma bilgileri üyelerin kendi beyanıdır. Ekipman, belge, referans ve iş
-        kapsamını çalışmadan önce doğrulayın.
-      </p>
+        {tr("Firma bilgileri üyelerin kendi beyanıdır. Ekipman, belge, referans ve iş kapsamını çalışmadan önce doğrulayın.")}</p>
     </>
   );
 }
 export function ProviderEditor() {
+  const { t: tr, language } = useLanguage();
+
   return (
     <Login>
       <ProviderEditorForm />
@@ -1730,6 +1695,8 @@ export function ProviderEditor() {
   );
 }
 function ProviderEditorForm() {
+  const { t: tr, language } = useLanguage();
+
   const { profile } = useMarket();
   const [provider, setProvider] = useState<Provider | null>(null),
     [areas, setAreas] = useState<string[]>([]),
@@ -1807,35 +1774,30 @@ function ProviderEditorForm() {
       setBusy(false);
     }
   }
-  if (loading) return <p role="status">Hizmet profili yükleniyor…</p>;
+  if (loading) return <p role="status">{tr("Hizmet profili yükleniyor…")}</p>;
   if (failed)
     return (
       <>
         <ErrorBox error={error} />
         <button className="btn ghost" onClick={() => setRefresh((x) => x + 1)}>
-          Tekrar dene
-        </button>
+          {tr("Tekrar dene")}</button>
       </>
     );
   return (
     <>
       <NetworkNav />
-      <h1>Firma / hizmet profilin</h1>
+      <h1>{tr("Firma / hizmet profilin")}</h1>
       <p className="lead">
-        Hangi bölgede, hangi işleri yaptığını göster. Aynı hesabınla ilan
-        verebilir ve fiyat teklifi gönderebilirsin.
-      </p>
+        {tr("Hangi bölgede, hangi işleri yaptığını göster. Aynı hesabınla ilan verebilir ve fiyat teklifi gönderebilirsin.")}</p>
       <p>
         <a className="linkbtn" href="/envanterim">
-          Şirketinin makine ve araç envanterini yönet →
-        </a>
+          {tr("Şirketinin makine ve araç envanterini yönet →")}</a>
       </p>
       <form className="panel network-form" onSubmit={save}>
         <fieldset disabled={busy}>
           <div className="network-form-grid">
             <label>
-              Firma / hizmet adı
-              <input
+              {tr("Firma / hizmet adı")}<input
                 name="name"
                 minLength={2}
                 maxLength={120}
@@ -1847,38 +1809,35 @@ function ProviderEditorForm() {
               />
             </label>
             <label>
-              Profil türü
-              <select name="kind" defaultValue={provider?.kind ?? "excavation"}>
+              {tr("Profil türü")}<select name="kind" defaultValue={provider?.kind ?? "excavation"}>
                 {Object.entries(PROVIDER_KINDS).map(([k, v]) => (
                   <option key={k} value={k}>
-                    {v}
+                    {tr(v)}
                   </option>
                 ))}
               </select>
             </label>
           </div>
           <label>
-            Şirket kategorisi
-            <select
+            {tr("Şirket kategorisi")}<select
               name="company_category"
               defaultValue={provider?.company_category ?? ""}
             >
-              <option value="">Bireysel hizmet / seçilmedi</option>
+              <option value="">{tr("Bireysel hizmet / seçilmedi")}</option>
               {COMPANY_CATEGORIES.map((c) => (
-                <option key={c}>{c}</option>
+                <option key={c} value={c}>{tr(c)}</option>
               ))}
             </select>
           </label>
           <label>
-            Şirket / hizmet açıklaması
-            <textarea
+            {tr("Şirket / hizmet açıklaması")}<textarea
               name="description"
               minLength={20}
               maxLength={5000}
               required
               rows={5}
               defaultValue={provider?.description ?? ""}
-              placeholder="Şirketinizi tanıtın: iş alanları, hizmet verdiğiniz il ve ilçeler, ekipman, kapasite ve deneyim."
+              placeholder={tr("Şirketinizi tanıtın: iş alanları, hizmet verdiğiniz il ve ilçeler, ekipman, kapasite ve deneyim.")}
             />
           </label>
           <div className="network-form-grid">
@@ -1890,7 +1849,7 @@ function ProviderEditorForm() {
             />
           </div>
           <fieldset className="network-choices">
-            <legend>İş yaptığın alanlar</legend>
+            <legend>{tr("İş yaptığın alanlar")}</legend>
             {ACTIVITIES.map((a) => (
               <label key={a}>
                 <input
@@ -1909,7 +1868,7 @@ function ProviderEditorForm() {
             ))}
           </fieldset>
           <fieldset className="network-choices network-cities">
-            <legend>Hizmet verdiğin iller</legend>
+            <legend>{tr("Hizmet verdiğin iller")}</legend>
             {CITIES.map((c) => (
               <label key={c}>
                 <input
@@ -1933,16 +1892,12 @@ function ProviderEditorForm() {
               name="published"
               defaultChecked={provider?.published ?? true}
             />
-            Profilimi firma rehberinde yayımla
-          </label>
+            {tr("Profilimi firma rehberinde yayımla")}</label>
           <p className="sub">
-            Profil adı, açıklama, iş alanları, hizmet illeri ve eklediğin harita
-            konumu herkese açık olur. Hesap başına bir hizmet profili
-            oluşturabilirsin.
-          </p>
+            {tr("Profil adı, açıklama, iş alanları, hizmet illeri ve eklediğin harita konumu herkese açık olur. Hesap başına bir hizmet profili oluşturabilirsin.")}</p>
           <ErrorBox error={error} />
           <button className="btn">
-            {busy ? "Kaydediliyor…" : "Hizmet profilini kaydet"}
+            {busy ? tr("Kaydediliyor…") : tr("Hizmet profilini kaydet")}
           </button>
         </fieldset>
       </form>
@@ -1950,6 +1905,8 @@ function ProviderEditorForm() {
   );
 }
 export function ProviderDetail({ id }: { id: string }) {
+  const { t: tr, language } = useLanguage();
+
   const { profile, authReady } = useMarket();
   const [provider, setProvider] = useState<Provider | null>(null),
     [posts, setPosts] = useState<MarketPost[]>([]),
@@ -1999,15 +1956,14 @@ export function ProviderDetail({ id }: { id: string }) {
       active = false;
     };
   }, [id, authReady, profile?.id, refresh]);
-  if (busy) return <p role="status">Hizmet profili yükleniyor…</p>;
+  if (busy) return <p role="status">{tr("Hizmet profili yükleniyor…")}</p>;
   return (
     <>
       <NetworkNav />
       <ErrorBox error={error} />
       {error && (
         <button className="btn ghost" onClick={() => setRefresh((x) => x + 1)}>
-          Tekrar dene
-        </button>
+          {tr("Tekrar dene")}</button>
       )}
       {provider ? (
         <>
@@ -2015,7 +1971,7 @@ export function ProviderDetail({ id }: { id: string }) {
             <div>
               <span className="pill">
                 {provider.company_category || PROVIDER_KINDS[provider.kind]}
-                {!provider.published ? " · Yayımlanmıyor" : ""}
+                {!provider.published ? tr(" · Yayımlanmıyor") : ""}
               </span>
               <h1>{provider.name}</h1>
               <p className="lead">
@@ -2024,19 +1980,17 @@ export function ProviderDetail({ id }: { id: string }) {
             </div>
             {profile?.id === id ? (
               <a className="btn" href="/firma-kaydi">
-                Profili düzenle
-              </a>
+                {tr("Profili düzenle")}</a>
             ) : (
               <a
                 className="btn"
                 href={`/is-agi/yeni?kind=${provider.kind === "supplier" ? "part_request" : "job"}&provider=${provider.user_id}&firma=${encodeURIComponent(provider.name)}`}
               >
-                Bu firma için talep oluştur
-              </a>
+                {tr("Bu firma için talep oluştur")}</a>
             )}
           </div>
           <article className="panel">
-            <h2>Hizmetler</h2>
+            <h2>{tr("Hizmetler")}</h2>
             <p className="network-text">{provider.description}</p>
             <div className="network-tags">
               {provider.specialties.map((s) => (
@@ -2045,7 +1999,7 @@ export function ProviderDetail({ id }: { id: string }) {
                 </span>
               ))}
             </div>
-            <h3>Hizmet verilen iller</h3>
+            <h3>{tr("Hizmet verilen iller")}</h3>
             <div className="network-tags">
               {provider.service_cities.map((s) => (
                 <a
@@ -2058,14 +2012,11 @@ export function ProviderDetail({ id }: { id: string }) {
               ))}
             </div>
             <p className="sub">
-              Talebin herkese açık yayımlanır. Tercih ettiğin firma talebi kendi
-              işlerim ve tekliflerim sayfasında görür. Diğer üyeler de teklif verebilir. Profil
-              bilgileri üyenin kendi beyanıdır.
-            </p>
+              {tr("Talebin herkese açık yayımlanır. Tercih ettiğin firma talebi kendi işlerim ve tekliflerim sayfasında görür. Diğer üyeler de teklif verebilir. Profil bilgileri üyenin kendi beyanıdır.")}</p>
           </article>
           <CompanyInventory ownerId={provider.user_id} />
           <section className="sect">
-            <h2>Şirketin açık ilanları</h2>
+            <h2>{tr("Şirketin açık ilanları")}</h2>
             {posts.length ? (
               <div className="network-cards">
                 {posts.map((p) => (
@@ -2073,19 +2024,20 @@ export function ProviderDetail({ id }: { id: string }) {
                 ))}
               </div>
             ) : (
-              <p>Henüz açık ilanı yok.</p>
+              <p>{tr("Henüz açık ilanı yok.")}</p>
             )}
           </section>
         </>
       ) : profile?.id === id ? (
         <a className="btn" href="/firma-kaydi">
-          Hizmet profilini oluştur
-        </a>
+          {tr("Hizmet profilini oluştur")}</a>
       ) : null}
     </>
   );
 }
 export function NetworkAccount() {
+  const { t: tr, language } = useLanguage();
+
   return (
     <Login>
       <NetworkAccountData />
@@ -2093,6 +2045,8 @@ export function NetworkAccount() {
   );
 }
 function NetworkAccountData() {
+  const { t: tr, language } = useLanguage();
+
   const { profile } = useMarket();
   const [posts, setPosts] = useState<MarketPost[]>([]),
     [quotes, setQuotes] = useState<Quote[]>([]),
@@ -2157,27 +2111,24 @@ function NetworkAccountData() {
     <>
       <NetworkNav />
       <div className="network-heading">
-        <h1>İşlerim ve tekliflerim</h1>
+        <h1>{tr("İşlerim ve tekliflerim")}</h1>
         <div className="network-actions">
           <a className="btn" href="/is-agi/yeni">
-            Yeni ilan
-          </a>
+            {tr("Yeni ilan")}</a>
           <a className="btn ghost" href="/firma-kaydi">
-            Hizmet profilim
-          </a>
+            {tr("Hizmet profilim")}</a>
         </div>
       </div>
       <ErrorBox error={error} />
       {error && (
         <button className="btn ghost" onClick={() => setRefresh((x) => x + 1)}>
-          Tekrar dene
-        </button>
+          {tr("Tekrar dene")}</button>
       )}
       {busy ? (
-        <p>Yükleniyor…</p>
+        <p>{tr("Yükleniyor…")}</p>
       ) : (
         <>
-          <h2>Firmamdan istenen işler / parçalar</h2>
+          <h2>{tr("Firmamdan istenen işler / parçalar")}</h2>
           {requests.length ? (
             <div className="network-cards">
               {requests.map((p) => (
@@ -2185,9 +2136,9 @@ function NetworkAccountData() {
               ))}
             </div>
           ) : (
-            <p>Henüz doğrudan bir talep gelmedi.</p>
+            <p>{tr("Henüz doğrudan bir talep gelmedi.")}</p>
           )}
-          <h2>İş ve hizmet ilanlarım</h2>
+          <h2>{tr("İş ve hizmet ilanlarım")}</h2>
           {posts.length ? (
             <div className="network-cards">
               {posts.map((p) => (
@@ -2195,10 +2146,10 @@ function NetworkAccountData() {
               ))}
             </div>
           ) : (
-            <p>Henüz ilan açmadın.</p>
+            <p>{tr("Henüz ilan açmadın.")}</p>
           )}
           <section className="sect">
-            <h2>Gelen teklifler</h2>
+            <h2>{tr("Gelen teklifler")}</h2>
             {incoming.length ? (
               incoming.map((q) => (
                 <a
@@ -2207,18 +2158,18 @@ function NetworkAccountData() {
                   key={q.id}
                 >
                   <span>
-                    <b>{q.display_name}</b> · {QUOTE_STATUS[q.status]}
+                    <b>{q.display_name}</b> · {tr(QUOTE_STATUS[q.status])}
                   </span>
-                  <strong>{money(q.amount, q.price_unit)}</strong>
-                  <span className="linkbtn">İlana ve mesajlara git →</span>
+                  <strong>{money(q.amount, q.price_unit, language)}</strong>
+                  <span className="linkbtn">{tr("İlana ve mesajlara git →")}</span>
                 </a>
               ))
             ) : (
-              <p>Henüz teklif gelmedi.</p>
+              <p>{tr("Henüz teklif gelmedi.")}</p>
             )}
           </section>
           <section className="sect">
-            <h2>Verdiğim teklifler / kiralama talepleri</h2>
+            <h2>{tr("Verdiğim teklifler / kiralama talepleri")}</h2>
             {quotes.length ? (
               quotes.map((q) => (
                 <a
@@ -2227,24 +2178,22 @@ function NetworkAccountData() {
                   key={q.id}
                 >
                   <span>
-                    {QUOTE_STATUS[q.status]} ·{" "}
-                    {new Date(q.created_at).toLocaleDateString("tr-TR")}
+                    {tr(QUOTE_STATUS[q.status])} ·{" "}
+                    {new Date(q.created_at).toLocaleDateString(language === "en" ? "en-GB" : "tr-TR")}
                   </span>
-                  <strong>{money(q.amount, q.price_unit)}</strong>
-                  <span className="linkbtn">İlana ve mesajlara git →</span>
+                  <strong>{money(q.amount, q.price_unit, language)}</strong>
+                  <span className="linkbtn">{tr("İlana ve mesajlara git →")}</span>
                 </a>
               ))
             ) : (
-              <p>Henüz teklif vermedin.</p>
+              <p>{tr("Henüz teklif vermedin.")}</p>
             )}
           </section>
           <p className="sub">
-            En son 100 kayıt gösterilir. Satılık ilanların{" "}
+            {tr("En son 100 kayıt gösterilir. Satılık ilanların")}{" "}
             <a className="linkbtn" href="/ilanlarim">
-              İlanlarım
-            </a>{" "}
-            bölümündedir.
-          </p>
+              {tr("İlanlarım")}</a>{" "}
+            {tr("bölümündedir.")}</p>
         </>
       )}
     </>

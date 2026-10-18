@@ -1,4 +1,6 @@
 'use client';
+import { useLanguage } from "@/components/LanguageProvider";
+
 
 import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
 import { MESSAGE_PAGE_SIZE, mergeMessages, olderMessagesFilter } from '@/lib/messages';
@@ -14,9 +16,11 @@ type Msg = { id: string; sender_id: string; body: string; created_at: string; ki
 type Trust = { rep: number; deals: number; s: number | null };
 
 const one = <T,>(x: T | T[] | null | undefined): T | null => (Array.isArray(x) ? x[0] ?? null : x ?? null);
-const fmt = (s: string) => new Date(s).toLocaleString('tr-TR', { dateStyle: 'short', timeStyle: 'short' });
+const fmt = (s: string, language: 'tr'|'en') => new Date(s).toLocaleString(language === 'en' ? 'en-GB' : 'tr-TR', { dateStyle: 'short', timeStyle: 'short' });
 
 export function MessagesView({ activeId }: { activeId?: string }) {
+  const { t: tr, language } = useLanguage();
+
   const { profile, authReady, refreshUnread } = useMarket();
   const me = profile?.id ?? null;
   const [threads, setThreads] = useState<Thread[] | null>(null);
@@ -123,7 +127,7 @@ export function MessagesView({ activeId }: { activeId?: string }) {
         else if (first || atBottom) bottom.current?.scrollIntoView({ block: 'nearest' });
       });
       if (!older && !document.hidden) { await supabase.rpc('mark_thread_read', { p_thread: activeId }); if (currentScope.current === scope) void refreshUnread(); }
-    } catch { if (currentScope.current === scope) setError('Mesajlar yüklenemedi. Bağlantını kontrol edip tekrar dene.'); }
+    } catch { if (currentScope.current === scope) setError("Mesajlar yüklenemedi. Bağlantını kontrol edip tekrar dene."); }
     finally {
       messageRequests.current.delete(requestKey);
       if (currentScope.current === scope) { setMessagesLoading(false); setOlderLoading(false); }
@@ -158,7 +162,7 @@ export function MessagesView({ activeId }: { activeId?: string }) {
     setSendError('');
     const check = checkMessage(body);
     if (check.block) { setSendError(check.block); return; }
-    if (check.warn && !window.confirm('Dikkat: Ürünü görmeden kapora, ön ödeme, havale ya da EFT göndermek dolandırıcılık riski taşır. Yine de göndermek istiyor musun?')) return;
+    if (check.warn && !window.confirm(tr("Dikkat: Ürünü görmeden kapora, ön ödeme, havale ya da EFT göndermek dolandırıcılık riski taşır. Yine de göndermek istiyor musun?"))) return;
     const scope = currentScope.current;
     if (pendingSend.current?.scope !== scope || pendingSend.current.body !== body) pendingSend.current = { scope, body, id: crypto.randomUUID() };
     const messageId = pendingSend.current.id;
@@ -166,7 +170,7 @@ export function MessagesView({ activeId }: { activeId?: string }) {
     try {
       const { error: err } = await supabase.from('messages').insert({ id: messageId, thread_id: activeId, sender_id: me, body });
       if (currentScope.current !== scope) return;
-      if (err && err.code !== '23505') { setSendError('Mesaj gönderilemedi. Yazdığın mesaj korunuyor; tekrar deneyebilirsin.'); return; }
+      if (err && err.code !== '23505') { setSendError(err.message.includes('MESSAGE_PROFANITY') ? 'Küfür veya hakaret içeren mesaj gönderilemez. Lütfen mesajını düzenle.' : 'Mesaj gönderilemedi. Yazdığın mesaj korunuyor; tekrar deneyebilirsin.'); return; }
       if (pendingSend.current?.id === messageId) pendingSend.current = null;
       setText(current => current.trim() === body ? '' : current);
       await loadMsgs();
@@ -175,31 +179,31 @@ export function MessagesView({ activeId }: { activeId?: string }) {
     finally { if (currentScope.current === scope) setBusy(false); }
   }
 
-  if (!authReady) return <div className="empty">Yükleniyor…</div>;
-  if (!getSupabase()) return <div className="panel">Supabase bağlantısı yok.</div>;
-  if (!me) return <><h1>Mesajlar</h1><div className="panel" style={{ marginTop: 16 }}>Mesajlarını görmek için <a className="linkbtn" href="/giris">giriş yap</a>.</div></>;
+  if (!authReady) return <div className="empty">{tr("Yükleniyor…")}</div>;
+  if (!getSupabase()) return <div className="panel">{tr("Supabase bağlantısı yok.")}</div>;
+  if (!me) return <><h1>{tr("Mesajlar")}</h1><div className="panel" style={{ marginTop: 16 }}>{tr("Mesajlarını görmek için ")}<a className="linkbtn" href="/giris">{tr("giriş yap")}</a>.</div></>;
 
   return (
     <>
-      <h1>Mesajlar</h1>
-      <p className="lead">Yazışmalar, teklifler ve satış onayı burada. Mesajlarda IBAN ve harici link paylaşımı engellenir.</p>
-      {threadError ? <div className="err" role="alert">{threadError} <button className="btn ghost sm" onClick={() => void loadThreads()}>Tekrar dene</button></div> : null}
+      <h1>{tr("Mesajlar")}</h1>
+      <p className="lead">{tr("Yazışmalar, teklifler ve satış onayı burada. Mesajlarda IBAN ve harici link paylaşımı engellenir.")}</p>
+      {threadError ? <div className="err" role="alert">{tr(threadError)} <button className="btn ghost sm" onClick={() => void loadThreads()}>{tr("Tekrar dene")}</button></div> : null}
       <div className={`msgs${activeId ? ' show-conv' : ''}`}>
         <div className="panel thr-list" style={{ padding: 0 }}>
-          {threads === null ? <div className="empty">Yükleniyor…</div> : threads.length === 0 && !threadError ? (
-            <div className="empty">Henüz konuşman yok. Bir ilanda <b>Mesaj gönder</b> düğmesine bas.</div>
+          {threads === null ? <div className="empty">{tr("Yükleniyor…")}</div> : threads.length === 0 && !threadError ? (
+            <div className="empty">{tr("Henüz konuşman yok. Bir ilanda ")}<b>{tr("Mesaj gönder")}</b> {tr(" düğmesine bas.")}</div>
           ) : threads.map((t) => (
             <a key={t.id} href={`/mesajlar/${t.id}`} className="thr" aria-current={t.id === activeId ? 'true' : undefined}>
-              <b>{t.other}{t.unread > 0 ? <span className="udot" aria-label={`${t.unread} okunmamış`} /> : null}</b>
+              <b>{t.other}{t.unread > 0 ? <span className="udot" aria-label={tr("{0} okunmamış", {"0":t.unread})} /> : null}</b>
               <span className="sub">{t.title}</span>
               <div className="sub clamp">{t.last}</div>
-              <div className="sub">{fmt(t.at)}</div>
+              <div className="sub">{fmt(t.at, language)}</div>
             </a>
           ))}
         </div>
         <div className="panel thr-conv">
-          {!activeId ? <div className="empty">Soldan bir konuşma seç.</div> : !active ? (
-            threads === null ? <div className="empty">Yükleniyor…</div> : <div className="empty">Bu konuşma bulunamadı. <a className="linkbtn" href="/mesajlar">Mesajlara dön</a></div>
+          {!activeId ? <div className="empty">{tr("Soldan bir konuşma seç.")}</div> : !active ? (
+            threads === null ? <div className="empty">{tr("Yükleniyor…")}</div> : <div className="empty">{tr("Bu konuşma bulunamadı. ")}<a className="linkbtn" href="/mesajlar">{tr("Mesajlara dön")}</a></div>
           ) : (
             <>
               <div className="sh-head">
@@ -207,28 +211,28 @@ export function MessagesView({ activeId }: { activeId?: string }) {
                   <b>{active.other}</b> {trust ? <TrustPill seller={trust} /> : null}
                   <div className="sub"><a className="linkbtn" href={`/ilanlar/${active.listingId}`}>{active.title}</a></div>
                 </div>
-                <a className="btn ghost sm thr-back" href="/mesajlar">← Tüm mesajlar</a>
+                <a className="btn ghost sm thr-back" href="/mesajlar">{tr("← Tüm mesajlar")}</a>
               </div>
-              <div className="note" style={{ margin: '10px 0' }}>Ürünü görmeden kapora veya ön ödeme gönderme. IBAN ve harici link paylaşımı engellenir.</div>
+              <div className="note" style={{ margin: '10px 0' }}>{tr("Ürünü görmeden kapora veya ön ödeme gönderme. IBAN ve harici link paylaşımı engellenir.")}</div>
               <DealBox threadId={active.id} me={me} buyerId={active.buyerId} sellerId={active.sellerId} />
               <div className="conv-msgs" ref={conversation} aria-live="polite" aria-busy={messagesLoading || olderLoading}>
-                {hasOlder && <button className="btn ghost sm" disabled={olderLoading} onClick={() => void loadMsgs(msgs[0])}>{olderLoading ? "Eski mesajlar yükleniyor…" : "Önceki mesajları yükle"}</button>}
-                {messagesLoading && <p role="status">Mesajlar yükleniyor…</p>}
-                {!messagesLoading && !error && msgs.length === 0 ? <p className="sub">Henüz mesaj yok. İlk mesajı sen yaz.</p> : null}
+                {hasOlder && <button className="btn ghost sm" disabled={olderLoading} onClick={() => void loadMsgs(msgs[0])}>{olderLoading ? tr("Eski mesajlar yükleniyor…") : tr("Önceki mesajları yükle")}</button>}
+                {messagesLoading && <p role="status">{tr("Mesajlar yükleniyor…")}</p>}
+                {!messagesLoading && !error && msgs.length === 0 ? <p className="sub">{tr("Henüz mesaj yok. İlk mesajı sen yaz.")}</p> : null}
                 {msgs.map((m) => (
                   <div key={m.id} className={`bub${m.sender_id === me ? ' me' : ''}${m.kind === 'offer' ? ' offer' : ''}${KAPORA_RE.test(m.body) ? ' warnb' : ''}`}>
-                    {m.kind === 'offer' && m.offer_amount != null ? <b>Teklif: {formatTL(Number(m.offer_amount))}<br /></b> : null}
+                    {m.kind === 'offer' && m.offer_amount != null ? <b>{tr("Teklif: ")}{formatTL(Number(m.offer_amount), language)}<br /></b> : null}
                     {m.body}
-                    <span className="tm">{fmt(m.created_at)}</span>
+                    <span className="tm">{fmt(m.created_at, language)}</span>
                   </div>
                 ))}
                 <div ref={bottom} />
               </div>
-              {error ? <div className="err" role="alert">{error} <button className="btn ghost sm" onClick={() => void loadMsgs()}>Tekrar dene</button></div> : null}
-              {sendError && <div className="err" role="alert">{sendError}</div>}
+              {error ? <div className="err" role="alert">{tr(error)} <button className="btn ghost sm" onClick={() => void loadMsgs()}>{tr("Tekrar dene")}</button></div> : null}
+              {sendError && <div className="err" role="alert">{tr(sendError)}</div>}
               <form className="searchbar" style={{ marginTop: 10 }} onSubmit={send}>
-                <input type="text" value={text} onChange={(e) => setText(e.target.value)} maxLength={2000} placeholder="Mesajını yaz…" aria-label="Mesaj" />
-                <button className="btn" type="submit" disabled={busy || !text.trim()}>Gönder</button>
+                <input type="text" value={text} onChange={(e) => setText(e.target.value)} maxLength={2000} placeholder={tr("Mesajını yaz…")} aria-label={tr("Mesaj")} />
+                <button className="btn" type="submit" disabled={busy || !text.trim()}>{tr("Gönder")}</button>
               </form>
             </>
           )}

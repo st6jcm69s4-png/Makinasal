@@ -1,4 +1,6 @@
 "use client";
+import { useLanguage } from "@/components/LanguageProvider";
+
 
 import { formatPersonName } from "@/lib/profile";
 import {
@@ -34,6 +36,8 @@ function Icon({
 }: {
   type: "search" | "pin" | "arrow" | "machine" | "work" | "part" | "company";
 }) {
+  const { t: tr, language } = useLanguage();
+
   const paths = {
     search: (
       <>
@@ -95,6 +99,8 @@ type Feed = {
   errors: string[];
 };
 export function HomeView() {
+  const { t: tr, language } = useLanguage();
+
   const { listings, profile, authReady, ready } = useMarket();
   const [tab, setTab] = useState<HomeTab>("sale"),
     [q, setQ] = useState(""),
@@ -254,29 +260,25 @@ export function HomeView() {
       <section className="home-hero" aria-labelledby="home-title">
         <div className="home-hero-top">
           <span className="home-kicker">
-            <span /> SAHANIN DİJİTAL İŞ AĞI
-          </span>
+            <span /> {tr(" SAHANIN DİJİTAL İŞ AĞI")}</span>
           <a href="/sirketler">
-            Şirketleri keşfet <Icon type="arrow" />
+            {tr("Şirketleri keşfet ")}<Icon type="arrow" />
           </a>
         </div>
         <div className="home-hero-copy">
           <h1 id="home-title">
-            Doğru makine.
-            <br />
-            <mark>Doğru ekip. Daha çok iş.</mark>
+            {tr("Doğru makine.")}<br />
+            <mark>{tr("Doğru ekip. Daha çok iş.")}</mark>
           </h1>
           <p>
-            Al, sat, kirala. İşini paylaş, fiyat al.
-            <br />
-            Makine, yedek parça ve işini yapacak hizmeti burada bul.
-          </p>
+            {tr("Al, sat, kirala. İşini paylaş, fiyat al.")}<br />
+            {tr("Makine, yedek parça ve işini yapacak hizmeti burada bul.")}</p>
         </div>
         <div className="home-search-box">
           <div
             className="home-search-tabs"
             role="tablist"
-            aria-label="Arama kategorisi"
+            aria-label={tr("Arama kategorisi")}
           >
             {HOME_TABS.map((t, i) => (
               <button
@@ -304,7 +306,7 @@ export function HomeView() {
                     ?.focus();
                 }}
               >
-                {t.label}
+                {tr(t.label)}
               </button>
             ))}
           </div>
@@ -322,43 +324,43 @@ export function HomeView() {
             >
               <label className="home-search-query">
                 <Icon type="search" />
-                <span className="sr">{activeTab.label} ara</span>
+                <span className="sr">{tr(activeTab.label)} {tr(" ara")}</span>
                 <input
                   name="q"
                   value={q}
                   onChange={(e) => setQ(e.target.value)}
                   maxLength={200}
-                  placeholder={activeTab.placeholder}
+                  placeholder={tr(activeTab.placeholder)}
                 />
               </label>
               <label className="home-search-city">
                 <Icon type="pin" />
-                <span className="sr">Arama ve ana sayfa için il seç</span>
+                <span className="sr">{tr("Arama ve ana sayfa için il seç")}</span>
                 <select
                   name="city"
                   value={city}
                   onChange={(e) => chooseCity(e.target.value)}
                 >
-                  <option value="">Tüm Türkiye</option>
+                  <option value="">{tr("Tüm Türkiye")}</option>
                   {CITIES.map((c) => (
-                    <option key={c}>{c}</option>
+                    <option key={c} value={c}>{tr(c)}</option>
                   ))}
                 </select>
               </label>
               <button className="btn" type="submit">
-                Ara <Icon type="arrow" />
+                {tr("Ara ")}<Icon type="arrow" />
               </button>
             </form>
           </div>
         </div>
         <div className="home-popular">
-          <span>Hızlı keşfet</span>
-          <a href={locationUrl("/kiralik", city)}>Kiralık makineler</a>
-          <a href={`/kiralik?bolum=personel${city ? "&city=" + encodeURIComponent(city) : ""}`}>Operatör ve ustalar</a>
-          <a href="/parca-talepleri">Parça talepleri</a>
+          <span>{tr("Hızlı keşfet")}</span>
+          <a href={locationUrl("/kiralik", city)}>{tr("Kiralık makineler")}</a>
+          <a href={`/kiralik?bolum=personel${city ? "&city=" + encodeURIComponent(city) : ""}`}>{tr("Operatör ve ustalar")}</a>
+          <a href="/parca-talepleri">{tr("Parça talepleri")}</a>
         </div>
       </section>
-      <section className="home-intents" aria-label="Hızlı işlemler">
+      <section className="home-intents" aria-label={tr("Hızlı işlemler")}>
         {[
           {
             href: "/ilan-ver",
@@ -390,67 +392,64 @@ export function HomeView() {
               <Icon type={a.icon} />
             </span>
             <div>
-              <h2>{a.title}</h2>
-              <p>{a.text}</p>
+              <h2>{tr(a.title)}</h2>
+              <p>{tr(a.text)}</p>
             </div>
             <span className="home-intent-arrow">↗</span>
           </a>
         ))}
       </section>
       {authReady && profile ? (
-        <section className="home-account" aria-label="Hesabın">
+        <section className="home-account" aria-label={tr("Hesabın")}>
           <div>
-            <span className="home-small-label">İŞ MERKEZİN</span>
+            <span className="home-small-label">{tr("İŞ MERKEZİN")}</span>
             <h2>
-              Merhaba, {formatPersonName(profile.full_name || "").split(" ")[0] || "tekrar hoş geldin"}
+              {tr("Merhaba, ")}{formatPersonName(profile.full_name || "").split(" ")[0] || tr("tekrar hoş geldin")}
               .
             </h2>
           </div>
           <div>
             <a href="/is-agi/hesabim">
-              Gelen teklifler {counts && <b>{counts.offers}</b>}
+              {tr("Gelen teklifler ")}{counts && <b>{counts.offers}</b>}
             </a>
             <a href="/is-agi/hesabim">
-              Açık işlerim {counts && <b>{counts.works}</b>}
+              {tr("Açık işlerim ")}{counts && <b>{counts.works}</b>}
             </a>
-            <a href="/ilanlarim">İlanlarım</a>
+            <a href="/ilanlarim">{tr("İlanlarım")}</a>
             <a href="/envanterim">
-              Şirketim ve envanterim <span>↗</span>
+              {tr("Şirketim ve envanterim ")}<span>↗</span>
             </a>
           </div>
         </section>
       ) : (
         <section className="home-account home-join">
           <div>
-            <h2>İşin için yeni bağlantılar kur.</h2>
+            <h2>{tr("İşin için yeni bağlantılar kur.")}</h2>
             <p>
-              Ücretsiz hesap aç; ilanlarını, taleplerini ve tekliflerini tek
-              yerden yönet.
-            </p>
+              {tr("Ücretsiz hesap aç; ilanlarını, taleplerini ve tekliflerini tek yerden yönet.")}</p>
           </div>
           <a className="btn ghost" href="/giris">
-            Giriş yap / Kayıt ol →
-          </a>
+            {tr("Giriş yap / Kayıt ol →")}</a>
         </section>
       )}
       <div className="home-region">
         <div>
           <Icon type="pin" />
           <span>
-            <b>{city || "Tüm Türkiye"}</b>
+            <b>{city || tr("Tüm Türkiye")}</b>
             <small>
               {city
-                ? "Seçtiğin ildeki işler, makineler ve bu ile hizmet veren şirketler"
-                : "Şehir seçerek çevrendeki fırsatları keşfet"}
+                ? tr("Seçtiğin ildeki işler, makineler ve bu ile hizmet veren şirketler")
+                : tr("Şehir seçerek çevrendeki fırsatları keşfet")}
             </small>
           </span>
         </div>
         <label>
-          <span className="sr">İçeriklerin şehri</span>
+          <span className="sr">{tr("İçeriklerin şehri")}</span>
           <select value={city} onChange={(e) => chooseCity(e.target.value)}>
-            <option value="">Tüm Türkiye</option>
+            <option value="">{tr("Tüm Türkiye")}</option>
             {CITIES.map((c) => (
-              <option key={c}>{c}</option>
+              <option key={c} value={c}>{tr(c)}</option>
             ))}
           </select>
         </label>
@@ -462,13 +461,12 @@ export function HomeView() {
             className="btn ghost sm"
             onClick={() => setRefresh((x) => x + 1)}
           >
-            Tekrar dene
-          </button>
+            {tr("Tekrar dene")}</button>
         </div>
       )}
       <HomeSection
-        label="YENİ İŞ FIRSATLARI"
-        title="Bir sonraki işin burada olabilir."
+        label={tr("YENİ İŞ FIRSATLARI")}
+        title={tr("Bir sonraki işin burada olabilir.")}
         href={locationUrl("/isler", city)}
       >
         <FeedContent
@@ -479,7 +477,7 @@ export function HomeView() {
           )}
           message={
             city
-              ? `${city} için henüz açık iş talebi yok.`
+              ? tr("{0} için henüz açık iş talebi yok.", {0:city})
               : "Henüz açık iş talebi yok."
           }
           action="İlk iş talebini oluştur"
@@ -493,8 +491,8 @@ export function HomeView() {
         </FeedContent>
       </HomeSection>
       <HomeSection
-        label="KİRALIK MAKİNELER"
-        title="İşin kadar kirala."
+        label={tr("KİRALIK MAKİNELER")}
+        title={tr("İşin kadar kirala.")}
         href={locationUrl("/kiralik", city)}
       >
         <FeedContent
@@ -515,8 +513,8 @@ export function HomeView() {
         </FeedContent>
       </HomeSection>
       <HomeSection
-        label="SATILIK İLANLAR"
-        title="İşine güç katacak makineler."
+        label={tr("SATILIK İLANLAR")}
+        title={tr("İşine güç katacak makineler.")}
         href={locationUrl("/ilanlar", city)}
       >
         <FeedContent
@@ -534,7 +532,7 @@ export function HomeView() {
         </FeedContent>
         <details className="home-categories">
           <summary>
-            Satılık kategorilerine göz at <span>+</span>
+            {tr("Satılık kategorilerine göz at ")}<span>+</span>
           </summary>
           <div>
             {CATEGORIES.map((c) => (
@@ -553,20 +551,17 @@ export function HomeView() {
           <Icon type="company" />
         </span>
         <div>
-          <span className="home-small-label">ŞİRKETİNİ SAHAYA ÇIKAR</span>
-          <h2>Filonu göster. Hizmet bölgelerini seç. İş al.</h2>
+          <span className="home-small-label">{tr("ŞİRKETİNİ SAHAYA ÇIKAR")}</span>
+          <h2>{tr("Filonu göster. Hizmet bölgelerini seç. İş al.")}</h2>
           <p>
-            Hafriyat şirketin, kamyonların ve makinelerin için tek bir şirket
-            vitrini oluştur.
-          </p>
+            {tr("Hafriyat şirketin, kamyonların ve makinelerin için tek bir şirket vitrini oluştur.")}</p>
         </div>
         <a className="btn" href="/firma-kaydi">
-          Şirket profili oluştur →
-        </a>
+          {tr("Şirket profili oluştur →")}</a>
       </section>
       <HomeSection
-        label="BÖLGENDEKİ ŞİRKETLER"
-        title="İşini bilen bir ekiple çalış."
+        label={tr("BÖLGENDEKİ ŞİRKETLER")}
+        title={tr("İşini bilen bir ekiple çalış.")}
         href={locationUrl("/sirketler", city)}
       >
         <FeedContent
@@ -604,7 +599,7 @@ export function HomeView() {
                   ))}
                 </div>
                 <span className="home-card-footer">
-                  Şirketi ve envanterini incele <span>↗</span>
+                  {tr("Şirketi ve envanterini incele ")}<span>↗</span>
                 </span>
               </a>
             ))}
@@ -613,43 +608,41 @@ export function HomeView() {
       </HomeSection>
       <section className="home-how">
         <div>
-          <span className="home-small-label">NASIL ÇALIŞIR?</span>
+          <span className="home-small-label">{tr("NASIL ÇALIŞIR?")}</span>
           <h2>
-            İhtiyacından anlaşmaya
-            <br />
-            üç adım.
-          </h2>
-          <p>İşin kapsamını ve bedelini karşılıklı netleştir.</p>
+            {tr("İhtiyacından anlaşmaya")}<br />
+            {tr("üç adım.")}</h2>
+          <p>{tr("İşin kapsamını ve bedelini karşılıklı netleştir.")}</p>
         </div>
         <ol>
           <li>
             <b>01</b>
             <div>
-              <h3>İhtiyacını paylaş</h3>
-              <p>Konumu, tarihleri ve neye ihtiyacın olduğunu belirt.</p>
+              <h3>{tr("İhtiyacını paylaş")}</h3>
+              <p>{tr("Konumu, tarihleri ve neye ihtiyacın olduğunu belirt.")}</p>
             </div>
           </li>
           <li>
             <b>02</b>
             <div>
-              <h3>Teklifleri karşılaştır</h3>
-              <p>Fiyatı, kapsamı ve şirket profilini birlikte değerlendir.</p>
+              <h3>{tr("Teklifleri karşılaştır")}</h3>
+              <p>{tr("Fiyatı, kapsamı ve şirket profilini birlikte değerlendir.")}</p>
             </div>
           </li>
           <li>
             <b>03</b>
             <div>
-              <h3>Ayrıntıları konuş</h3>
-              <p>Özel mesajlarla işi netleştir. Seçim ödeme oluşturmaz.</p>
+              <h3>{tr("Ayrıntıları konuş")}</h3>
+              <p>{tr("Özel mesajlarla işi netleştir. Seçim ödeme oluşturmaz.")}</p>
             </div>
           </li>
         </ol>
       </section>
       <div className="home-trust">
-        <span>Konuma göre keşfet</span>
-        <span>İki tarafa özel teklifler</span>
-        <span>Tek hesapla iş ve ilan yönetimi</span>
-        <a href="/guven">Güvenli işlem rehberi ↗</a>
+        <span>{tr("Konuma göre keşfet")}</span>
+        <span>{tr("İki tarafa özel teklifler")}</span>
+        <span>{tr("Tek hesapla iş ve ilan yönetimi")}</span>
+        <a href="/guven">{tr("Güvenli işlem rehberi ↗")}</a>
       </div>
     </div>
   );
@@ -665,15 +658,17 @@ function HomeSection({
   href: string;
   children: ReactNode;
 }) {
+  const { t: tr, language } = useLanguage();
+
   return (
     <section className="home-section">
       <div className="home-section-heading">
         <div>
-          <span className="home-small-label">{label}</span>
-          <h2>{title}</h2>
+          <span className="home-small-label">{tr(label)}</span>
+          <h2>{tr(title)}</h2>
         </div>
         <a href={href}>
-          Tümünü gör <span>↗</span>
+          {tr("Tümünü gör ")}<span>↗</span>
         </a>
       </div>
       {children}
@@ -697,11 +692,13 @@ function FeedContent({
   href: string;
   children: ReactNode;
 }) {
+  const { t: tr, language } = useLanguage();
+
   return loading ? (
     <div
       className="home-skeletons"
       role="status"
-      aria-label="İçerikler yükleniyor"
+      aria-label={tr("İçerikler yükleniyor")}
     >
       <span />
       <span />
@@ -711,29 +708,29 @@ function FeedContent({
   ) : unavailable ? (
     <div className="home-empty">
       <p>
-        Bu bölüm yüklenemedi. Yukarıdaki “Tekrar dene” düğmesiyle yeniden
-        deneyebilirsin.
-      </p>
+        {tr("Bu bölüm yüklenemedi. Yukarıdaki “Tekrar dene” düğmesiyle yeniden deneyebilirsin.")}</p>
     </div>
   ) : empty ? (
     <div className="home-empty">
-      <p>{message}</p>
-      <a href={href}>{action} →</a>
+      <p>{tr(message)}</p>
+      <a href={href}>{tr(action)} →</a>
     </div>
   ) : (
     <>{children}</>
   );
 }
 function HomePost({ p }: { p: MarketPost }) {
+  const { t: tr, language } = useLanguage();
+
   return (
     <a className="home-post-card" href={`/is-agi/ilan/${p.id}`}>
       <span className={`home-post-type ${p.kind === "job" ? "job" : ""}`}>
-        {POST_KINDS[p.kind]}
+        {tr(POST_KINDS[p.kind])}
       </span>
       <h3>{p.title}</h3>
       {p.kind === "rental_machine" && (
         <span className="home-rental-scope">
-          {rentalModeLabel(p.rental_mode)}
+          {tr(rentalModeLabel(p.rental_mode))}
         </span>
       )}
       <p className="home-card-location">
@@ -746,15 +743,15 @@ function HomePost({ p }: { p: MarketPost }) {
         {p.description.length > 110 ? "…" : ""}
       </p>
       <div className="home-post-meta">
-        <span>{p.category}</span>
+        <span>{tr(p.category)}</span>
         <span>
-          {p.start_date ? dateLabel(p.start_date) : "Tarih görüşülecek"}
-          {p.end_date ? ` – ${dateLabel(p.end_date)}` : ""}
+          {p.start_date ? dateLabel(p.start_date, language) : tr("Tarih görüşülecek")}
+          {p.end_date ? ` – ${dateLabel(p.end_date, language)}` : ""}
         </span>
       </div>
-      <strong>{money(p.price, p.price_unit)}</strong>
+      <strong>{money(p.price, p.price_unit, language)}</strong>
       <span className="home-card-footer">
-        {p.kind === "job" ? "İşi incele ve teklif ver" : "Kiralama ayrıntıları"}{" "}
+        {p.kind === "job" ? tr("İşi incele ve teklif ver") : tr("Kiralama ayrıntıları")}{" "}
         <span>↗</span>
       </span>
     </a>

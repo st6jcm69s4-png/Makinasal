@@ -1,3 +1,4 @@
+import { Text } from "@/components/LanguageProvider";
 export const metadata = { title: 'Yol haritası | Makinasal' };
 
 const MVP: [string, string?][] = [
@@ -20,19 +21,19 @@ const PHASE2: [string, string?][] = [
 export default function PlanPage() {
   return (
     <>
-      <h1>Yol haritası</h1>
-      <p className="lead">Ürün kararları. Bütçe: aylık 5.000 ₺, günde 1 ila 2 saat çalışma.</p>
+      <h1><Text value={"Yol haritası"} /></h1>
+      <p className="lead"><Text value={"Ürün kararları. Bütçe: aylık 5.000 ₺, günde 1 ila 2 saat çalışma."} /></p>
       <div className="two" style={{ marginTop: 18 }}>
-        <div className="panel"><h3>MVP (ilk sürüm)</h3>
+        <div className="panel"><h3><Text value={"MVP (ilk sürüm)"} /></h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 12 }}>
             {MVP.map(([t, s], i) => <div key={t} className="step"><span className="badge-n">{i + 1}</span><div><b>{t}</b>{s ? <><br /><span className="sub">{s}</span></> : null}</div></div>)}
           </div>
         </div>
-        <div className="panel"><h3>Faz 2</h3>
+        <div className="panel"><h3><Text value={"Faz 2"} /></h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginTop: 12 }}>
             {PHASE2.map(([t, s], i) => <div key={t} className="step"><span className="badge-n">{'ABCDE'[i]}</span><div><b>{t}</b>{s ? <><br /><span className="sub">{s}</span></> : null}</div></div>)}
           </div>
-          <div className="note" style={{ marginTop: 16 }}>Emanet için parayı kendi hesabında tutma. Lisanslı bir ödeme firmasıyla çalışmak gerekir.</div>
+          <div className="note" style={{ marginTop: 16 }}><Text value={"Emanet için parayı kendi hesabında tutma. Lisanslı bir ödeme firmasıyla çalışmak gerekir."} /></div>
         </div>
       </div>
     </>

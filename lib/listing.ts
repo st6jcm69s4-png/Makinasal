@@ -1,3 +1,4 @@
+import type { Language } from './i18n/index';
 import { KM_CATEGORIES } from './data/constants';
 import type { Listing } from './data/types';
 import { isPartCategory } from './pricing';
@@ -23,9 +24,9 @@ export function usageUnit(l: Listing): 'sa' | 'km' | '' {
 }
 
 /** Çalışma saati / km etiketi; parça ve lastikte boş döner. */
-export function usageLabel(l: Listing): string {
+export function usageLabel(l: Listing, language: Language = 'tr'): string {
   if (isPartCategory(l.cat) || l.use == null) return '';
-  return `${formatNum(l.use)} ${usageUnit(l)}`;
+  return `${formatNum(l.use, language)} ${language === "en" && usageUnit(l) === "sa" ? "h" : usageUnit(l)}`;
 }
 
 export const getListing = (all: Listing[], id: number | string) => all.find((l) => String(l.id) === String(id)) ?? null;
