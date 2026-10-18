@@ -62,7 +62,7 @@ export function SiteHeader() {
   }, []);
   useEffect(close, [path]);
 
-  return <header className="top app-header"><div className="wrap">
+  return <header className={"top app-header"+(profile?"":" guest-header")}><div className="wrap">
     <details className="site-menu" ref={menu}>
       <summary className="menu-toggle" aria-label={tr("Menüyü aç veya kapat")} aria-controls="site-drawer">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18" /></svg><span>{tr("Menü")}</span>
@@ -93,7 +93,7 @@ export function SiteHeader() {
     <div className="header-actions">
       <a className="header-home" href="/" onClick={close}>{tr('Ana sayfa')}</a>
       <a className="header-account" href="/ilan-ver" onClick={close}>{tr('İlan ver')}</a>
-      <a className="header-account" href="/profil" onClick={close}>{tr('Hesabım')}</a>
+      <a className="header-account header-auth" href={profile?"/profil":"/giris"} onClick={close}>{tr(profile?"Hesabım":"Giriş yap / Kayıt ol")}</a>
     </div>
   </div></header>;
 }
