@@ -1,4 +1,5 @@
 'use client';
+import {useAdminAccess} from './useAdminAccess';
 import { useLanguage } from "@/components/LanguageProvider";
 
 import { useCallback, useEffect, useState } from 'react';
@@ -10,14 +11,9 @@ export function ModerationView() {
   const { t: tr, language } = useLanguage();
 
  const { profile, authReady, reload } = useMarket();
- const [admin,setAdmin] = useState(false); const [checked,setChecked] = useState(false);
+ const {admin,checked}=useAdminAccess(profile?.id);
  const [listings,setListings] = useState<PendingListing[]>([]); const [reports,setReports] = useState<Report[]>([]);
  const [error,setError] = useState(''); const [busy,setBusy] = useState(false);
- useEffect(() => { setChecked(false); const client=getSupabase(); let live=true;
-  if (!client || !profile) { setAdmin(false); setChecked(true); return; }
-  void client.auth.getUser().then(({data})=>{ if(live){setAdmin(data.user?.app_metadata?.role==='admin');setChecked(true);} }).catch(()=>{if(live)setChecked(true);});
-  return ()=>{live=false;};
- },[profile?.id]);
  const load = useCallback(async()=>{
   const client=getSupabase(); if(!client||!admin)return;
   const [l,r]=await Promise.all([

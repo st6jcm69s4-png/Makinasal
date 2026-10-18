@@ -37,7 +37,7 @@ Uygulama kontrolleri: npm test, Next typecheck/production build ve hosted Vinext
 
 ## Yönetici ve sağlayıcı hazırlığı — açık kalan gerçek bağımlılıklar
 
-Canlıda 2 hesap ve **0 atanmış yönetici** var. Yanlış kişiye yetki vermemek için yönetici yapılacak **mevcut Makinasal hesabının kayıtlı e-posta adresi** kullanıcıdan alınmalıdır. Hiçbir hesabın adına bakılarak admin verilmedi. `/yonetim` rolü yalnızca sunucudan app_metadata ile atanır; rol atandıktan sonra yeni oturum gerekir.
+Kullanıcının belirttiği mevcut hesap doğrulanarak sunucuda app_metadata üzerinden yönetici yapıldı. Kayıtlı e-posta veya kullanıcı UUID'si depoya yazılmaz. Menüde ve Ayarlar'da yalnızca yönetici için Yönetim bağlantısı bulunur. Yeni rol sunucudan doğrulanır; önbellekteki JWT rolü farklıysa oturum yenilenir. Menü görünürlüğü bir yetki kontrolünün yerine geçmez; işlemleri veritabanı RLS korur.
 
 Auth servisinden bu turda okunan durum: Google kapalı, Apple kapalı, telefon sağlayıcısı kapalı, e-posta etkin ancak otomatik onay açık. Bu nedenle istenen e-posta+SMS doğrulaması sağlanmıyor. Sites ortamında yalnızca Supabase URL/public key ve Site URL mevcut; ödeme, CAPTCHA, yasal kimlik ve Sentry ayarları yok.
 

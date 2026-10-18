@@ -1,4 +1,5 @@
 'use client';
+import {useAdminAccess} from './useAdminAccess';
 import { SearchAutocomplete } from './SearchAutocomplete';
 import { useLanguage } from "@/components/LanguageProvider";
 
@@ -8,12 +9,13 @@ import { usePathname } from 'next/navigation';
 import { getSupabase } from '@/lib/supabase/client';
 import { useMarket } from './MarketProvider';
 
-const NAV: { href: string; label: string; match: (p: string) => boolean; badge?: 'unread' | 'favs' }[] = [
+const NAV: { href: string; label: string; match: (p: string) => boolean; adminOnly?:boolean; badge?: 'unread' | 'favs' }[] = [
   { href: '/', label: 'Ana sayfa', match: p => p === '/' },
   { href: '/ilan-ver', label: 'İlan ver', match: p => p.startsWith('/ilan-ver') },
   { href: '/ilanlarim', label: 'İlanlarım', match: p => p.startsWith('/ilanlarim') },
   { href: '/mesajlar', label: 'Mesajlar', match: p => p.startsWith('/mesajlar'), badge: 'unread' },
   { href: '/bildirimler', label: 'Bildirimler', match: p => p === '/bildirimler' },
+  { href: '/yonetim', label: 'Yönetim', adminOnly:true, match:p=>p.startsWith('/yonetim') },
   { href: '/is-agi/hesabim', label: 'İşlerim ve tekliflerim', match: p => p === '/is-agi/hesabim' },
   { href: '/favoriler', label: 'Favoriler', match: p => p.startsWith('/favoriler'), badge: 'favs' },
   { href: '/ilanlar', label: 'İlanlarda ara', match: p => p.startsWith('/ilanlar') && !p.startsWith('/ilanlarim') || p.startsWith('/karsilastir') || p.startsWith('/magaza') },
@@ -36,6 +38,7 @@ export function SiteHeader() {
 
   const path = usePathname() ?? '/';
   const { profile, unread, favNews, toast } = useMarket();
+  const {admin}=useAdminAccess(profile?.id);
   const menu = useRef<HTMLDetailsElement>(null);
   const [query, setQuery] = useState('');
   const label = profile ? profile.full_name || profile.email || 'Hesabım' : '';
@@ -69,7 +72,7 @@ export function SiteHeader() {
       <aside id="site-drawer" className="site-drawer" aria-label={tr("Gezinme menüsü")}>
         <div className="drawer-heading"><div><b>{tr("Makinasal")}</b><p>{tr("İş makinesi pazarı")}</p></div><a className="drawer-close" href={path} aria-label={tr("Menüyü kapat")} onClick={e => { e.preventDefault(); close(); }}>×</a></div>
         <div className={'drawer-account'+(profile?' signed-in':'')}>{profile ? <><a className="drawer-profile-link" href="/profil" aria-label={tr("{0}, profilimi aç", {"0":label})}><b>{label}</b></a><a className="drawer-profile-sub" href="/profil" aria-current={path.startsWith('/profil') ? 'page' : undefined}>{tr("Profil")}</a></> : <><b>{tr("Makinasal’a hoş geldin")}</b><a className="btn sm" href="/giris">{tr("Giriş yap / Kayıt ol")}</a></>}</div>
-        <nav aria-label={tr("Ana menü")}>{NAV.map(n => {
+        <nav aria-label={tr("Ana menü")}>{NAV.filter(n=>!n.adminOnly||admin).map(n => {
           const count = n.badge === 'unread' ? unread : n.badge === 'favs' ? favNews : 0;
           // Real document links continue to work if the SPA router is unavailable.
           return <a key={n.href} href={n.href} aria-current={n.match(path) ? 'page' : undefined}><span>{tr(n.label)}</span>{count > 0 ? <span className="nb" aria-label={tr("{0} yeni", {"0":count})}>{count}</span> : null}</a>;

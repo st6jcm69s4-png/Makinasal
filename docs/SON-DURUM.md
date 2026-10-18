@@ -27,4 +27,4 @@ Bordo menü, profil bağlantıları, kiralık makine/personel merkezi, makineye 
 
 Moderasyon/RLS, itibar özetleri, kalıcı bildirimler ve doğrudan veritabanı istek sınırları kullanıcının onayıyla canlıya uygulandı. Onaysız ilanlar telefon ve genel aramadan da gizlenir. Sahip kendi taslağını görebilir; ilan formu/profil gerçek inceleme durumunu gösterir. Bildirim geçmişi sayfalanır ve hesap değişiminde sıfırlanır.
 
-Altı SQL test paketi rollback ile geçti; geçici veri kalmadı. `user_stats` invoker ve anonim sayaç erişimi doğrulandı. Yönetici ataması için hesap e-postası, sağlayıcılar ve hukuk onayı bekleniyor; kayıt ve gerçek tahsilat kapalıdır. Tam durum ve kalan bağımlılıklar `docs/CANLIYA-HAZIRLIK-2026-10-18.md` içindedir.
+Altı SQL test paketi rollback ile geçti; geçici veri kalmadı. `user_stats` invoker ve anonim sayaç erişimi doğrulandı. Yönetici atandı ve Yönetim bağlantısı menü/Ayarlar’a eklendi; sağlayıcılar ve hukuk onayı bekleniyor; kayıt ve gerçek tahsilat kapalıdır. Tam durum ve kalan bağımlılıklar `docs/CANLIYA-HAZIRLIK-2026-10-18.md` içindedir.
