@@ -6,8 +6,11 @@ import './globals.css';
 import { MarketProvider } from '@/components/MarketProvider';
 import { AppServiceWorker } from '@/components/AppInstaller';
 import { SiteHeader } from '@/components/SiteHeader';
+import { SITE_URL } from '@/lib/site';
 
 export const metadata = {
+  metadataBase: new URL(SITE_URL),
+  openGraph: { siteName: 'Makinasal', locale: 'tr_TR', type: 'website' as const },
   title: 'Makinasal | Makine, İş ve Şirket Ağı',
   description: 'Satılık ve kiralık iş makineleri, kamyonlar, operatörler, iş ve parça talepleri. Bölgenizdeki hafriyat şirketlerini ve filolarını keşfedin.',
 };
@@ -20,6 +23,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
         <link rel="manifest" href="/manifest.webmanifest" />
         <link rel="apple-touch-icon" href="/icons/icon-192.png" />
         <meta name="theme-color" content="#25272D" />
+        {process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN ? <script defer data-domain={process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN} src="https://plausible.io/js/script.js" /> : null}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@600;700&family=Noto+Sans:wght@400;500;600&display=swap" />

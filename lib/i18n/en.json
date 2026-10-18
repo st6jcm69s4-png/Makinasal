@@ -1300,5 +1300,19 @@
   "Önerilen filtreler": "Suggested filters",
   "Arama önerileri": "Search suggestions",
   "{0} öneri": "{0} suggestions",
-  "Uygun filtre bulunamadı. Yazdığın kelimeyle aramak için Enter’a bas veya Ara’ya dokun.": "No matching filters. Press Enter or tap Search to search for your text."
+  "Uygun filtre bulunamadı. Yazdığın kelimeyle aramak için Enter’a bas veya Ara’ya dokun.": "No matching filters. Press Enter or tap Search to search for your text.",
+  "KVKK": "Privacy (KVKK)",
+  "Kullanım sözleşmesi": "Terms of use",
+  "Çerezler": "Cookies",
+  "Mesafeli satış": "Distance sales",
+  "Daha fazla ilan yükle": "Load more listings",
+  "Sonuçlar yüklenemedi. Bağlantını kontrol edip tekrar dene.": "Results could not be loaded. Check your connection and try again.",
+  "Bildirimler": "Notifications",
+  "Bildirimlerini görmek için giriş yap.": "Sign in to see your notifications.",
+  "Bildirimler yüklenemedi. Bağlantını kontrol edip tekrar dene.": "Notifications could not be loaded. Check your connection and try again.",
+  "Hepsini okundu işaretle": "Mark all as read",
+  "Henüz bildirimin yok.": "You have no notifications yet.",
+  "Yeni": "New",
+  "Yeni mesajın var": "You have a new message",
+  "Favori ilanında fiyat düştü": "A favourite listing dropped in price"
 }

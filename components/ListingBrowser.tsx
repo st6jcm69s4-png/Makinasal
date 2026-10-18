@@ -4,7 +4,10 @@ import { useLanguage } from "@/components/LanguageProvider";
 
 
 import { useSearchParams } from "next/navigation";
-import { Suspense, useEffect, useMemo, useState, type FormEvent } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
+import { searchListings } from "@/lib/dbListings";
+import { getSupabase } from "@/lib/supabase/client";
+import type { Listing, Seller } from "@/lib/data/types";
 import { CITIES } from "@/lib/data/constants";
 import { formatTL } from "@/lib/format";
 import { isPartCategory } from "@/lib/pricing";
@@ -29,8 +32,43 @@ function Browser() {
   const { t: tr, language } = useLanguage();
 
   const params = useSearchParams();
-  const { listings, sellers, myCity, saveSearch, ready } = useMarket();
+  const { listings: localListings, sellers: localSellers, myCity, saveSearch, ready: localReady } = useMarket();
   const [f, setF] = useState<Filters>(() => filtersFromParams(params));
+  const demoMode = process.env.NEXT_PUBLIC_DEMO_MODE === "true";
+  // Sunucu taraflı sonuçlar: filtreler veritabanında uygulanır, sayfa sayfa yüklenir.
+  const [remote, setRemote] = useState<{ listings: Listing[]; sellers: Record<string, Seller>; hasMore: boolean } | null>(null);
+  const [remoteBusy, setRemoteBusy] = useState(false);
+  const [remoteError, setRemoteError] = useState(false);
+  const serverKey = JSON.stringify([f.cat, f.brand, f.city, f.maxPrice, f.yMin, f.yMax, f.takas, f.q]);
+  useEffect(() => {
+    const supabase = getSupabase();
+    if (!supabase || demoMode) return;
+    let cancelled = false;
+    setRemoteBusy(true); setRemoteError(false);
+    searchListings(supabase, f, 0)
+      .then((d) => { if (!cancelled) setRemote(d); })
+      .catch(() => { if (!cancelled) { setRemote(null); setRemoteError(true); } })
+      .finally(() => { if (!cancelled) setRemoteBusy(false); });
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [serverKey, demoMode]);
+  const loadMore = useCallback(async () => {
+    const supabase = getSupabase();
+    if (!supabase || !remote) return;
+    setRemoteBusy(true);
+    try {
+      const d = await searchListings(supabase, f, remote.listings.length);
+      setRemote((cur) => {
+        if (!cur) return d;
+        const seen = new Set(cur.listings.map((l) => String(l.id)));
+        return { listings: [...cur.listings, ...d.listings.filter((l) => !seen.has(String(l.id)))], sellers: { ...cur.sellers, ...d.sellers }, hasMore: d.hasMore };
+      });
+    } catch { setRemoteError(true); } finally { setRemoteBusy(false); }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [remote, serverKey]);
+  const listings = remote ? remote.listings : localListings;
+  const sellers = useMemo(() => remote ? { ...localSellers, ...remote.sellers } : localSellers, [remote, localSellers]);
+  const ready = remote ? true : localReady;
   const [sort, setSort] = useState<SortKey>(() =>
     SORTS.some(([k]) => k === params.get("sort"))
       ? (params.get("sort") as SortKey)
@@ -360,6 +398,14 @@ function Browser() {
                     {tr("Sonraki")}</button>
                 </nav>
               ) : null}
+              {remote?.hasMore && currentPage >= pages ? (
+                <div className="acts-row" style={{ marginTop: 20 }}>
+                  <button className="btn" type="button" disabled={remoteBusy} onClick={loadMore}>
+                    {remoteBusy ? tr("Yükleniyor…") : tr("Daha fazla ilan yükle")}
+                  </button>
+                </div>
+              ) : null}
+              {remoteError ? <p className="sub" role="alert">{tr("Sonuçlar yüklenemedi. Bağlantını kontrol edip tekrar dene.")}</p> : null}
             </>
           )}
         </div>
