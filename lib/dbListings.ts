@@ -170,3 +170,17 @@ export async function fetchSellerListings(supabase: SupabaseClient, sellerId: st
     supabase.from('listings').select(cols).eq('seller_id', sellerId).eq('status', 'active').order('created_at', { ascending: false }));
   return ((data ?? []) as unknown as Row[]).map((r) => rowToListing(r, photoUrlFn(supabase)));
 }
+
+/** Favoriler ana sayfanın 300 ilanlık havuzundan bağımsız yüklenir. RLS korunur. */
+export async function fetchListingsByIds(supabase: SupabaseClient | null, ids: string[]): Promise<DbData> {
+  if (!supabase) throw new Error('İlan bağlantısı kurulamadı.');
+  const unique = [...new Set(ids)].filter(id => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id));
+  const listings: Listing[] = [];
+  for (let i = 0; i < unique.length; i += 50) {
+    const result = await selectListings(supabase, cols => supabase.from('listings').select(cols).in('id', unique.slice(i, i + 50)));
+    if (result.error) throw new Error('Favori ilanlar yüklenemedi.');
+    listings.push(...((result.data ?? []) as Row[]).map(row => rowToListing(row, photoUrlFn(supabase))));
+  }
+  const sellers = await loadSellers(supabase, [...new Set(listings.map(l => l.sel))]);
+  return { listings, sellers };
+}

@@ -1,4 +1,5 @@
 'use client';
+import { readApiJson } from '@/lib/http';
 
 import { useEffect, useState, type FormEvent } from 'react';
 import { getSupabase } from '@/lib/supabase/client';
@@ -34,7 +35,7 @@ export function PasswordResetForm() {
     setBusy(true); setError('');
     try {
       const response = await fetch('/api/auth/password',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password})});
-      const result = await response.json(); if(!response.ok) setError(result.error || 'Şifre güncellenemedi.'); else setDone(true);
+      const result = await readApiJson(response); if(!response.ok) setError(result.error || 'Şifre güncellenemedi.'); else setDone(true);
     } catch { setError('Bağlantı kurulamadı. Tekrar dene.'); }
     finally { setBusy(false); }
   }

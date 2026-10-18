@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
-    "test": "node --experimental-strip-types --import ./scripts/ts-resolve.mjs scripts/check-logic.mjs && node scripts/check-pwa.mjs"
+    "test": "node --experimental-strip-types --import ./scripts/ts-resolve.mjs scripts/check-logic.mjs && node scripts/check-pwa.mjs && node --experimental-strip-types --import ./scripts/ts-resolve.mjs scripts/check-data.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "0.5.2",

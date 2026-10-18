@@ -1,14 +1,15 @@
 "use client";
+import { readApiJson } from "@/lib/http";
 import { useEffect, useState } from "react";
 import type { User } from "@supabase/supabase-js";
 import { getSupabase } from "@/lib/supabase/client";
-import { normalizePhone, type AuthOptions } from "@/lib/accountSecurity";
+import { normalizePhone, publicAuthOptions, type AuthOptions } from "@/lib/accountSecurity";
 import { authError, safeAuthNext } from "@/lib/auth";
 import { useMarket } from "./MarketProvider";
 export function AccountVerification() {
  const { reloadProfile } = useMarket();
  const [user,setUser]=useState<User|null>(null), [options,setOptions]=useState<AuthOptions|null>(null), [loading,setLoading]=useState(true), [phone,setPhone]=useState(""), [code,setCode]=useState(""), [sent,setSent]=useState(false), [busy,setBusy]=useState(false), [cooldown,setCooldown]=useState(0), [error,setError]=useState(""), [info,setInfo]=useState("");
- useEffect(()=>{let active=true;const db=getSupabase();void Promise.all([db?.auth.getUser(),fetch('/api/auth/options',{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error();return r.json();})]).then(([result,settings])=>{if(!active)return;const u=result?.data.user??null;setUser(u);if(u?.phone_confirmed_at) void db?.rpc('sync_contact_verification').then(({error})=>{if(!error)void reloadProfile();});setOptions(settings);setPhone(u?.phone||String(u?.user_metadata.contact_phone||""));}).catch(()=>{if(active)setError("Hesap bilgilerin yüklenemedi. Sayfayı yenileyerek tekrar dene.");}).finally(()=>{if(active)setLoading(false);});return()=>{active=false;};},[]);
+ useEffect(()=>{let active=true;const db=getSupabase();void Promise.all([db?.auth.getUser(),fetch('/api/auth/options',{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error();return r.json();})]).then(([result,settings])=>{if(!active)return;const u=result?.data.user??null;setUser(u);if(u?.phone_confirmed_at) void db?.rpc('sync_contact_verification').then(({error})=>{if(!error)void reloadProfile();});setOptions(publicAuthOptions(settings));setPhone(u?.phone||String(u?.user_metadata.contact_phone||""));}).catch(()=>{if(active)setError("Hesap bilgilerin yüklenemedi. Sayfayı yenileyerek tekrar dene.");}).finally(()=>{if(active)setLoading(false);});return()=>{active=false;};},[]);
  useEffect(()=>{if(!cooldown)return;const t=setTimeout(()=>setCooldown(v=>Math.max(0,v-1)),1000);return()=>clearTimeout(t);},[cooldown]);
  const confirmedPhone=!!user?.phone_confirmed_at && !!user.phone;
  async function send() {

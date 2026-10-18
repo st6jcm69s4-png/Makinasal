@@ -6,7 +6,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import { LISTINGS } from '@/lib/data/listings';
 import { SELLERS } from '@/lib/data/sellers';
 import type { Listing, Seller } from '@/lib/data/types';
-import { fetchActiveListings } from '@/lib/dbListings';
+import { fetchActiveListings, fetchListingsByIds } from '@/lib/dbListings';
 import { listingKey, cardTitle } from '@/lib/listing';
 import { defaultFilters, filterListings, type Filters } from '@/lib/market';
 import { buildPriceStats, type PriceStats } from '@/lib/pricing';
@@ -27,6 +27,11 @@ type Ctx = {
   authReady: boolean;
   myCity: string;
   favs: Record<string, number>;
+  favoriteListings: Listing[];
+  favoritesReady: boolean;
+  favoritesError: string;
+  retryFavorites: () => void;
+  removeFav: (key: string) => Promise<void>;
   toggleFav: (l: Listing) => Promise<void>;
   cmp: string[];
   toggleCmp: (l: Listing) => void;
@@ -70,6 +75,13 @@ export function MarketProvider({ children }: { children: ReactNode }) {
   const [authReady, setAuthReady] = useState(false);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [favs, setFavs] = useState<Record<string, number>>({});
+  const [favoriteData, setFavoriteData] = useState<{ listings: Listing[]; sellers: Record<string, Seller> }>({ listings: [], sellers: {} });
+  const [favoritesReady, setFavoritesReady] = useState(false);
+  const [favoritesError, setFavoritesError] = useState('');
+  const [userFavoritesError, setUserFavoritesError] = useState('');
+  const activeUserId = useRef<string | null>(null);
+  const [favoritesAttempt, setFavoritesAttempt] = useState(0);
+  const favoriteWrites = useRef(new Set<string>());
   const [cmp, setCmp] = useState<string[]>([]);
   const [saved, setSaved] = useState<SavedSearch[]>([]);
   const [unread, setUnread] = useState(0);
@@ -117,18 +129,21 @@ export function MarketProvider({ children }: { children: ReactNode }) {
     const supabase = getSupabase();
     const localFavs = lsGet<Record<string, number>>('mk-favs', {});
     if (!supabase || !uid) {
+      setUserFavoritesError('');
       setFavs(localFavs);
       setSaved(lsGet<SavedSearch[]>('mk-saved', []).map((s) => ({ ...s, local: true })));
       return;
     }
     let fr: QueryResult = await supabase.from('favorites').select('listing_id,price_at_save').eq('user_id', uid);
     if (fr.error) fr = await supabase.from('favorites').select('listing_id').eq('user_id', uid);
-    const out: Record<string, number> = { ...localFavs };
+    // Hesap favorileri ve misafir favorileri birbirine karışmaz. Demo kayıtları cihazda kalır.
+    const out: Record<string, number> = Object.fromEntries(Object.entries(localFavs).filter(([key]) => /^\d+$/.test(key)));
     for (const r of (fr.data ?? []) as unknown as { listing_id: string; price_at_save?: number | string | null }[]) {
       out[r.listing_id] = r.price_at_save != null ? Number(r.price_at_save) : 0;
     }
     if (version !== sessionVersion.current) return;
-    setFavs(out);
+    if (fr.error) setUserFavoritesError('Hesap favorileri yüklenemedi. Tekrar dene.');
+    else { setFavs(out); setUserFavoritesError(''); }
     let sr: QueryResult = await supabase.from('saved_searches').select('id,query,notify,last_seen_at,created_at').eq('user_id', uid);
     if (sr.error) sr = await supabase.from('saved_searches').select('id,query,created_at').eq('user_id', uid);
     if (version !== sessionVersion.current) return;
@@ -165,6 +180,11 @@ export function MarketProvider({ children }: { children: ReactNode }) {
     // Supabase API calls must run after the auth callback releases its lock.
     const schedule = (u: { id: string; email?: string | null } | null) => {
       const version = ++sessionVersion.current;
+      if (activeUserId.current !== (u?.id ?? null)) {
+        activeUserId.current = u?.id ?? null;
+        setAuthReady(false); setProfile(null); setFavs({}); setSaved([]); setUnread(0);
+        setFavoriteData({ listings: [], sellers: {} }); setUserFavoritesError('');
+      }
       clearTimeout(pending);
       pending = setTimeout(() => {
         if (!disposed) void apply(u, version).catch(() => {
@@ -184,33 +204,57 @@ export function MarketProvider({ children }: { children: ReactNode }) {
     return () => clearInterval(id);
   }, [profile, refreshUnread]);
 
-  const sellers = useMemo(() => ({ ...DEMO_SELLERS, ...db.sellers }), [db.sellers]);
+  const favoriteIds = Object.keys(favs).sort().join(',');
+  useEffect(() => {
+    if (!authReady) return;
+    let live = true;
+    setFavoritesReady(false); setFavoritesError('');
+    const ids = favoriteIds ? favoriteIds.split(',') : [];
+    const realIds = ids.filter(id => !/^\d+$/.test(id));
+    if (!realIds.length) { setFavoriteData({ listings: [], sellers: {} }); setFavoritesReady(true); return; }
+    void fetchListingsByIds(getSupabase(), realIds).then(data => {
+      if (live) { setFavoriteData(data); setFavoritesReady(true); }
+    }).catch(() => {
+      if (live) { setFavoritesError('Favori ilanlar yüklenemedi. Bağlantını kontrol edip tekrar dene.'); setFavoritesReady(true); }
+    });
+    return () => { live = false; };
+  }, [authReady, favoriteIds, profile?.id, favoritesAttempt]);
+  const sellers = useMemo(() => ({ ...DEMO_SELLERS, ...favoriteData.sellers, ...db.sellers }), [db.sellers, favoriteData.sellers]);
   const listings = useMemo(() => [...db.listings, ...(SHOW_DEMO ? DEMO : [])], [db.listings]);
   const stats = useMemo(() => buildPriceStats(listings), [listings]);
   const myCity = profile?.city || 'İstanbul';
-  const find = useCallback((id: string | number) => listings.find((l) => String(l.id) === String(id)) ?? null, [listings]);
+  const favoriteListings = useMemo(() => [...favoriteData.listings, ...(SHOW_DEMO ? DEMO : [])].filter(l => String(l.id) in favs), [favoriteData.listings, favs]);
+  const find = useCallback((id: string | number) => listings.find(l => String(l.id) === String(id)) ?? favoriteListings.find(l => String(l.id) === String(id)) ?? null, [listings, favoriteListings]);
 
-  const toggleFav = useCallback(async (l: Listing) => {
-    const key = listingKey(l);
-    const had = key in favs;
-    const next = { ...favs };
-    if (had) delete next[key]; else next[key] = l.price;
-    setFavs(next);
-    const isDemo = typeof l.id === 'number';
-    if (isDemo || !profile) {
-      const local = lsGet<Record<string, number>>('mk-favs', {});
-      if (had) delete local[key]; else local[key] = l.price;
-      lsSet('mk-favs', local);
-      if (!isDemo && !profile) toast('Favoriler bu cihazda saklanıyor. Hesabına kaydetmek için giriş yap.');
-      return;
-    }
-    const supabase = getSupabase();
-    if (!supabase) return;
-    const res = had
-      ? await supabase.from('favorites').delete().eq('user_id', profile.id).eq('listing_id', key)
-      : await supabase.from('favorites').insert({ user_id: profile.id, listing_id: key });
-    if (res.error) { setFavs(favs); toast('Favori kaydedilemedi: ' + res.error.message); }
+  const changeFavorite = useCallback(async (key: string, price: number, on: boolean) => {
+    if (favoriteWrites.current.has(key)) return;
+    favoriteWrites.current.add(key);
+    const version = sessionVersion.current;
+    const previous = favs[key];
+    setFavs(current => { const next = { ...current }; if (on) next[key] = price; else delete next[key]; return next; });
+    try {
+      if (/^\d+$/.test(key) || !profile) {
+        const local = lsGet<Record<string, number>>('mk-favs', {});
+        if (on) local[key] = price; else delete local[key];
+        lsSet('mk-favs', local);
+        if (!profile) toast('Favoriler bu cihazda saklanıyor. Hesap favorilerini görmek için giriş yap.');
+        return;
+      }
+      const supabase = getSupabase();
+      if (!supabase) throw new Error('Bağlantı yok');
+      const res = on
+        ? await supabase.from('favorites').insert({ user_id: profile.id, listing_id: key, price_at_save: price })
+        : await supabase.from('favorites').delete().eq('user_id', profile.id).eq('listing_id', key);
+      if (res.error) throw res.error;
+    } catch {
+      if (version === sessionVersion.current) {
+        setFavs(current => { const next = { ...current }; if (previous === undefined) delete next[key]; else next[key] = previous; return next; });
+        toast('Favori değişikliği kaydedilemedi. Tekrar dene.');
+      }
+    } finally { favoriteWrites.current.delete(key); }
   }, [favs, profile, toast]);
+  const toggleFav = useCallback((l: Listing) => changeFavorite(listingKey(l), l.price, !(listingKey(l) in favs)), [changeFavorite, favs]);
+  const removeFav = useCallback((key: string) => changeFavorite(key, favs[key] ?? 0, false), [changeFavorite, favs]);
 
   const persistCmp = (v: string[]) => { try { sessionStorage.setItem('mk-cmp', JSON.stringify(v)); } catch { /* yok say */ } };
   const toggleCmp = useCallback((l: Listing) => {
@@ -282,15 +326,19 @@ export function MarketProvider({ children }: { children: ReactNode }) {
   const favNews = useMemo(() => {
     let n = 0;
     for (const [k, was] of Object.entries(favs)) {
-      const l = listings.find((x) => String(x.id) === k);
+      const l = favoriteListings.find((x) => String(x.id) === k);
       if (l && was > 0 && l.price < was) n++;
     }
     for (const s of saved) if (s.notify && newCount(s) > 0) n++;
     return n;
-  }, [favs, listings, saved, newCount]);
+  }, [favs, favoriteListings, saved, newCount]);
 
   const value: Ctx = {
     ready, listings, sellers, stats, profile, authReady, myCity, favs, toggleFav, cmp, toggleCmp, removeCmp, clearCmp,
+    favoriteListings, favoritesReady, favoritesError: userFavoritesError || favoritesError, retryFavorites: () => {
+      if (profile) void loadUserData(profile.id).then(() => setFavoritesAttempt(n => n + 1));
+      else setFavoritesAttempt(n => n + 1);
+    }, removeFav,
     saved, saveSearch, deleteSaved, setNotify, markSeen, newCount, unread, refreshUnread, favNews, toast, reload,
     reloadProfile: () => loadProfile(profile?.id ?? null, profile?.email ?? ''), find,
   };

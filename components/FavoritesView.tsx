@@ -8,8 +8,8 @@ import { useMarket } from './MarketProvider';
 import { Pill } from './ui';
 
 export function FavoritesView() {
-  const { listings, sellers, favs, saved, newCount, setNotify, deleteSaved, markSeen, myCity, profile, authReady } = useMarket();
-  const favListings = Object.keys(favs).map((k) => listings.find((l) => String(l.id) === k)).filter((l): l is NonNullable<typeof l> => !!l);
+  const { listings, sellers, favs, saved, newCount, setNotify, deleteSaved, markSeen, myCity, profile, authReady, favoriteListings: favListings, favoritesReady, favoritesError, retryFavorites, removeFav } = useMarket();
+  const unavailable = favoritesReady && !favoritesError ? Object.keys(favs).filter(key => !favListings.some(l => String(l.id) === key)) : [];
 
   async function run(id: string) {
     const s = saved.find((x) => x.id === id);
@@ -45,17 +45,19 @@ export function FavoritesView() {
         </div>
         <div>
           <h2 style={{ marginBottom: 12 }}>Favori ilanlar</h2>
-          {favListings.length === 0 ? <div className="empty">Henüz favorin yok. Bir ilandaki kalp düğmesine bas.</div> : (
+          {!authReady || !favoritesReady ? <div className="empty" role="status">Favori ilanlar yükleniyor…</div> : favoritesError ? <div className="panel" role="alert">{favoritesError} <button className="btn ghost" onClick={retryFavorites}>Tekrar dene</button></div> : favListings.length === 0 && unavailable.length === 0 ? <div className="empty">Henüz favorin yok. Bir ilandaki kalp düğmesine bas.</div> : (
             <div className="grid">
               {favListings.map((l) => {
                 const was = favs[String(l.id)];
                 return (
                   <div key={String(l.id)}>
                     <ListingCard l={l} />
+                    {l.status && l.status !== 'active' ? <p className="note">{l.status === 'sold' ? 'Bu ilan satıldı.' : 'Bu ilan şu anda yayında değil.'}</p> : null}
                     {was > 0 && l.price < was ? <div className="note good" style={{ marginTop: 6 }}>Favoriye eklediğinden beri <b>{formatTL(was - l.price)}</b> düştü.</div> : null}
                   </div>
                 );
               })}
+              {unavailable.map(key => <div className="panel" key={key}><h3>İlan artık görüntülenemiyor</h3><p className="sub">İlan kaldırılmış veya erişime kapatılmış olabilir.</p><button className="btn ghost sm" onClick={() => void removeFav(key)}>Favorilerden çıkar</button></div>)}
             </div>
           )}
         </div>

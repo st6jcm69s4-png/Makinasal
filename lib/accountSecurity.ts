@@ -17,3 +17,11 @@ export function parseAuthOptions(settings: { external?: Record<string, boolean>;
  const emailConfirmation = settings.external?.email === true && settings.mailer_autoconfirm === false;
  return { google: settings.external?.google === true, apple: settings.external?.apple === true, phone, emailConfirmation, registration: !settings.disable_signup && phone && emailConfirmation };
 }
+
+export function publicAuthOptions(value: unknown): AuthOptions {
+ if (!value || typeof value !== 'object') throw new Error('Giriş seçenekleri okunamadı.');
+ const v = value as Record<string, unknown>;
+ const keys = ['google','apple','phone','emailConfirmation','registration'] as const;
+ if (keys.some(key => typeof v[key] !== 'boolean')) throw new Error('Giriş seçenekleri okunamadı.');
+ return Object.fromEntries(keys.map(key => [key, v[key]])) as AuthOptions;
+}

@@ -1,4 +1,5 @@
 'use client';
+import { readApiJson } from '@/lib/http';
 
 import { useEffect, useState, type FormEvent } from 'react';
 import { getSupabase } from '@/lib/supabase/client';
@@ -6,7 +7,7 @@ import { authError, safeAuthNext } from '@/lib/auth';
 import { capitalizeName, formatPersonName, validRegion } from '@/lib/profile';
 import { RegionFields } from './RegionFields';
 import { PasswordRules } from './PasswordRules';
-import { passwordValid, normalizePhone, type AuthOptions } from '@/lib/accountSecurity';
+import { passwordValid, normalizePhone, publicAuthOptions, type AuthOptions } from '@/lib/accountSecurity';
 
 type Mode = 'login' | 'register' | 'reset';
 export function AuthForm() {
@@ -28,7 +29,7 @@ export function AuthForm() {
   const supabase = getSupabase();
   useEffect(() => {
     let active = true;
-    void fetch('/api/auth/options', { cache: 'no-store' }).then(r => { if (!r.ok) throw new Error(); return r.json(); }).then(data => { if (active) setOptions(data); }).catch(() => { if (active) setOptions({google:false,apple:false,phone:false,emailConfirmation:false,registration:false}); });
+    void fetch('/api/auth/options', { cache: 'no-store' }).then(r => { if (!r.ok) throw new Error(); return r.json(); }).then(data => { if (active) setOptions(publicAuthOptions(data)); }).catch(() => { if (active) setOptions({google:false,apple:false,phone:false,emailConfirmation:false,registration:false}); });
     return () => { active = false; };
   }, []);
   useEffect(() => { if (!cooldown) return; const timer = setTimeout(() => setCooldown(c => Math.max(0,c-1)),1000); return () => clearTimeout(timer); }, [cooldown]);
@@ -59,7 +60,7 @@ export function AuthForm() {
         if (password !== confirmation) { setError('Şifreler eşleşmiyor.'); return; }
         if (!normalizePhone(phone)) { setError('Geçerli bir Türkiye cep telefonu numarası gir.'); return; }
         const response = await fetch('/api/auth/register', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ name:formatPersonName(name),email:cleanEmail,password,phone,city:region.city,district:region.district,next }) });
-        const result = await response.json();
+        const result = await readApiJson(response);
         if (!response.ok) setError(result.error || 'Kayıt tamamlanamadı.');
         else { setConfirmationPending(true); setPassword(''); setConfirmation(''); setCooldown(60); setInfo('Kayıt isteğin alındı. E-postandaki onay bağlantısını aç; ardından telefonuna gelen SMS koduyla doğrulamayı tamamla.'); }
       } else {
