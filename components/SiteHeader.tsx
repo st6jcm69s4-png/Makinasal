@@ -1,4 +1,5 @@
 'use client';
+import { SearchAutocomplete } from './SearchAutocomplete';
 import { LanguageSwitcher, useLanguage } from "@/components/LanguageProvider";
 
 
@@ -83,7 +84,7 @@ export function SiteHeader() {
     <a href="/" className="logo" aria-label={tr("Makinasal ana sayfa")}><svg className="gear" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><circle cx="12" cy="12" r="4" /><path d="M12 2v3m0 14v3M2 12h3m14 0h3M5 5l2 2m10 10 2 2M5 19l2-2M17 7l2-2" /></svg><span>{tr("Makinasal")}<small>{tr("İş makinesi pazarı")}</small></span></a>
     <form className="header-search" action="/ilanlar" method="get" role="search" onSubmit={close}>
       <label className="sr" htmlFor="global-search">{tr('Tüm sayfalarda ilan ara')}</label>
-      <input id="global-search" name="q" type="search" maxLength={200} placeholder={tr('Makine, marka veya parça ara…')} value={query} onChange={event=>setQuery(event.target.value)} />
+      <SearchAutocomplete id="global-search" name="q" type="search" maxLength={200} placeholder={tr('Makine, marka veya parça ara…')} value={query} onValueChange={setQuery} onNavigate={close} />
       <button type="submit" aria-label={tr('Ara')}>{tr('Ara')}</button>
     </form>
     <div className="header-actions">

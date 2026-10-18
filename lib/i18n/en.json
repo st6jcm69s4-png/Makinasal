@@ -1294,5 +1294,11 @@
   "Kasa ve damper hidroliği sorunsuz": "Body and tipping hydraulics work properly",
   "Kayar kasa, vinç hidroliği ve bağlama ekipmanları sorunsuz": "Sliding bed, crane hydraulics and securing equipment work properly",
   "Tüm sayfalarda ilan ara": "Search listings from any page",
-  "Makine, marka veya parça ara…": "Search machine, brand or part…"
+  "Makine, marka veya parça ara…": "Search machine, brand or part…",
+  "İş makinesi": "Construction machinery",
+  "Bölüm": "Section",
+  "Önerilen filtreler": "Suggested filters",
+  "Arama önerileri": "Search suggestions",
+  "{0} öneri": "{0} suggestions",
+  "Uygun filtre bulunamadı. Yazdığın kelimeyle aramak için Enter’a bas veya Ara’ya dokun.": "No matching filters. Press Enter or tap Search to search for your text."
 }

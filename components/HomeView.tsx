@@ -1,4 +1,5 @@
 "use client";
+import { SearchAutocomplete } from "./SearchAutocomplete";
 import { useLanguage } from "@/components/LanguageProvider";
 
 
@@ -322,17 +323,21 @@ export function HomeView() {
               method="get"
               onSubmit={submit}
             >
-              <label className="home-search-query">
+              <div className="home-search-query">
                 <Icon type="search" />
                 <span className="sr">{tr(activeTab.label)} {tr(" ara")}</span>
-                <input
+                <SearchAutocomplete
+                  id="home-query"
+                  aria-label={tr(activeTab.label)}
+                  scope={tab === "rental" ? "rental" : tab === "jobs" ? "jobs" : tab === "parts" ? "parts" : tab === "firms" ? "firms" : "sale"}
+                  city={city}
                   name="q"
                   value={q}
-                  onChange={(e) => setQ(e.target.value)}
+                  onValueChange={setQ}
                   maxLength={200}
                   placeholder={tr(activeTab.placeholder)}
                 />
-              </label>
+              </div>
               <label className="home-search-city">
                 <Icon type="pin" />
                 <span className="sr">{tr("Arama ve ana sayfa için il seç")}</span>

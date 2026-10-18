@@ -297,3 +297,23 @@ a.btn{display:inline-block;text-align:center;text-decoration:none}
 @media(max-width:380px){.app-header .logo{font-size:15px}.header-actions>a{padding:8px 5px;font-size:11px}.app-header>.wrap{padding-inline:10px;gap:5px}}
 
 .drawer-account.signed-in{padding:0;border:0;background:transparent;gap:2px}.drawer-account.signed-in .drawer-profile-link{padding:12px 14px;font-size:18px}
+/* Search suggestions sit above page content and never intercept clicks when closed. */
+.search-autocomplete{position:relative;flex:1 1 auto;min-width:0;width:100%}
+.search-autocomplete>input{width:100%;min-width:0}
+.header-search{overflow:visible}.header-search>.search-autocomplete{align-self:stretch}
+.header-search input[type=search]{border-radius:8px 0 0 8px;height:100%}
+.header-search>button{border-radius:0 8px 8px 0}
+.searchbar>.search-autocomplete{flex:1 1 200px}
+.search-suggestions{position:absolute;top:calc(100% + 7px);left:0;width:100%;z-index:1100;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 36px #0003;overflow:hidden;text-align:left;min-width:0}
+.search-suggestions-title{font-size:11px;font-weight:650;color:var(--muted);padding:10px 13px;margin:0;border-bottom:1px solid var(--line)}
+.search-suggestions ul{list-style:none;padding:5px;margin:0;max-height:min(390px,55dvh);overflow-y:auto;overscroll-behavior:contain}
+.search-suggestions li{margin:0;padding:0}
+.search-suggestions a{display:flex;flex-direction:column;gap:3px;padding:10px 11px;min-height:52px;border-radius:6px;color:var(--ink);font-size:14px;line-height:1.45;touch-action:manipulation;text-decoration:none}
+.search-suggestions a:hover,.search-suggestions a[aria-selected=true]{background:var(--neutral-bg)}
+.search-suggestions .suggestion-label{font-weight:550;overflow-wrap:anywhere}
+.search-suggestions .suggestion-path{display:flex;align-items:center;justify-content:space-between;gap:8px;color:var(--muted);font-size:11px}
+.search-suggestions mark{color:#800020;background:transparent;font-weight:800;padding:0}
+.search-no-suggestions{padding:13px;margin:0;font-size:12px;color:var(--muted);line-height:1.6}
+.home-market .home-search-box,.home-hero{overflow:visible}.home-search-tabs{border-radius:12px 12px 0 0}.home-hero:after{right:0;top:0;width:230px;height:230px;clip-path:inset(0 round 0 20px 0 0)}
+@media(prefers-color-scheme:dark){.search-suggestions mark{background:#F4EDEE;border-radius:2px}}
+@media(max-width:600px){.search-suggestions ul{max-height:45dvh}.search-suggestions a{padding:11px 9px}.search-suggestions{top:calc(100% + 4px)}}

@@ -164,6 +164,7 @@ export const CATEGORY_GROUPS = [
   },
 ] as const;
 export function categoryValues(selection: string): string[] {
+  if (selection === "group:machines") return [...MACHINE_CATEGORIES];
   if (selection.startsWith("group:"))
     return [
       ...(CATEGORY_GROUPS.find((g) => "group:" + g.id === selection)
@@ -176,6 +177,7 @@ export function categoryValues(selection: string): string[] {
     : [];
 }
 export function categoryLabel(selection: string) {
+  if (selection === "group:machines") return "İş makinesi";
   return (
     CATEGORY_GROUPS.find((g) => "group:" + g.id === selection)?.label ??
     selection

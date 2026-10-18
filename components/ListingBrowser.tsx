@@ -1,4 +1,5 @@
 "use client";
+import { SearchAutocomplete } from "./SearchAutocomplete";
 import { useLanguage } from "@/components/LanguageProvider";
 
 
@@ -93,11 +94,13 @@ function Browser() {
       <form className="searchbar" role="search" onSubmit={submit}>
         <label className="sr" htmlFor="q">
           {tr("Marka veya model ara")}</label>
-        <input
-          type="text"
+        <SearchAutocomplete
+          type="search"
+          scope="sale"
+          city={f.city}
           id="q"
           value={q}
-          onChange={(e) => setQ(e.target.value)}
+          onValueChange={setQ}
           placeholder={tr("Marka veya model ara. Örn. Hidromek, Scania")}
         />
         <button
