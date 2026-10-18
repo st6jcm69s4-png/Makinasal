@@ -1,4 +1,5 @@
 'use client';
+import {AuthCaptcha} from "./AuthCaptcha";
 import { useLanguage } from "@/components/LanguageProvider";
 
 import { readApiJson } from '@/lib/http';
@@ -15,6 +16,9 @@ type Mode = 'login' | 'register' | 'reset';
 export function AuthForm() {
   const { t: tr, language } = useLanguage();
 
+  const [captchaToken,setCaptchaToken]=useState('');
+  const [captchaAttempt,setCaptchaAttempt]=useState(0);
+  const [acceptedTerms,setAcceptedTerms]=useState(false);
   const [mode, setMode] = useState<Mode>('login');
   const [name, setName] = useState('');
   const [region, setRegion] = useState({ city: '', district: '' });
@@ -42,7 +46,7 @@ export function AuthForm() {
       setError("Onay bağlantısı geçersiz veya süresi dolmuş. Tekrar giriş yap ya da yeni bir şifre sıfırlama bağlantısı iste.");
     }
   }, []);
-  function switchMode(value: Mode) { setMode(value); setError(''); setInfo(''); setPassword(''); setConfirmation(''); setConfirmationPending(false); }
+  function switchMode(value: Mode) { setMode(value); setError(''); setInfo(''); setPassword(''); setConfirmation(''); setConfirmationPending(false);setCaptchaToken('');setCaptchaAttempt(n=>n+1); }
 
   async function submit(e: FormEvent) {
     e.preventDefault();
@@ -54,26 +58,27 @@ export function AuthForm() {
       const callback = new URL('/auth/callback', window.location.origin);
       callback.searchParams.set('next', mode === 'reset' ? '/sifre-yenile' : next);
       if (mode === 'reset') {
-        const { error } = await supabase.auth.resetPasswordForEmail(cleanEmail, { redirectTo: callback.toString() });
+        const { error } = await supabase.auth.resetPasswordForEmail(cleanEmail, { redirectTo: callback.toString(),captchaToken });
         if (error) setError(authError(error.message));
         else setInfo("Bu e-posta ile bir hesap varsa şifre sıfırlama bağlantısı gönderildi. Gelen kutunu ve spam klasörünü kontrol et. Bağlantıyı bu tarayıcıda aç.");
       } else if (mode === 'register') {
+        if(!acceptedTerms){setError("Kullanım koşullarını kabul etmelisin.");return;}
         if (name.trim().length < 2) { setError("Ad soyadını en az 2 karakter olarak gir."); return; }
         if (!validRegion(region.city, region.district)) { setError("Lütfen seçtiğin ile ait bir ilçe seç."); return; }
         if (!passwordValid(password)) { setError("Şifren aşağıdaki güvenlik koşullarının tamamını karşılamalı."); return; }
         if (password !== confirmation) { setError("Şifreler eşleşmiyor."); return; }
         if (!normalizePhone(phone)) { setError("Geçerli bir Türkiye cep telefonu numarası gir."); return; }
-        const response = await fetch('/api/auth/register', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ name:formatPersonName(name),email:cleanEmail,password,phone,city:region.city,district:region.district,next }) });
+        const response = await fetch('/api/auth/register', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ name:formatPersonName(name),email:cleanEmail,password,phone,city:region.city,district:region.district,next,captchaToken,acceptedTerms }) });
         const result = await readApiJson(response);
         if (!response.ok) setError(result.error || 'Kayıt tamamlanamadı.');
         else { setConfirmationPending(true); setPassword(''); setConfirmation(''); setCooldown(60); setInfo("Kayıt isteğin alındı. E-postandaki onay bağlantısını aç; ardından telefonuna gelen SMS koduyla doğrulamayı tamamla."); }
       } else {
-        const { error } = await supabase.auth.signInWithPassword({ email: cleanEmail, password });
+        const { error } = await supabase.auth.signInWithPassword({ email: cleanEmail, password,options:{captchaToken} });
         if (error) setError(authError(error.message));
         else { window.location.assign(next); }
       }
     } catch { setError("Bağlantı kurulamadı. Tekrar dene."); }
-    finally { setBusy(false); }
+    finally { setBusy(false);setCaptchaToken('');setCaptchaAttempt(n=>n+1); }
   }
 
   async function social(provider: 'google' | 'apple') {
@@ -114,9 +119,11 @@ export function AuthForm() {
       <p className="sub">{tr("İsteğe bağlıdır. Daha sonra Profil → Bilgilerim bölümünden değiştirebilirsin.")}</p>
       {skipRegion ? <><p className="sub">{tr("Bölge seçimi atlandı.")}</p><button type="button" className="btn ghost sm" onClick={() => setSkipRegion(false)}>{tr("Bölge seç")}</button></> : <><RegionFields {...region} onChange={setRegion} /><button type="button" className="btn ghost sm" onClick={() => { setRegion({ city: '', district: '' }); setSkipRegion(true); }}>{tr("Şimdilik atla")}</button></>}
     </section>}
+    {mode==='register'?<><label className="check"><input type="checkbox" checked={acceptedTerms} required onChange={e=>setAcceptedTerms(e.target.checked)}/><span><a href="/hukuki/kullanim" target="_blank" rel="noopener noreferrer">{tr('Kullanım koşulları')}</a> · {tr('Kullanım koşullarını kabul ediyorum.')}</span></label><p className="sub"><a href="/hukuki/kvkk" target="_blank" rel="noopener noreferrer">{tr('KVKK aydınlatma')}</a> · <a href="/hukuki/cerez" target="_blank" rel="noopener noreferrer">{tr('Çerez politikası')}</a></p></>:null}
+    <AuthCaptcha key={captchaAttempt} onToken={setCaptchaToken}/>
     {error ? <div className="alert low" role="alert">{tr(error)}</div> : null}
     {info ? <div className="alert high" role="status">{tr(info)}</div> : null}
-    <p><button className="btn" type="submit" disabled={busy || (mode === 'register' && (!options?.registration || confirmationPending))}>{busy ? tr("Bekleyin…") : mode === 'login' ? tr("Giriş yap") : mode === 'register' ? tr("Kayıt ol") : tr("Sıfırlama bağlantısı gönder")}</button></p>
+    <p><button className="btn" type="submit" disabled={busy || (!!process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY&&!captchaToken) || (mode === 'register' && (!options?.registration || confirmationPending))}>{busy ? tr("Bekleyin…") : mode === 'login' ? tr("Giriş yap") : mode === 'register' ? tr("Kayıt ol") : tr("Sıfırlama bağlantısı gönder")}</button></p>
     {mode === 'register' && confirmationPending && <p><button type="button" className="btn ghost" disabled={busy || cooldown > 0} onClick={() => void resendEmail()}>{tr("Onay e-postasını yeniden gönder")}{cooldown ? ` (${cooldown} sn)` : ''}</button></p>}
     {mode === 'login' ? <p><button type="button" className="btn ghost" disabled={busy} onClick={() => switchMode('reset')}>{tr("Şifremi unuttum")}</button></p> : null}
     <p className="meta" style={{ marginBottom: 0 }}>

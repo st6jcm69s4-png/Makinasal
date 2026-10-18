@@ -23,10 +23,10 @@ Bordo menü, profil bağlantıları, kiralık makine/personel merkezi, makineye 
 ## Doğrulama
 `npm test`, `npm run typecheck`, Next üretim derlemesi, Vinext tür kontrolü/üretim derlemesi ve `supabase/tests/message_history.sql` kullanılır. Veritabanı testleri geçici kayıtları transaction sonunda geri alır. Kapsam: 300 üzeri önizleme, katılımcı dışı erişim reddi, 50 mesajlık sayfalar, aynı timestamp imleci; birim testleri: 150 kayıt birleştirme, yinelenen mesaj, eski favori, ağ hatası ve bozuk API yanıtı.
 
-## 18 Ekim 2026 — eksik raporu sonrası eklenenler
-- SEO: `app/sitemap.ts`, `app/robots.ts`, ilan sayfasında JSON-LD (Product/Offer) ve canonical adres. Canlıda `NEXT_PUBLIC_SITE_URL` gerçek alan adı olmalı.
-- Hukuki sayfalar: `/hukuki/kvkk`, `/hukuki/kullanim-sozlesmesi`, `/hukuki/cerez-politikasi`, `/hukuki/mesafeli-satis-ve-ticaret` (`lib/legal.ts`). **Taslaktır; [KÖŞELİ] alanları doldurulup avukata onaylatılmalı.**
-- Arama: `searchListings` (`lib/dbListings.ts`) filtreleri veritabanında uygular; ilan listesi 60'lık sayfalarla "Daha fazla ilan yükle" ile gelir. Güven/uzaklık/kullanım süzgeçleri yüklenen sayfa üzerinde tarayıcıda uygulanır.
-- Migrasyon `20261018200000_rate_limits_notifications.sql`: rate limit (mesaj 20/dk, ilan 10/saat, şikâyet 10/saat, görüntülenme sayacı), `notifications` tablosu (yeni mesaj, favori fiyat düşüşü), `run_maintenance()` (eski sayaç, okunmuş bildirim ve sahipsiz fotoğraf temizliği; pg_cron varsa her gece 03:00). Test: `supabase/tests/rate_limits_notifications.sql`. **Canlıya SQL Editor'den elle uygulanmalı.**
-- `/bildirimler` sayfası ve menü bağlantısı. E-posta/SMS/push gönderimi için sağlayıcı bağlanmadı (`notifications.emailed_at` hazır).
-- İsteğe bağlı çerezsiz analitik: `NEXT_PUBLIC_PLAUSIBLE_DOMAIN`.
+## 18 Ekim 2026 — son birleştirilmiş durum
+
+Sunucu taraflı arama, tüm filtre/sıralama/count ve 24 sonuçluk sayfalama; 325 ilanla rollback testi geçti. SEO özel-beta noindex kapısı ve parçalı haritalarla tamamlandı. Hukuki taslaklar, çerez tercihi, bildirim özetleri, CSV/XML taslak aktarımı, CAPTCHA ve gözlemlenebilirlik bağlantıları eklendi. Önceki hukuki URL'ler yönlendirilir; bildirim geçmişi ve Plausible hazırlığı korunur.
+
+**Veritabanında yalnızca arama migrasyonu uygulandı. Moderasyon/RLS ve kalıcı bildirim/rate-limit migrasyonları uygulanmadı.** Canlı moderasyon işlemi otomatik onay incelemesinde reddedildi. Sızdırılmış şifre koruması, gerçek sağlayıcılar ve hukuk onayı bekliyor. SMS/e-posta/push gönderimi, tahsilat, mobil uygulama, ortaklıklar ve otomatik fotoğraf silme etkin değildir.
+
+Ayrıntılar ve kurulum: `docs/CANLIYA-HAZIRLIK-2026-10-18.md`. `app/sitemap.ts` tek-parça alternatifi yerine `app/sitemap.xml/route.ts` kullanılır. `lib/legalDraftReference.ts` önceki taslağın arşividir; güncel kullanıcı sayfaları `app/hukuki/[slug]/page.tsx` içindedir.

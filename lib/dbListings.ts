@@ -1,8 +1,6 @@
 import type { QueryResult } from '@/lib/supabase/result';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Listing, Review, Seller } from './data/types';
-import { categoryValues } from './machineryCatalog';
-import { MAX_PRICE, type Filters } from './market';
 
 const BASE =
   'id,seller_id,kind,category,title,description,price,city,year,usage_value,usage_unit,spec,cond,compat,qty,status,created_at,listing_photos(path,position)';
@@ -187,47 +185,13 @@ export async function fetchListingsByIds(supabase: SupabaseClient | null, ids: s
   return { listings, sellers };
 }
 
-export const SEARCH_PAGE_SIZE = 60;
-
-/** PostgREST `or(...)` süzgecini bozabilecek karakterleri temizler. */
-const safeTerm = (v: string) => v.replace(/[%_,()*\\"'`;:]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 60);
-
-/**
- * Filtreleri veritabanında uygular ve sayfa sayfa getirir (offset/limit).
- * Güven, uzaklık, kullanım saati gibi satıcıya bağlı süzgeçler tarayıcıda ayrıca uygulanır.
- */
-export async function searchListings(
-  supabase: SupabaseClient | null,
-  f: Filters,
-  offset = 0,
-  limit = SEARCH_PAGE_SIZE,
-): Promise<DbData & { hasMore: boolean }> {
-  if (!supabase) return { listings: [], sellers: {}, hasMore: false };
-  const publicUrl = photoUrlFn(supabase);
-  const term = safeTerm(f.q);
-  const cats = f.cat && f.cat !== 'Tümü' ? categoryValues(f.cat) : [];
-  const run = (cols: string, withBrand: boolean) => {
-    let q = supabase.from('listings').select(cols).eq('status', 'active');
-    if (cats.length) q = q.in('category', cats);
-    if (f.city && f.city !== 'Tümü') q = q.eq('city', f.city);
-    if (f.maxPrice < MAX_PRICE) q = q.lte('price', f.maxPrice);
-    const yMin = Number(f.yMin), yMax = Number(f.yMax);
-    if (f.yMin !== '' && Number.isFinite(yMin)) q = q.gte('year', yMin);
-    if (f.yMax !== '' && Number.isFinite(yMax)) q = q.lte('year', yMax);
-    if (f.takas && withBrand) q = q.eq('takas', true);
-    const brand = safeTerm(f.brand ?? '');
-    if (brand && withBrand) q = q.ilike('brand', `%${brand}%`);
-    if (term) {
-      const cols2 = withBrand ? ['title', 'brand', 'model', 'spec', 'compat'] : ['title', 'spec', 'compat'];
-      q = q.or(cols2.map((c) => `${c}.ilike.%${term}%`).join(','));
-    }
-    return q.order('created_at', { ascending: false }).range(offset, offset + limit - 1);
-  };
-  let res = await run(`${BASE},${EXTRA}`, true);
-  if (res.error) res = await run(BASE, false);
-  if (res.error || !res.data) throw new Error('İlanlar yüklenemedi. Bağlantını kontrol edip tekrar dene.');
-  const rows = res.data as unknown as Row[];
-  const listings = rows.map((r) => rowToListing(r, publicUrl));
-  const sellers = await loadSellers(supabase, [...new Set(listings.map((l) => l.sel))]);
-  return { listings, sellers, hasMore: rows.length === limit };
+/** Database filters/count/order run before LIMIT, independent of the home feed. */
+export async function searchListings(supabase: SupabaseClient | null, request: Record<string,unknown>, countOnly=false): Promise<DbData & { total:number }> {
+ if(!supabase) throw new Error('İlan bağlantısı kurulamadı.');
+ const {data,error}=await supabase.rpc('search_listings',{p:request, count_only:countOnly});
+ if(error || !data) throw new Error('Arama yüklenemedi. Lütfen tekrar dene.');
+ const rows=(data.rows??[]) as Row[];
+ const listings=rows.map(r=>rowToListing(r,photoUrlFn(supabase)));
+ const sellers=await loadSellers(supabase,[...new Set(listings.map(l=>l.sel))]);
+ return {listings,sellers,total:Number(data.total)||0};
 }

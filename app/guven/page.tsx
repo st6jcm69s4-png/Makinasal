@@ -1,10 +1,11 @@
+import { pageMetadata } from '@/lib/seo';
 import { Text } from "@/components/LanguageProvider";
 import { SELLERS } from '@/lib/data/sellers';
 import { Pill, toneClass } from '@/components/ui';
 import { formatScore } from '@/lib/format';
 import { trustLevel } from '@/lib/trust';
 
-export const metadata = { title: 'Güven sistemi | Makinasal' };
+export const metadata = pageMetadata('/guven', 'Güven sistemi', 'Makinasal · Güven sistemi. İş makinesi ve kamyon pazarı.', false);
 
 const KEYS = ['A', 'D', 'B', 'E', 'C', 'H'];
 

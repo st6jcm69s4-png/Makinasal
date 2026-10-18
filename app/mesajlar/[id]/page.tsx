@@ -1,6 +1,8 @@
+import {pageMetadata} from '@/lib/seo';
+export const metadata=pageMetadata('/mesajlar/[id]','Mesajlar','Makinasal · Mesajlar.',true);
 import { MessagesView } from '@/components/MessagesView';
 
-export const metadata = { title: 'Konuşma | Makinasal' };
+
 
 export default async function ThreadPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;

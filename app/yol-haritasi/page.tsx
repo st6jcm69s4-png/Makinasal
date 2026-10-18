@@ -1,5 +1,6 @@
+import { pageMetadata } from '@/lib/seo';
 import { Text } from "@/components/LanguageProvider";
-export const metadata = { title: 'Yol haritası | Makinasal' };
+export const metadata = pageMetadata('/yol-haritasi', 'Yol haritası', 'Makinasal · Yol haritası. İş makinesi ve kamyon pazarı.', true);
 
 const MVP: [string, string?][] = [
   ['İlan, fotoğraf, arama ve filtreler', 'İş makineleri, beton, kamyon, tır çekicisi, kurtarıcı, forklift, yedek parça, lastik. 81 il.'],

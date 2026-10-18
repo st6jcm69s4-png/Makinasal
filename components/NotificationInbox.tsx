@@ -1,0 +1,12 @@
+"use client";
+import {useEffect,useState} from 'react';
+import {useLanguage} from './LanguageProvider';
+import {useMarket} from './MarketProvider';
+import {getSupabase} from '@/lib/supabase/client';
+type Note={id:string;title:string;body:string;url:string;read_at:string|null;created_at:string};
+export function NotificationInbox(){const {language,t}=useLanguage(),{profile}=useMarket();const [items,setItems]=useState<Note[]>([]),[state,setState]=useState('loading'),[attempt,setAttempt]=useState(0),[busy,setBusy]=useState(false);const uid=profile?.id;
+ useEffect(()=>{let live=true;setItems([]);setState('loading');const db=getSupabase();if(!uid||!db){setState('off');return;}
+ void db.from('notifications').select('id,title,body,url,read_at,created_at').eq('user_id',uid).order('created_at',{ascending:false}).order('id',{ascending:false}).limit(50).then(({data,error})=>{if(live){setItems((data??[]) as Note[]);setState(error?'unavailable':'ready');}});return()=>{live=false;};},[uid,attempt]);
+ async function mark(){const db=getSupabase();if(!uid||!db||busy)return;setBusy(true);try{const at=new Date().toISOString();const {error}=await db.from('notifications').update({read_at:at}).eq('user_id',uid).in('id',items.filter(n=>!n.read_at).map(n=>n.id));if(!error)setItems(cur=>cur.map(n=>({...n,read_at:n.read_at||at})));else setState('unavailable');}finally{setBusy(false);}}
+ if(!uid)return null;return <section className="panel" style={{marginTop:16}}><h2>{language==='en'?'Notification history':'Bildirim geçmişi'}</h2>{state==='unavailable'?<p>{language==='en'?'Persistent notification history is not available yet. You can use the summaries above.':'Kalıcı bildirim geçmişi henüz kullanılamıyor. Yukarıdaki özetleri kullanabilirsin.'}</p>:state==='loading'?<p>{t('Yükleniyor…')}</p>:!items.length?<p>{t('Henüz bildirimin yok.')}</p>:<><button className="btn ghost sm" disabled={busy||!items.some(n=>!n.read_at)} onClick={()=>void mark()}>{t('Hepsini okundu işaretle')}</button><ul style={{listStyle:'none',padding:0}}>{items.map(n=><li key={n.id} style={{padding:'12px 0',opacity:n.read_at ? 0.7 : 1}}><a href={/^\/(?:mesajlar|ilanlar)\/[0-9a-f-]{36}$/i.test(n.url)?n.url:'/bildirimler'}>{t(n.title)}</a><p>{n.body}</p><time dateTime={n.created_at}>{new Date(n.created_at).toLocaleString(language==='en'?'en-GB':'tr-TR')}</time></li>)}</ul><p className="sub">{language==='en'?'Latest 50 notifications':'Son 50 bildirim'}</p></>}<button className="btn ghost sm" onClick={()=>setAttempt(n=>n+1)}>{t('Yenile')}</button></section>;
+}

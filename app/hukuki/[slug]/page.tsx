@@ -1,34 +1,54 @@
-import { notFound } from 'next/navigation';
-import type { Metadata } from 'next';
-import { LEGAL, LEGAL_SLUGS, LEGAL_UPDATED, type LegalSlug } from '@/lib/legal';
-
-type Props = { params: Promise<{ slug: string }> };
-
-export function generateStaticParams() { return LEGAL_SLUGS.map((slug) => ({ slug })); }
-
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug } = await params;
-  const doc = LEGAL[slug as LegalSlug];
-  return doc ? { title: `${doc.title} | Makinasal` } : {};
-}
-
-export default async function LegalPage({ params }: Props) {
-  const { slug } = await params;
-  const doc = LEGAL[slug as LegalSlug];
-  if (!doc) notFound();
-  return (
-    <article className="card" style={{ padding: 20, maxWidth: 820 }}>
-      <h1>{doc.title}</h1>
-      <p className="sub">Son güncelleme: {LEGAL_UPDATED} · Taslak metindir; yayına almadan önce hukuki danışmanlıkla onaylanmalıdır.</p>
-      {doc.sections.map((s) => (
-        <section key={s.h}>
-          <h2>{s.h}</h2>
-          {s.p.map((t) => <p key={t}>{t}</p>)}
-        </section>
-      ))}
-      <nav className="acts-row" aria-label="Hukuki metinler">
-        {LEGAL_SLUGS.map((k) => <a key={k} href={`/hukuki/${k}`}>{LEGAL[k].title}</a>)}
-      </nav>
-    </article>
-  );
+import {redirect,notFound} from 'next/navigation';
+import {cookies} from 'next/headers';
+import {legalIdentity,legalReady} from '@/lib/legal';
+import {pageMetadata} from '@/lib/seo';
+import {CookiePreferences} from '@/components/CookiePreferences';
+const sections={kvkk:['KVKK aydınlatma','Privacy notice'],kullanim:['Kullanım koşulları','Terms of use'],cerez:['Çerez politikası','Cookie policy'],satis:['Satış ve ödeme bilgileri','Sales and payments']} as const;
+type Props={params:Promise<{slug:string}>};
+export async function generateMetadata({params}:Props){const {slug:section}=await params;const v=sections[section as keyof typeof sections];return pageMetadata('/hukuki/'+section,v?.[0]||'Hukuki bilgiler','Makinasal hukuki bilgiler ve tercihler.',!legalReady());}
+export default async function Page({params}:Props){const {slug:section}=await params;const aliases:Record<string,string>={'kullanim-sozlesmesi':'kullanim','cerez-politikasi':'cerez','mesafeli-satis-ve-ticaret':'satis'};if(Object.prototype.hasOwnProperty.call(aliases,section))redirect('/hukuki/'+aliases[section]);if(!(section in sections))notFound();const en=(await cookies()).get('makinasal-language')?.value==='en';const identity=legalIdentity();const ready=legalReady();
+ const kvkk=en?[
+ ['Controller and contact',identity.name?identity.name+' · '+identity.address+' · '+identity.email:'The operator identity, address and privacy contact have not been finalised. This is a review draft, not a completed privacy notice.'],
+ ['Data and purposes','Name, account email and phone support account access and verification; optional province, district and bio support profile display and regional discovery. Public listing details, photos and seller profiles are visible to other visitors. Messages are visible to conversation participants; reports support moderation. Transaction records support account services and legal obligations.'],
+ ['Collection and legal grounds','Data is collected electronically through forms, uploads, account and messaging actions. Draft grounds are performance of a contract (KVKK 5/2-c), legal obligations (5/2-ç), establishment or defence of rights (5/2-e), and proportionate security interests (5/2-f). Optional measurement requires a separate choice. Final grounds and retention periods must be confirmed before public registration.'],
+ ['Recipients, retention and transfers','Hosting and database providers process service data. Public listing/profile fields are disclosed to visitors, messages to participants, and records to competent authorities when legally required. Provider locations, international-transfer safeguards and a purpose-specific retention schedule must be finalised before public launch; indefinite retention is not assumed.'],
+ ['Your rights','Under KVKK Article 11 you may ask about processing, purposes, recipients and transfers; request correction or deletion when conditions apply; request notification of correction/deletion to recipients; object to adverse solely automated outcomes; and seek compensation for unlawful processing. Use the controller contact above once configured. Do not send identity documents in public listings or messages.']
+ ]:[
+ ['Veri sorumlusu ve iletişim',identity.name?identity.name+' · '+identity.address+' · '+identity.email:'İşletmeci unvanı, adresi ve veri başvuru kanalı henüz kesinleşmedi. Bu sayfa inceleme taslağıdır; tamamlanmış bir aydınlatma metni değildir.'],
+ ['Veriler ve amaçlar','Ad, hesap e-postası ve telefon bilgileri hesap erişimi ve doğrulama; isteğe bağlı il, ilçe ve açıklama bilgileri profil ve bölgesel keşif için kullanılır. İlan ayrıntıları, fotoğraflar ve satıcı profilleri ziyaretçilere görünür. Mesajlar görüşme katılımcılarına açıktır; şikayetler moderasyon için işlenir. İşlem kayıtları hesap hizmetleri ve hukuki yükümlülükleri destekler.'],
+ ['Toplama yöntemi ve hukuki sebepler','Veriler formlar, yüklemeler, hesap ve mesajlaşma işlemleri yoluyla elektronik olarak toplanır. Taslak dayanaklar sözleşmenin ifası (KVKK 5/2-c), hukuki yükümlülük (5/2-ç), hakkın tesisi ve korunması (5/2-e), ölçülü güvenlik amaçlı meşru menfaat (5/2-f) olarak belirlenmiştir. İsteğe bağlı ölçüm ayrı tercihe bağlıdır. Kesin dayanaklar ve saklama süreleri genel kayıt açılmadan önce doğrulanmalıdır.'],
+ ['Alıcılar, saklama ve aktarım','Barındırma ve veritabanı hizmet sağlayıcıları hizmet verilerini işler. Herkese açık ilan/profil bilgileri ziyaretçilere, mesajlar katılımcılara, yasal olarak gerekli kayıtlar yetkili makamlara aktarılabilir. Sağlayıcı konumları, yurt dışı aktarım güvenceleri ve amaca göre saklama takvimi genel açılıştan önce kesinleştirilecektir; süresiz saklama varsayılmaz.'],
+ ['Hakların ve başvuru','KVKK 11 kapsamında işleme, amaç, alıcı ve aktarım bilgilerini öğrenme; düzeltme, şartları varsa silme/yok etme ve bu işlemlerin alıcılara bildirilmesini isteme; yalnızca otomatik analizle aleyhine çıkan sonuçlara itiraz ve hukuka aykırı işlemeden doğan zararın giderilmesini talep hakların vardır. Yapılandırıldığında yukarıdaki veri sorumlusu iletişim kanalına başvurabilirsin. Kimlik belgelerini herkese açık ilan veya mesajlara yükleme.']
+ ];
+ const terms=en?[
+ ['Scope','Makinasal is a listing and communication service. Sellers are responsible for ownership, descriptions, photographs, price and authority to sell. A listing or message is not an ownership, inspection or payment guarantee.'],
+ ['Account and conduct','Provide accurate information, keep account access secure and use only photos and content you may lawfully publish. Fraud, abusive messages, unsolicited bulk messages, illegal listings and disclosure of another person’s private information are prohibited.'],
+ ['Moderation and disputes','Content may be reviewed, restricted or removed for reported abuse or legal obligations. Use the report action and retain the relevant records. Seller identity, condition, serial number and documents should be verified before a transaction.'],
+ ['Service changes and responsibility','Beta availability and third-party integrations may change. Mandatory consumer rights cannot be excluded by these draft terms. Paid services require a separate price, seller identity, pre-contract information and the applicable contract before payment.']
+ ]:[
+ ['Kapsam','Makinasal ilan ve iletişim hizmetidir. İlan sahibi mülkiyet, açıklama, fotoğraf, fiyat ve satış yetkisinden sorumludur. İlan veya mesaj mülkiyet, ekspertiz ya da ödeme garantisi oluşturmaz.'],
+ ['Hesap ve davranış','Doğru bilgi ver, hesap erişimini koru ve yayımlama hakkına sahip olduğun içerikleri kullan. Dolandırıcılık, küfürlü mesajlar, izinsiz toplu mesajlar, hukuka aykırı ilanlar ve başkasının özel bilgilerinin paylaşılması yasaktır.'],
+ ['Moderasyon ve uyuşmazlıklar','Bildirilen ihlaller ve hukuki yükümlülükler nedeniyle içerikler incelenebilir, kısıtlanabilir veya kaldırılabilir. Şikayet düğmesini kullan ve ilgili kayıtları sakla. İşlem öncesi satıcı kimliği, durum, seri numarası ve belgeleri doğrula.'],
+ ['Hizmet ve sorumluluk','Beta hizmetin erişilebilirliği ve üçüncü taraf bağlantıları değişebilir. Bu taslak koşullar zorunlu tüketici haklarını ortadan kaldırmaz. Ücretli hizmetler ödeme öncesi ayrı fiyat, satıcı kimliği, ön bilgilendirme ve ilgili sözleşmeyi gerektirir.']
+ ];
+ const cookie=en?[
+ ['Essential storage','Authentication cookies keep the session. makinasal-language stores the selected language for up to one year. Local device storage holds guest favourites, comparison choices, saved searches and cookie preferences until removed or changed.'],
+ ['Optional measurement','Measurement is disabled until you allow it and a measurement service is configured. This beta does not load advertising trackers. You may withdraw your choice below; this does not remove essential session storage.'],
+ ['Third-party requests','Fonts may be requested from Google Fonts and images/data from configured service providers. Those network requests may transmit your IP address and are separate from an optional analytics cookie. Browser site-data controls can clear local storage and sign you out.']
+ ]:[
+ ['Zorunlu depolama','Kimlik doğrulama çerezleri oturumu sürdürür. makinasal-language seçilen dili bir yıla kadar saklar. Cihaz depolaması misafir favorileri, karşılaştırma seçimleri, kayıtlı aramalar ve çerez tercihini silinene veya değiştirilene kadar tutar.'],
+ ['İsteğe bağlı ölçüm','Ölçüm, izin vermeden ve ölçüm hizmeti yapılandırılmadan etkinleşmez. Bu beta reklam izleyicisi yüklemez. Tercihini aşağıdan geri alabilirsin; zorunlu oturum depolaması bundan etkilenmez.'],
+ ['Üçüncü taraf istekler','Yazı tipleri Google Fonts üzerinden, görseller ve veriler yapılandırılmış hizmet sağlayıcılardan istenebilir. Bu ağ istekleri IP adresini iletebilir ve isteğe bağlı analitik çerezinden ayrıdır. Tarayıcının site verisi ayarları yerel depolamayı silebilir ve oturumunu kapatabilir.']
+ ];
+ const sales=en?[
+ ['Current service','Live collection, escrow and paid store packages are not active. Do not send a deposit to a platform account or enter card details in a listing or chat.'],
+ ['Before paid services launch','The contracting seller/service provider, address, tax and contact details, total price and taxes, delivery/performance, cancellation and withdrawal terms, complaint channels and any applicable exclusions must be provided for the actual product before acceptance. This page is not a substitute for transaction-specific pre-contract information or a distance contract.'],
+ ['Marketplace transactions','Private and business sellers may have different legal obligations. Machine condition, delivery, inspection, transport and payment terms must be documented with the actual seller. An iyzico integration alone does not establish consumer-law compliance.']
+ ]:[
+ ['Mevcut hizmet','Gerçek tahsilat, emanet ödeme ve ücretli mağaza paketleri etkin değildir. Platform adına kapora gönderme, ilan veya mesaj alanlarına kart bilgisi yazma.'],
+ ['Ücretli hizmet açılmadan önce','Sözleşmenin tarafı satıcı/hizmet sağlayıcı, adres, vergi ve iletişim bilgileri, toplam fiyat ve vergiler, teslim/ifa, iptal ve cayma koşulları, şikayet kanalları ve varsa istisnalar gerçek ürüne göre kabul öncesinde sunulmalıdır. Bu sayfa işleme özel ön bilgilendirme ve mesafeli sözleşmenin yerine geçmez.'],
+ ['İlan üzerinden işlemler','Bireysel ve ticari satıcıların yükümlülükleri farklı olabilir. Makinenin durumu, teslim, ekspertiz, taşıma ve ödeme koşulları gerçek satıcıyla yazılı olarak belirlenmelidir. iyzico bağlantısı tek başına tüketici mevzuatına uyum sağlamaz.']
+ ];
+ const content=section==='kvkk'?kvkk:section==='kullanim'?terms:section==='cerez'?cookie:sales;
+ return <><h1>{sections[section as keyof typeof sections][en?1:0]}</h1>{!ready?<p className="note" role="status">{en?'Private beta review draft · operator details and legal approval pending.':'Özel beta inceleme taslağı · işletmeci bilgileri ve hukuk onayı bekleniyor.'}</p>:null}<p className="sub">{en?'Version: 18 October 2026':'Sürüm: 18 Ekim 2026'}</p>{content.map(([title,body])=><section className="panel" style={{marginTop:16}} key={title}><h2>{title}</h2><p>{body}</p></section>)}{section==='cerez'?<CookiePreferences/>:null}<p><a href="/hukuki">{en?'All legal information':'Tüm hukuki bilgiler'}</a></p></>;
 }

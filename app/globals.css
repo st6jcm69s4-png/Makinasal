@@ -317,3 +317,5 @@ a.btn{display:inline-block;text-align:center;text-decoration:none}
 .home-market .home-search-box,.home-hero{overflow:visible}.home-search-tabs{border-radius:12px 12px 0 0}.home-hero:after{right:0;top:0;width:230px;height:230px;clip-path:inset(0 round 0 20px 0 0)}
 @media(prefers-color-scheme:dark){.search-suggestions mark{background:#F4EDEE;border-radius:2px}}
 @media(max-width:600px){.search-suggestions ul{max-height:45dvh}.search-suggestions a{padding:11px 9px}.search-suggestions{top:calc(100% + 4px)}}
+
+.cookie-banner{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);width:min(720px,calc(100% - 28px));z-index:1300;max-height:65dvh;overflow:auto;box-shadow:0 8px 35px #0003}.cookie-banner h2{font-size:20px}.cookie-banner p{margin:8px 0}.cookie-banner .acts-row{margin-top:12px}

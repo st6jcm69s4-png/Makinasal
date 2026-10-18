@@ -1,13 +1,14 @@
 "use client";
+import { searchListings } from "@/lib/dbListings";
+import { searchRequest } from "@/lib/searchRequest";
+import { getSupabase } from "@/lib/supabase/client";
+import type { Listing } from "@/lib/data/types";
 import { SearchAutocomplete } from "./SearchAutocomplete";
 import { useLanguage } from "@/components/LanguageProvider";
 
 
 import { useSearchParams } from "next/navigation";
-import { Suspense, useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
-import { searchListings } from "@/lib/dbListings";
-import { getSupabase } from "@/lib/supabase/client";
-import type { Listing, Seller } from "@/lib/data/types";
+import { Suspense, useEffect, useMemo, useState, type FormEvent } from "react";
 import { CITIES } from "@/lib/data/constants";
 import { formatTL } from "@/lib/format";
 import { isPartCategory } from "@/lib/pricing";
@@ -32,43 +33,8 @@ function Browser() {
   const { t: tr, language } = useLanguage();
 
   const params = useSearchParams();
-  const { listings: localListings, sellers: localSellers, myCity, saveSearch, ready: localReady } = useMarket();
+  const { listings, sellers, myCity, saveSearch, ready, rememberListings } = useMarket();
   const [f, setF] = useState<Filters>(() => filtersFromParams(params));
-  const demoMode = process.env.NEXT_PUBLIC_DEMO_MODE === "true";
-  // Sunucu taraflı sonuçlar: filtreler veritabanında uygulanır, sayfa sayfa yüklenir.
-  const [remote, setRemote] = useState<{ listings: Listing[]; sellers: Record<string, Seller>; hasMore: boolean } | null>(null);
-  const [remoteBusy, setRemoteBusy] = useState(false);
-  const [remoteError, setRemoteError] = useState(false);
-  const serverKey = JSON.stringify([f.cat, f.brand, f.city, f.maxPrice, f.yMin, f.yMax, f.takas, f.q]);
-  useEffect(() => {
-    const supabase = getSupabase();
-    if (!supabase || demoMode) return;
-    let cancelled = false;
-    setRemoteBusy(true); setRemoteError(false);
-    searchListings(supabase, f, 0)
-      .then((d) => { if (!cancelled) setRemote(d); })
-      .catch(() => { if (!cancelled) { setRemote(null); setRemoteError(true); } })
-      .finally(() => { if (!cancelled) setRemoteBusy(false); });
-    return () => { cancelled = true; };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [serverKey, demoMode]);
-  const loadMore = useCallback(async () => {
-    const supabase = getSupabase();
-    if (!supabase || !remote) return;
-    setRemoteBusy(true);
-    try {
-      const d = await searchListings(supabase, f, remote.listings.length);
-      setRemote((cur) => {
-        if (!cur) return d;
-        const seen = new Set(cur.listings.map((l) => String(l.id)));
-        return { listings: [...cur.listings, ...d.listings.filter((l) => !seen.has(String(l.id)))], sellers: { ...cur.sellers, ...d.sellers }, hasMore: d.hasMore };
-      });
-    } catch { setRemoteError(true); } finally { setRemoteBusy(false); }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [remote, serverKey]);
-  const listings = remote ? remote.listings : localListings;
-  const sellers = useMemo(() => remote ? { ...localSellers, ...remote.sellers } : localSellers, [remote, localSellers]);
-  const ready = remote ? true : localReady;
   const [sort, setSort] = useState<SortKey>(() =>
     SORTS.some(([k]) => k === params.get("sort"))
       ? (params.get("sort") as SortKey)
@@ -94,19 +60,25 @@ function Browser() {
 
   const set = <K extends keyof Filters>(k: K, v: Filters[K]) =>
     setF((cur) => ({ ...cur, [k]: v }));
-  const shown = useMemo(
-    () =>
-      sortListings(
-        filterListings(listings, sellers, f, myCity),
-        sort,
-        sellers,
-        myCity,
-      ),
-    [listings, sellers, f, myCity, sort],
-  );
-  const pages = Math.max(1, Math.ceil(shown.length / 24));
-  const currentPage = Math.min(page, pages);
-  const visible = shown.slice((currentPage - 1) * 24, currentPage * 24);
+  const [result,setResult] = useState<{listings:Listing[];total:number}>({listings:[],total:0});
+  const [loading,setLoading]=useState(true);
+  const [error,setError]=useState('');
+  const [attempt,setAttempt]=useState(0);
+  const demo = process.env.NEXT_PUBLIC_DEMO_MODE === 'true';
+  useEffect(()=>{
+    if(demo) {setLoading(false);return;}
+    let live=true; setLoading(true);setError('');
+    const timer=setTimeout(()=>{void searchListings(getSupabase(),searchRequest(f,sort,page,myCity)).then(data=>{
+      if(!live)return; rememberListings(data);setResult(data);setLoading(false);
+      if(page>Math.max(1,Math.ceil(data.total/24)))setPage(Math.max(1,Math.ceil(data.total/24)));
+    }).catch(()=>{if(live){setError('Arama yüklenemedi. Lütfen tekrar dene.');setLoading(false);}});},180);
+    return()=>{live=false;clearTimeout(timer);};
+  },[f,sort,page,myCity,attempt,demo,rememberListings]);
+  const demoShown=useMemo(()=>demo?sortListings(filterListings(listings,sellers,f,myCity),sort,sellers,myCity):[],[demo,listings,sellers,f,myCity,sort]);
+  const total=demo?demoShown.length:result.total;
+  const pages=Math.max(1,Math.ceil(total/24));
+  const currentPage=Math.min(page,pages);
+  const visible=demo?demoShown.slice((currentPage-1)*24,currentPage*24):result.listings;
   const n = activeFilterCount(f);
   const part = isPartCategory(f.cat);
   const submit = (e: FormEvent) => {
@@ -341,7 +313,7 @@ function Browser() {
         <div style={{ minWidth: 0 }}>
           <div className="bar">
             <span className="out" aria-live="polite">
-              {ready ? tr("{0} ilan", {"0":shown.length}) : tr("Yükleniyor…")}
+              {!loading ? tr("{0} ilan", {"0":total}) : tr("Yükleniyor…")}
             </span>
             <div className="acts-row">
               <button
@@ -365,7 +337,7 @@ function Browser() {
               </select>
             </div>
           </div>
-          {shown.length === 0 ? (
+          {error ? <div className="empty" role="alert">{tr(error)} <button className="btn ghost" onClick={()=>setAttempt(n=>n+1)}>{tr("Tekrar dene")}</button></div> : loading ? <div className="empty" role="status">{tr("Yükleniyor…")}</div> : total === 0 ? (
             <div className="empty">
               {tr("Bu filtrelerle ilan bulunamadı. Filtreleri gevşetmeyi dene.")}</div>
           ) : (
@@ -398,14 +370,6 @@ function Browser() {
                     {tr("Sonraki")}</button>
                 </nav>
               ) : null}
-              {remote?.hasMore && currentPage >= pages ? (
-                <div className="acts-row" style={{ marginTop: 20 }}>
-                  <button className="btn" type="button" disabled={remoteBusy} onClick={loadMore}>
-                    {remoteBusy ? tr("Yükleniyor…") : tr("Daha fazla ilan yükle")}
-                  </button>
-                </div>
-              ) : null}
-              {remoteError ? <p className="sub" role="alert">{tr("Sonuçlar yüklenemedi. Bağlantını kontrol edip tekrar dene.")}</p> : null}
             </>
           )}
         </div>

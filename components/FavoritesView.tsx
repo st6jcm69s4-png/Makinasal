@@ -12,7 +12,7 @@ import { Pill } from './ui';
 export function FavoritesView() {
   const { t: tr, language } = useLanguage();
 
-  const { listings, sellers, favs, saved, newCount, setNotify, deleteSaved, markSeen, myCity, profile, authReady, favoriteListings: favListings, favoritesReady, favoritesError, retryFavorites, removeFav } = useMarket();
+  const { listings, sellers, favs, saved, newCount, savedTotal, setNotify, deleteSaved, markSeen, myCity, profile, authReady, favoriteListings: favListings, favoritesReady, favoritesError, retryFavorites, removeFav } = useMarket();
   const unavailable = favoritesReady && !favoritesError ? Object.keys(favs).filter(key => !favListings.some(l => String(l.id) === key)) : [];
 
   async function run(id: string) {
@@ -34,10 +34,10 @@ export function FavoritesView() {
           <p className="sub" style={{ margin: '4px 0 6px' }}>{tr("Yeni ilan çıkınca burada ve menüdeki rozette gösterilir. (SMS ve e-posta bildirimi sonraki aşamada.)")}</p>
           {saved.length === 0 ? <div className="empty">{tr("Kayıtlı aramın yok. İlanlar sayfasında filtreleri seç ve \"Aramayı kaydet\"e bas.")}</div> : saved.map((s) => {
             const n = newCount(s);
-            const tot = filterListings(listings, sellers, s.f, myCity).length;
+            const tot = savedTotal(s);
             return (
               <div key={s.id} className="mine">
-                <div style={{ minWidth: 0 }}><b>{tr(filterLabel(s.f, language))}</b><br /><span className="sub">{tot} {tr(" ilan")}{n ? ' · ' : ''}{n ? <Pill cls="prem">{n} {tr(" yeni ilan")}</Pill> : null}</span></div>
+                <div style={{ minWidth: 0 }}><b>{tr(filterLabel(s.f, language))}</b><br /><span className="sub">{tot===null?tr("Arama sayısı henüz alınamadı."):tr("{0} ilan",{0:tot})}{n ? ' · ' : ''}{n ? <Pill cls="prem">{n} {tr(" yeni ilan")}</Pill> : null}</span></div>
                 <div className="acts-row">
                   <label className="check"><input type="checkbox" checked={s.notify} onChange={(e) => void setNotify(s.id, e.target.checked)} />{tr("Yeni ilan bildir")}</label>
                   <button className="btn sm" type="button" onClick={() => void run(s.id)}>{tr("Çalıştır")}</button>

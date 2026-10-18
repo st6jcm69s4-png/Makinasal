@@ -1,7 +1,8 @@
+import { pageMetadata } from '@/lib/seo';
 import { Text } from "@/components/LanguageProvider";
 import { AuthForm } from '@/components/AuthForm';
 
-export const metadata = { title: 'Giriş | Makinasal' };
+export const metadata = pageMetadata('/giris', 'Giriş', 'Makinasal · Giriş. İş makinesi ve kamyon pazarı.', true);
 
 export default function LoginPage() {
   return (

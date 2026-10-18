@@ -1,0 +1,22 @@
+import assert from 'node:assert/strict';
+import {csvRecords,parseCsv,importValues} from '../lib/bulkImport.ts';
+import {searchRequest} from '../lib/searchRequest.ts';
+import {defaultFilters} from '../lib/market.ts';
+import {jsonLd,xmlEscape,pageMetadata,PUBLIC_INDEXING} from '../lib/seo.ts';
+import {routeLabel} from '../lib/telemetry.ts';
+import {legalReady} from '../lib/legal.ts';
+import {readBoundedText} from '../lib/http.ts';
+const csv='\uFEFFcategory,brand,model,price,city,description\r\nEkskavatör,Hidromek,HMK 220,2500000,Ankara,"Satır 1\r\nSatır 2, \"\"kontrollü\"\""\r\n';
+const records=csvRecords(csv);assert.equal(records.length,1);assert.equal(records[0].description,'Satır 1\r\nSatır 2, "kontrollü"');assert.equal(importValues(records[0]).status,'paused');
+assert.equal(csvRecords('category;title;price;city\nEkskavatör;Örnek;1234.56;Ankara')[0].title,'Örnek');
+assert.throws(()=>csvRecords('x,x\na,b'));assert.throws(()=>parseCsv('"unfinished'));assert.throws(()=>csvRecords('category,title\nEkskavatör'));assert.throws(()=>csvRecords('title\n'+Array(101).fill('x').join('\n')));
+for(const row of [{...records[0],price:'NaN'},{...records[0],price:'0'},{...records[0],price:'-2'},{...records[0],category:'unknown'},{...records[0],city:'unknown'},{...records[0],year:'1950.5'},{...records[0],category:'Yedek parça'}])assert.throws(()=>importValues(row));
+assert.equal(importValues({...records[0],price:'0.29'}).price,.29);
+const f={...defaultFilters(),cat:'group:machines',q:'i',near:50};const req=searchRequest(f,'pa',14,'Ankara');assert.ok(req.categories.length>70);assert.equal(req.page,14);assert.equal(req.sort,'pa');assert.equal(req.distances.Ankara,0);assert.ok(req.distances['İstanbul']>50);assert.equal(searchRequest(f,'new',0,'Ankara','bad').since,null);
+const attack='</script><script>alert(1)</script>\u2028';assert.ok(!jsonLd({name:attack}).includes('<'));assert.equal(JSON.parse(jsonLd({name:attack})).name,attack);assert.equal(xmlEscape('"<&'), '&quot;&lt;&amp;');
+assert.equal(pageMetadata('/profil','Profil','X',true).robots.index,false);if(!PUBLIC_INDEXING)assert.equal(pageMetadata('/','Ana sayfa','X').robots.index,false);
+for(const input of ['/mesajlar/private-id?token=secret','/ilanlar/private-id?email=a@b.com','/unknown/private?q=foo']){const label=routeLabel(input);assert.ok(!label.includes('private')&&!label.includes('?')&&!label.includes('@'));}
+assert.equal(routeLabel('/mesajlar/abc'),'/mesajlar/[id]');
+assert.equal(legalReady(),false);
+await assert.rejects(()=>readBoundedText(new Request('https://example.invalid',{method:'POST',body:'x'.repeat(10)}),5));
+console.log('Launch foundations: CSV parsing/draft validation, server search parameters, SEO escaping/noindex, telemetry redaction, legal gate and body limits passed ✔');

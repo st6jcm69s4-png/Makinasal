@@ -1,5 +1,6 @@
+import { pageMetadata } from '@/lib/seo';
 import { Text } from "@/components/LanguageProvider";
-export const metadata = { title: 'Yardım | Makinasal' };
+export const metadata = pageMetadata('/destek', 'Yardım', 'Makinasal · Yardım. İş makinesi ve kamyon pazarı.', false);
 export default function HelpPage() { return <><h1><Text value={"Yardım merkezi"} /></h1><div className="panel" style={{ marginTop: 20 }}>
 <h2><Text value={"Hesabıma giremiyorum"} /></h2><p><a className="linkbtn" href="/giris"><Text value={"Giriş sayfasından"} /></a> <Text value={" “Şifremi unuttum” seçeneğini kullan. Onay e-postasını spam klasöründe de kontrol et."} /></p>
 <h2><Text value={"Fotoğraflarım yüklenmedi"} /></h2><p><Text value={"İlan duraklatılmış olarak saklanır. "} /><a className="linkbtn" href="/ilanlarim"><Text value={"İlanlarım"} /></a> <Text value={" bölümünde Düzenle’ye bas, eksik fotoğrafları ekle ve kaydet."} /></p>

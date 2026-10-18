@@ -1,70 +1,4 @@
--- İstek sınırlama (rate limit), uygulama içi bildirimler ve bakım işleri.
-
--- ===== Rate limit =====
-create table if not exists public.rate_limit_hits(
-  key text not null,
-  bucket timestamptz not null,
-  n int not null default 1,
-  primary key (key, bucket)
-);
-alter table public.rate_limit_hits enable row level security; -- politika yok: yalnızca security definer fonksiyonlar yazar
-revoke all on public.rate_limit_hits from anon, authenticated;
-
--- true: izin var, false: sınır aşıldı
-create or replace function public.hit_rate_limit(p_key text, p_max int, p_window_seconds int)
-returns boolean language plpgsql security definer set search_path = '' as $$
-declare b timestamptz; c int;
-begin
-  b := to_timestamp(floor(extract(epoch from now()) / p_window_seconds) * p_window_seconds);
-  insert into public.rate_limit_hits(key, bucket, n) values (p_key, b, 1)
-  on conflict (key, bucket) do update set n = public.rate_limit_hits.n + 1
-  returning n into c;
-  return c <= p_max;
-end $$;
-revoke all on function public.hit_rate_limit(text, int, int) from public, anon, authenticated;
-
-create or replace function public.client_key() returns text language plpgsql stable set search_path = '' as $$
-declare h text;
-begin
-  begin
-    h := split_part(coalesce(current_setting('request.headers', true)::json ->> 'x-forwarded-for', ''), ',', 1);
-  exception when others then h := '';
-  end;
-  return coalesce(nullif(trim(h), ''), (select auth.uid())::text, 'anon');
-end $$;
-
--- Görüntülenme sayacı: aynı istemci aynı ilan için 10 dakikada en fazla 3 kez sayılır
-create or replace function public.track_view(p_listing uuid) returns void
-language plpgsql security definer set search_path = public as $$
-begin
-  if not public.hit_rate_limit('view:' || public.client_key() || ':' || p_listing::text, 3, 600) then return; end if;
-  if exists (select 1 from listings where id = p_listing and status = 'active' and seller_id is distinct from auth.uid()) then
-    insert into listing_stats(listing_id, views) values (p_listing, 1)
-    on conflict (listing_id) do update set views = listing_stats.views + 1;
-  end if;
-end $$;
-grant execute on function public.track_view(uuid) to anon, authenticated;
-
-create or replace function public.enforce_rate_limit() returns trigger language plpgsql security definer set search_path = '' as $$
-declare uid uuid := (select auth.uid());
-begin
-  if uid is null then return new; end if;
-  if tg_table_name = 'messages' and not public.hit_rate_limit('msg:' || uid, 20, 60) then
-    raise exception 'Çok hızlı mesaj gönderiyorsun. Bir dakika sonra tekrar dene.' using errcode = '54000';
-  elsif tg_table_name = 'listings' and not public.hit_rate_limit('listing:' || uid, 10, 3600) then
-    raise exception 'Bir saatte en fazla 10 ilan verebilirsin.' using errcode = '54000';
-  elsif tg_table_name = 'reports' and not public.hit_rate_limit('report:' || uid, 10, 3600) then
-    raise exception 'Bir saatte en fazla 10 şikâyet gönderebilirsin.' using errcode = '54000';
-  end if;
-  return new;
-end $$;
-drop trigger if exists messages_rate_limit on public.messages;
-create trigger messages_rate_limit before insert on public.messages for each row execute function public.enforce_rate_limit();
-drop trigger if exists listings_rate_limit on public.listings;
-create trigger listings_rate_limit before insert on public.listings for each row execute function public.enforce_rate_limit();
-drop trigger if exists reports_rate_limit on public.reports;
-create trigger reports_rate_limit before insert on public.reports for each row execute function public.enforce_rate_limit();
-
+-- Pending: not installed in production. Limits are consolidated in server_search_and_abuse_guards.
 -- ===== Bildirimler =====
 create table if not exists public.notifications(
   id uuid primary key default gen_random_uuid(),
@@ -119,23 +53,14 @@ $$;
 revoke all on function public.unread_notification_count() from public, anon;
 grant execute on function public.unread_notification_count() to authenticated;
 
--- ===== Bakım: eski sayaçlar, okunmuş bildirimler ve sahipsiz fotoğraflar =====
-create or replace function public.run_maintenance() returns jsonb language plpgsql security definer set search_path = '' as $$
-declare a int; b int; c int;
+-- Maintenance of notification records only. Storage objects must be removed through Storage API after dry-run review, never SQL deletion of storage metadata.
+create or replace function public.run_maintenance() returns jsonb language plpgsql security definer set search_path='' as $$
+declare n int;
 begin
-  delete from public.rate_limit_hits where bucket < now() - interval '1 day'; get diagnostics a = row_count;
-  delete from public.notifications where read_at is not null and created_at < now() - interval '90 days'; get diagnostics b = row_count;
-  delete from storage.objects o
-  where o.bucket_id = 'listing-photos' and o.created_at < now() - interval '1 day'
-    and not exists (select 1 from public.listing_photos p where p.path = o.name);
-  get diagnostics c = row_count;
-  return jsonb_build_object('rate_hits', a, 'notifications', b, 'orphan_photos', c);
+ delete from public.notifications where read_at is not null and created_at < now()-interval '90 days';get diagnostics n=row_count;
+ return jsonb_build_object('notifications',n,'orphan_photos',0);
 end $$;
-revoke all on function public.run_maintenance() from public, anon, authenticated;
-
--- pg_cron etkinse her gece 03:00'te çalıştır (Supabase → Database → Extensions → pg_cron)
-do $$ begin
-  if exists (select 1 from pg_extension where extname = 'pg_cron') then
-    perform cron.schedule('makinasal-maintenance', '0 3 * * *', 'select public.run_maintenance()');
-  end if;
-end $$;
+revoke all on function public.run_maintenance() from public,anon,authenticated;
+revoke all on function public.notify_new_message() from public,anon,authenticated;
+revoke all on function public.notify_price_drop() from public,anon,authenticated;
+-- Deliberately unscheduled until deployment approval and retention policy are confirmed.

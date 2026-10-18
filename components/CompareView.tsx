@@ -16,9 +16,10 @@ import { Pill, toneClass } from './ui';
 export function CompareView() {
   const { t: tr, language } = useLanguage();
 
-  const { cmp, find, sellers, stats, myCity, removeCmp, ready } = useMarket();
+  const { cmp, find, sellers, stats, myCity, removeCmp, ready,comparisonReady,comparisonError,retryComparison } = useMarket();
   const items = cmp.map((k) => find(k)).filter((x): x is Listing => !!x);
-  if (!ready) return <div className="empty">{tr("Yükleniyor…")}</div>;
+  if (!ready||!comparisonReady) return <div className="empty">{tr("Yükleniyor…")}</div>;
+  if(comparisonError)return <div className="empty" role="alert">{tr(comparisonError)} <button className="btn ghost" onClick={retryComparison}>{tr("Tekrar dene")}</button></div>;
   if (items.length < 2) {
     return (
       <>

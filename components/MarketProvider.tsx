@@ -8,7 +8,8 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import { LISTINGS } from '@/lib/data/listings';
 import { SELLERS } from '@/lib/data/sellers';
 import type { Listing, Seller } from '@/lib/data/types';
-import { fetchActiveListings, fetchListingsByIds } from '@/lib/dbListings';
+import { searchListings, fetchActiveListings, fetchListingsByIds } from '@/lib/dbListings';
+import { searchRequest } from '@/lib/searchRequest';
 import { listingKey, cardTitle } from '@/lib/listing';
 import { defaultFilters, filterListings, type Filters } from '@/lib/market';
 import { buildPriceStats, type PriceStats } from '@/lib/pricing';
@@ -21,6 +22,7 @@ export type Profile = {
 export type SavedSearch = { id: string; f: Filters; notify: boolean; lastSeen: string; local?: boolean };
 
 type Ctx = {
+  rememberListings: (data: {listings:Listing[];sellers:Record<string,Seller>}) => void;
   ready: boolean;
   listings: Listing[];
   sellers: Record<string, Seller>;
@@ -35,6 +37,9 @@ type Ctx = {
   retryFavorites: () => void;
   removeFav: (key: string) => Promise<void>;
   toggleFav: (l: Listing) => Promise<void>;
+  comparisonReady:boolean;
+  comparisonError:string;
+  retryComparison:()=>void;
   cmp: string[];
   toggleCmp: (l: Listing) => void;
   removeCmp: (key: string) => void;
@@ -44,7 +49,8 @@ type Ctx = {
   deleteSaved: (id: string) => Promise<void>;
   setNotify: (id: string, on: boolean) => Promise<void>;
   markSeen: (id: string) => Promise<void>;
-  newCount: (s: SavedSearch) => number;
+  newCount: (s: SavedSearch) => number | null;
+  savedTotal: (s: SavedSearch) => number | null;
   unread: number;
   refreshUnread: () => Promise<void>;
   favNews: number;
@@ -74,6 +80,8 @@ export function MarketProvider({ children }: { children: ReactNode }) {
   const { t: tr, language } = useLanguage();
 
   const [db, setDb] = useState<{ listings: Listing[]; sellers: Record<string, Seller> }>({ listings: [], sellers: {} });
+  const [discovered,setDiscovered]=useState<{listings:Listing[];sellers:Record<string,Seller>}>({listings:[],sellers:{}});
+  const rememberListings=useCallback((data:{listings:Listing[];sellers:Record<string,Seller>})=>{setDiscovered(cur=>({listings:[...new Map([...cur.listings,...data.listings].map(l=>[String(l.id),l])).values()].slice(-240),sellers:{...cur.sellers,...data.sellers}}));},[]);
   const [ready, setReady] = useState(false);
   const [loadError, setLoadError] = useState('');
   const [authReady, setAuthReady] = useState(false);
@@ -86,6 +94,10 @@ export function MarketProvider({ children }: { children: ReactNode }) {
   const activeUserId = useRef<string | null>(null);
   const [favoritesAttempt, setFavoritesAttempt] = useState(0);
   const favoriteWrites = useRef(new Set<string>());
+  const [comparisonData,setComparisonData]=useState<{listings:Listing[];sellers:Record<string,Seller>}>({listings:[],sellers:{}});
+  const [comparisonReady,setComparisonReady]=useState(false);
+  const [comparisonError,setComparisonError]=useState('');
+  const [comparisonAttempt,setComparisonAttempt]=useState(0);
   const [cmp, setCmp] = useState<string[]>([]);
   const [saved, setSaved] = useState<SavedSearch[]>([]);
   const [unread, setUnread] = useState(0);
@@ -223,12 +235,16 @@ export function MarketProvider({ children }: { children: ReactNode }) {
     });
     return () => { live = false; };
   }, [authReady, favoriteIds, profile?.id, favoritesAttempt]);
-  const sellers = useMemo(() => ({ ...DEMO_SELLERS, ...favoriteData.sellers, ...db.sellers }), [db.sellers, favoriteData.sellers]);
+  const comparisonIds=cmp.filter(id=>!/^\d+$/.test(id)).slice(0,3).join(',');
+  useEffect(()=>{let live=true;setComparisonReady(false);setComparisonError('');if(!comparisonIds){setComparisonData({listings:[],sellers:{}});setComparisonReady(true);return;}
+    void fetchListingsByIds(getSupabase(),comparisonIds.split(',')).then(data=>{if(live){setComparisonData(data);setComparisonReady(true);}}).catch(()=>{if(live){setComparisonError('Karşılaştırma ilanları yüklenemedi.');setComparisonReady(true);}});return()=>{live=false;};
+  },[comparisonIds,comparisonAttempt,profile?.id]);
+  const sellers = useMemo(() => ({ ...DEMO_SELLERS, ...comparisonData.sellers, ...discovered.sellers, ...favoriteData.sellers, ...db.sellers }), [db.sellers, favoriteData.sellers, discovered.sellers, comparisonData.sellers]);
   const listings = useMemo(() => [...db.listings, ...(SHOW_DEMO ? DEMO : [])], [db.listings]);
   const stats = useMemo(() => buildPriceStats(listings), [listings]);
   const myCity = profile?.city || 'İstanbul';
   const favoriteListings = useMemo(() => [...favoriteData.listings, ...(SHOW_DEMO ? DEMO : [])].filter(l => String(l.id) in favs), [favoriteData.listings, favs]);
-  const find = useCallback((id: string | number) => listings.find(l => String(l.id) === String(id)) ?? favoriteListings.find(l => String(l.id) === String(id)) ?? null, [listings, favoriteListings]);
+  const find = useCallback((id: string | number) => listings.find(l => String(l.id) === String(id)) ?? favoriteListings.find(l => String(l.id) === String(id)) ?? comparisonData.listings.find(l=>String(l.id)===String(id)) ?? discovered.listings.find(l=>String(l.id)===String(id)) ?? null, [listings, favoriteListings, discovered.listings,comparisonData.listings]);
 
   const changeFavorite = useCallback(async (key: string, price: number, on: boolean) => {
     if (favoriteWrites.current.has(key)) return;
@@ -321,10 +337,17 @@ export function MarketProvider({ children }: { children: ReactNode }) {
   const setNotify = useCallback((id: string, on: boolean) => patchSaved(id, { notify: on }), [patchSaved]);
   const markSeen = useCallback((id: string) => patchSaved(id, { lastSeen: new Date().toISOString() }), [patchSaved]);
 
-  const newCount = useCallback((s: SavedSearch) => {
-    const since = Date.parse(s.lastSeen);
-    return filterListings(listings, sellers, s.f, myCity).filter((l) => l.createdAt && Date.parse(l.createdAt) > since).length;
-  }, [listings, sellers, myCity]);
+  const [savedCounts,setSavedCounts]=useState<Record<string,number>>({});
+  const [savedTotals,setSavedTotals]=useState<Record<string,number>>({});
+  useEffect(()=>{
+    let live=true;setSavedCounts({});setSavedTotals({});
+    const run=async()=>{const next:Record<string,number>={},totals:Record<string,number>={};for(const s of saved){try {const [data,all]=await Promise.all([searchListings(getSupabase(),searchRequest(s.f,'new',1,myCity,s.lastSeen),true),searchListings(getSupabase(),searchRequest(s.f,'new',1,myCity),true)]);next[s.id]=data.total;totals[s.id]=all.total;}catch{/* Unknown counts are not presented as matching results. */}}if(live){setSavedCounts(next);setSavedTotals(totals);}};
+    void run();const timer=setInterval(()=>{if(!document.hidden)void run();},60000);
+    return()=>{live=false;clearInterval(timer);};
+  },[saved,myCity]);
+  const newCount=useCallback((s:SavedSearch)=>savedCounts[s.id]??null,[savedCounts]);
+
+  const savedTotal=useCallback((s:SavedSearch)=>savedTotals[s.id]??null,[savedTotals]);
 
   // Menüdeki favori rozeti: fiyatı düşen favoriler + yeni ilanı olan bildirimli aramalar
   const favNews = useMemo(() => {
@@ -333,17 +356,17 @@ export function MarketProvider({ children }: { children: ReactNode }) {
       const l = favoriteListings.find((x) => String(x.id) === k);
       if (l && was > 0 && l.price < was) n++;
     }
-    for (const s of saved) if (s.notify && newCount(s) > 0) n++;
+    for (const s of saved) if (s.notify && (newCount(s)??0) > 0) n++;
     return n;
   }, [favs, favoriteListings, saved, newCount]);
 
   const value: Ctx = {
-    ready, listings, sellers, stats, profile, authReady, myCity, favs, toggleFav, cmp, toggleCmp, removeCmp, clearCmp,
+    comparisonReady,comparisonError,retryComparison:()=>setComparisonAttempt(n=>n+1),rememberListings, ready, listings, sellers, stats, profile, authReady, myCity, favs, toggleFav, cmp, toggleCmp, removeCmp, clearCmp,
     favoriteListings, favoritesReady, favoritesError: userFavoritesError || favoritesError, retryFavorites: () => {
       if (profile) void loadUserData(profile.id).then(() => setFavoritesAttempt(n => n + 1));
       else setFavoritesAttempt(n => n + 1);
     }, removeFav,
-    saved, saveSearch, deleteSaved, setNotify, markSeen, newCount, unread, refreshUnread, favNews, toast, reload,
+    saved, saveSearch, deleteSaved, setNotify, markSeen, newCount, savedTotal, unread, refreshUnread, favNews, toast, reload,
     reloadProfile: () => loadProfile(profile?.id ?? null, profile?.email ?? ''), find,
   };
 

@@ -1,7 +1,8 @@
+import { pageMetadata } from '@/lib/seo';
 import { Text } from "@/components/LanguageProvider";
 import { ListingForm } from '@/components/ListingForm';
 
-export const metadata = { title: 'İlan ver | Makinasal' };
+export const metadata = pageMetadata('/ilan-ver', 'İlan ver', 'Makinasal · İlan ver. İş makinesi ve kamyon pazarı.', true);
 
 export default function NewListingPage() {
   return (
