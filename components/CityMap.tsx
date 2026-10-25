@@ -30,7 +30,7 @@ export function CityMap({ onPick }: { onPick: (city: string) => void }) {
   }, []);
 
   const points = useMemo(
-    () => Object.entries(counts ?? {}).filter(([c]) => COORDS[c]).sort((a, b) => b[1] - a[1]),
+    () => Object.entries<number>(counts ?? {}).filter(([c]) => COORDS[c]).sort((a, b) => b[1] - a[1]),
     [counts],
   );
   const max = points[0]?.[1] ?? 1;
