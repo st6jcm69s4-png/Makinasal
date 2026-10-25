@@ -1,0 +1,14 @@
+{
+  "expo": {
+    "name": "Makinasal",
+    "slug": "makinasal",
+    "scheme": "makinasal",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "plugins": ["expo-router"],
+    "experiments": { "typedRoutes": false },
+    "ios": { "supportsTablet": false, "bundleIdentifier": "tr.com.makinasal.app" },
+    "android": { "package": "tr.com.makinasal.app" }
+  }
+}
