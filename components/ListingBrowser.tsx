@@ -8,6 +8,7 @@ import { useLanguage } from "@/components/LanguageProvider";
 
 
 import { useSearchParams } from "next/navigation";
+import { CityMap } from "./CityMap";
 import { Suspense, useEffect, useMemo, useState, type FormEvent } from "react";
 import { CITIES } from "@/lib/data/constants";
 import { formatTL } from "@/lib/format";
@@ -41,6 +42,7 @@ function Browser() {
       : "rec",
   );
   const [open, setOpen] = useState(false);
+  const [mapView, setMapView] = useState(false);
   const [page, setPage] = useState(1);
   const paramString = params.toString();
   useEffect(() => {
@@ -322,6 +324,8 @@ function Browser() {
                 onClick={() => void saveSearch(f)}
               >
                 {tr("Aramayı kaydet")}</button>
+              <button className="btn ghost sm" type="button" aria-pressed={mapView} onClick={() => setMapView((v) => !v)}>
+                {tr(mapView ? "Liste görünümü" : "Harita görünümü")}</button>
               <label htmlFor="sort">{tr("Sırala")}</label>
               <select
                 id="sort"
@@ -337,7 +341,7 @@ function Browser() {
               </select>
             </div>
           </div>
-          {error ? <div className="empty" role="alert">{tr(error)} <button className="btn ghost" onClick={()=>setAttempt(n=>n+1)}>{tr("Tekrar dene")}</button></div> : loading ? <div className="empty" role="status">{tr("Yükleniyor…")}</div> : total === 0 ? (
+          {mapView ? <CityMap onPick={(c) => { set("city", c); setMapView(false); }} /> : error ? <div className="empty" role="alert">{tr(error)} <button className="btn ghost" onClick={()=>setAttempt(n=>n+1)}>{tr("Tekrar dene")}</button></div> : loading ? <div className="empty" role="status">{tr("Yükleniyor…")}</div> : total === 0 ? (
             <div className="empty">
               {tr("Bu filtrelerle ilan bulunamadı. Filtreleri gevşetmeyi dene.")}</div>
           ) : (

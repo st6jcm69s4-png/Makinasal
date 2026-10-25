@@ -1365,5 +1365,12 @@
   "Davet edilen": "Invited",
   "Kazanılan hak": "Slots earned",
   "Bir davet kodun var mı?": "Do you have a referral code?",
-  "Kodu kullan": "Use code"
+  "Kodu kullan": "Use code",
+  "Harita yüklenemedi.": "The map could not be loaded.",
+  "Harita yükleniyor…": "Loading map…",
+  "Haritada gösterilecek ilan yok.": "No listings to show on the map.",
+  "İllere göre ilan haritası": "Listings by province map",
+  "Bir ile tıklayarak o ildeki ilanları listele. Konumlar il merkezidir, tam adres paylaşılmaz.": "Click a province to list its listings. Positions are province centres; exact addresses are never shown.",
+  "Liste görünümü": "List view",
+  "Harita görünümü": "Map view"
 }
