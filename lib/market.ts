@@ -120,7 +120,9 @@ export function filterListings(
       const hay = lower(
         `${l.brand ?? ""} ${l.model ?? ""} ${l.title ?? ""} ${l.spec ?? ""} ${l.compat ?? ""}`,
       );
-      if (!hay.includes(q)) return false;
+      const squash = (v: string) => v.replace(/[^a-z0-9]/g, "");
+      const qs = squash(q);
+      if (!hay.includes(q) && !(qs.length >= 3 && squash(hay).includes(qs))) return false;
     }
     return true;
   });
