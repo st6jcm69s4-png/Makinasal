@@ -15,6 +15,7 @@ import { isPartCategory } from '@/lib/pricing';
 import { getSupabase } from '@/lib/supabase/client';
 import { trustLevel } from '@/lib/trust';
 import { useMarket } from './MarketProvider';
+import { ServiceRequestBox } from './ServiceRequestBox';
 import { IconCmp, IconFav, Pill, ScoreRow, toneClass } from './ui';
 
 const REPORT_REASONS = ['Sahte veya yanıltıcı ilan', 'Kapora / ön ödeme istiyor', 'Fiyat gerçek dışı', 'Hakaret veya taciz', 'Diğer'];
@@ -321,6 +322,7 @@ function Actions({ l, part }: { l: Listing; part: boolean }) {
           </div>
         </div>
       ) : null}
+      {!own && !isDemo && /^[0-9a-f-]{36}$/i.test(l.id) ? <ServiceRequestBox listingId={l.id} city={l.city} part={isPartCategory(l.cat)} /> : null}
       {offerOpen ? (
         <form className="panel" onSubmit={sendOffer} noValidate>
           <h3>{tr("Teklif ver")}</h3>
