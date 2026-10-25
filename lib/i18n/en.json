@@ -1372,5 +1372,12 @@
   "İllere göre ilan haritası": "Listings by province map",
   "Bir ile tıklayarak o ildeki ilanları listele. Konumlar il merkezidir, tam adres paylaşılmaz.": "Click a province to list its listings. Positions are province centres; exact addresses are never shown.",
   "Liste görünümü": "List view",
-  "Harita görünümü": "Map view"
+  "Harita görünümü": "Map view",
+  "Hizmet talepleri": "Service requests",
+  "Talep yok.": "No requests.",
+  "Finansman": "Financing",
+  "Ekspertiz": "Inspection",
+  "Görüşüldü": "Contacted",
+  "Kapandı": "Closed",
+  "Kapat": "Close"
 }
