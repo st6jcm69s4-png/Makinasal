@@ -115,9 +115,9 @@ export default function Listings() {
 
 const s = StyleSheet.create({
   screen: { flex: 1, backgroundColor: '#F6F5F3' },
-  input: { margin: 12, padding: 12, backgroundColor: '#fff', borderRadius: 8, borderWidth: 1, borderColor: '#DDD9DC' },
+  input: { margin: 12, padding: 12, backgroundColor: '#fff', borderRadius: 4, borderWidth: 1, borderColor: '#DDD9DC' },
   chips: { paddingHorizontal: 12, gap: 8, paddingBottom: 8 },
-  chip: { paddingVertical: 8, paddingHorizontal: 14, backgroundColor: '#fff', borderRadius: 20, borderWidth: 1, borderColor: '#DDD9DC' },
+  chip: { paddingVertical: 8, paddingHorizontal: 14, backgroundColor: '#fff', borderRadius: 4, borderWidth: 1, borderColor: '#DDD9DC' },
   chipOn: { backgroundColor: '#800020', borderColor: '#800020' },
   chipText: { color: '#25272D' },
   chipTextOn: { color: '#fff' },

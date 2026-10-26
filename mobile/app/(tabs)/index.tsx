@@ -4,21 +4,23 @@ import { Text, } from '../../components/LText';
 import { router, useFocusEffect } from 'expo-router';
 import { SearchBox } from '../../components/SearchBox';
 import { ListingCard } from '../../components/ListingCard';
-import { Btn } from '../../components/ui';
+import { Btn, Band } from '../../components/ui';
+import { Icon, type IconName } from '../../components/Icon';
+import { color, font } from '../../lib/theme';
 import { useApp } from '../../lib/AppContext';
 import { CATEGORY_GROUPS } from '../../lib/machineryCatalog';
 import { money, type MarketPost, type Provider } from '../../lib/network';
 import { supabase, type Row } from '../../lib/supabase';
 
-const QUICK: [string, string, () => void][] = [
-  ['Satılık ilanlar', '🚜', () => router.navigate('/ilanlar')],
-  ['Kiralık makineler', '🔑', () => router.navigate({ pathname: '/is-agi', params: { kind: 'rental_machine' } })],
-  ['Operatör ve ustalar', '👷', () => router.navigate({ pathname: '/is-agi', params: { kind: 'rental_operator' } })],
-  ['İş talepleri', '📋', () => router.navigate({ pathname: '/is-agi', params: { kind: 'job' } })],
-  ['Parça talepleri', '🔧', () => router.navigate({ pathname: '/is-agi', params: { kind: 'part_request' } })],
-  ['Yedek parça', '⚙', () => router.push('/yedek-parca')],
-  ['Şirketler ve filolar', '🏢', () => router.navigate({ pathname: '/is-agi', params: { kind: 'firma' } })],
-  ['İl haritası', '🗺', () => router.push('/harita')],
+const QUICK: [string, IconName, () => void][] = [
+  ['Satılık ilanlar', 'truck', () => router.navigate('/ilanlar')],
+  ['Kiralık makineler', 'key', () => router.navigate({ pathname: '/is-agi', params: { kind: 'rental_machine' } })],
+  ['Operatör ve ustalar', 'user-check', () => router.navigate({ pathname: '/is-agi', params: { kind: 'rental_operator' } })],
+  ['İş talepleri', 'clipboard', () => router.navigate({ pathname: '/is-agi', params: { kind: 'job' } })],
+  ['Parça talepleri', 'tool', () => router.navigate({ pathname: '/is-agi', params: { kind: 'part_request' } })],
+  ['Yedek parça', 'settings', () => router.push('/yedek-parca')],
+  ['Şirketler ve filolar', 'briefcase', () => router.navigate({ pathname: '/is-agi', params: { kind: 'firma' } })],
+  ['İl haritası', 'map', () => router.push('/harita')],
 ];
 const STEPS: [string, string][] = [
   ['İhtiyacını paylaş', 'Konumu, tarihleri ve neye ihtiyacın olduğunu belirt.'],
@@ -55,7 +57,6 @@ export default function Home() {
   return (
     <ScrollView style={s.screen} contentContainerStyle={{ paddingBottom: 24 }} refreshControl={<RefreshControl refreshing={busy} onRefresh={() => void load()} />} keyboardShouldPersistTaps="handled">
       <View style={s.hero}>
-        <Text style={s.eyebrow}>SAHANIN DİJİTAL İŞ AĞI</Text>
         <Text style={s.h1}>{session ? `Merhaba${name ? ', ' + name : ''}, tekrar hoş geldin` : 'Al, sat, kirala. İşini paylaş, fiyat al.'}</Text>
         <Text style={s.lead}>Makine, yedek parça ve işini yapacak hizmeti burada bul.</Text>
         <View style={s.searchRow}>
@@ -65,17 +66,17 @@ export default function Home() {
         {!session ? <Pressable onPress={() => router.navigate('/hesap')} accessibilityRole="button"><Text style={s.link}>Giriş yap / Kayıt ol →</Text></Pressable> : null}
       </View>
 
-      <Text style={s.h2}>Hızlı keşfet</Text>
+      <Band title="Hızlı keşfet" />
       <View style={s.grid}>
         {QUICK.map(([label, icon, go]) => (
           <Pressable key={label} style={s.tile} onPress={go} accessibilityRole="button">
-            <Text style={{ fontSize: 24 }}>{icon}</Text>
+            <Icon name={icon} size={22} color={color.accent} />
             <Text style={s.tileText}>{label}</Text>
           </Pressable>
         ))}
       </View>
 
-      <Text style={s.h2}>Satılık kategorilerine göz at</Text>
+      <Band title="Satılık kategorilerine göz at" />
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 12, gap: 8 }}>
         {CATEGORY_GROUPS.map((g) => (
           <Pressable key={g.id} style={s.cat} onPress={() => router.navigate({ pathname: '/ilanlar', params: { cat: 'group:' + g.id } })} accessibilityRole="button"><Text style={s.catText}>{g.label}</Text></Pressable>
@@ -83,11 +84,11 @@ export default function Home() {
       </ScrollView>
 
       {error ? <Text style={s.err}>Bazı bölümler yüklenemedi. Aşağı çekerek yenileyebilirsin.</Text> : null}
-      <View style={s.sectionHead}><Text style={s.h2b}>Satılık ilanlar</Text><Pressable onPress={() => router.navigate('/ilanlar')} accessibilityRole="button"><Text style={s.link2}>Tümünü gör</Text></Pressable></View>
+      <Band title="Satılık ilanlar" action="Tümünü gör" onAction={() => router.navigate('/ilanlar')} />
       {latest.map((r) => <ListingCard key={r.id} item={r} />)}
       {!busy && !latest.length ? <Text style={s.empty}>Henüz ilan yok.</Text> : null}
 
-      <View style={s.sectionHead}><Text style={s.h2b}>Yeni iş fırsatları</Text><Pressable onPress={() => router.navigate({ pathname: '/is-agi', params: { kind: 'job' } })} accessibilityRole="button"><Text style={s.link2}>Tümünü gör</Text></Pressable></View>
+      <Band title="Yeni iş fırsatları" action="Tümünü gör" onAction={() => router.navigate({ pathname: '/is-agi', params: { kind: 'job' } })} />
       {jobs.map((p) => (
         <Pressable key={p.id} style={s.card} onPress={() => router.push(`/ag/ilan/${p.id}`)} accessibilityRole="button">
           <Text style={s.cardTitle}>{p.title}</Text>
@@ -97,7 +98,7 @@ export default function Home() {
       ))}
       {!busy && !jobs.length ? <Text style={s.empty}>Bir sonraki işin burada olabilir.</Text> : null}
 
-      <View style={s.sectionHead}><Text style={s.h2b}>Bölgendeki şirketler</Text><Pressable onPress={() => router.navigate({ pathname: '/is-agi', params: { kind: 'firma' } })} accessibilityRole="button"><Text style={s.link2}>Şirketleri keşfet</Text></Pressable></View>
+      <Band title="Bölgendeki şirketler" action="Şirketleri keşfet" onAction={() => router.navigate({ pathname: '/is-agi', params: { kind: 'firma' } })} />
       {firms.map((f) => (
         <Pressable key={f.user_id} style={s.card} onPress={() => router.push(`/firma/${f.user_id}`)} accessibilityRole="button">
           <Text style={s.cardTitle}>{f.name}</Text>
@@ -106,13 +107,13 @@ export default function Home() {
         </Pressable>
       ))}
 
-      <Text style={s.h2}>Nasıl çalışır? Üç adım.</Text>
+      <Band title="Nasıl çalışır? Üç adım." />
       {STEPS.map(([t, d], i) => (
         <View key={t} style={s.card}><Text style={s.cardTitle}>{i + 1}. {t}</Text><Text>{d}</Text></View>
       ))}
 
       <View style={{ padding: 12, gap: 8 }}>
-        <Text style={s.h2b}>Şirketini sahaya çıkar</Text>
+        <Text style={[s.h2b, { fontFamily: font.bold }]}>Şirketini sahaya çıkar</Text>
         <Text>Hafriyat şirketin, kamyonların ve makinelerin için tek bir şirket vitrini oluştur.</Text>
         <Btn title="Şirket profili oluştur →" onPress={() => router.push(session ? '/ag/firma-kaydi' : '/hesap' as never)} />
         <Btn ghost title="Güvenli işlem rehberi" onPress={() => router.push('/guven')} />
@@ -123,28 +124,23 @@ export default function Home() {
 
 const s = StyleSheet.create({
   screen: { flex: 1, backgroundColor: '#F6F5F3' },
-  hero: { backgroundColor: '#25272D', padding: 16, gap: 8, borderBottomWidth: 2, borderBottomColor: '#800020' },
-  eyebrow: { color: '#D5CDD2', fontSize: 12, fontWeight: '700', letterSpacing: 1.2 },
-  h1: { color: '#fff', fontSize: 24, fontWeight: '800' },
-  lead: { color: '#D5CDD2' },
+  hero: { backgroundColor: color.navy, padding: 16, paddingTop: 12, gap: 8, borderBottomWidth: 3, borderBottomColor: color.accent },
+  h1: { color: '#fff', fontSize: 27, fontWeight: '700', lineHeight: 31 },
+  lead: { color: color.onNavy },
   searchRow: { flexDirection: 'row', gap: 8, marginTop: 4, alignItems: 'flex-start' },
-  search: { flex: 1, backgroundColor: '#fff', borderRadius: 8, padding: 12 },
-  go: { backgroundColor: '#800020', borderRadius: 8, paddingHorizontal: 18, height: 46, justifyContent: 'center' },
+  go: { backgroundColor: color.accent, borderRadius: 4, paddingHorizontal: 18, height: 46, justifyContent: 'center' },
   goText: { color: '#fff', fontWeight: '700' },
   link: { color: '#fff', fontWeight: '600', textDecorationLine: 'underline' },
-  h2: { fontSize: 18, fontWeight: '700', color: '#25272D', marginHorizontal: 12, marginTop: 18, marginBottom: 8 },
-  h2b: { fontSize: 18, fontWeight: '700', color: '#25272D' },
-  sectionHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginHorizontal: 12, marginTop: 18, marginBottom: 8 },
-  link2: { color: '#800020', fontWeight: '600' },
-  grid: { flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 8 },
-  tile: { width: '46%', margin: '2%', backgroundColor: '#fff', borderRadius: 10, padding: 14, gap: 6, borderWidth: 1, borderColor: '#DDD9DC' },
-  tileText: { fontWeight: '600', color: '#25272D' },
-  cat: { backgroundColor: '#fff', borderRadius: 20, paddingVertical: 8, paddingHorizontal: 14, borderWidth: 1, borderColor: '#DDD9DC' },
-  catText: { color: '#25272D' },
-  card: { backgroundColor: '#fff', marginHorizontal: 12, marginBottom: 8, padding: 12, borderRadius: 8, gap: 4 },
-  cardTitle: { fontWeight: '700', color: '#25272D' },
-  meta: { color: '#666' },
-  price: { fontWeight: '700', color: '#800020' },
-  empty: { color: '#666', marginHorizontal: 12 },
-  err: { color: '#b00020', marginHorizontal: 12, marginTop: 8 },
+  h2b: { fontSize: 18, fontWeight: '700', color: color.ink },
+  grid: { flexDirection: 'row', flexWrap: 'wrap', marginHorizontal: 12, borderLeftWidth: 1, borderTopWidth: 1, borderColor: color.line, backgroundColor: color.surface },
+  tile: { width: '50%', padding: 14, gap: 8, borderRightWidth: 1, borderBottomWidth: 1, borderColor: color.line },
+  tileText: { fontWeight: '600', color: color.ink, fontSize: 16 },
+  cat: { backgroundColor: color.surface, borderRadius: 4, paddingVertical: 9, paddingHorizontal: 14, borderWidth: 1, borderColor: color.line },
+  catText: { color: color.ink, fontWeight: '500' },
+  card: { backgroundColor: color.surface, marginHorizontal: 12, marginBottom: 8, padding: 12, borderRadius: 4, gap: 4, borderWidth: 1, borderColor: color.line },
+  cardTitle: { fontWeight: '700', color: color.ink, fontSize: 16 },
+  meta: { color: color.muted },
+  price: { fontWeight: '700', color: color.accent },
+  empty: { color: color.muted, marginHorizontal: 12 },
+  err: { color: color.bad, marginHorizontal: 12, marginTop: 8 },
 });

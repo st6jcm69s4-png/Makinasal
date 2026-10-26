@@ -82,9 +82,9 @@ export default function MyListings() {
 const s = StyleSheet.create({
   msg: { textAlign: 'center', color: '#666', margin: 24 },
   err: { color: '#b00020', margin: 12 },
-  card: { backgroundColor: '#fff', borderRadius: 8, overflow: 'hidden' },
+  card: { backgroundColor: '#fff', borderRadius: 4, overflow: 'hidden' },
   top: { flexDirection: 'row', gap: 10, padding: 10 },
-  img: { width: 90, height: 70, borderRadius: 6 },
+  img: { width: 90, height: 70, borderRadius: 4 },
   title: { fontWeight: '600', color: '#25272D' },
   price: { color: '#800020', fontWeight: '700' },
   status: { color: '#666' },

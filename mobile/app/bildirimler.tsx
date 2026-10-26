@@ -63,7 +63,7 @@ const s = StyleSheet.create({
   msg: { textAlign: 'center', color: '#666', margin: 24 },
   err: { color: '#b00020', margin: 12 },
   link: { color: '#800020', fontWeight: '600', margin: 12 },
-  card: { backgroundColor: '#fff', padding: 12, borderRadius: 8, gap: 4 },
+  card: { backgroundColor: '#fff', padding: 12, borderRadius: 4, gap: 4 },
   unread: { borderLeftWidth: 4, borderLeftColor: '#800020' },
   title: { fontWeight: '700' },
   date: { color: '#888', fontSize: 12 },

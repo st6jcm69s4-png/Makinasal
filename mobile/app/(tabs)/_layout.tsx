@@ -1,23 +1,27 @@
 import { Tabs } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { View } from 'react-native';
-import { Text } from '../../components/LText';
+import { Icon, type IconName } from '../../components/Icon';
+import { PlainText } from '../../components/LText';
+import { font } from '../../lib/theme';
 import { useApp } from '../../lib/AppContext';
 import { tr } from '../../lib/i18n';
 import { useLang } from '../../lib/lang';
 import { supabase } from '../../lib/supabase';
 
-// Ek paket gerektirmeyen basit simgeler.
-const tab = (glyph: string) => ({ focused }: { focused: boolean }) => (
-  <Text style={{ fontSize: 20, opacity: focused ? 1 : 0.7 }}>{glyph}</Text>
+const icon = (name: IconName) => ({ color, focused }: { color: string; focused: boolean }) => (
+  <View style={{ alignItems: 'center' }}>
+    <View style={{ position: 'absolute', top: -9, width: 44, height: 3, backgroundColor: focused ? '#800020' : 'transparent' }} />
+    <Icon name={name} size={21} color={color} />
+  </View>
 );
 
-/** Üst başlık: web sitesindeki gibi lacivert zemin, bordo alt çizgi. */
+/** Üst başlık: lacivert zemin, Barlow yazılı marka. */
 function Logo() {
   return (
-    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-      <Text style={{ color: '#800020', fontSize: 22 }}>⚙</Text>
-      <Text style={{ color: '#fff', fontSize: 20, fontWeight: '800', letterSpacing: 1 }}>MAKİNASAL</Text>
+    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+      <Icon name="settings" size={20} color="#800020" />
+      <PlainText style={{ color: '#fff', fontSize: 21, fontFamily: font.bold, letterSpacing: 1.6 }}>MAKİNASAL</PlainText>
     </View>
   );
 }
@@ -48,18 +52,17 @@ export default function TabsLayout() {
         headerTitle: () => <Logo />,
         tabBarActiveTintColor: '#fff',
         tabBarInactiveTintColor: '#D5CDD2',
-        tabBarActiveBackgroundColor: '#800020',
-        tabBarStyle: { backgroundColor: '#25272D', borderTopWidth: 2, borderTopColor: '#800020', paddingHorizontal: 6, paddingTop: 4 },
-        tabBarItemStyle: { borderRadius: 8, marginHorizontal: 2, marginVertical: 2, paddingVertical: 2 },
-        tabBarLabelStyle: { fontSize: 10.5, fontWeight: '600' },
+        tabBarStyle: { backgroundColor: '#25272D', borderTopWidth: 1, borderTopColor: '#34363D', paddingTop: 0 },
+        tabBarItemStyle: { borderLeftWidth: 1, borderLeftColor: '#34363D', paddingTop: 6 },
+        tabBarLabelStyle: { fontSize: 11.5, fontFamily: font.label, letterSpacing: 0.4 },
       }}
     >
-      <Tabs.Screen name="index" options={{ tabBarLabel: tr('Ana sayfa'), tabBarIcon: tab('🏠') }} />
-      <Tabs.Screen name="ilanlar" options={{ tabBarLabel: tr('İlanlar'), tabBarIcon: tab('🔎') }} />
-      <Tabs.Screen name="is-agi" options={{ tabBarLabel: tr('İş Ağı'), tabBarIcon: tab('💼') }} />
-      <Tabs.Screen name="favoriler" options={{ tabBarLabel: tr('Favoriler'), tabBarIcon: tab('♥'), tabBarBadge: favs.size > 0 ? favs.size : undefined, tabBarBadgeStyle: { backgroundColor: '#fff', color: '#800020', fontSize: 10 } }} />
-      <Tabs.Screen name="mesajlar" options={{ tabBarLabel: tr('Mesajlar'), tabBarIcon: tab('💬'), tabBarBadge: unread > 0 ? unread : undefined, tabBarBadgeStyle: { backgroundColor: '#fff', color: '#800020', fontSize: 10 } }} />
-      <Tabs.Screen name="hesap" options={{ tabBarLabel: tr('Hesabım'), tabBarIcon: tab('👤') }} />
+      <Tabs.Screen name="index" options={{ tabBarLabel: tr('Ana sayfa'), tabBarIcon: icon('home') }} />
+      <Tabs.Screen name="ilanlar" options={{ tabBarLabel: tr('İlanlar'), tabBarIcon: icon('search') }} />
+      <Tabs.Screen name="is-agi" options={{ tabBarLabel: tr('İş Ağı'), tabBarIcon: icon('briefcase') }} />
+      <Tabs.Screen name="favoriler" options={{ tabBarLabel: tr('Favoriler'), tabBarIcon: icon('heart'), tabBarBadge: favs.size > 0 ? favs.size : undefined, tabBarBadgeStyle: { backgroundColor: '#fff', color: '#800020', fontSize: 10 } }} />
+      <Tabs.Screen name="mesajlar" options={{ tabBarLabel: tr('Mesajlar'), tabBarIcon: icon('message-square'), tabBarBadge: unread > 0 ? unread : undefined, tabBarBadgeStyle: { backgroundColor: '#fff', color: '#800020', fontSize: 10 } }} />
+      <Tabs.Screen name="hesap" options={{ tabBarLabel: tr('Hesabım'), tabBarIcon: icon('user') }} />
     </Tabs>
   );
 }

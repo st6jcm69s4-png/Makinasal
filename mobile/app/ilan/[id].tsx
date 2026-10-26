@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, Image, Linking, Modal, Pressable, ScrollView, StyleSheet, Switch, View } from 'react-native';
+import { ActivityIndicator, Alert, Dimensions, Image, Linking, Modal, Pressable, ScrollView, StyleSheet, Switch, View } from 'react-native';
 import { Text, TextInput } from '../../components/LText';
 import { router, useLocalSearchParams } from 'expo-router';
+import { Heart, Icon } from '../../components/Icon';
+import { FieldCell, FieldGrid } from '../../components/ui';
 import { checkMessage } from '../../lib/messageFilter';
 import { PickerModal } from '../../components/PickerModal';
 import { useApp } from '../../lib/AppContext';
@@ -144,15 +146,20 @@ export default function ListingScreen() {
         <Text style={s.title}>{item.title}</Text>
         <Text style={s.price}>{tl(item.price)}</Text>
         <Pressable style={s.favBtn} accessibilityRole="button" onPress={async () => { const err = await toggleFav(item.id, item.price); if (err) Alert.alert('Favoriler', err); }}>
-          <Text style={s.favText}>{favs.has(item.id) ? '♥ Favorilerde' : '♡ Favorilere ekle'}</Text>
+          <Heart on={favs.has(item.id)} size={18} color="#800020" /><Text style={s.favText}>{favs.has(item.id) ? 'Favorilerde' : 'Favorilere ekle'}</Text>
         </Pressable>
         <Pressable style={s.favBtn} accessibilityRole="button" onPress={() => { const err = toggleCmp(item.id); if (err) Alert.alert('Karşılaştır', err); }}>
-          <Text style={s.favText}>{cmp.includes(item.id) ? `⇄ Karşılaştırmada (${cmp.length}/3)` : '⇄ Karşılaştırmaya ekle'}</Text>
+          <Icon name="repeat" size={17} color="#800020" /><Text style={s.favText}>{cmp.includes(item.id) ? `Karşılaştırmada (${cmp.length}/3)` : 'Karşılaştırmaya ekle'}</Text>
         </Pressable>
         {cmp.length >= 2 ? <Pressable onPress={() => router.push('/karsilastir')} accessibilityRole="button"><Text style={s.favText}>Karşılaştırmayı aç ({cmp.length})</Text></Pressable> : null}
-        <Text style={s.meta}>
-          {[item.brand, item.model, item.city, item.year, item.usage_value ? `${item.usage_value} ${item.usage_unit ?? ''}` : null].filter(Boolean).join(' · ')}
-        </Text>
+        <FieldGrid style={{ marginTop: 4 }}>
+          <FieldCell label="Marka" value={item.brand} />
+          <FieldCell label="Model" value={item.model} />
+          <FieldCell label="Yıl" value={item.year} />
+          <FieldCell label="Kullanım" value={item.usage_value ? `${item.usage_value} ${item.usage_unit ?? ''}`.trim() : null} />
+          <FieldCell label="İl" value={item.city} />
+          <FieldCell label="Kategori" value={item.category} />
+        </FieldGrid>
         {trust ? (
           <Text style={s.meta}>Satıcı: {seller || '—'} · <Text style={{ color: trust.color, fontWeight: '700' }}>{trust.label}</Text></Text>
         ) : null}
@@ -218,25 +225,25 @@ export default function ListingScreen() {
 }
 
 const s = StyleSheet.create({
-  photo: { width: 390, height: 260 },
+  photo: { width: Dimensions.get('window').width, height: 260 },
   body: { padding: 16, gap: 10 },
-  title: { fontSize: 20, fontWeight: '700', color: '#25272D' },
-  price: { fontSize: 20, fontWeight: '700', color: '#800020' },
+  title: { fontSize: 23, fontWeight: '700', color: '#25272D', lineHeight: 27 },
+  price: { fontSize: 24, fontWeight: '700', color: '#800020' },
   meta: { color: '#666' },
   desc: { marginTop: 4, lineHeight: 20 },
-  warn: { color: '#b36b00', backgroundColor: '#fff6e5', padding: 10, borderRadius: 8 },
-  favBtn: { alignSelf: 'flex-start', paddingVertical: 2 },
+  warn: { color: '#7F5200', backgroundColor: '#FFF0C2', padding: 10, borderRadius: 4, borderLeftWidth: 3, borderLeftColor: '#7F5200' },
+  favBtn: { alignSelf: 'flex-start', paddingVertical: 4, flexDirection: 'row', alignItems: 'center', gap: 6 },
   favText: { color: '#800020', fontWeight: '600' },
-  btn: { backgroundColor: '#800020', padding: 14, borderRadius: 8, alignItems: 'center' },
+  btn: { backgroundColor: '#800020', padding: 14, borderRadius: 4, alignItems: 'center' },
   btnText: { color: '#fff', fontWeight: '600' },
-  btnGhost: { borderWidth: 1, borderColor: '#800020', padding: 12, borderRadius: 8, alignItems: 'center' },
+  btnGhost: { borderWidth: 1, borderColor: '#800020', padding: 12, borderRadius: 4, alignItems: 'center' },
   btnGhostText: { color: '#800020', fontWeight: '600' },
   phone: { fontSize: 18, fontWeight: '700', textAlign: 'center', padding: 8 },
   section: { fontWeight: '700', fontSize: 16, marginTop: 8 },
   report: { color: '#888', textAlign: 'center', padding: 10, textDecorationLine: 'underline' },
   msg: { margin: 24, textAlign: 'center' },
   backdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' },
-  sheet: { backgroundColor: '#fff', padding: 16, gap: 10, borderTopLeftRadius: 16, borderTopRightRadius: 16 },
-  input: { minHeight: 80, padding: 10, backgroundColor: '#F6F5F3', borderRadius: 8, textAlignVertical: 'top' },
+  sheet: { backgroundColor: '#fff', padding: 16, gap: 10, borderTopLeftRadius: 4, borderTopRightRadius: 4 },
+  input: { minHeight: 80, padding: 10, backgroundColor: '#F6F5F3', borderRadius: 4, textAlignVertical: 'top' },
   small: { color: '#666', fontSize: 12 },
 });

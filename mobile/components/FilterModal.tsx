@@ -70,7 +70,7 @@ const s = StyleSheet.create({
   title: { fontWeight: '700', fontSize: 16 },
   close: { color: '#800020', fontWeight: '600' },
   label: { fontWeight: '600', color: '#25272D' },
-  input: { padding: 12, backgroundColor: '#fff', borderRadius: 8, borderWidth: 1, borderColor: '#DDD9DC' },
+  input: { padding: 12, backgroundColor: '#fff', borderRadius: 4, borderWidth: 1, borderColor: '#DDD9DC' },
   row: { flexDirection: 'row', gap: 8 },
   sw: { flexDirection: 'row', alignItems: 'center' },
 });

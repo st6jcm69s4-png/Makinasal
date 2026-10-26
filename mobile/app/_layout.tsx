@@ -1,4 +1,9 @@
+import { Barlow_400Regular, Barlow_500Medium, Barlow_600SemiBold, Barlow_700Bold } from '@expo-google-fonts/barlow';
+import { BarlowCondensed_600SemiBold, BarlowCondensed_700Bold } from '@expo-google-fonts/barlow-condensed';
+import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
+import { useEffect, useState } from 'react';
+import { fontState } from '../lib/theme';
 import { StatusBar } from 'expo-status-bar';
 import { HeaderBack } from '../components/HeaderBack';
 import { AppProvider } from '../lib/AppContext';
@@ -10,7 +15,7 @@ function Screens() {
   return (
     <>
       <StatusBar style="light" />
-      <Stack screenOptions={{ headerStyle: { backgroundColor: '#25272D' }, headerTintColor: '#fff', headerTitleStyle: { fontWeight: '700' }, headerShadowVisible: false, headerLeft: () => <HeaderBack />, contentStyle: { backgroundColor: '#F6F5F3' } }}>
+      <Stack screenOptions={{ headerStyle: { backgroundColor: '#25272D' }, headerTintColor: '#fff', headerTitleStyle: { fontFamily: fontState.ok ? 'Barlow_700Bold' : undefined, fontSize: 19 }, headerShadowVisible: false, headerLeft: () => <HeaderBack />, contentStyle: { backgroundColor: '#F6F5F3' } }}>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="ilan/[id]" options={{ title: tr('İlan') }} />
         <Stack.Screen name="ilan-ver" options={{ title: tr('İlan ver') }} />
@@ -43,6 +48,12 @@ function Screens() {
 }
 
 export default function RootLayout() {
+  const [loaded, error] = useFonts({ Barlow_400Regular, Barlow_500Medium, Barlow_600SemiBold, Barlow_700Bold, BarlowCondensed_600SemiBold, BarlowCondensed_700Bold });
+  // Yazı tipi yüklenemese de (çevrimdışı vb.) uygulama sistem yazı tipiyle açılır.
+  const [timedOut, setTimedOut] = useState(false);
+  useEffect(() => { const t = setTimeout(() => setTimedOut(true), 4000); return () => clearTimeout(t); }, []);
+  fontState.ok = !!loaded && !error;
+  if (!loaded && !error && !timedOut) return null;
   return (
     <LangProvider>
       <AppProvider>

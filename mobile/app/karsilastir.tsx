@@ -39,7 +39,7 @@ export default function Compare() {
 }
 const s = StyleSheet.create({
   msg: { textAlign: 'center', color: '#666', margin: 24 },
-  col: { width: 150, backgroundColor: '#fff', padding: 10, borderRadius: 8, gap: 14 },
+  col: { width: 150, backgroundColor: '#fff', padding: 10, borderRadius: 4, gap: 14 },
   title: { fontWeight: '700', height: 40, color: '#25272D' },
   lbl: { color: '#666', fontWeight: '600' },
   val: { color: '#25272D' },

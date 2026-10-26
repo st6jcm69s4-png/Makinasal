@@ -69,9 +69,9 @@ const s = StyleSheet.create({
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12, padding: 24 },
   msg: { textAlign: 'center', color: '#666', margin: 24 },
   err: { color: '#b00020', margin: 12 },
-  row: { marginHorizontal: 12, marginBottom: 8, padding: 14, backgroundColor: '#fff', borderRadius: 8, gap: 2 },
+  row: { marginHorizontal: 12, marginBottom: 8, padding: 14, backgroundColor: '#fff', borderRadius: 4, gap: 2 },
   other: { fontWeight: '700', color: '#25272D' },
   title: { color: '#666' },
-  btn: { backgroundColor: '#800020', paddingVertical: 12, paddingHorizontal: 20, borderRadius: 8 },
+  btn: { backgroundColor: '#800020', paddingVertical: 12, paddingHorizontal: 20, borderRadius: 4 },
   btnText: { color: '#fff', fontWeight: '600' },
 });

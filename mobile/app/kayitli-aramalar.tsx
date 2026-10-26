@@ -51,7 +51,7 @@ export default function SavedSearches() {
 }
 const s = StyleSheet.create({
   msg: { textAlign: 'center', color: '#666', margin: 24 },
-  card: { backgroundColor: '#fff', padding: 14, borderRadius: 8, flexDirection: 'row', alignItems: 'center', gap: 10 },
+  card: { backgroundColor: '#fff', padding: 14, borderRadius: 4, flexDirection: 'row', alignItems: 'center', gap: 10 },
   title: { fontWeight: '600', color: '#25272D' },
   del: { color: '#b00020' },
 });

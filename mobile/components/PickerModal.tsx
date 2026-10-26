@@ -59,7 +59,7 @@ const s = StyleSheet.create({
   head: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, borderBottomWidth: 1, borderBottomColor: '#eee' },
   title: { fontWeight: '700', fontSize: 16 },
   close: { color: '#800020', fontWeight: '600' },
-  search: { margin: 12, padding: 10, backgroundColor: '#F6F5F3', borderRadius: 8, borderWidth: 1, borderColor: '#DDD9DC' },
+  search: { margin: 12, padding: 10, backgroundColor: '#F6F5F3', borderRadius: 4, borderWidth: 1, borderColor: '#DDD9DC' },
   row: { paddingVertical: 14, paddingHorizontal: 16, borderBottomWidth: 1, borderBottomColor: '#f2f2f2' },
   label: { color: '#25272D' },
   sel: { color: '#800020', fontWeight: '700' },

@@ -102,6 +102,6 @@ export default function NetworkTab() {
   );
 }
 const s = StyleSheet.create({
-  input: { padding: 12, backgroundColor: '#fff', borderRadius: 8, borderWidth: 1, borderColor: '#DDD9DC' },
+  input: { padding: 12, backgroundColor: '#fff', borderRadius: 4, borderWidth: 1, borderColor: '#DDD9DC' },
   item: { marginHorizontal: 12, marginBottom: 8 },
 });

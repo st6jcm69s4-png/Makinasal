@@ -83,9 +83,9 @@ export default function EditProfile() {
 const s = StyleSheet.create({
   msg: { textAlign: 'center', color: '#666', margin: 24 },
   label: { fontWeight: '600' },
-  input: { padding: 12, backgroundColor: '#fff', borderRadius: 8, borderWidth: 1, borderColor: '#DDD9DC' },
+  input: { padding: 12, backgroundColor: '#fff', borderRadius: 4, borderWidth: 1, borderColor: '#DDD9DC' },
   small: { color: '#666', fontSize: 12 },
   err: { color: '#b00020' },
-  btn: { backgroundColor: '#800020', padding: 14, borderRadius: 8, alignItems: 'center' },
+  btn: { backgroundColor: '#800020', padding: 14, borderRadius: 4, alignItems: 'center' },
   btnText: { color: '#fff', fontWeight: '600' },
 });

@@ -108,7 +108,7 @@ export default function Thread() {
 }
 
 const s = StyleSheet.create({
-  bubble: { maxWidth: '80%', padding: 10, borderRadius: 12 },
+  bubble: { maxWidth: '80%', padding: 10, borderRadius: 4 },
   offer: { borderWidth: 2, borderColor: '#e0a100' },
   hint2: { color: '#666', paddingHorizontal: 12, paddingTop: 8 },
   mine: { alignSelf: 'flex-end', backgroundColor: '#800020' },
@@ -119,7 +119,7 @@ const s = StyleSheet.create({
   err: { color: '#b00020', marginHorizontal: 12 },
   hint: { color: '#888', fontSize: 12, marginHorizontal: 12, marginBottom: 4 },
   bar: { flexDirection: 'row', gap: 8, padding: 10, backgroundColor: '#fff', alignItems: 'flex-end' },
-  input: { flex: 1, maxHeight: 100, padding: 10, backgroundColor: '#F6F5F3', borderRadius: 8 },
-  send: { backgroundColor: '#800020', paddingVertical: 12, paddingHorizontal: 16, borderRadius: 8 },
+  input: { flex: 1, maxHeight: 100, padding: 10, backgroundColor: '#F6F5F3', borderRadius: 4 },
+  send: { backgroundColor: '#800020', paddingVertical: 12, paddingHorizontal: 16, borderRadius: 4 },
   sendText: { color: '#fff', fontWeight: '600' },
 });
