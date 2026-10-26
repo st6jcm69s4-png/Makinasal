@@ -16,6 +16,12 @@ export default function RootLayout() {
         <Stack.Screen name="bildirimler" options={{ title: 'Bildirimler' }} />
         <Stack.Screen name="profil-duzenle" options={{ title: 'Profili düzenle' }} />
         <Stack.Screen name="kayitli-aramalar" options={{ title: 'Kayıtlı aramalar' }} />
+        <Stack.Screen name="ag/ilan/[id]" options={{ title: 'İş ağı ilanı' }} />
+        <Stack.Screen name="ag/yeni" options={{ title: 'İş ağı ilanı' }} />
+        <Stack.Screen name="ag/hesabim" options={{ title: 'İş ağı hesabım' }} />
+        <Stack.Screen name="ag/firma-kaydi" options={{ title: 'Firma profilim' }} />
+        <Stack.Screen name="ag/envanter" options={{ title: 'Envanterim' }} />
+        <Stack.Screen name="firma/[id]" options={{ title: 'Firma' }} />
       </Stack>
     </AppProvider>
   );
