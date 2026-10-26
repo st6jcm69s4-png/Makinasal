@@ -23,3 +23,7 @@ Mesajlar, favoriler, ilan verme (kamera/galeri), bildirimler, şifre yenileme, k
 - Apple Developer hesabı (yıllık ücretli) ve Google Play geliştirici hesabı (tek seferlik ücret).
 - `app.json` içindeki uygulama kimlikleri (`tr.com.makinasal.app`) alan adınıza göre onaylanmalı.
 - EAS Build ile paket üretme, gizlilik beyanları ve mağaza incelemesi.
+
+## Tek tıkla başlatma (Windows)
+`mobile` klasöründeki `baslat.bat` dosyasına çift tıklayın. Güncel kodu indirir, paketleri kontrol eder ve uygulamayı başlatır.
+Expo hesabına giriş için bir kez: PowerShell'de `setx EXPO_TOKEN "ANAHTAR"` yazın (anahtarı expo.dev → Account settings → Access tokens bölümünden oluşturun), pencereyi kapatıp yenisini açın.
