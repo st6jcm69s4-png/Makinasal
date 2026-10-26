@@ -25,20 +25,12 @@ export default function Account() {
       <ScrollView style={{ backgroundColor: '#F5F5F6' }} contentContainerStyle={s.screen}>
         <Text style={s.h}>Hesabım</Text>
         <Text>{session.user.email}</Text>
+        <Pressable style={s.btn} onPress={() => router.push('/ilan-ver')} accessibilityRole="button"><Text style={s.btnText}>İlan ver</Text></Pressable>
         <Pressable style={s.btn} onPress={() => router.push('/ilanlarim')} accessibilityRole="button"><Text style={s.btnText}>İlanlarım</Text></Pressable>
         <ReferralBox />
         <Pressable style={s.btnGhost} onPress={() => void supabase.auth.signOut()} accessibilityRole="button"><Text style={s.btnGhostText}>Çıkış yap</Text></Pressable>
-        <Text style={s.note}>İlan verme, bildirimler ve profil düzenleme sonraki sürümlerde eklenecek.</Text>
+        <Text style={s.note}>Bildirimler ve profil düzenleme sonraki sürümlerde eklenecek.</Text>
       </ScrollView>
-    );
-  }
-  return (
-      <View style={s.screen}>
-        <Text style={s.h}>Giriş yapıldı</Text>
-        <Text>{session.user.email}</Text>
-        <Pressable style={s.btn} onPress={() => void supabase.auth.signOut()} accessibilityRole="button"><Text style={s.btnText}>Çıkış yap</Text></Pressable>
-        <Text style={s.note}>Mesajlar, favoriler ve ilan verme sonraki sürümlerde eklenecek.</Text>
-      </View>
     );
   }
   return (
@@ -54,13 +46,13 @@ export default function Account() {
 }
 
 const s = StyleSheet.create({
-  screen: { flex: 1, padding: 20, gap: 12, backgroundColor: '#F5F5F6' },
+  screen: { padding: 20, gap: 12, flexGrow: 1, backgroundColor: '#F5F5F6' },
   h: { fontSize: 22, fontWeight: '700' },
   input: { padding: 12, backgroundColor: '#fff', borderRadius: 8, borderWidth: 1, borderColor: '#ddd' },
   btn: { backgroundColor: '#6B1E2E', padding: 14, borderRadius: 8, alignItems: 'center' },
   btnText: { color: '#fff', fontWeight: '600' },
-  err: { color: '#b00020' },
   btnGhost: { borderWidth: 1, borderColor: '#6B1E2E', padding: 14, borderRadius: 8, alignItems: 'center' },
   btnGhostText: { color: '#6B1E2E', fontWeight: '600' },
+  err: { color: '#b00020' },
   note: { color: '#666' },
 });

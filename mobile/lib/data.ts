@@ -187,3 +187,8 @@ export const LIMITS = {
     listings: 30,
   },
 } as const;
+
+// Web lib/parts.ts içindeki parça grupları.
+export const PART_GROUPS = [
+ {id:"engine",label:"Motor ve motor parçaları"},{id:"hydraulics",label:"Hidrolik pompa, valf ve silindir"},{id:"undercarriage",label:"Palet ve yürüyüş takımı"},{id:"transmission",label:"Şanzıman, diferansiyel ve aktarma"},{id:"brakes",label:"Fren ve süspansiyon"},{id:"electrical",label:"Elektrik, elektronik ve sensörler"},{id:"cooling",label:"Radyatör ve soğutma"},{id:"fuel",label:"Yakıt sistemi ve enjektör"},{id:"filters",label:"Filtre ve bakım parçaları"},{id:"seals",label:"Keçe, conta ve rulman"},{id:"body",label:"Kabin, kaporta ve cam"},{id:"attachments",label:"Kova, kırıcı ve ataşman"},{id:"lifting",label:"Bom, halat ve kaldırma parçaları"},{id:"tires",label:"Lastik ve jant"},{id:"exhaust",label:"Egzoz ve emisyon parçaları"},{id:"other",label:"Diğer yedek parçalar"}
+] as const;
