@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, FlatList, Image, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
-import { router } from 'expo-router';
-import { configured, photoUrl, supabase, tl, type Row } from '../../lib/supabase';
+import { ActivityIndicator, FlatList, StyleSheet, Text, TextInput, View } from 'react-native';
+import { ListingCard } from '../../components/ListingCard';
+import { configured, supabase, type Row } from '../../lib/supabase';
 
 export default function Listings() {
   const [q, setQ] = useState('');
@@ -42,19 +42,7 @@ export default function Listings() {
         onEndReached={() => { if (!loading && rows.length < total) void load(page + 1, q.trim()); }}
         ListEmptyComponent={loading ? null : <Text style={s.empty}>İlan bulunamadı.</Text>}
         ListFooterComponent={loading ? <ActivityIndicator style={{ margin: 16 }} /> : null}
-        renderItem={({ item }) => {
-          const photo = [...(item.listing_photos ?? [])].sort((a, b) => a.position - b.position)[0];
-          return (
-            <Pressable style={s.card} onPress={() => router.push(`/ilan/${item.id}`)} accessibilityRole="button">
-              {photo ? <Image source={{ uri: photoUrl(photo.path) }} style={s.img} /> : <View style={[s.img, s.noimg]} />}
-              <View style={s.body}>
-                <Text style={s.title} numberOfLines={2}>{item.title}</Text>
-                <Text style={s.price}>{tl(item.price)}</Text>
-                <Text style={s.meta}>{item.city}{item.year ? ` · ${item.year}` : ''}</Text>
-              </View>
-            </Pressable>
-          );
-        }}
+        renderItem={({ item }) => <ListingCard item={item} />}
       />
     </View>
   );
@@ -63,13 +51,6 @@ export default function Listings() {
 const s = StyleSheet.create({
   screen: { flex: 1, backgroundColor: '#F5F5F6' },
   input: { margin: 12, padding: 12, backgroundColor: '#fff', borderRadius: 8, borderWidth: 1, borderColor: '#ddd' },
-  card: { flexDirection: 'row', marginHorizontal: 12, marginBottom: 10, backgroundColor: '#fff', borderRadius: 8, overflow: 'hidden' },
-  img: { width: 110, height: 90 },
-  noimg: { backgroundColor: '#e3e3e6' },
-  body: { flex: 1, padding: 10, gap: 4 },
-  title: { fontWeight: '600', color: '#25272D' },
-  price: { fontWeight: '700', color: '#6B1E2E' },
-  meta: { color: '#666' },
   err: { color: '#b00020', marginHorizontal: 12 },
   empty: { textAlign: 'center', margin: 24, color: '#666' },
 });

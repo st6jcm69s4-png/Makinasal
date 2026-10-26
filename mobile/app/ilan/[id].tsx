@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Image, Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, Image, Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
+import { useApp } from '../../lib/AppContext';
 import { SITE_URL, photoUrl, supabase, tl } from '../../lib/supabase';
 
 type Detail = {
@@ -11,6 +12,7 @@ type Detail = {
 
 export default function ListingScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
+  const { favs, toggleFav } = useApp();
   const [item, setItem] = useState<Detail | null>(null);
   const [state, setState] = useState<'loading' | 'ok' | 'error' | 'missing'>('loading');
 
@@ -37,6 +39,9 @@ export default function ListingScreen() {
       <View style={s.body}>
         <Text style={s.title}>{item.title}</Text>
         <Text style={s.price}>{tl(item.price)}</Text>
+        <Pressable style={s.favBtn} accessibilityRole="button" onPress={async () => { const err = await toggleFav(item.id, item.price); if (err) Alert.alert('Favoriler', err); }}>
+          <Text style={s.favText}>{favs.has(item.id) ? '♥ Favorilerde' : '♡ Favorilere ekle'}</Text>
+        </Pressable>
         <Text style={s.meta}>
           {[item.brand, item.model, item.city, item.year, item.usage_value ? `${item.usage_value} ${item.usage_unit ?? ''}` : null].filter(Boolean).join(' · ')}
         </Text>
@@ -58,6 +63,8 @@ const s = StyleSheet.create({
   price: { fontSize: 20, fontWeight: '700', color: '#6B1E2E' },
   meta: { color: '#666' },
   desc: { marginTop: 8, lineHeight: 20 },
+  favBtn: { alignSelf: 'flex-start', paddingVertical: 6 },
+  favText: { color: '#6B1E2E', fontWeight: '600' },
   btn: { marginTop: 16, backgroundColor: '#6B1E2E', padding: 14, borderRadius: 8, alignItems: 'center' },
   btnText: { color: '#fff', fontWeight: '600' },
   msg: { margin: 24, textAlign: 'center' },

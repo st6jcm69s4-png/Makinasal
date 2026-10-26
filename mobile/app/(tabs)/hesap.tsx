@@ -1,20 +1,14 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
-import type { Session } from '@supabase/supabase-js';
+import { useApp } from '../../lib/AppContext';
 import { configured, supabase } from '../../lib/supabase';
 
 export default function Account() {
-  const [session, setSession] = useState<Session | null>(null);
+  const { session } = useApp();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [msg, setMsg] = useState('');
   const [busy, setBusy] = useState(false);
-
-  useEffect(() => {
-    void supabase.auth.getSession().then(({ data }) => setSession(data.session));
-    const { data } = supabase.auth.onAuthStateChange((_e, next) => setSession(next));
-    return () => data.subscription.unsubscribe();
-  }, []);
 
   async function signIn() {
     if (!configured) { setMsg('Uygulama ayarları eksik (.env dosyası).'); return; }
