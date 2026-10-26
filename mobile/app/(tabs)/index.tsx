@@ -1,7 +1,8 @@
 import { useCallback, useState } from 'react';
 import { Pressable, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
-import { Text, TextInput } from '../../components/LText';
+import { Text, } from '../../components/LText';
 import { router, useFocusEffect } from 'expo-router';
+import { SearchBox } from '../../components/SearchBox';
 import { ListingCard } from '../../components/ListingCard';
 import { Btn } from '../../components/ui';
 import { useApp } from '../../lib/AppContext';
@@ -58,7 +59,7 @@ export default function Home() {
         <Text style={s.h1}>{session ? `Merhaba${name ? ', ' + name : ''}, tekrar hoş geldin` : 'Al, sat, kirala. İşini paylaş, fiyat al.'}</Text>
         <Text style={s.lead}>Makine, yedek parça ve işini yapacak hizmeti burada bul.</Text>
         <View style={s.searchRow}>
-          <TextInput style={s.search} placeholder="Marka, model veya parça numarası ara" placeholderTextColor="#888" value={q} onChangeText={setQ} onSubmitEditing={search} returnKeyType="search" autoCorrect={false} />
+          <View style={{ flex: 1 }}><SearchBox value={q} onChangeText={setQ} onSubmit={search} placeholder="Marka, model veya parça numarası ara" /></View>
           <Pressable style={s.go} onPress={search} accessibilityRole="button"><Text style={s.goText}>Ara</Text></Pressable>
         </View>
         {!session ? <Pressable onPress={() => router.navigate('/hesap')} accessibilityRole="button"><Text style={s.link}>Giriş yap / Kayıt ol →</Text></Pressable> : null}
@@ -126,9 +127,9 @@ const s = StyleSheet.create({
   eyebrow: { color: '#D5CDD2', fontSize: 12, fontWeight: '700', letterSpacing: 1.2 },
   h1: { color: '#fff', fontSize: 24, fontWeight: '800' },
   lead: { color: '#D5CDD2' },
-  searchRow: { flexDirection: 'row', gap: 8, marginTop: 4 },
+  searchRow: { flexDirection: 'row', gap: 8, marginTop: 4, alignItems: 'flex-start' },
   search: { flex: 1, backgroundColor: '#fff', borderRadius: 8, padding: 12 },
-  go: { backgroundColor: '#800020', borderRadius: 8, paddingHorizontal: 18, justifyContent: 'center' },
+  go: { backgroundColor: '#800020', borderRadius: 8, paddingHorizontal: 18, height: 46, justifyContent: 'center' },
   goText: { color: '#fff', fontWeight: '700' },
   link: { color: '#fff', fontWeight: '600', textDecorationLine: 'underline' },
   h2: { fontSize: 18, fontWeight: '700', color: '#25272D', marginHorizontal: 12, marginTop: 18, marginBottom: 8 },

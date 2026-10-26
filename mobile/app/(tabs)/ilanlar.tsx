@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, FlatList, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { Text, TextInput } from '../../components/LText';
+import { SearchBox } from '../../components/SearchBox';
 import { PickerModal } from '../../components/PickerModal';
 import { advCount, FilterModal, NO_ADV, type Adv } from '../../components/FilterModal';
 import { CITIES } from '../../lib/data';
@@ -38,13 +39,14 @@ export default function Listings() {
     if (!session) return;
     void supabase.from('profiles').select('city').eq('id', session.user.id).maybeSingle().then((r) => { const c = (r.data as { city?: string | null } | null)?.city; if (c && COORDS[c]) setMyCity(c); });
   }, [session]);
-  const params = useLocalSearchParams<{ q?: string; cat?: string; city?: string; maxPrice?: string }>();
+  const params = useLocalSearchParams<{ q?: string; cat?: string; city?: string; maxPrice?: string; brand?: string; n?: string }>();
   useEffect(() => {
     if (params.q !== undefined) setQ(params.q);
     if (params.cat !== undefined) setCat(params.cat);
     if (params.city) setCity(params.city);
     if (params.maxPrice) setMaxPrice(params.maxPrice);
-  }, [params.q, params.cat, params.city, params.maxPrice]);
+    if (params.brand !== undefined) setAdv((a) => ({ ...a, brand: params.brand ?? '' }));
+  }, [params.q, params.cat, params.city, params.maxPrice, params.brand, params.n]);
 
   async function saveSearch() {
     if (!session) { Alert.alert('Aramayı kaydet', 'Aramayı kaydetmek için giriş yapmalısın.'); return; }
@@ -81,7 +83,7 @@ export default function Listings() {
 
   return (
     <View style={s.screen}>
-      <TextInput style={s.input} placeholder="Marka, model veya parça numarası ara" value={q} onChangeText={setQ} autoCorrect={false} />
+      <View style={{ marginHorizontal: 12, marginTop: 12, marginBottom: 8 }}><SearchBox value={q} onChangeText={setQ} placeholder="Marka, model veya parça numarası ara" /></View>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flexGrow: 0 }} contentContainerStyle={s.chips}>
         <Pressable style={[s.chip, !!cat && s.chipOn]} onPress={() => setSheet('cat')}><Text style={[s.chipText, !!cat && s.chipTextOn]}>{cat ? categoryLabel(cat) : 'Kategori'}</Text></Pressable>
         <Pressable style={[s.chip, city !== 'Tümü' && s.chipOn]} onPress={() => setSheet('city')}><Text style={[s.chipText, city !== 'Tümü' && s.chipTextOn]}>{city === 'Tümü' ? 'İl' : city}</Text></Pressable>

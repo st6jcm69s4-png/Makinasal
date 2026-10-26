@@ -49,9 +49,9 @@ export default function TabsLayout() {
         tabBarActiveTintColor: '#fff',
         tabBarInactiveTintColor: '#D5CDD2',
         tabBarActiveBackgroundColor: '#800020',
-        tabBarStyle: { backgroundColor: '#25272D', borderTopWidth: 2, borderTopColor: '#800020', height: 62, paddingBottom: 6, paddingTop: 4 },
-        tabBarItemStyle: { borderRadius: 8, marginHorizontal: 3, marginBottom: 2 },
-        tabBarLabelStyle: { fontSize: 11, fontWeight: '600' },
+        tabBarStyle: { backgroundColor: '#25272D', borderTopWidth: 2, borderTopColor: '#800020', paddingHorizontal: 6, paddingTop: 4 },
+        tabBarItemStyle: { borderRadius: 8, marginHorizontal: 2, marginVertical: 2, paddingVertical: 2 },
+        tabBarLabelStyle: { fontSize: 10.5, fontWeight: '600' },
       }}
     >
       <Tabs.Screen name="index" options={{ tabBarLabel: tr('Ana sayfa'), tabBarIcon: tab('🏠') }} />

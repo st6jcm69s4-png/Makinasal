@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, FlatList, ScrollView, View } from 'react-native';
 import { Text, TextInput } from '../components/LText';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
+import { openSuggestion, SearchBox } from '../components/SearchBox';
 import { ListingCard } from '../components/ListingCard';
 import { PickerModal } from '../components/PickerModal';
 import { Btn, Chip, common } from '../components/ui';
@@ -17,6 +18,12 @@ export default function Parts() {
   const [brand, setBrand] = useState('');
   const [city, setCity] = useState('');
   const [q, setQ] = useState('');
+  const params = useLocalSearchParams<{ part?: string; equipment?: string; brand?: string; n?: string }>();
+  useEffect(() => {
+    if (params.equipment) setEquipment(params.equipment);
+    if (params.part) setGroup(params.part);
+    if (params.brand) setBrand(params.brand);
+  }, [params.part, params.equipment, params.brand, params.n]);
   const [sheet, setSheet] = useState<null | 'eq' | 'group' | 'city' | 'brand'>(null);
   const [rows, setRows] = useState<Row[]>([]);
   const [total, setTotal] = useState(0);
@@ -54,7 +61,19 @@ export default function Parts() {
   const header = (
     <View style={{ padding: 12, gap: 8 }}>
       <Text style={common.meta}>Makine veya aracını seç, ihtiyacın olan parçayı bul.</Text>
-      <TextInput style={{ padding: 12, backgroundColor: '#fff', borderRadius: 8, borderWidth: 1, borderColor: '#DDD9DC' }} placeholder="Parça adı veya numarası (pompa, filtre, A10VO71…)" value={q} onChangeText={setQ} maxLength={100} autoCorrect={false} />
+      <SearchBox
+        value={q}
+        onChangeText={setQ}
+        scope="parts"
+        placeholder="Parça adı veya numarası (pompa, filtre, A10VO71…)"
+        onPick={(it) => {
+          const key = it.id.slice(it.id.indexOf(':') + 1);
+          if (it.id.startsWith('part:')) { setGroup(key); setQ(''); }
+          else if (it.id.startsWith('category:')) { setEquipment(key); setGroup(''); setQ(''); }
+          else if (it.id.startsWith('brand:')) { setBrand(key); setQ(''); }
+          else openSuggestion(it);
+        }}
+      />
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
         <Chip title={equipment || 'Makine / araç'} on={!!equipment} onPress={() => setSheet('eq')} />
         <Chip title={group ? partGroupLabel(group) : 'Parça grubu'} on={!!group} onPress={() => setSheet('group')} />
