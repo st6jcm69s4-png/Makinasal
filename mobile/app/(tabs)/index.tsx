@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, FlatList, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { PickerModal } from '../../components/PickerModal';
 import { CATEGORIES, CITIES } from '../../lib/data';
-import { useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { Alert } from 'react-native';
 import { useApp } from '../../lib/AppContext';
 import { ListingCard } from '../../components/ListingCard';
@@ -75,6 +75,8 @@ export default function Listings() {
         <Pressable style={[s.chip, city !== 'Tümü' && s.chipOn]} onPress={() => setSheet('city')}><Text style={[s.chipText, city !== 'Tümü' && s.chipTextOn]}>{city === 'Tümü' ? 'İl' : city}</Text></Pressable>
         <Pressable style={[s.chip, maxPrice !== '6000000' && s.chipOn]} onPress={() => setSheet('price')}><Text style={[s.chipText, maxPrice !== '6000000' && s.chipTextOn]}>{maxPrice === '6000000' ? 'Fiyat' : PRICES.find((p) => p.value === maxPrice)?.label}</Text></Pressable>
         <Pressable style={s.chip} onPress={() => void saveSearch()}><Text style={s.chipText}>♡ Aramayı kaydet</Text></Pressable>
+        <Pressable style={s.chip} onPress={() => router.push('/yedek-parca')}><Text style={s.chipText}>Yedek parça</Text></Pressable>
+        <Pressable style={s.chip} onPress={() => router.push('/harita')}><Text style={s.chipText}>İl haritası</Text></Pressable>
         <Pressable style={s.chip} onPress={() => setSheet('sort')}><Text style={s.chipText}>Sırala: {SORTS.find((o) => o.value === sort)?.label}</Text></Pressable>
       </ScrollView>
       <PickerModal visible={sheet === 'cat'} title="Kategori" selected={cat} options={[{ value: '', label: 'Tümü' }, ...CATEGORIES.map((c) => ({ value: c, label: c }))]} onPick={setCat} onClose={() => setSheet(null)} />

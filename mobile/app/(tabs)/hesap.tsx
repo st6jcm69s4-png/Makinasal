@@ -3,7 +3,8 @@ import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-
 import { router } from 'expo-router';
 import { ReferralBox } from '../../components/ReferralBox';
 import { useApp } from '../../lib/AppContext';
-import { configured, supabase } from '../../lib/supabase';
+import { configured, supabase, SITE_URL } from '../../lib/supabase';
+import { openWeb } from '../../lib/web';
 
 export default function Account() {
   const { session } = useApp();
@@ -20,6 +21,16 @@ export default function Account() {
     if (error) setMsg('Giriş yapılamadı. E-posta veya şifreyi kontrol et.');
   }
 
+  async function forgot() {
+    const mail = email.trim();
+    if (!mail) { setMsg('Önce e-posta adresini yaz, sonra "Şifremi unuttum"a bas.'); return; }
+    setBusy(true); setMsg('');
+    const { error } = await supabase.auth.resetPasswordForEmail(mail, { redirectTo: `${SITE_URL.replace(/\/$/, '')}/auth/callback?next=/sifre-yenile` });
+    setBusy(false);
+    if (error) { setMsg('Şifre sıfırlama bağlantısı buradan gönderilemedi. Web sitesinden dene.'); openWeb('/giris'); }
+    else setMsg('Bu e-posta ile bir hesap varsa şifre sıfırlama bağlantısı gönderildi. Gelen kutunu ve spam klasörünü kontrol et.');
+  }
+
   if (session) {
     return (
       <ScrollView style={{ backgroundColor: '#F5F5F6' }} contentContainerStyle={s.screen}>
@@ -31,9 +42,13 @@ export default function Account() {
         <Pressable style={s.btnGhost} onPress={() => router.push('/kayitli-aramalar')} accessibilityRole="button"><Text style={s.btnGhostText}>Kayıtlı aramalar</Text></Pressable>
         <Pressable style={s.btnGhost} onPress={() => router.push('/karsilastir')} accessibilityRole="button"><Text style={s.btnGhostText}>Karşılaştırma</Text></Pressable>
         <Pressable style={s.btnGhost} onPress={() => router.push('/profil-duzenle')} accessibilityRole="button"><Text style={s.btnGhostText}>Profili düzenle</Text></Pressable>
+        <Pressable style={s.btnGhost} onPress={() => router.push('/ag/hesabim' as never)} accessibilityRole="button"><Text style={s.btnGhostText}>İş ağı hesabım</Text></Pressable>
+        <Pressable style={s.btnGhost} onPress={() => router.push('/yedek-parca')} accessibilityRole="button"><Text style={s.btnGhostText}>Yedek parça</Text></Pressable>
+        <Pressable style={s.btnGhost} onPress={() => router.push('/harita')} accessibilityRole="button"><Text style={s.btnGhostText}>İl haritası</Text></Pressable>
+        <Pressable style={s.btnGhost} onPress={() => router.push('/odemelerim')} accessibilityRole="button"><Text style={s.btnGhostText}>Ödemelerim</Text></Pressable>
+        <Pressable style={s.btnGhost} onPress={() => router.push('/ayarlar')} accessibilityRole="button"><Text style={s.btnGhostText}>Ayarlar, yardım ve hukuki bilgiler</Text></Pressable>
         <ReferralBox />
         <Pressable style={s.btnGhost} onPress={() => void supabase.auth.signOut()} accessibilityRole="button"><Text style={s.btnGhostText}>Çıkış yap</Text></Pressable>
-        <Text style={s.note}>Daha fazla özellik yakında.</Text>
       </ScrollView>
     );
   }
@@ -44,6 +59,10 @@ export default function Account() {
       <TextInput style={s.input} placeholder="Şifre" secureTextEntry value={password} onChangeText={setPassword} />
       {msg ? <Text style={s.err}>{msg}</Text> : null}
       <Pressable style={s.btn} disabled={busy} onPress={() => void signIn()} accessibilityRole="button"><Text style={s.btnText}>Giriş yap</Text></Pressable>
+      <Pressable style={s.btnGhost} onPress={() => void forgot()} accessibilityRole="button"><Text style={s.btnGhostText}>Şifremi unuttum</Text></Pressable>
+      <Pressable style={s.btnGhost} onPress={() => openWeb('/giris')} accessibilityRole="button"><Text style={s.btnGhostText}>Kayıt ol (web sitesi)</Text></Pressable>
+      <Pressable style={s.btnGhost} onPress={() => router.push('/yedek-parca')} accessibilityRole="button"><Text style={s.btnGhostText}>Yedek parça ara</Text></Pressable>
+      <Pressable style={s.btnGhost} onPress={() => router.push('/destek')} accessibilityRole="button"><Text style={s.btnGhostText}>Yardım ve hukuki bilgiler</Text></Pressable>
       <Text style={s.note}>Yeni kayıt şimdilik web sitesinden yapılır.</Text>
     </View>
   );

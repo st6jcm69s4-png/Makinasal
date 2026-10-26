@@ -155,6 +155,7 @@ export default function ListingScreen() {
         {trust ? (
           <Text style={s.meta}>Satıcı: {seller || '—'} · <Text style={{ color: trust.color, fontWeight: '700' }}>{trust.label}</Text></Text>
         ) : null}
+        <Pressable onPress={() => router.push(`/magaza/${item.seller_id}`)} accessibilityRole="button"><Text style={s.favText}>Satıcının profili ve ilanları</Text></Pressable>
         {item.description ? <Text style={s.desc}>{item.description}</Text> : null}
         <Text style={s.warn}>Ürünü görmeden kapora, ön ödeme, havale ya da EFT göndermeyin.</Text>
 

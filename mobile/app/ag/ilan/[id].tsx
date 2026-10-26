@@ -7,6 +7,7 @@ import { Btn, common, Field, Select } from '../../../components/ui';
 import { useApp } from '../../../lib/AppContext';
 import { dateLabel, money, networkError, PERSONNEL_ROLES, POST_KINDS, QUOTE_STATUS, RENTAL_MODES, UNITS, type MarketPost, type Quote } from '../../../lib/network';
 import { supabase } from '../../../lib/supabase';
+import { openWeb } from '../../../lib/web';
 
 export default function PostDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -116,6 +117,7 @@ export default function PostDetail() {
           <Text style={common.title}>{q.display_name}</Text>
           <Text style={common.price}>{money(q.amount, q.price_unit)}</Text>
           <Text style={common.meta}>{QUOTE_STATUS[q.status]}{q.note ? ` · ${q.note}` : ''}</Text>
+          {isOwner && q.status === 'accepted' && q.price_unit === 'toplam' ? <Btn ghost title="Güvenli ödeme seçenekleri" onPress={() => openWeb('/odeme?teklif=' + q.id)} /> : null}
           {isOwner && q.status === 'pending' ? (
             <View style={{ flexDirection: 'row', gap: 8, marginTop: 6 }}>
               {!selected ? <View style={{ flex: 1 }}><Btn title="Seç" disabled={busy} onPress={() => confirm('Bu teklifi seçmek istiyor musun? Seçim geri alınamaz ve ödeme oluşturmaz. Kapsamı mesajla doğrula.', () => void quoteAction(q, 'accepted'))} /></View> : null}
