@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, Image, Linking, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, Alert, Image, Linking, Modal, Pressable, ScrollView, StyleSheet, Switch, Text, TextInput, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
+import { checkMessage } from '../../lib/messageFilter';
 import { PickerModal } from '../../components/PickerModal';
 import { useApp } from '../../lib/AppContext';
 import { SITE_URL, photoUrl, supabase, tl } from '../../lib/supabase';
@@ -20,7 +21,12 @@ const SERVICES = [
 
 export default function ListingScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { favs, toggleFav, session } = useApp();
+  const { favs, toggleFav, session, cmp, toggleCmp } = useApp();
+  const [offerOpen, setOfferOpen] = useState(false);
+  const [offerAmt, setOfferAmt] = useState('');
+  const [offerNote, setOfferNote] = useState('');
+  const [offerTakas, setOfferTakas] = useState(false);
+  const [offerErr, setOfferErr] = useState('');
   const [item, setItem] = useState<Detail | null>(null);
   const [state, setState] = useState<'loading' | 'ok' | 'error' | 'missing'>('loading');
   const [trust, setTrust] = useState<TrustLevel | null>(null);
@@ -74,6 +80,31 @@ export default function ListingScreen() {
     router.push(`/mesaj/${tid}`);
   }
 
+  async function sendOffer() {
+    if (!session || !item) return;
+    const n = Number(offerAmt.replace(/\./g, '').replace(',', '.'));
+    if (!n || n < 1) { setOfferErr('Teklif tutarını gir.'); return; }
+    const part = item.category === 'Yedek parça' || item.category === 'Lastik ve jant';
+    const body = `Teklifim: ${tl(n)}${part ? ' (birim fiyat)' : ''}${offerTakas ? ', takas da olabilir' : ''}.${offerNote.trim() ? ' ' + offerNote.trim() : ''}`;
+    const chk = checkMessage(body);
+    if (chk.block) { setOfferErr(chk.block); return; }
+    setMsgBusy(true); setOfferErr('');
+    const me = session.user.id;
+    const found = await supabase.from('threads').select('id').eq('listing_id', item.id).eq('buyer_id', me).maybeSingle();
+    let tid = (found.data as { id: string } | null)?.id;
+    if (!tid) {
+      const created = await supabase.from('threads').insert({ listing_id: item.id, buyer_id: me, seller_id: item.seller_id }).select('id').single();
+      tid = (created.data as { id: string } | null)?.id;
+    }
+    if (!tid) { setMsgBusy(false); setOfferErr('Konuşma başlatılamadı. Bağlantını kontrol et.'); return; }
+    let res = await supabase.from('messages').insert({ thread_id: tid, sender_id: me, body, kind: 'offer', offer_amount: n });
+    if (res.error && /kind|offer_amount/.test(res.error.message)) res = await supabase.from('messages').insert({ thread_id: tid, sender_id: me, body });
+    setMsgBusy(false);
+    if (res.error) { setOfferErr(res.error.message.includes('MESSAGE_PROFANITY') ? 'Küfür veya hakaret içeren mesaj gönderilemez.' : /RATE_LIMIT/.test(res.error.message) ? 'Çok fazla işlem. Bir dakika sonra tekrar dene.' : 'Teklif gönderilemedi. Tekrar dene.'); return; }
+    setOfferOpen(false); setOfferAmt(''); setOfferNote('');
+    router.push(`/mesaj/${tid}`);
+  }
+
   async function showPhone() {
     if (!session) return needLogin('Telefon');
     const { data, error } = await supabase.rpc('listing_phone', { p_listing: id });
@@ -114,6 +145,10 @@ export default function ListingScreen() {
         <Pressable style={s.favBtn} accessibilityRole="button" onPress={async () => { const err = await toggleFav(item.id, item.price); if (err) Alert.alert('Favoriler', err); }}>
           <Text style={s.favText}>{favs.has(item.id) ? '♥ Favorilerde' : '♡ Favorilere ekle'}</Text>
         </Pressable>
+        <Pressable style={s.favBtn} accessibilityRole="button" onPress={() => { const err = toggleCmp(item.id); if (err) Alert.alert('Karşılaştır', err); }}>
+          <Text style={s.favText}>{cmp.includes(item.id) ? `⇄ Karşılaştırmada (${cmp.length}/3)` : '⇄ Karşılaştırmaya ekle'}</Text>
+        </Pressable>
+        {cmp.length >= 2 ? <Pressable onPress={() => router.push('/karsilastir')} accessibilityRole="button"><Text style={s.favText}>Karşılaştırmayı aç ({cmp.length})</Text></Pressable> : null}
         <Text style={s.meta}>
           {[item.brand, item.model, item.city, item.year, item.usage_value ? `${item.usage_value} ${item.usage_unit ?? ''}` : null].filter(Boolean).join(' · ')}
         </Text>
@@ -131,6 +166,7 @@ export default function ListingScreen() {
             <Pressable style={s.btn} disabled={msgBusy} onPress={() => void startThread(item.id, item.seller_id)} accessibilityRole="button">
               <Text style={s.btnText}>Mesaj gönder</Text>
             </Pressable>
+            <Pressable style={s.btnGhost} onPress={() => (session ? setOfferOpen(true) : needLogin('Teklif'))} accessibilityRole="button"><Text style={s.btnGhostText}>Teklif ver</Text></Pressable>
             <Text style={s.section}>Ek hizmetler</Text>
             {SERVICES.filter((x) => !part || !x.machineOnly).map((x) => (
               <Pressable key={x.id} style={s.btnGhost} onPress={() => (session ? setService(x.id) : needLogin('Talep'))} accessibilityRole="button">
@@ -147,6 +183,20 @@ export default function ListingScreen() {
         ) : null}
       </View>
 
+      <Modal visible={offerOpen} transparent animationType="slide" onRequestClose={() => setOfferOpen(false)}>
+        <View style={s.backdrop}>
+          <View style={s.sheet}>
+            <Text style={s.section}>Teklif ver</Text>
+            <TextInput style={s.input} value={offerAmt} onChangeText={setOfferAmt} placeholder={`Teklifin (₺${part ? ', birim fiyat' : ''})`} keyboardType="decimal-pad" />
+            <TextInput style={s.input} value={offerNote} onChangeText={setOfferNote} placeholder="Not (isteğe bağlı)" maxLength={300} />
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}><Text style={{ flex: 1 }}>Takas da olabilir</Text><Switch value={offerTakas} onValueChange={setOfferTakas} /></View>
+            {offerErr ? <Text style={{ color: '#b00020' }}>{offerErr}</Text> : null}
+            <Text style={s.small}>Ürünü görmeden kapora, ön ödeme, havale veya EFT göndermeyin.</Text>
+            <Pressable style={s.btn} disabled={msgBusy} onPress={() => void sendOffer()} accessibilityRole="button"><Text style={s.btnText}>Teklifi gönder</Text></Pressable>
+            <Pressable onPress={() => setOfferOpen(false)} accessibilityRole="button"><Text style={s.report}>Vazgeç</Text></Pressable>
+          </View>
+        </View>
+      </Modal>
       <PickerModal visible={reportOpen} title="Şikayet nedeni" options={REPORT_REASONS.map((r) => ({ value: r, label: r }))} onPick={(r) => void report(r)} onClose={() => setReportOpen(false)} />
       <Modal visible={!!service} transparent animationType="slide" onRequestClose={() => setService(null)}>
         <View style={s.backdrop}>

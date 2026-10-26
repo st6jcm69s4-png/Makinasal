@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, Image, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Switch, Text, TextInput, View } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { PickerModal } from '../components/PickerModal';
 import { useApp } from '../lib/AppContext';
 import { CATEGORIES, CITIES, KM_CATEGORIES, LIMITS, MACHINE_CATEGORIES, PART_GROUPS } from '../lib/data';
-import { supabase } from '../lib/supabase';
+import { photoUrl, supabase } from '../lib/supabase';
 
 const CONDITIONS = ['Sıfır', 'Çıkma', 'Revizyonlu'];
 const YEAR_MAX = new Date().getFullYear() + 1;
@@ -14,6 +14,11 @@ type Sheet = null | 'cat' | 'city' | 'equip' | 'group' | 'cond';
 export default function NewListing() {
   const { session } = useApp();
   const uid = session?.user.id;
+  const { duzenle } = useLocalSearchParams<{ duzenle?: string }>();
+  const editId = duzenle || '';
+  const [existing, setExisting] = useState<{ id: string; path: string }[]>([]);
+  const [removed, setRemoved] = useState<{ id: string; path: string }[]>([]);
+  const [loadedEdit, setLoadedEdit] = useState(!editId);
   const [premium, setPremium] = useState(false);
   const [sheet, setSheet] = useState<Sheet>(null);
   const [cat, setCat] = useState('');
@@ -42,13 +47,31 @@ export default function NewListing() {
     void supabase.from('profiles').select('is_premium').eq('id', uid).maybeSingle().then(({ data }) => setPremium(!!(data as { is_premium?: boolean } | null)?.is_premium));
   }, [uid]);
 
+  useEffect(() => {
+    if (!uid || !editId) return;
+    void supabase.from('listings')
+      .select('category,brand,model,year,usage_value,price,city,description,takas,spec,cond,compat,qty,equipment_category,part_group,listing_photos(id,path,position)')
+      .eq('id', editId).eq('seller_id', uid).maybeSingle().then(({ data }) => {
+        const r = data as unknown as Record<string, unknown> | null;
+        if (!r) { Alert.alert('İlan', 'İlan bulunamadı.'); router.back(); return; }
+        setCat(String(r.category ?? '')); setBrand(String(r.brand ?? '')); setModel(String(r.model ?? ''));
+        setYear(r.year ? String(r.year) : ''); setUsage(r.usage_value != null ? String(r.usage_value) : ''); setPrice(String(r.price ?? ''));
+        setCity(String(r.city ?? '')); setDesc(String(r.description ?? '')); setTakas(!!r.takas); setSpec(String(r.spec ?? ''));
+        setCond(String(r.cond ?? 'Sıfır')); setCompat(String(r.compat ?? '')); setQty(r.qty ? String(r.qty) : '1');
+        setEquip(String(r.equipment_category ?? '')); setGroup(String(r.part_group ?? ''));
+        const ph = ((r.listing_photos ?? []) as { id: string; path: string; position: number }[]).sort((a, b) => a.position - b.position);
+        setExisting(ph.map((p) => ({ id: p.id, path: p.path })));
+        setLoadedEdit(true);
+      });
+  }, [uid, editId]);
+
   const part = cat === 'Yedek parça' || cat === 'Lastik ve jant';
   const kind = !cat ? '' : cat === 'Yedek parça' ? 'part' : cat === 'Lastik ve jant' ? 'tire' : 'machine';
   const unit = KM_CATEGORIES.has(cat) ? 'km' : 'saat';
   const maxPhotos = premium ? LIMITS.prem.photos : LIMITS.free.photos;
 
   async function pick(camera: boolean) {
-    const room = maxPhotos - photos.length;
+    const room = maxPhotos - photos.length - existing.length;
     if (room <= 0) { Alert.alert('Fotoğraf', `En fazla ${maxPhotos} fotoğraf ekleyebilirsin.`); return; }
     const perm = camera ? await ImagePicker.requestCameraPermissionsAsync() : await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!perm.granted) { Alert.alert('İzin gerekli', 'Fotoğraf eklemek için izin vermelisin. Telefon ayarlarından değiştirebilirsin.'); return; }
@@ -56,7 +79,7 @@ export default function NewListing() {
       ? await ImagePicker.launchCameraAsync({ mediaTypes: ['images'], quality: 0.6 })
       : await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], allowsMultipleSelection: true, selectionLimit: room, quality: 0.6 });
     if (res.canceled) return;
-    setPhotos((cur) => [...cur, ...res.assets.map((a) => a.uri)].slice(0, maxPhotos));
+    setPhotos((cur) => [...cur, ...res.assets.map((a) => a.uri)].slice(0, maxPhotos - existing.length));
   }
 
   async function submit() {
@@ -77,13 +100,13 @@ export default function NewListing() {
     if (!city) return setError('İl seç.');
     if (desc.trim().length < 10) return setError('Açıklamayı en az 10 karakterle yaz.');
     if (!Number.isFinite(priceNum) || priceNum <= 0 || priceNum > 999999999999.99) return setError('Fiyatı gir.');
-    if (photos.length === 0) return setError('En az 1 fotoğraf ekle. Alıcılar fotoğrafsız ilanlara güvenmez.');
-    if (!pledge) return setError('Kapora taahhüdünü onaylaman gerekiyor.');
+    if (photos.length + existing.length === 0) return setError('En az 1 fotoğraf ekle. Alıcılar fotoğrafsız ilanlara güvenmez.');
+    if (!pledge && !editId) return setError('Kapora taahhüdünü onaylaman gerekiyor.');
 
     setBusy(true);
     let id: string | null = null;
     try {
-      const { count } = await supabase.from('listings').select('id', { count: 'exact', head: true }).eq('seller_id', uid).in('status', ['active', 'paused']);
+      const { count } = editId ? { count: 0 } : await supabase.from('listings').select('id', { count: 'exact', head: true }).eq('seller_id', uid).in('status', ['active', 'paused']);
       const maxListings = premium ? LIMITS.prem.listings : LIMITS.free.listings;
       if ((count ?? 0) >= maxListings) throw new Error(`${premium ? 'Premium' : 'Ücretsiz'} üyelikte aynı anda ${maxListings} ilan olabilir. İlanlarından birini satıldı yap ya da kaldır.`);
       const base = {
@@ -93,9 +116,18 @@ export default function NewListing() {
         equipment_category: part ? equip : null, part_group: part ? group : null,
         brand: brand.trim(), model: model.trim(), takas, serial_declared: false,
       };
-      const created = await supabase.from('listings').insert(base).select('id').single();
+      const { seller_id: _s, ...changes } = base;
+      const created = editId
+        ? await supabase.from('listings').update({ ...changes, status: 'paused' }).eq('id', editId).eq('seller_id', uid).select('id').single()
+        : await supabase.from('listings').insert(base).select('id').single();
       if (created.error || !created.data) throw new Error(created.error?.message.includes('RATE_LIMIT') ? 'Çok fazla işlem. Bir dakika sonra tekrar dene.' : 'İlan kaydedilemedi. Bilgileri kontrol edip tekrar dene.');
       id = (created.data as { id: string }).id;
+      if (editId && removed.length) {
+        const unlink = await supabase.from('listing_photos').delete().in('id', removed.map((p) => p.id));
+        if (unlink.error) throw new Error('Eski fotoğraflar kaldırılamadı. İlan yayına alınmadı.');
+        await supabase.storage.from('listing-photos').remove(removed.map((p) => p.path));
+      }
+      for (let i = 0; i < existing.length; i++) await supabase.from('listing_photos').update({ position: i }).eq('id', existing[i].id);
       let failed = 0;
       for (let i = 0; i < photos.length; i++) {
         setProgress(`Fotoğraflar yükleniyor (${i + 1}/${photos.length})…`);
@@ -104,7 +136,7 @@ export default function NewListing() {
           const path = `${uid}/${id}/${Date.now()}-${Math.random().toString(36).slice(2, 10)}.jpg`;
           const up = await supabase.storage.from('listing-photos').upload(path, buf, { contentType: 'image/jpeg' });
           if (up.error) throw up.error;
-          const link = await supabase.from('listing_photos').insert({ listing_id: id, path, position: i });
+          const link = await supabase.from('listing_photos').insert({ listing_id: id, path, position: existing.length + i });
           if (link.error) { await supabase.storage.from('listing-photos').remove([path]); throw link.error; }
         } catch { failed++; }
       }
@@ -124,6 +156,7 @@ export default function NewListing() {
   }
 
   if (!session) return <Text style={s.msg}>İlan vermek için giriş yap.</Text>;
+  if (!loadedEdit) return <ActivityIndicator style={{ margin: 32 }} />;
   const field = (label: string, value: string, set: (v: string) => void, extra: Record<string, unknown> = {}) => (
     <View style={s.field}><Text style={s.label}>{label}</Text><TextInput style={s.input} value={value} onChangeText={set} {...extra} /></View>
   );
@@ -162,8 +195,13 @@ export default function NewListing() {
           <TextInput style={[s.input, { minHeight: 100, textAlignVertical: 'top' }]} value={desc} onChangeText={setDesc} multiline maxLength={4000} /></View>
         <View style={s.rowSwitch}><Text style={{ flex: 1 }}>Takas olur</Text><Switch value={takas} onValueChange={setTakas} /></View>
 
-        <Text style={s.label}>Fotoğraflar ({photos.length}/{maxPhotos})</Text>
+        <Text style={s.label}>Fotoğraflar ({photos.length + existing.length}/{maxPhotos})</Text>
         <ScrollView horizontal contentContainerStyle={{ gap: 8 }}>
+          {existing.map((p) => (
+            <Pressable key={p.id} onPress={() => { setExisting((cur) => cur.filter((x) => x.id !== p.id)); setRemoved((cur) => [...cur, p]); }} accessibilityRole="button" accessibilityLabel="Fotoğrafı kaldır">
+              <Image source={{ uri: photoUrl(p.path) }} style={s.thumb} /><Text style={s.rm}>Kaldır</Text>
+            </Pressable>
+          ))}
           {photos.map((u, i) => (
             <Pressable key={u + i} onPress={() => setPhotos((cur) => cur.filter((_, j) => j !== i))} accessibilityRole="button" accessibilityLabel="Fotoğrafı kaldır">
               <Image source={{ uri: u }} style={s.thumb} /><Text style={s.rm}>Kaldır</Text>
@@ -175,11 +213,11 @@ export default function NewListing() {
           <Pressable style={[s.btnGhost, { flex: 1 }]} onPress={() => void pick(false)} accessibilityRole="button"><Text style={s.btnGhostText}>Galeri</Text></Pressable>
         </View>
 
-        <View style={s.rowSwitch}><Text style={{ flex: 1 }}>Ürünü görmeden kapora, ön ödeme, havale veya EFT istemeyeceğimi taahhüt ederim.</Text><Switch value={pledge} onValueChange={setPledge} /></View>
+        {!editId ? <View style={s.rowSwitch}><Text style={{ flex: 1 }}>Ürünü görmeden kapora, ön ödeme, havale veya EFT istemeyeceğimi taahhüt ederim.</Text><Switch value={pledge} onValueChange={setPledge} /></View> : null}
         {error ? <Text style={s.err} accessibilityRole="alert">{error}</Text> : null}
         {progress ? <Text style={s.small}>{progress}</Text> : null}
         <Pressable style={[s.btn, busy && { opacity: 0.5 }]} disabled={busy} onPress={() => void submit()} accessibilityRole="button">
-          {busy ? <ActivityIndicator color="#fff" /> : <Text style={s.btnText}>İlanı gönder</Text>}
+          {busy ? <ActivityIndicator color="#fff" /> : <Text style={s.btnText}>{editId ? 'Değişiklikleri gönder' : 'İlanı gönder'}</Text>}
         </Pressable>
         <Text style={s.small}>Yeni ilanlar yayına girmeden önce incelenir.</Text>
       </ScrollView>

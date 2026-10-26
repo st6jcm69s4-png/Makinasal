@@ -7,6 +7,8 @@ Expo / React Native ile yazıldı. Web sitesiyle aynı Supabase veritabanını k
 - İlan listesi: arama (marka, model, parça numarası), sayfalama (24'erli).
 - İlan detayı: fotoğraflar, fiyat, açıklama.
 - Giriş / çıkış (e-posta + şifre).
+- Favoriler, mesajlaşma, teklif, satış onayı ve puanlama, bildirimler, kayıtlı aramalar, karşılaştırma.
+- İlan verme ve düzenleme (kamera/galeri), ilanlarım, profil düzenleme, davet kodu, hizmet talepleri.
 
 ## Sonraki sürümler
 Mesajlar, favoriler, ilan verme (kamera/galeri), bildirimler, şifre yenileme, kayıt.

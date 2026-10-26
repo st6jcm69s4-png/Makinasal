@@ -8,14 +8,17 @@ type Ctx = {
   favs: Set<string>;
   toggleFav: (listingId: string, price: number | string) => Promise<string | null>; // hata metni ya da null
   reloadFavs: () => Promise<void>;
+  cmp: string[];
+  toggleCmp: (listingId: string) => string | null; // hata metni ya da null
 };
-const AppCtx = createContext<Ctx>({ session: null, ready: false, favs: new Set(), toggleFav: async () => null, reloadFavs: async () => {} });
+const AppCtx = createContext<Ctx>({ session: null, ready: false, favs: new Set(), toggleFav: async () => null, reloadFavs: async () => {}, cmp: [], toggleCmp: () => null });
 export const useApp = () => useContext(AppCtx);
 
 export function AppProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [ready, setReady] = useState(false);
   const [favs, setFavs] = useState<Set<string>>(new Set());
+  const [cmp, setCmp] = useState<string[]>([]);
   const uid = session?.user.id;
 
   useEffect(() => {
@@ -46,6 +49,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
     return null;
   }, [uid, favs, reloadFavs]);
 
-  const value = useMemo(() => ({ session, ready, favs, toggleFav, reloadFavs }), [session, ready, favs, toggleFav, reloadFavs]);
+  const toggleCmp = useCallback((listingId: string) => {
+    if (cmp.includes(listingId)) { setCmp(cmp.filter((x) => x !== listingId)); return null; }
+    if (cmp.length >= 3) return 'En fazla 3 ilan karşılaştırabilirsin.';
+    setCmp([...cmp, listingId]); return null;
+  }, [cmp]);
+
+  const value = useMemo(() => ({ session, ready, favs, toggleFav, reloadFavs, cmp, toggleCmp }), [session, ready, favs, toggleFav, reloadFavs, cmp, toggleCmp]);
   return <AppCtx.Provider value={value}>{children}</AppCtx.Provider>;
 }

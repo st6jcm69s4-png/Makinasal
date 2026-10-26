@@ -64,6 +64,7 @@ export default function MyListings() {
                 </View>
               </Pressable>
               <View style={s.actions}>
+                <Pressable onPress={() => router.push(`/ilan-ver?duzenle=${r.id}`)}><Text style={s.link}>Düzenle</Text></Pressable>
                 {r.status === 'active' ? <Pressable onPress={() => confirm(r, 'sold', 'Satıldı olarak işaretlensin mi?')}><Text style={s.link}>Satıldı yap</Text></Pressable> : null}
                 {r.status === 'active' ? <Pressable onPress={() => void patch(r.id, 'paused')}><Text style={s.link}>Duraklat</Text></Pressable> : null}
                 {r.status === 'paused' ? <Pressable onPress={() => void patch(r.id, 'active')}><Text style={s.link}>Yayına al</Text></Pressable> : null}

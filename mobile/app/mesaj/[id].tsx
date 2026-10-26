@@ -2,10 +2,12 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Alert, FlatList, KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { useApp } from '../../lib/AppContext';
+import { DealBox } from '../../components/DealBox';
 import { checkMessage } from '../../lib/messageFilter';
 import { supabase } from '../../lib/supabase';
 
-type Msg = { id: string; sender_id: string; body: string; created_at: string };
+type Msg = { id: string; sender_id: string; body: string; created_at: string; kind?: string | null; offer_amount?: number | null };
+type ThreadInfo = { buyer_id: string; seller_id: string; title: string };
 const PAGE = 50;
 
 export default function Thread() {
@@ -13,19 +15,29 @@ export default function Thread() {
   const { session } = useApp();
   const me = session?.user.id;
   const [msgs, setMsgs] = useState<Msg[]>([]);
+  const [info, setInfo] = useState<ThreadInfo | null>(null);
   const [text, setText] = useState('');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   const alive = useRef(true);
 
   const load = useCallback(async () => {
-    const { data, error: e } = await supabase.from('messages').select('id,sender_id,body,created_at')
+    let res = await supabase.from('messages').select('id,sender_id,body,created_at,kind,offer_amount')
       .eq('thread_id', id).order('created_at', { ascending: false }).limit(PAGE);
+    if (res.error) res = await supabase.from('messages').select('id,sender_id,body,created_at').eq('thread_id', id).order('created_at', { ascending: false }).limit(PAGE);
+    const { data, error: e } = res;
     if (!alive.current) return;
     if (e) { setError('Mesajlar yüklenemedi. Bağlantını kontrol et.'); return; }
     setError('');
     setMsgs((data ?? []) as Msg[]); // en yeni en üstte (liste ters çevrilmiş gösterilir)
     void supabase.rpc('mark_thread_read', { p_thread: id });
+  }, [id]);
+
+  useEffect(() => {
+    void supabase.from('threads').select('buyer_id,seller_id,listings(title)').eq('id', id).maybeSingle().then(({ data }) => {
+      const t = data as unknown as { buyer_id: string; seller_id: string; listings: { title: string } | { title: string }[] | null } | null;
+      if (t) { const l = Array.isArray(t.listings) ? t.listings[0] : t.listings; setInfo({ buyer_id: t.buyer_id, seller_id: t.seller_id, title: l?.title ?? 'İlan' }); }
+    });
   }, [id]);
 
   useEffect(() => {
@@ -66,6 +78,8 @@ export default function Thread() {
 
   return (
     <KeyboardAvoidingView style={{ flex: 1, backgroundColor: '#F5F5F6' }} behavior={Platform.OS === 'ios' ? 'padding' : undefined} keyboardVerticalOffset={90}>
+      {info ? <Text style={s.hint2} numberOfLines={1}>İlan: {info.title}</Text> : null}
+      {info && me ? <DealBox threadId={id} me={me} buyerId={info.buyer_id} sellerId={info.seller_id} /> : null}
       <FlatList
         inverted
         data={msgs}
@@ -75,7 +89,8 @@ export default function Thread() {
         renderItem={({ item }) => {
           const mine = item.sender_id === me;
           return (
-            <View style={[s.bubble, mine ? s.mine : s.theirs]}>
+            <View style={[s.bubble, mine ? s.mine : s.theirs, item.kind === 'offer' && s.offer]}>
+              {item.kind === 'offer' ? <Text style={mine ? s.mineText : s.theirsText}>💰 Teklif</Text> : null}
               <Text style={mine ? s.mineText : s.theirsText}>{item.body}</Text>
             </View>
           );
@@ -93,6 +108,8 @@ export default function Thread() {
 
 const s = StyleSheet.create({
   bubble: { maxWidth: '80%', padding: 10, borderRadius: 12 },
+  offer: { borderWidth: 2, borderColor: '#e0a100' },
+  hint2: { color: '#666', paddingHorizontal: 12, paddingTop: 8 },
   mine: { alignSelf: 'flex-end', backgroundColor: '#6B1E2E' },
   theirs: { alignSelf: 'flex-start', backgroundColor: '#fff' },
   mineText: { color: '#fff' },

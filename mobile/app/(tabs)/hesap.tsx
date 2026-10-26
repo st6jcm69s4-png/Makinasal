@@ -27,9 +27,13 @@ export default function Account() {
         <Text>{session.user.email}</Text>
         <Pressable style={s.btn} onPress={() => router.push('/ilan-ver')} accessibilityRole="button"><Text style={s.btnText}>İlan ver</Text></Pressable>
         <Pressable style={s.btn} onPress={() => router.push('/ilanlarim')} accessibilityRole="button"><Text style={s.btnText}>İlanlarım</Text></Pressable>
+        <Pressable style={s.btnGhost} onPress={() => router.push('/bildirimler')} accessibilityRole="button"><Text style={s.btnGhostText}>Bildirimler</Text></Pressable>
+        <Pressable style={s.btnGhost} onPress={() => router.push('/kayitli-aramalar')} accessibilityRole="button"><Text style={s.btnGhostText}>Kayıtlı aramalar</Text></Pressable>
+        <Pressable style={s.btnGhost} onPress={() => router.push('/karsilastir')} accessibilityRole="button"><Text style={s.btnGhostText}>Karşılaştırma</Text></Pressable>
+        <Pressable style={s.btnGhost} onPress={() => router.push('/profil-duzenle')} accessibilityRole="button"><Text style={s.btnGhostText}>Profili düzenle</Text></Pressable>
         <ReferralBox />
         <Pressable style={s.btnGhost} onPress={() => void supabase.auth.signOut()} accessibilityRole="button"><Text style={s.btnGhostText}>Çıkış yap</Text></Pressable>
-        <Text style={s.note}>Bildirimler ve profil düzenleme sonraki sürümlerde eklenecek.</Text>
+        <Text style={s.note}>Daha fazla özellik yakında.</Text>
       </ScrollView>
     );
   }

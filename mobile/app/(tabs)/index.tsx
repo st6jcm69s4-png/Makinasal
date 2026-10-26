@@ -2,6 +2,9 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, FlatList, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { PickerModal } from '../../components/PickerModal';
 import { CATEGORIES, CITIES } from '../../lib/data';
+import { useLocalSearchParams } from 'expo-router';
+import { Alert } from 'react-native';
+import { useApp } from '../../lib/AppContext';
 import { ListingCard } from '../../components/ListingCard';
 import { configured, supabase, type Row } from '../../lib/supabase';
 
@@ -22,6 +25,21 @@ export default function Listings() {
   const [maxPrice, setMaxPrice] = useState('6000000');
   const [sort, setSort] = useState('rec');
   const [sheet, setSheet] = useState<Sheet>(null);
+  const { session } = useApp();
+  const params = useLocalSearchParams<{ q?: string; cat?: string; city?: string; maxPrice?: string }>();
+  useEffect(() => {
+    if (params.q !== undefined) setQ(params.q);
+    if (params.cat !== undefined) setCat(params.cat);
+    if (params.city) setCity(params.city);
+    if (params.maxPrice) setMaxPrice(params.maxPrice);
+  }, [params.q, params.cat, params.city, params.maxPrice]);
+
+  async function saveSearch() {
+    if (!session) { Alert.alert('Aramayı kaydet', 'Aramayı kaydetmek için giriş yapmalısın.'); return; }
+    const f = { cat: cat || 'Tümü', city, maxPrice: Number(maxPrice), q: q.trim(), brand: '', unit: 'sa', useMin: '', useMax: '', yMin: '', yMax: '', minScore: 0, incNew: true, ver: false, hide: false, takas: false, near: 0 };
+    const { error: e } = await supabase.from('saved_searches').insert({ user_id: session.user.id, query: { f } });
+    Alert.alert('Aramayı kaydet', e ? 'Arama kaydedilemedi. Tekrar dene.' : 'Arama kaydedildi. Hesabım → Kayıtlı aramalar bölümünden görebilirsin.');
+  }
   const [q, setQ] = useState('');
   const [rows, setRows] = useState<Row[]>([]);
   const [total, setTotal] = useState(0);
@@ -56,6 +74,7 @@ export default function Listings() {
         <Pressable style={[s.chip, !!cat && s.chipOn]} onPress={() => setSheet('cat')}><Text style={[s.chipText, !!cat && s.chipTextOn]}>{cat || 'Kategori'}</Text></Pressable>
         <Pressable style={[s.chip, city !== 'Tümü' && s.chipOn]} onPress={() => setSheet('city')}><Text style={[s.chipText, city !== 'Tümü' && s.chipTextOn]}>{city === 'Tümü' ? 'İl' : city}</Text></Pressable>
         <Pressable style={[s.chip, maxPrice !== '6000000' && s.chipOn]} onPress={() => setSheet('price')}><Text style={[s.chipText, maxPrice !== '6000000' && s.chipTextOn]}>{maxPrice === '6000000' ? 'Fiyat' : PRICES.find((p) => p.value === maxPrice)?.label}</Text></Pressable>
+        <Pressable style={s.chip} onPress={() => void saveSearch()}><Text style={s.chipText}>♡ Aramayı kaydet</Text></Pressable>
         <Pressable style={s.chip} onPress={() => setSheet('sort')}><Text style={s.chipText}>Sırala: {SORTS.find((o) => o.value === sort)?.label}</Text></Pressable>
       </ScrollView>
       <PickerModal visible={sheet === 'cat'} title="Kategori" selected={cat} options={[{ value: '', label: 'Tümü' }, ...CATEGORIES.map((c) => ({ value: c, label: c }))]} onPick={setCat} onClose={() => setSheet(null)} />

@@ -12,6 +12,10 @@ export default function RootLayout() {
         <Stack.Screen name="ilan-ver" options={{ title: 'İlan ver' }} />
         <Stack.Screen name="ilanlarim" options={{ title: 'İlanlarım' }} />
         <Stack.Screen name="mesaj/[id]" options={{ title: 'Mesajlar' }} />
+        <Stack.Screen name="karsilastir" options={{ title: 'Karşılaştır' }} />
+        <Stack.Screen name="bildirimler" options={{ title: 'Bildirimler' }} />
+        <Stack.Screen name="profil-duzenle" options={{ title: 'Profili düzenle' }} />
+        <Stack.Screen name="kayitli-aramalar" options={{ title: 'Kayıtlı aramalar' }} />
       </Stack>
     </AppProvider>
   );
