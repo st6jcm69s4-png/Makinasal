@@ -33,7 +33,7 @@ export default function Account() {
 
   if (session) {
     return (
-      <ScrollView style={{ backgroundColor: '#F5F5F6' }} contentContainerStyle={s.screen}>
+      <ScrollView style={{ backgroundColor: '#F6F5F3' }} contentContainerStyle={s.screen}>
         <Text style={s.h}>Hesabım</Text>
         <Text>{session.user.email}</Text>
         <Pressable style={s.btn} onPress={() => router.push('/ilan-ver')} accessibilityRole="button"><Text style={s.btnText}>İlan ver</Text></Pressable>
@@ -69,13 +69,13 @@ export default function Account() {
 }
 
 const s = StyleSheet.create({
-  screen: { padding: 20, gap: 12, flexGrow: 1, backgroundColor: '#F5F5F6' },
+  screen: { padding: 20, gap: 12, flexGrow: 1, backgroundColor: '#F6F5F3' },
   h: { fontSize: 22, fontWeight: '700' },
-  input: { padding: 12, backgroundColor: '#fff', borderRadius: 8, borderWidth: 1, borderColor: '#ddd' },
-  btn: { backgroundColor: '#6B1E2E', padding: 14, borderRadius: 8, alignItems: 'center' },
+  input: { padding: 12, backgroundColor: '#fff', borderRadius: 8, borderWidth: 1, borderColor: '#DDD9DC' },
+  btn: { backgroundColor: '#800020', padding: 14, borderRadius: 8, alignItems: 'center' },
   btnText: { color: '#fff', fontWeight: '600' },
-  btnGhost: { borderWidth: 1, borderColor: '#6B1E2E', padding: 14, borderRadius: 8, alignItems: 'center' },
-  btnGhostText: { color: '#6B1E2E', fontWeight: '600' },
+  btnGhost: { borderWidth: 1, borderColor: '#800020', padding: 14, borderRadius: 8, alignItems: 'center' },
+  btnGhostText: { color: '#800020', fontWeight: '600' },
   err: { color: '#b00020' },
   note: { color: '#666' },
 });

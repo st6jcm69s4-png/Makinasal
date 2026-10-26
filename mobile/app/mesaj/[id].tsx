@@ -77,7 +77,7 @@ export default function Thread() {
   }
 
   return (
-    <KeyboardAvoidingView style={{ flex: 1, backgroundColor: '#F5F5F6' }} behavior={Platform.OS === 'ios' ? 'padding' : undefined} keyboardVerticalOffset={90}>
+    <KeyboardAvoidingView style={{ flex: 1, backgroundColor: '#F6F5F3' }} behavior={Platform.OS === 'ios' ? 'padding' : undefined} keyboardVerticalOffset={90}>
       {info ? <Text style={s.hint2} numberOfLines={1}>İlan: {info.title}</Text> : null}
       {info && me ? <DealBox threadId={id} me={me} buyerId={info.buyer_id} sellerId={info.seller_id} /> : null}
       <FlatList
@@ -110,7 +110,7 @@ const s = StyleSheet.create({
   bubble: { maxWidth: '80%', padding: 10, borderRadius: 12 },
   offer: { borderWidth: 2, borderColor: '#e0a100' },
   hint2: { color: '#666', paddingHorizontal: 12, paddingTop: 8 },
-  mine: { alignSelf: 'flex-end', backgroundColor: '#6B1E2E' },
+  mine: { alignSelf: 'flex-end', backgroundColor: '#800020' },
   theirs: { alignSelf: 'flex-start', backgroundColor: '#fff' },
   mineText: { color: '#fff' },
   theirsText: { color: '#25272D' },
@@ -118,7 +118,7 @@ const s = StyleSheet.create({
   err: { color: '#b00020', marginHorizontal: 12 },
   hint: { color: '#888', fontSize: 12, marginHorizontal: 12, marginBottom: 4 },
   bar: { flexDirection: 'row', gap: 8, padding: 10, backgroundColor: '#fff', alignItems: 'flex-end' },
-  input: { flex: 1, maxHeight: 100, padding: 10, backgroundColor: '#F5F5F6', borderRadius: 8 },
-  send: { backgroundColor: '#6B1E2E', paddingVertical: 12, paddingHorizontal: 16, borderRadius: 8 },
+  input: { flex: 1, maxHeight: 100, padding: 10, backgroundColor: '#F6F5F3', borderRadius: 8 },
+  send: { backgroundColor: '#800020', paddingVertical: 12, paddingHorizontal: 16, borderRadius: 8 },
   sendText: { color: '#fff', fontWeight: '600' },
 });

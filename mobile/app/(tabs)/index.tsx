@@ -1,110 +1,148 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, FlatList, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
-import { PickerModal } from '../../components/PickerModal';
-import { CATEGORIES, CITIES } from '../../lib/data';
-import { router, useLocalSearchParams } from 'expo-router';
-import { Alert } from 'react-native';
-import { useApp } from '../../lib/AppContext';
+import { useCallback, useState } from 'react';
+import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { router, useFocusEffect } from 'expo-router';
 import { ListingCard } from '../../components/ListingCard';
-import { configured, supabase, type Row } from '../../lib/supabase';
+import { Btn } from '../../components/ui';
+import { useApp } from '../../lib/AppContext';
+import { CATEGORY_GROUPS } from '../../lib/machineryCatalog';
+import { money, type MarketPost, type Provider } from '../../lib/network';
+import { supabase, type Row } from '../../lib/supabase';
 
-const SORTS = [
-  { value: 'rec', label: 'Öne çıkanlar önce' }, { value: 'new', label: 'En yeni ilan' }, { value: 'pa', label: 'Fiyat: artan' },
-  { value: 'pd', label: 'Fiyat: azalan' }, { value: 'drop', label: 'Fiyatı düşenler önce' }, { value: 'yd', label: 'Model yılı: yeniden eskiye' },
-  { value: 'trust', label: 'Satıcı puanı: yüksek önce' },
+const QUICK: [string, string, () => void][] = [
+  ['Satılık ilanlar', '🚜', () => router.navigate('/ilanlar')],
+  ['Kiralık makineler', '🔑', () => router.navigate({ pathname: '/is-agi', params: { kind: 'rental_machine' } })],
+  ['Operatör ve ustalar', '👷', () => router.navigate({ pathname: '/is-agi', params: { kind: 'rental_operator' } })],
+  ['İş talepleri', '📋', () => router.navigate({ pathname: '/is-agi', params: { kind: 'job' } })],
+  ['Parça talepleri', '🔧', () => router.navigate({ pathname: '/is-agi', params: { kind: 'part_request' } })],
+  ['Yedek parça', '⚙', () => router.push('/yedek-parca')],
+  ['Şirketler ve filolar', '🏢', () => router.navigate({ pathname: '/is-agi', params: { kind: 'firma' } })],
+  ['İl haritası', '🗺', () => router.push('/harita')],
 ];
-const PRICES = [
-  { value: '6000000', label: 'Tümü' }, { value: '250000', label: '250.000 ₺ ve altı' }, { value: '500000', label: '500.000 ₺ ve altı' },
-  { value: '1000000', label: '1.000.000 ₺ ve altı' }, { value: '2500000', label: '2.500.000 ₺ ve altı' }, { value: '5000000', label: '5.000.000 ₺ ve altı' },
+const STEPS: [string, string][] = [
+  ['İhtiyacını paylaş', 'Konumu, tarihleri ve neye ihtiyacın olduğunu belirt.'],
+  ['Teklifleri karşılaştır', 'Fiyatı, kapsamı ve şirket profilini birlikte değerlendir.'],
+  ['Ayrıntıları konuş', 'Özel mesajlarla işi netleştir. Seçim ödeme oluşturmaz.'],
 ];
-type Sheet = null | 'cat' | 'city' | 'price' | 'sort';
 
-export default function Listings() {
-  const [cat, setCat] = useState('');
-  const [city, setCity] = useState('Tümü');
-  const [maxPrice, setMaxPrice] = useState('6000000');
-  const [sort, setSort] = useState('rec');
-  const [sheet, setSheet] = useState<Sheet>(null);
+export default function Home() {
   const { session } = useApp();
-  const params = useLocalSearchParams<{ q?: string; cat?: string; city?: string; maxPrice?: string }>();
-  useEffect(() => {
-    if (params.q !== undefined) setQ(params.q);
-    if (params.cat !== undefined) setCat(params.cat);
-    if (params.city) setCity(params.city);
-    if (params.maxPrice) setMaxPrice(params.maxPrice);
-  }, [params.q, params.cat, params.city, params.maxPrice]);
-
-  async function saveSearch() {
-    if (!session) { Alert.alert('Aramayı kaydet', 'Aramayı kaydetmek için giriş yapmalısın.'); return; }
-    const f = { cat: cat || 'Tümü', city, maxPrice: Number(maxPrice), q: q.trim(), brand: '', unit: 'sa', useMin: '', useMax: '', yMin: '', yMax: '', minScore: 0, incNew: true, ver: false, hide: false, takas: false, near: 0 };
-    const { error: e } = await supabase.from('saved_searches').insert({ user_id: session.user.id, query: { f } });
-    Alert.alert('Aramayı kaydet', e ? 'Arama kaydedilemedi. Tekrar dene.' : 'Arama kaydedildi. Hesabım → Kayıtlı aramalar bölümünden görebilirsin.');
-  }
   const [q, setQ] = useState('');
-  const [rows, setRows] = useState<Row[]>([]);
-  const [total, setTotal] = useState(0);
-  const [page, setPage] = useState(1);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const seq = useRef(0);
+  const [latest, setLatest] = useState<Row[]>([]);
+  const [jobs, setJobs] = useState<MarketPost[]>([]);
+  const [firms, setFirms] = useState<Provider[]>([]);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState(false);
 
-  const load = useCallback(async (nextPage: number, query: string, f: { cat: string; city: string; maxPrice: string; sort: string }) => {
-    if (!configured) { setError('Uygulama ayarları eksik (.env dosyası).'); return; }
-    const id = ++seq.current;
-    setLoading(true); setError('');
-    const { data, error: e } = await supabase.rpc('search_listings', { p: { q: query, page: nextPage, categories: f.cat ? [f.cat] : [], city: f.city, maxPrice: Number(f.maxPrice), sort: f.sort }, count_only: false });
-    if (id !== seq.current) return;
-    setLoading(false);
-    if (e || !data) { setError('İlanlar yüklenemedi. Bağlantını kontrol et.'); return; }
-    const res = data as { total: number; rows: Row[] };
-    setTotal(res.total);
-    setRows((cur) => (nextPage === 1 ? res.rows : [...cur, ...res.rows]));
-    setPage(nextPage);
+  const load = useCallback(async () => {
+    setBusy(true);
+    const [l, j, f] = await Promise.all([
+      supabase.rpc('search_listings', { p: { q: '', page: 1, categories: [], city: 'Tümü', maxPrice: 6000000, sort: 'new' }, count_only: false }),
+      supabase.from('market_posts').select('*').eq('kind', 'job').eq('status', 'open').order('created_at', { ascending: false }).limit(3),
+      supabase.from('service_providers').select('*').eq('published', true).order('created_at', { ascending: false }).limit(3),
+    ]);
+    setError(!!(l.error || j.error || f.error));
+    setLatest(((l.data as { rows?: Row[] } | null)?.rows ?? []).slice(0, 6));
+    setJobs((j.data ?? []) as MarketPost[]);
+    setFirms((f.data ?? []) as Provider[]);
+    setBusy(false);
   }, []);
+  useFocusEffect(useCallback(() => { void load(); }, [load]));
 
-  useEffect(() => {
-    const t = setTimeout(() => void load(1, q.trim(), { cat, city, maxPrice, sort }), 350);
-    return () => clearTimeout(t);
-  }, [q, cat, city, maxPrice, sort, load]);
-
+  const search = () => router.navigate({ pathname: '/ilanlar', params: { q: q.trim() } });
+  const name = (session?.user.user_metadata?.full_name as string | undefined)?.split(' ')[0] ?? '';
   return (
-    <View style={s.screen}>
-      <TextInput style={s.input} placeholder="Marka, model veya parça numarası ara" value={q} onChangeText={setQ} autoCorrect={false} />
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flexGrow: 0 }} contentContainerStyle={s.chips}>
-        <Pressable style={[s.chip, !!cat && s.chipOn]} onPress={() => setSheet('cat')}><Text style={[s.chipText, !!cat && s.chipTextOn]}>{cat || 'Kategori'}</Text></Pressable>
-        <Pressable style={[s.chip, city !== 'Tümü' && s.chipOn]} onPress={() => setSheet('city')}><Text style={[s.chipText, city !== 'Tümü' && s.chipTextOn]}>{city === 'Tümü' ? 'İl' : city}</Text></Pressable>
-        <Pressable style={[s.chip, maxPrice !== '6000000' && s.chipOn]} onPress={() => setSheet('price')}><Text style={[s.chipText, maxPrice !== '6000000' && s.chipTextOn]}>{maxPrice === '6000000' ? 'Fiyat' : PRICES.find((p) => p.value === maxPrice)?.label}</Text></Pressable>
-        <Pressable style={s.chip} onPress={() => void saveSearch()}><Text style={s.chipText}>♡ Aramayı kaydet</Text></Pressable>
-        <Pressable style={s.chip} onPress={() => router.push('/yedek-parca')}><Text style={s.chipText}>Yedek parça</Text></Pressable>
-        <Pressable style={s.chip} onPress={() => router.push('/harita')}><Text style={s.chipText}>İl haritası</Text></Pressable>
-        <Pressable style={s.chip} onPress={() => setSheet('sort')}><Text style={s.chipText}>Sırala: {SORTS.find((o) => o.value === sort)?.label}</Text></Pressable>
+    <ScrollView style={s.screen} contentContainerStyle={{ paddingBottom: 24 }} refreshControl={<RefreshControl refreshing={busy} onRefresh={() => void load()} />} keyboardShouldPersistTaps="handled">
+      <View style={s.hero}>
+        <Text style={s.eyebrow}>SAHANIN DİJİTAL İŞ AĞI</Text>
+        <Text style={s.h1}>{session ? `Merhaba${name ? ', ' + name : ''}, tekrar hoş geldin` : 'Al, sat, kirala. İşini paylaş, fiyat al.'}</Text>
+        <Text style={s.lead}>Makine, yedek parça ve işini yapacak hizmeti burada bul.</Text>
+        <View style={s.searchRow}>
+          <TextInput style={s.search} placeholder="Marka, model veya parça numarası ara" placeholderTextColor="#888" value={q} onChangeText={setQ} onSubmitEditing={search} returnKeyType="search" autoCorrect={false} />
+          <Pressable style={s.go} onPress={search} accessibilityRole="button"><Text style={s.goText}>Ara</Text></Pressable>
+        </View>
+        {!session ? <Pressable onPress={() => router.navigate('/hesap')} accessibilityRole="button"><Text style={s.link}>Giriş yap / Kayıt ol →</Text></Pressable> : null}
+      </View>
+
+      <Text style={s.h2}>Hızlı keşfet</Text>
+      <View style={s.grid}>
+        {QUICK.map(([label, icon, go]) => (
+          <Pressable key={label} style={s.tile} onPress={go} accessibilityRole="button">
+            <Text style={{ fontSize: 24 }}>{icon}</Text>
+            <Text style={s.tileText}>{label}</Text>
+          </Pressable>
+        ))}
+      </View>
+
+      <Text style={s.h2}>Satılık kategorilerine göz at</Text>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 12, gap: 8 }}>
+        {CATEGORY_GROUPS.map((g) => (
+          <Pressable key={g.id} style={s.cat} onPress={() => router.navigate({ pathname: '/ilanlar', params: { cat: 'group:' + g.id } })} accessibilityRole="button"><Text style={s.catText}>{g.label}</Text></Pressable>
+        ))}
       </ScrollView>
-      <PickerModal visible={sheet === 'cat'} title="Kategori" selected={cat} options={[{ value: '', label: 'Tümü' }, ...CATEGORIES.map((c) => ({ value: c, label: c }))]} onPick={setCat} onClose={() => setSheet(null)} />
-      <PickerModal visible={sheet === 'city'} title="İl" selected={city} options={['Tümü', ...CITIES].map((c) => ({ value: c, label: c }))} onPick={setCity} onClose={() => setSheet(null)} />
-      <PickerModal visible={sheet === 'price'} title="En yüksek fiyat" selected={maxPrice} options={PRICES} onPick={setMaxPrice} onClose={() => setSheet(null)} />
-      <PickerModal visible={sheet === 'sort'} title="Sırala" selected={sort} options={SORTS} onPick={setSort} onClose={() => setSheet(null)} />
-      {error ? <Text style={s.err}>{error}</Text> : null}
-      <FlatList
-        data={rows}
-        keyExtractor={(r) => r.id}
-        onEndReachedThreshold={0.5}
-        onEndReached={() => { if (!loading && rows.length < total) void load(page + 1, q.trim(), { cat, city, maxPrice, sort }); }}
-        ListEmptyComponent={loading ? null : <Text style={s.empty}>İlan bulunamadı.</Text>}
-        ListFooterComponent={loading ? <ActivityIndicator style={{ margin: 16 }} /> : null}
-        renderItem={({ item }) => <ListingCard item={item} />}
-      />
-    </View>
+
+      {error ? <Text style={s.err}>Bazı bölümler yüklenemedi. Aşağı çekerek yenileyebilirsin.</Text> : null}
+      <View style={s.sectionHead}><Text style={s.h2b}>Satılık ilanlar</Text><Pressable onPress={() => router.navigate('/ilanlar')} accessibilityRole="button"><Text style={s.link2}>Tümünü gör</Text></Pressable></View>
+      {latest.map((r) => <ListingCard key={r.id} item={r} />)}
+      {!busy && !latest.length ? <Text style={s.empty}>Henüz ilan yok.</Text> : null}
+
+      <View style={s.sectionHead}><Text style={s.h2b}>Yeni iş fırsatları</Text><Pressable onPress={() => router.navigate({ pathname: '/is-agi', params: { kind: 'job' } })} accessibilityRole="button"><Text style={s.link2}>Tümünü gör</Text></Pressable></View>
+      {jobs.map((p) => (
+        <Pressable key={p.id} style={s.card} onPress={() => router.push(`/ag/ilan/${p.id}`)} accessibilityRole="button">
+          <Text style={s.cardTitle}>{p.title}</Text>
+          <Text style={s.meta}>{[p.category, p.city].filter(Boolean).join(' · ')}</Text>
+          <Text style={s.price}>{money(p.price, p.price_unit)}</Text>
+        </Pressable>
+      ))}
+      {!busy && !jobs.length ? <Text style={s.empty}>Bir sonraki işin burada olabilir.</Text> : null}
+
+      <View style={s.sectionHead}><Text style={s.h2b}>Bölgendeki şirketler</Text><Pressable onPress={() => router.navigate({ pathname: '/is-agi', params: { kind: 'firma' } })} accessibilityRole="button"><Text style={s.link2}>Şirketleri keşfet</Text></Pressable></View>
+      {firms.map((f) => (
+        <Pressable key={f.user_id} style={s.card} onPress={() => router.push(`/firma/${f.user_id}`)} accessibilityRole="button">
+          <Text style={s.cardTitle}>{f.name}</Text>
+          <Text style={s.meta}>{f.city}</Text>
+          <Text numberOfLines={2}>{f.description}</Text>
+        </Pressable>
+      ))}
+
+      <Text style={s.h2}>Nasıl çalışır? Üç adım.</Text>
+      {STEPS.map(([t, d], i) => (
+        <View key={t} style={s.card}><Text style={s.cardTitle}>{i + 1}. {t}</Text><Text>{d}</Text></View>
+      ))}
+
+      <View style={{ padding: 12, gap: 8 }}>
+        <Text style={s.h2b}>Şirketini sahaya çıkar</Text>
+        <Text>Hafriyat şirketin, kamyonların ve makinelerin için tek bir şirket vitrini oluştur.</Text>
+        <Btn title="Şirket profili oluştur →" onPress={() => router.push(session ? '/ag/firma-kaydi' : '/hesap' as never)} />
+        <Btn ghost title="Güvenli işlem rehberi" onPress={() => router.push('/guven')} />
+      </View>
+    </ScrollView>
   );
 }
 
 const s = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: '#F5F5F6' },
-  input: { margin: 12, padding: 12, backgroundColor: '#fff', borderRadius: 8, borderWidth: 1, borderColor: '#ddd' },
-  chips: { paddingHorizontal: 12, gap: 8, paddingBottom: 8 },
-  chip: { paddingVertical: 8, paddingHorizontal: 14, backgroundColor: '#fff', borderRadius: 20, borderWidth: 1, borderColor: '#ddd' },
-  chipOn: { backgroundColor: '#6B1E2E', borderColor: '#6B1E2E' },
-  chipText: { color: '#25272D' },
-  chipTextOn: { color: '#fff' },
-  err: { color: '#b00020', marginHorizontal: 12 },
-  empty: { textAlign: 'center', margin: 24, color: '#666' },
+  screen: { flex: 1, backgroundColor: '#F6F5F3' },
+  hero: { backgroundColor: '#25272D', padding: 16, gap: 8, borderBottomWidth: 2, borderBottomColor: '#800020' },
+  eyebrow: { color: '#D5CDD2', fontSize: 12, fontWeight: '700', letterSpacing: 1.2 },
+  h1: { color: '#fff', fontSize: 24, fontWeight: '800' },
+  lead: { color: '#D5CDD2' },
+  searchRow: { flexDirection: 'row', gap: 8, marginTop: 4 },
+  search: { flex: 1, backgroundColor: '#fff', borderRadius: 8, padding: 12 },
+  go: { backgroundColor: '#800020', borderRadius: 8, paddingHorizontal: 18, justifyContent: 'center' },
+  goText: { color: '#fff', fontWeight: '700' },
+  link: { color: '#fff', fontWeight: '600', textDecorationLine: 'underline' },
+  h2: { fontSize: 18, fontWeight: '700', color: '#25272D', marginHorizontal: 12, marginTop: 18, marginBottom: 8 },
+  h2b: { fontSize: 18, fontWeight: '700', color: '#25272D' },
+  sectionHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginHorizontal: 12, marginTop: 18, marginBottom: 8 },
+  link2: { color: '#800020', fontWeight: '600' },
+  grid: { flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 8 },
+  tile: { width: '46%', margin: '2%', backgroundColor: '#fff', borderRadius: 10, padding: 14, gap: 6, borderWidth: 1, borderColor: '#DDD9DC' },
+  tileText: { fontWeight: '600', color: '#25272D' },
+  cat: { backgroundColor: '#fff', borderRadius: 20, paddingVertical: 8, paddingHorizontal: 14, borderWidth: 1, borderColor: '#DDD9DC' },
+  catText: { color: '#25272D' },
+  card: { backgroundColor: '#fff', marginHorizontal: 12, marginBottom: 8, padding: 12, borderRadius: 8, gap: 4 },
+  cardTitle: { fontWeight: '700', color: '#25272D' },
+  meta: { color: '#666' },
+  price: { fontWeight: '700', color: '#800020' },
+  empty: { color: '#666', marginHorizontal: 12 },
+  err: { color: '#b00020', marginHorizontal: 12, marginTop: 8 },
 });

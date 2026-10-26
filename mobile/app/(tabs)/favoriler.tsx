@@ -38,7 +38,7 @@ export default function Favorites() {
     );
   }
   return (
-    <View style={{ flex: 1, backgroundColor: '#F5F5F6' }}>
+    <View style={{ flex: 1, backgroundColor: '#F6F5F3' }}>
       {error ? <Text style={s.err}>{error}</Text> : null}
       <FlatList
         data={rows}
@@ -55,6 +55,6 @@ const s = StyleSheet.create({
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12, padding: 24 },
   msg: { textAlign: 'center', color: '#666', margin: 24 },
   err: { color: '#b00020', margin: 12 },
-  btn: { backgroundColor: '#6B1E2E', paddingVertical: 12, paddingHorizontal: 20, borderRadius: 8 },
+  btn: { backgroundColor: '#800020', paddingVertical: 12, paddingHorizontal: 20, borderRadius: 8 },
   btnText: { color: '#fff', fontWeight: '600' },
 });

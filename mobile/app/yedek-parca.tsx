@@ -5,6 +5,7 @@ import { ListingCard } from '../components/ListingCard';
 import { PickerModal } from '../components/PickerModal';
 import { Btn, Chip, common } from '../components/ui';
 import { CITIES, MACHINE_CATEGORIES } from '../lib/data';
+import { brandsForCategory } from '../lib/machineryCatalog';
 import { partGroupLabel, partGroupsFor, partsSearchText } from '../lib/parts';
 import { supabase, type Row } from '../lib/supabase';
 
@@ -15,7 +16,7 @@ export default function Parts() {
   const [brand, setBrand] = useState('');
   const [city, setCity] = useState('');
   const [q, setQ] = useState('');
-  const [sheet, setSheet] = useState<null | 'eq' | 'group' | 'city'>(null);
+  const [sheet, setSheet] = useState<null | 'eq' | 'group' | 'city' | 'brand'>(null);
   const [rows, setRows] = useState<Row[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -52,11 +53,11 @@ export default function Parts() {
   const header = (
     <View style={{ padding: 12, gap: 8 }}>
       <Text style={common.meta}>Makine veya aracını seç, ihtiyacın olan parçayı bul.</Text>
-      <TextInput style={{ padding: 12, backgroundColor: '#fff', borderRadius: 8, borderWidth: 1, borderColor: '#ddd' }} placeholder="Parça adı veya numarası (pompa, filtre, A10VO71…)" value={q} onChangeText={setQ} maxLength={100} autoCorrect={false} />
-      <TextInput style={{ padding: 12, backgroundColor: '#fff', borderRadius: 8, borderWidth: 1, borderColor: '#ddd' }} placeholder="Marka" value={brand} onChangeText={setBrand} maxLength={100} />
+      <TextInput style={{ padding: 12, backgroundColor: '#fff', borderRadius: 8, borderWidth: 1, borderColor: '#DDD9DC' }} placeholder="Parça adı veya numarası (pompa, filtre, A10VO71…)" value={q} onChangeText={setQ} maxLength={100} autoCorrect={false} />
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
         <Chip title={equipment || 'Makine / araç'} on={!!equipment} onPress={() => setSheet('eq')} />
         <Chip title={group ? partGroupLabel(group) : 'Parça grubu'} on={!!group} onPress={() => setSheet('group')} />
+        <Chip title={brand || 'Marka'} on={!!brand} onPress={() => setSheet('brand')} />
         <Chip title={city || 'İl'} on={!!city} onPress={() => setSheet('city')} />
         <Chip title="Temizle" onPress={() => { setEquipment(''); setGroup(''); setBrand(''); setCity(''); setQ(''); }} />
       </ScrollView>
@@ -84,6 +85,7 @@ export default function Parts() {
       />
       <PickerModal visible={sheet === 'eq'} title="Makine veya araç" selected={equipment} options={[{ value: '', label: 'Tümü' }, ...MACHINE_CATEGORIES.map((c) => ({ value: c, label: c }))]} onPick={(v) => { setEquipment(v); setGroup(''); }} onClose={() => setSheet(null)} />
       <PickerModal visible={sheet === 'group'} title="Parça grubu" selected={group} options={[{ value: '', label: 'Tümü' }, ...partGroupsFor(equipment).map((g) => ({ value: g.id, label: g.label }))]} onPick={setGroup} onClose={() => setSheet(null)} />
+      <PickerModal visible={sheet === 'brand'} title="Marka" searchable allowCustom selected={brand} options={[{ value: '', label: 'Tümü' }, ...brandsForCategory(equipment).map((b) => ({ value: b, label: b }))]} onPick={setBrand} onClose={() => setSheet(null)} />
       <PickerModal visible={sheet === 'city'} title="İl" selected={city} options={[{ value: '', label: 'Tümü' }, ...CITIES.map((c) => ({ value: c, label: c }))]} onPick={setCity} onClose={() => setSheet(null)} />
     </View>
   );

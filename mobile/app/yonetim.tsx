@@ -69,7 +69,7 @@ export default function Admin() {
         <View key={r.id} style={common.card}>
           <Text style={common.title}>ŞK-{r.ticket}</Text>
           <Text>{r.reason}</Text>
-          {r.listing_id ? <Text style={{ color: '#6B1E2E' }} onPress={() => router.push(`/ilan/${r.listing_id}`)}>İlanı aç</Text> : null}
+          {r.listing_id ? <Text style={{ color: '#800020' }} onPress={() => router.push(`/ilan/${r.listing_id}`)}>İlanı aç</Text> : null}
           <View style={{ flexDirection: 'row', gap: 8, marginTop: 6 }}>
             <View style={{ flex: 1 }}><Btn title="Doğrula" disabled={busy} onPress={() => ask('Şikayet doğrulansın mı? Satıcının puanını etkiler.', () => void act('reports', r.id, { verified: true, status: 'resolved' }))} /></View>
             <View style={{ flex: 1 }}><Btn ghost title="Geçersiz" disabled={busy} onPress={() => void act('reports', r.id, { verified: false, status: 'dismissed' })} /></View>

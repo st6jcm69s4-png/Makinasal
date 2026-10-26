@@ -26,9 +26,9 @@ export default function CityMap() {
       ListHeaderComponent={<Text style={[common.meta, { padding: 12 }]}>İllere göre ilan dağılımı. Bir ile dokununca o ildeki ilanlar açılır.</Text>}
       ListEmptyComponent={<Text style={common.empty}>Henüz ilan yok.</Text>}
       renderItem={({ item: [city, n] }) => (
-        <Pressable style={[common.card, { marginHorizontal: 12, marginBottom: 6 }]} onPress={() => router.push({ pathname: '/', params: { city } })} accessibilityRole="button">
+        <Pressable style={[common.card, { marginHorizontal: 12, marginBottom: 6 }]} onPress={() => router.push({ pathname: '/ilanlar', params: { city } })} accessibilityRole="button">
           <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}><Text style={common.title}>{city}</Text><Text style={common.price}>{n} ilan</Text></View>
-          <View style={{ height: 6, backgroundColor: '#eee', borderRadius: 3 }}><View style={{ height: 6, width: `${Math.max(4, (n / max) * 100)}%`, backgroundColor: '#6B1E2E', borderRadius: 3 }} /></View>
+          <View style={{ height: 6, backgroundColor: '#eee', borderRadius: 3 }}><View style={{ height: 6, width: `${Math.max(4, (n / max) * 100)}%`, backgroundColor: '#800020', borderRadius: 3 }} /></View>
         </Pressable>
       )}
     />

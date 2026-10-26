@@ -44,7 +44,7 @@ export default function MyListings() {
   if (!session) return <Text style={s.msg}>İlanlarını görmek için giriş yap.</Text>;
   if (rows === null) return <ActivityIndicator style={{ margin: 32 }} />;
   return (
-    <View style={{ flex: 1, backgroundColor: '#F5F5F6' }}>
+    <View style={{ flex: 1, backgroundColor: '#F6F5F3' }}>
       {error ? <Text style={s.err}>{error}</Text> : null}
       <FlatList
         data={rows}
@@ -85,8 +85,8 @@ const s = StyleSheet.create({
   top: { flexDirection: 'row', gap: 10, padding: 10 },
   img: { width: 90, height: 70, borderRadius: 6 },
   title: { fontWeight: '600', color: '#25272D' },
-  price: { color: '#6B1E2E', fontWeight: '700' },
+  price: { color: '#800020', fontWeight: '700' },
   status: { color: '#666' },
   actions: { flexDirection: 'row', gap: 18, padding: 10, borderTopWidth: 1, borderTopColor: '#f0f0f0' },
-  link: { color: '#6B1E2E', fontWeight: '600' },
+  link: { color: '#800020', fontWeight: '600' },
 });

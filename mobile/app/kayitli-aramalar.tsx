@@ -27,7 +27,7 @@ export default function SavedSearches() {
   if (rows === null) return <ActivityIndicator style={{ margin: 32 }} />;
   return (
     <FlatList
-      style={{ backgroundColor: '#F5F5F6' }}
+      style={{ backgroundColor: '#F6F5F3' }}
       data={rows}
       keyExtractor={(r) => r.id}
       contentContainerStyle={{ padding: 12, gap: 8 }}
@@ -36,7 +36,7 @@ export default function SavedSearches() {
         const f = item.query?.f ?? {};
         return (
           <View style={s.card}>
-            <Pressable style={{ flex: 1 }} accessibilityRole="button" onPress={() => router.navigate({ pathname: '/', params: { q: f.q ?? '', cat: f.cat && f.cat !== 'Tümü' ? f.cat : '', city: f.city ?? 'Tümü', maxPrice: String(f.maxPrice ?? 6000000) } })}>
+            <Pressable style={{ flex: 1 }} accessibilityRole="button" onPress={() => router.navigate({ pathname: '/ilanlar', params: { q: f.q ?? '', cat: f.cat && f.cat !== 'Tümü' ? f.cat : '', city: f.city ?? 'Tümü', maxPrice: String(f.maxPrice ?? 6000000) } })}>
               <Text style={s.title}>{label(f)}</Text>
             </Pressable>
             <Pressable accessibilityRole="button" onPress={() => Alert.alert('Kayıtlı arama', 'Silinsin mi?', [{ text: 'Vazgeç', style: 'cancel' }, { text: 'Sil', style: 'destructive', onPress: async () => { await supabase.from('saved_searches').delete().eq('id', item.id).eq('user_id', uid!); void load(); } }])}>

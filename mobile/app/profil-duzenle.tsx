@@ -62,7 +62,7 @@ export default function EditProfile() {
   );
   return (
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <ScrollView style={{ backgroundColor: '#F5F5F6' }} contentContainerStyle={{ padding: 16, gap: 12 }} keyboardShouldPersistTaps="handled">
+      <ScrollView style={{ backgroundColor: '#F6F5F3' }} contentContainerStyle={{ padding: 16, gap: 12 }} keyboardShouldPersistTaps="handled">
         {input('Ad soyad', name, setName)}
         {input('Telefon', phone, setPhone, { keyboardType: 'phone-pad' })}
         <Text style={s.small}>Telefonunu değiştirirsen doğrulaman sıfırlanır; doğrulama web sitesinden yapılır.</Text>
@@ -82,9 +82,9 @@ export default function EditProfile() {
 const s = StyleSheet.create({
   msg: { textAlign: 'center', color: '#666', margin: 24 },
   label: { fontWeight: '600' },
-  input: { padding: 12, backgroundColor: '#fff', borderRadius: 8, borderWidth: 1, borderColor: '#ddd' },
+  input: { padding: 12, backgroundColor: '#fff', borderRadius: 8, borderWidth: 1, borderColor: '#DDD9DC' },
   small: { color: '#666', fontSize: 12 },
   err: { color: '#b00020' },
-  btn: { backgroundColor: '#6B1E2E', padding: 14, borderRadius: 8, alignItems: 'center' },
+  btn: { backgroundColor: '#800020', padding: 14, borderRadius: 8, alignItems: 'center' },
   btnText: { color: '#fff', fontWeight: '600' },
 });

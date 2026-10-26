@@ -34,10 +34,10 @@ export function Chip({ title, on, onPress }: { title: string; on?: boolean; onPr
   );
 }
 export const common = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: '#F5F5F6' },
+  screen: { flex: 1, backgroundColor: '#F6F5F3' },
   card: { backgroundColor: '#fff', padding: 12, borderRadius: 8, gap: 4 },
   title: { fontWeight: '700', color: '#25272D' },
-  price: { fontWeight: '700', color: '#6B1E2E' },
+  price: { fontWeight: '700', color: '#800020' },
   meta: { color: '#666' },
   err: { color: '#b00020' },
   empty: { textAlign: 'center', color: '#666', margin: 24 },
@@ -45,13 +45,13 @@ export const common = StyleSheet.create({
 });
 const s = StyleSheet.create({
   label: { fontWeight: '600', color: '#25272D' },
-  input: { padding: 12, backgroundColor: '#fff', borderRadius: 8, borderWidth: 1, borderColor: '#ddd' },
-  btn: { backgroundColor: '#6B1E2E', padding: 13, borderRadius: 8, alignItems: 'center' },
+  input: { padding: 12, backgroundColor: '#fff', borderRadius: 8, borderWidth: 1, borderColor: '#DDD9DC' },
+  btn: { backgroundColor: '#800020', padding: 13, borderRadius: 8, alignItems: 'center' },
   btnText: { color: '#fff', fontWeight: '600' },
-  ghost: { backgroundColor: 'transparent', borderWidth: 1, borderColor: '#6B1E2E' },
-  ghostText: { color: '#6B1E2E' },
+  ghost: { backgroundColor: 'transparent', borderWidth: 1, borderColor: '#800020' },
+  ghostText: { color: '#800020' },
   danger: { backgroundColor: 'transparent', borderWidth: 1, borderColor: '#b00020' },
   dangerText: { color: '#b00020' },
-  chip: { paddingVertical: 8, paddingHorizontal: 14, backgroundColor: '#fff', borderRadius: 20, borderWidth: 1, borderColor: '#ddd' },
-  chipOn: { backgroundColor: '#6B1E2E', borderColor: '#6B1E2E' },
+  chip: { paddingVertical: 8, paddingHorizontal: 14, backgroundColor: '#fff', borderRadius: 20, borderWidth: 1, borderColor: '#DDD9DC' },
+  chipOn: { backgroundColor: '#800020', borderColor: '#800020' },
 });

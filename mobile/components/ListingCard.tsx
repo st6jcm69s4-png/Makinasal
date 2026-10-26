@@ -22,7 +22,7 @@ export function ListingCard({ item }: { item: Row }) {
         accessibilityLabel={fav ? 'Favorilerden çıkar' : 'Favorilere ekle'}
         onPress={async () => { const err = await toggleFav(item.id, item.price); if (err) Alert.alert('Favoriler', err); }}
       >
-        <Text style={[s.heartText, fav && { color: '#6B1E2E' }]}>{fav ? '♥' : '♡'}</Text>
+        <Text style={[s.heartText, fav && { color: '#800020' }]}>{fav ? '♥' : '♡'}</Text>
       </Pressable>
     </Pressable>
   );
@@ -34,7 +34,7 @@ const s = StyleSheet.create({
   noimg: { backgroundColor: '#e3e3e6' },
   body: { flex: 1, padding: 10, gap: 4 },
   title: { fontWeight: '600', color: '#25272D' },
-  price: { fontWeight: '700', color: '#6B1E2E' },
+  price: { fontWeight: '700', color: '#800020' },
   meta: { color: '#666' },
   heart: { padding: 10, justifyContent: 'flex-start' },
   heartText: { fontSize: 24, color: '#999' },

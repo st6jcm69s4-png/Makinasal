@@ -1,12 +1,13 @@
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import { HeaderBack } from '../components/HeaderBack';
 import { AppProvider } from '../lib/AppContext';
 
 export default function RootLayout() {
   return (
     <AppProvider>
       <StatusBar style="light" />
-      <Stack screenOptions={{ headerStyle: { backgroundColor: '#6B1E2E' }, headerTintColor: '#fff' }}>
+      <Stack screenOptions={{ headerStyle: { backgroundColor: '#25272D' }, headerTintColor: '#fff', headerTitleStyle: { fontWeight: '700' }, headerShadowVisible: false, headerLeft: () => <HeaderBack />, contentStyle: { backgroundColor: '#F6F5F3' } }}>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="ilan/[id]" options={{ title: 'İlan' }} />
         <Stack.Screen name="ilan-ver" options={{ title: 'İlan ver' }} />

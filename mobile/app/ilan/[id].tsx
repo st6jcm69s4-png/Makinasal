@@ -186,6 +186,7 @@ export default function ListingScreen() {
 
       <Modal visible={offerOpen} transparent animationType="slide" onRequestClose={() => setOfferOpen(false)}>
         <View style={s.backdrop}>
+          <Pressable style={StyleSheet.absoluteFill} onPress={() => setOfferOpen(false)} accessibilityRole="button" accessibilityLabel="Kapat" />
           <View style={s.sheet}>
             <Text style={s.section}>Teklif ver</Text>
             <TextInput style={s.input} value={offerAmt} onChangeText={setOfferAmt} placeholder={`Teklifin (₺${part ? ', birim fiyat' : ''})`} keyboardType="decimal-pad" />
@@ -201,6 +202,7 @@ export default function ListingScreen() {
       <PickerModal visible={reportOpen} title="Şikayet nedeni" options={REPORT_REASONS.map((r) => ({ value: r, label: r }))} onPick={(r) => void report(r)} onClose={() => setReportOpen(false)} />
       <Modal visible={!!service} transparent animationType="slide" onRequestClose={() => setService(null)}>
         <View style={s.backdrop}>
+          <Pressable style={StyleSheet.absoluteFill} onPress={() => setService(null)} accessibilityRole="button" accessibilityLabel="Kapat" />
           <View style={s.sheet}>
             <Text style={s.section}>{SERVICES.find((x) => x.id === service)?.label}</Text>
             <TextInput style={s.input} value={note} onChangeText={setNote} placeholder="Not (isteğe bağlı)" multiline maxLength={500} />
@@ -218,22 +220,22 @@ const s = StyleSheet.create({
   photo: { width: 390, height: 260 },
   body: { padding: 16, gap: 10 },
   title: { fontSize: 20, fontWeight: '700', color: '#25272D' },
-  price: { fontSize: 20, fontWeight: '700', color: '#6B1E2E' },
+  price: { fontSize: 20, fontWeight: '700', color: '#800020' },
   meta: { color: '#666' },
   desc: { marginTop: 4, lineHeight: 20 },
   warn: { color: '#b36b00', backgroundColor: '#fff6e5', padding: 10, borderRadius: 8 },
   favBtn: { alignSelf: 'flex-start', paddingVertical: 2 },
-  favText: { color: '#6B1E2E', fontWeight: '600' },
-  btn: { backgroundColor: '#6B1E2E', padding: 14, borderRadius: 8, alignItems: 'center' },
+  favText: { color: '#800020', fontWeight: '600' },
+  btn: { backgroundColor: '#800020', padding: 14, borderRadius: 8, alignItems: 'center' },
   btnText: { color: '#fff', fontWeight: '600' },
-  btnGhost: { borderWidth: 1, borderColor: '#6B1E2E', padding: 12, borderRadius: 8, alignItems: 'center' },
-  btnGhostText: { color: '#6B1E2E', fontWeight: '600' },
+  btnGhost: { borderWidth: 1, borderColor: '#800020', padding: 12, borderRadius: 8, alignItems: 'center' },
+  btnGhostText: { color: '#800020', fontWeight: '600' },
   phone: { fontSize: 18, fontWeight: '700', textAlign: 'center', padding: 8 },
   section: { fontWeight: '700', fontSize: 16, marginTop: 8 },
   report: { color: '#888', textAlign: 'center', padding: 10, textDecorationLine: 'underline' },
   msg: { margin: 24, textAlign: 'center' },
   backdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' },
   sheet: { backgroundColor: '#fff', padding: 16, gap: 10, borderTopLeftRadius: 16, borderTopRightRadius: 16 },
-  input: { minHeight: 80, padding: 10, backgroundColor: '#F5F5F6', borderRadius: 8, textAlignVertical: 'top' },
+  input: { minHeight: 80, padding: 10, backgroundColor: '#F6F5F3', borderRadius: 8, textAlignVertical: 'top' },
   small: { color: '#666', fontSize: 12 },
 });

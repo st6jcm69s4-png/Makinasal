@@ -46,7 +46,7 @@ export default function Messages() {
   }
   if (threads === null) return <ActivityIndicator style={{ margin: 32 }} />;
   return (
-    <View style={{ flex: 1, backgroundColor: '#F5F5F6' }}>
+    <View style={{ flex: 1, backgroundColor: '#F6F5F3' }}>
       {error ? <Text style={s.err}>{error}</Text> : null}
       <FlatList
         data={threads}
@@ -71,6 +71,6 @@ const s = StyleSheet.create({
   row: { marginHorizontal: 12, marginBottom: 8, padding: 14, backgroundColor: '#fff', borderRadius: 8, gap: 2 },
   other: { fontWeight: '700', color: '#25272D' },
   title: { color: '#666' },
-  btn: { backgroundColor: '#6B1E2E', paddingVertical: 12, paddingHorizontal: 20, borderRadius: 8 },
+  btn: { backgroundColor: '#800020', paddingVertical: 12, paddingHorizontal: 20, borderRadius: 8 },
   btnText: { color: '#fff', fontWeight: '600' },
 });

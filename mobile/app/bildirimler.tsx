@@ -39,7 +39,7 @@ export default function Notifications() {
   if (items === null) return <ActivityIndicator style={{ margin: 32 }} />;
   const unread = items.filter((n) => !n.read_at).map((n) => n.id);
   return (
-    <View style={{ flex: 1, backgroundColor: '#F5F5F6' }}>
+    <View style={{ flex: 1, backgroundColor: '#F6F5F3' }}>
       {error ? <Text style={s.err}>{error}</Text> : null}
       {unread.length ? <Pressable onPress={() => void mark(unread)} accessibilityRole="button"><Text style={s.link}>Hepsini okundu işaretle ({unread.length})</Text></Pressable> : null}
       <FlatList
@@ -61,9 +61,9 @@ export default function Notifications() {
 const s = StyleSheet.create({
   msg: { textAlign: 'center', color: '#666', margin: 24 },
   err: { color: '#b00020', margin: 12 },
-  link: { color: '#6B1E2E', fontWeight: '600', margin: 12 },
+  link: { color: '#800020', fontWeight: '600', margin: 12 },
   card: { backgroundColor: '#fff', padding: 12, borderRadius: 8, gap: 4 },
-  unread: { borderLeftWidth: 4, borderLeftColor: '#6B1E2E' },
+  unread: { borderLeftWidth: 4, borderLeftColor: '#800020' },
   title: { fontWeight: '700' },
   date: { color: '#888', fontSize: 12 },
 });

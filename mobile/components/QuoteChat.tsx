@@ -47,7 +47,7 @@ export function QuoteChat({ quoteId, userId }: { quoteId: string; userId: string
               <Text>{m.body}</Text>
             </View>
           ))}
-          <TextInput style={{ padding: 10, backgroundColor: '#fff', borderRadius: 8, borderWidth: 1, borderColor: '#ddd' }} placeholder="Mesaj yaz" value={text} onChangeText={setText} multiline />
+          <TextInput style={{ padding: 10, backgroundColor: '#fff', borderRadius: 8, borderWidth: 1, borderColor: '#DDD9DC' }} placeholder="Mesaj yaz" value={text} onChangeText={setText} multiline />
           {error ? <Text style={common.err}>{error}</Text> : null}
           <Btn title="Gönder" onPress={() => void send()} disabled={busy} />
         </View>

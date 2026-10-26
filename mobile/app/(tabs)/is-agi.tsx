@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { PickerModal } from '../../components/PickerModal';
 import { Btn, Chip, common } from '../../components/ui';
 import { CITIES } from '../../lib/data';
@@ -12,7 +12,11 @@ const TABS: [Tab, string][] = [['rental_machine', 'Kiralık'], ['rental_operator
 const PAGE = 20;
 
 export default function NetworkTab() {
+  const { kind } = useLocalSearchParams<{ kind?: string }>();
   const [tab, setTab] = useState<Tab>('rental_machine');
+  useEffect(() => {
+    if (kind && TABS.some(([k]) => k === kind)) { setPosts([]); setProviders([]); setTab(kind as Tab); }
+  }, [kind]);
   const [city, setCity] = useState('');
   const [q, setQ] = useState('');
   const [sheet, setSheet] = useState(false);
@@ -97,6 +101,6 @@ export default function NetworkTab() {
   );
 }
 const s = StyleSheet.create({
-  input: { padding: 12, backgroundColor: '#fff', borderRadius: 8, borderWidth: 1, borderColor: '#ddd' },
+  input: { padding: 12, backgroundColor: '#fff', borderRadius: 8, borderWidth: 1, borderColor: '#DDD9DC' },
   item: { marginHorizontal: 12, marginBottom: 8 },
 });

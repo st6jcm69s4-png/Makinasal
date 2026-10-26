@@ -57,8 +57,8 @@ const s = StyleSheet.create({
   box: { backgroundColor: '#fff', borderRadius: 8, padding: 14, gap: 8 },
   h: { fontWeight: '700', fontSize: 16 },
   small: { color: '#666', fontSize: 12 },
-  input: { padding: 10, backgroundColor: '#F5F5F6', borderRadius: 8 },
+  input: { padding: 10, backgroundColor: '#F6F5F3', borderRadius: 8 },
   err: { color: '#b00020' },
-  btn: { borderWidth: 1, borderColor: '#6B1E2E', padding: 10, borderRadius: 8, alignItems: 'center' },
-  btnText: { color: '#6B1E2E', fontWeight: '600' },
+  btn: { borderWidth: 1, borderColor: '#800020', padding: 10, borderRadius: 8, alignItems: 'center' },
+  btnText: { color: '#800020', fontWeight: '600' },
 });

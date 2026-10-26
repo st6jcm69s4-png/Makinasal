@@ -5,11 +5,12 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { PickerModal } from '../components/PickerModal';
 import { useApp } from '../lib/AppContext';
 import { CATEGORIES, CITIES, KM_CATEGORIES, LIMITS, MACHINE_CATEGORIES, PART_GROUPS } from '../lib/data';
+import { brandsForCategory, canonicalBrand } from '../lib/machineryCatalog';
 import { photoUrl, supabase } from '../lib/supabase';
 
 const CONDITIONS = ['Sıfır', 'Çıkma', 'Revizyonlu'];
 const YEAR_MAX = new Date().getFullYear() + 1;
-type Sheet = null | 'cat' | 'city' | 'equip' | 'group' | 'cond';
+type Sheet = null | 'cat' | 'city' | 'equip' | 'group' | 'cond' | 'brand';
 
 export default function NewListing() {
   const { session } = useApp();
@@ -114,7 +115,7 @@ export default function NewListing() {
         year: part ? null : yearNum, usage_value: !part ? Number(usage) : null, usage_unit: !part ? unit : null,
         spec: part ? spec.trim() : null, cond: part ? cond : null, compat: part && compat.trim() ? compat.trim() : null, qty: part ? Number(qty) : null,
         equipment_category: part ? equip : null, part_group: part ? group : null,
-        brand: brand.trim(), model: model.trim(), takas, serial_declared: false,
+        brand: canonicalBrand(brand), model: model.trim(), takas, serial_declared: false,
       };
       const { seller_id: _s, ...changes } = base;
       const created = editId
@@ -166,7 +167,7 @@ export default function NewListing() {
   );
   return (
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <ScrollView style={{ backgroundColor: '#F5F5F6' }} contentContainerStyle={s.form} keyboardShouldPersistTaps="handled">
+      <ScrollView style={{ backgroundColor: '#F6F5F3' }} contentContainerStyle={s.form} keyboardShouldPersistTaps="handled">
         {select('Kategori', cat, 'cat')}
         {part ? (
           <>
@@ -174,7 +175,7 @@ export default function NewListing() {
             {select('Parça grubu', PART_GROUPS.find((g) => g.id === group)?.label ?? '', 'group')}
           </>
         ) : null}
-        {field('Marka', brand, setBrand)}
+        {select('Marka', brand, 'brand')}
         {field(part ? 'Ürün adı' : 'Model', model, setModel)}
         {part ? (
           <>
@@ -222,7 +223,8 @@ export default function NewListing() {
         <Text style={s.small}>Yeni ilanlar yayına girmeden önce incelenir.</Text>
       </ScrollView>
 
-      <PickerModal visible={sheet === 'cat'} title="Kategori" selected={cat} options={CATEGORIES.map((c) => ({ value: c, label: c }))} onPick={setCat} onClose={() => setSheet(null)} />
+      <PickerModal visible={sheet === 'brand'} title="Marka" searchable allowCustom selected={brand} options={brandsForCategory(part ? equip : cat).map((b) => ({ value: b, label: b }))} onPick={setBrand} onClose={() => setSheet(null)} />
+        <PickerModal visible={sheet === 'cat'} title="Kategori" selected={cat} options={CATEGORIES.map((c) => ({ value: c, label: c }))} onPick={setCat} onClose={() => setSheet(null)} />
       <PickerModal visible={sheet === 'city'} title="İl" selected={city} options={CITIES.map((c) => ({ value: c, label: c }))} onPick={setCity} onClose={() => setSheet(null)} />
       <PickerModal visible={sheet === 'equip'} title="Makine / araç türü" selected={equip} options={MACHINE_CATEGORIES.map((c) => ({ value: c, label: c }))} onPick={setEquip} onClose={() => setSheet(null)} />
       <PickerModal visible={sheet === 'group'} title="Parça grubu" selected={group} options={PART_GROUPS.map((g) => ({ value: g.id, label: g.label }))} onPick={setGroup} onClose={() => setSheet(null)} />
@@ -235,14 +237,14 @@ const s = StyleSheet.create({
   form: { padding: 16, gap: 12 },
   field: { gap: 4 },
   label: { fontWeight: '600', color: '#25272D' },
-  input: { padding: 12, backgroundColor: '#fff', borderRadius: 8, borderWidth: 1, borderColor: '#ddd' },
+  input: { padding: 12, backgroundColor: '#fff', borderRadius: 8, borderWidth: 1, borderColor: '#DDD9DC' },
   rowSwitch: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   thumb: { width: 90, height: 70, borderRadius: 6 },
   rm: { textAlign: 'center', color: '#b00020', fontSize: 12 },
-  btn: { backgroundColor: '#6B1E2E', padding: 14, borderRadius: 8, alignItems: 'center' },
+  btn: { backgroundColor: '#800020', padding: 14, borderRadius: 8, alignItems: 'center' },
   btnText: { color: '#fff', fontWeight: '600' },
-  btnGhost: { borderWidth: 1, borderColor: '#6B1E2E', padding: 12, borderRadius: 8, alignItems: 'center' },
-  btnGhostText: { color: '#6B1E2E', fontWeight: '600' },
+  btnGhost: { borderWidth: 1, borderColor: '#800020', padding: 12, borderRadius: 8, alignItems: 'center' },
+  btnGhostText: { color: '#800020', fontWeight: '600' },
   err: { color: '#b00020' },
   small: { color: '#666', fontSize: 12 },
   msg: { textAlign: 'center', color: '#666', margin: 24 },
