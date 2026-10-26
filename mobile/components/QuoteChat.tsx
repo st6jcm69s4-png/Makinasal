@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Text, TextInput, View } from 'react-native';
+import { View } from 'react-native';
+import { Text, TextInput } from './LText';
 import { Btn, common } from './ui';
 import { checkMessage } from '../lib/messageFilter';
 import { networkError } from '../lib/network';

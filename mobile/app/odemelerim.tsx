@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, Text } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView } from 'react-native';
+import { Text } from '../components/LText';
 import { Btn, common } from '../components/ui';
 import { useApp } from '../lib/AppContext';
 import { supabase } from '../lib/supabase';

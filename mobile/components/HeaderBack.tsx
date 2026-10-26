@@ -1,4 +1,5 @@
-import { Pressable, Text } from 'react-native';
+import { Pressable } from 'react-native';
+import { Text } from './LText';
 import { router } from 'expo-router';
 
 /** Sol üstteki geri düğmesi; geçmiş yoksa ana sayfaya döner. */

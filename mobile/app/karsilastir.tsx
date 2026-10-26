@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Text } from '../components/LText';
 import { router } from 'expo-router';
 import { useApp } from '../lib/AppContext';
 import { supabase, tl } from '../lib/supabase';

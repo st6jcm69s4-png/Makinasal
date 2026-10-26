@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, ScrollView, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, ScrollView, View } from 'react-native';
+import { Text } from '../../components/LText';
 import { PickerModal } from '../../components/PickerModal';
 import { Btn, common, Field, Select } from '../../components/ui';
 import { useApp } from '../../lib/AppContext';

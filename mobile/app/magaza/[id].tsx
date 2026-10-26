@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList, Text, View } from 'react-native';
+import { ActivityIndicator, FlatList, View } from 'react-native';
+import { Text } from '../../components/LText';
 import { useLocalSearchParams } from 'expo-router';
 import { ListingCard } from '../../components/ListingCard';
 import { common } from '../../components/ui';

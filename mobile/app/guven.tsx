@@ -1,4 +1,5 @@
-import { ScrollView, Text, View } from 'react-native';
+import { ScrollView, View } from 'react-native';
+import { Text } from '../components/LText';
 import { common } from '../components/ui';
 
 const LEVELS: [string, string, string][] = [

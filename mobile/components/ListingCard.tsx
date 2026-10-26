@@ -1,4 +1,5 @@
-import { Alert, Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Alert, Image, Pressable, StyleSheet, View } from 'react-native';
+import { Text } from './LText';
 import { router } from 'expo-router';
 import { useApp } from '../lib/AppContext';
 import { photoUrl, tl, type Row } from '../lib/supabase';

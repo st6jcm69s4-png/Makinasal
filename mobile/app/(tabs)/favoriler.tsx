@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, FlatList, StyleSheet, View } from 'react-native';
+import { Text } from '../../components/LText';
 import { router } from 'expo-router';
 import { Pressable } from 'react-native';
 import { ListingCard } from '../../components/ListingCard';

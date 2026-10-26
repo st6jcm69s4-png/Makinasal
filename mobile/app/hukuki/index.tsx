@@ -1,4 +1,5 @@
-import { ScrollView, Text } from 'react-native';
+import { ScrollView } from 'react-native';
+import { Text } from '../../components/LText';
 import { Btn, common } from '../../components/ui';
 import { openWeb } from '../../lib/web';
 

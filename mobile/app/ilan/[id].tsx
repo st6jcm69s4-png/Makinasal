@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, Image, Linking, Modal, Pressable, ScrollView, StyleSheet, Switch, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, Alert, Image, Linking, Modal, Pressable, ScrollView, StyleSheet, Switch, View } from 'react-native';
+import { Text, TextInput } from '../../components/LText';
 import { router, useLocalSearchParams } from 'expo-router';
 import { checkMessage } from '../../lib/messageFilter';
 import { PickerModal } from '../../components/PickerModal';

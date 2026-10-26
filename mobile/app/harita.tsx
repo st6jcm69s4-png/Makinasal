@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList, Pressable, Text, View } from 'react-native';
+import { ActivityIndicator, FlatList, Pressable, View } from 'react-native';
+import { Text } from '../components/LText';
 import { router } from 'expo-router';
 import { common } from '../components/ui';
 import { supabase } from '../lib/supabase';

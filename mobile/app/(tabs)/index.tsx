@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react';
-import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Pressable, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
+import { Text, TextInput } from '../../components/LText';
 import { router, useFocusEffect } from 'expo-router';
 import { ListingCard } from '../../components/ListingCard';
 import { Btn } from '../../components/ui';

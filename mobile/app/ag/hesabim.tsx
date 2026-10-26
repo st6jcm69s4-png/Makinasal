@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
+import { Text } from '../../components/LText';
 import { router } from 'expo-router';
 import { Btn, common } from '../../components/ui';
 import { useApp } from '../../lib/AppContext';

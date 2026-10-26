@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Alert, ActivityIndicator, ScrollView, Text, View } from 'react-native';
+import { Alert, ActivityIndicator, ScrollView, View } from 'react-native';
+import { Text } from '../../../components/LText';
 import { router, useLocalSearchParams } from 'expo-router';
 import { PickerModal } from '../../../components/PickerModal';
 import { QuoteChat } from '../../../components/QuoteChat';

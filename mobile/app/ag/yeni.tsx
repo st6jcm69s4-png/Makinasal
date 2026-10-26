@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, ScrollView, Text } from 'react-native';
+import { ActivityIndicator, ScrollView } from 'react-native';
+import { Text } from '../../components/LText';
 import { router, useLocalSearchParams } from 'expo-router';
 import { PickerModal } from '../../components/PickerModal';
 import { Btn, common, Field, Select } from '../../components/ui';

@@ -1,12 +1,13 @@
 import { useState } from 'react';
-import { KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, Switch, Text, TextInput, View } from 'react-native';
+import { KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, Switch, View } from 'react-native';
+import { Text, TextInput } from './LText';
 import { PickerModal } from './PickerModal';
 import { Btn, Chip } from './ui';
 import { brandsForCategory } from '../lib/machineryCatalog';
 
-export type Adv = { brand: string; yMin: string; yMax: string; useMin: string; useMax: string; unit: 'sa' | 'km'; minScore: number; ver: boolean; hide: boolean; takas: boolean };
-export const NO_ADV: Adv = { brand: '', yMin: '', yMax: '', useMin: '', useMax: '', unit: 'sa', minScore: 0, ver: false, hide: false, takas: false };
-export const advCount = (a: Adv) => [a.brand, a.yMin, a.yMax, a.useMin, a.useMax].filter(Boolean).length + (a.minScore ? 1 : 0) + [a.ver, a.hide, a.takas].filter(Boolean).length;
+export type Adv = { brand: string; yMin: string; yMax: string; useMin: string; useMax: string; unit: 'sa' | 'km'; minScore: number; near: number; ver: boolean; hide: boolean; takas: boolean };
+export const NO_ADV: Adv = { brand: '', yMin: '', yMax: '', useMin: '', useMax: '', unit: 'sa', minScore: 0, near: 0, ver: false, hide: false, takas: false };
+export const advCount = (a: Adv) => [a.brand, a.yMin, a.yMax, a.useMin, a.useMax].filter(Boolean).length + (a.minScore ? 1 : 0) + (a.near ? 1 : 0) + [a.ver, a.hide, a.takas].filter(Boolean).length;
 
 export function FilterModal({ visible, value, category, part, onApply, onClose }: { visible: boolean; value: Adv; category: string; part: boolean; onApply: (a: Adv) => void; onClose: () => void }) {
   const [a, setA] = useState<Adv>(value);
@@ -44,6 +45,10 @@ export function FilterModal({ visible, value, category, part, onApply, onClose }
               <Text style={s.label}>En düşük satıcı puanı</Text>
               <View style={[s.row, { flexWrap: 'wrap' }]}>
                 {[[0, 'Hepsi'], [3, '3+'], [4, '4+'], [4.5, '4,5+']].map(([v, l]) => <Chip key={String(v)} title={String(l)} on={a.minScore === v} onPress={() => set('minScore', Number(v))} />)}
+              </View>
+              <Text style={s.label}>Bana uzaklık</Text>
+              <View style={[s.row, { flexWrap: 'wrap' }]}>
+                {[[0, 'Hepsi'], [50, '50 km'], [150, '150 km'], [300, '300 km'], [600, '600 km']].map(([v, l]) => <Chip key={String(v)} title={String(l)} on={a.near === v} onPress={() => set('near', Number(v))} />)}
               </View>
               <View style={s.sw}><Text style={{ flex: 1 }}>Yalnızca doğrulanmış satıcılar</Text><Switch value={a.ver} onValueChange={(v) => set('ver', v)} /></View>
               <View style={s.sw}><Text style={{ flex: 1 }}>Riskli satıcıları gizle</Text><Switch value={a.hide} onValueChange={(v) => set('hide', v)} /></View>

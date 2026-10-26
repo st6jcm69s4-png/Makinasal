@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, FlatList, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Text, TextInput } from '../../components/LText';
 import { router, useLocalSearchParams } from 'expo-router';
 import { PickerModal } from '../../components/PickerModal';
 import { Btn, Chip, common } from '../../components/ui';

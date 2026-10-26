@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Text, TextInput } from '../../components/LText';
 import { router } from 'expo-router';
 import { ReferralBox } from '../../components/ReferralBox';
 import { useApp } from '../../lib/AppContext';

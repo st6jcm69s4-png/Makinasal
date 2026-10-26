@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, FlatList, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, FlatList, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Text, TextInput } from '../../components/LText';
 import { PickerModal } from '../../components/PickerModal';
 import { advCount, FilterModal, NO_ADV, type Adv } from '../../components/FilterModal';
 import { CITIES } from '../../lib/data';
+import { COORDS, distanceKm } from '../../lib/geo';
 import { CATEGORY_GROUPS, categoryLabel, categoryValues } from '../../lib/machineryCatalog';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Alert } from 'react-native';
@@ -12,7 +14,7 @@ import { configured, supabase, type Row } from '../../lib/supabase';
 
 const SORTS = [
   { value: 'rec', label: 'Öne çıkanlar önce' }, { value: 'new', label: 'En yeni ilan' }, { value: 'pa', label: 'Fiyat: artan' },
-  { value: 'pd', label: 'Fiyat: azalan' }, { value: 'drop', label: 'Fiyatı düşenler önce' }, { value: 'yd', label: 'Model yılı: yeniden eskiye' },
+  { value: 'pd', label: 'Fiyat: azalan' }, { value: 'near', label: 'Bana en yakın' }, { value: 'drop', label: 'Fiyatı düşenler önce' }, { value: 'yd', label: 'Model yılı: yeniden eskiye' },
   { value: 'trust', label: 'Satıcı puanı: yüksek önce' },
 ];
 const PRICES = [
@@ -29,8 +31,13 @@ export default function Listings() {
   const [sheet, setSheet] = useState<Sheet>(null);
   const [adv, setAdv] = useState<Adv>(NO_ADV);
   const [advOpen, setAdvOpen] = useState(false);
+  const [myCity, setMyCity] = useState('İstanbul');
   const isPart = cat === 'Yedek parça' || cat === 'Lastik ve jant' || cat === 'group:parts';
   const { session } = useApp();
+  useEffect(() => {
+    if (!session) return;
+    void supabase.from('profiles').select('city').eq('id', session.user.id).maybeSingle().then((r) => { const c = (r.data as { city?: string | null } | null)?.city; if (c && COORDS[c]) setMyCity(c); });
+  }, [session]);
   const params = useLocalSearchParams<{ q?: string; cat?: string; city?: string; maxPrice?: string }>();
   useEffect(() => {
     if (params.q !== undefined) setQ(params.q);
@@ -41,7 +48,7 @@ export default function Listings() {
 
   async function saveSearch() {
     if (!session) { Alert.alert('Aramayı kaydet', 'Aramayı kaydetmek için giriş yapmalısın.'); return; }
-    const f = { cat: cat && !cat.startsWith('group:') ? cat : 'Tümü', city, maxPrice: Number(maxPrice), q: q.trim(), brand: adv.brand, unit: adv.unit, useMin: adv.useMin, useMax: adv.useMax, yMin: adv.yMin, yMax: adv.yMax, minScore: adv.minScore, incNew: true, ver: adv.ver, hide: adv.hide, takas: adv.takas, near: 0 };
+    const f = { cat: cat && !cat.startsWith('group:') ? cat : 'Tümü', city, maxPrice: Number(maxPrice), q: q.trim(), brand: adv.brand, unit: adv.unit, useMin: adv.useMin, useMax: adv.useMax, yMin: adv.yMin, yMax: adv.yMax, minScore: adv.minScore, incNew: true, ver: adv.ver, hide: adv.hide, takas: adv.takas, near: adv.near };
     const { error: e } = await supabase.from('saved_searches').insert({ user_id: session.user.id, query: { f } });
     Alert.alert('Aramayı kaydet', e ? 'Arama kaydedilemedi. Tekrar dene.' : 'Arama kaydedildi. Hesabım → Kayıtlı aramalar bölümünden görebilirsin.');
   }
@@ -57,7 +64,7 @@ export default function Listings() {
     if (!configured) { setError('Uygulama ayarları eksik (.env dosyası).'); return; }
     const id = ++seq.current;
     setLoading(true); setError('');
-    const { data, error: e } = await supabase.rpc('search_listings', { p: { q: query, page: nextPage, categories: f.cat ? categoryValues(f.cat) : [], city: f.city, maxPrice: Number(f.maxPrice), sort: f.sort, part: f.cat === 'Yedek parça' || f.cat === 'Lastik ve jant' || f.cat === 'group:parts', brand: a.brand, yMin: a.yMin, yMax: a.yMax, useMin: a.useMin, useMax: a.useMax, unit: a.unit, minScore: a.minScore, incNew: true, ver: a.ver, hide: a.hide, takas: a.takas }, count_only: false });
+    const { data, error: e } = await supabase.rpc('search_listings', { p: { q: query, page: nextPage, categories: f.cat ? categoryValues(f.cat) : [], city: f.city, maxPrice: Number(f.maxPrice), sort: f.sort, part: f.cat === 'Yedek parça' || f.cat === 'Lastik ve jant' || f.cat === 'group:parts', brand: a.brand, yMin: a.yMin, yMax: a.yMax, useMin: a.useMin, useMax: a.useMax, unit: a.unit, minScore: a.minScore, incNew: true, ver: a.ver, hide: a.hide, takas: a.takas, near: a.near, distances: Object.fromEntries(Object.keys(COORDS).map((c) => [c, distanceKm(myCity, c) ?? 99999])) }, count_only: false });
     if (id !== seq.current) return;
     setLoading(false);
     if (e || !data) { setError('İlanlar yüklenemedi. Bağlantını kontrol et.'); return; }
@@ -65,7 +72,7 @@ export default function Listings() {
     setTotal(res.total);
     setRows((cur) => (nextPage === 1 ? res.rows : [...cur, ...res.rows]));
     setPage(nextPage);
-  }, []);
+  }, [myCity]);
 
   useEffect(() => {
     const t = setTimeout(() => void load(1, q.trim(), { cat, city, maxPrice, sort }, adv), 350);

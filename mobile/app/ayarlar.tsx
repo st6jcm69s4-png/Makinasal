@@ -1,13 +1,16 @@
 import { useEffect, useState } from 'react';
-import { ScrollView, Text, View } from 'react-native';
+import { ScrollView, View } from 'react-native';
+import { Text } from '../components/LText';
 import { router } from 'expo-router';
-import { Btn, common } from '../components/ui';
+import { Btn, Chip, common } from '../components/ui';
+import { useLang } from '../lib/lang';
 import { useApp } from '../lib/AppContext';
 import { supabase } from '../lib/supabase';
 import { openWeb } from '../lib/web';
 
 export default function Settings() {
   const { session } = useApp();
+  const { lang, setLang } = useLang();
   const [admin, setAdmin] = useState(false);
   useEffect(() => {
     if (!session) { setAdmin(false); return; }
@@ -16,8 +19,12 @@ export default function Settings() {
   return (
     <ScrollView style={common.screen} contentContainerStyle={{ padding: 12, gap: 10 }}>
       <View style={common.card}>
-        <Text style={common.h2}>Dil</Text>
-        <Text>Uygulama şu anda Türkçe. İngilizce dil desteği web sitesinde mevcut; mobil sürüm için henüz hazır değil.</Text>
+        <Text style={common.h2}>Dil / Language</Text>
+        <View style={{ flexDirection: 'row', gap: 8 }}>
+          <Chip title="Türkçe" on={lang === 'tr'} onPress={() => setLang('tr')} />
+          <Chip title="English" on={lang === 'en'} onPress={() => setLang('en')} />
+        </View>
+        <Text style={common.meta}>Dil tercihin bu telefonda saklanır. İlanlar ve mesajlar yazıldıkları dilde kalır.</Text>
       </View>
       <View style={[common.card, { gap: 8 }]}>
         <Text style={common.h2}>Hesap</Text>
