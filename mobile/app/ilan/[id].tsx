@@ -1,25 +1,41 @@
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, Image, Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useApp } from '../../lib/AppContext';
 import { SITE_URL, photoUrl, supabase, tl } from '../../lib/supabase';
 
 type Detail = {
-  id: string; title: string; description: string | null; price: number | string; city: string; year: number | null;
+  id: string; seller_id: string; title: string; description: string | null; price: number | string; city: string; year: number | null;
   usage_value: number | null; usage_unit: string | null; brand: string | null; model: string | null;
   listing_photos: { path: string; position: number }[] | null;
 };
 
 export default function ListingScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { favs, toggleFav } = useApp();
+  const { favs, toggleFav, session } = useApp();
+  const [msgBusy, setMsgBusy] = useState(false);
+
+  async function startThread(listingId: string, sellerId: string) {
+    if (!session) { Alert.alert('Mesaj', 'Mesaj göndermek için giriş yapmalısın.'); return; }
+    setMsgBusy(true);
+    const me = session.user.id;
+    const found = await supabase.from('threads').select('id').eq('listing_id', listingId).eq('buyer_id', me).maybeSingle();
+    let tid = (found.data as { id: string } | null)?.id;
+    if (!tid) {
+      const created = await supabase.from('threads').insert({ listing_id: listingId, buyer_id: me, seller_id: sellerId }).select('id').single();
+      tid = (created.data as { id: string } | null)?.id;
+      if (created.error || !tid) { setMsgBusy(false); Alert.alert('Mesaj', 'Konuşma başlatılamadı. Bağlantını kontrol et.'); return; }
+    }
+    setMsgBusy(false);
+    router.push(`/mesaj/${tid}`);
+  }
   const [item, setItem] = useState<Detail | null>(null);
   const [state, setState] = useState<'loading' | 'ok' | 'error' | 'missing'>('loading');
 
   useEffect(() => {
     let alive = true;
     supabase.from('listings')
-      .select('id,title,description,price,city,year,usage_value,usage_unit,brand,model,listing_photos(path,position)')
+      .select('id,seller_id,title,description,price,city,year,usage_value,usage_unit,brand,model,listing_photos(path,position)')
       .eq('id', id).eq('status', 'active').eq('moderation_status', 'approved').maybeSingle()
       .then(({ data, error }) => {
         if (!alive) return;
@@ -46,6 +62,11 @@ export default function ListingScreen() {
           {[item.brand, item.model, item.city, item.year, item.usage_value ? `${item.usage_value} ${item.usage_unit ?? ''}` : null].filter(Boolean).join(' · ')}
         </Text>
         {item.description ? <Text style={s.desc}>{item.description}</Text> : null}
+        {session?.user.id !== item.seller_id ? (
+          <Pressable style={s.btn} disabled={msgBusy} onPress={() => void startThread(item.id, item.seller_id)} accessibilityRole="button">
+            <Text style={s.btnText}>Mesaj gönder</Text>
+          </Pressable>
+        ) : null}
         {SITE_URL ? (
           <Pressable style={s.btn} onPress={() => void Linking.openURL(`${SITE_URL}/ilanlar/${item.id}`)} accessibilityRole="button">
             <Text style={s.btnText}>Mesaj ve teklif için web sitesinde aç</Text>

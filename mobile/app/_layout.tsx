@@ -9,6 +9,7 @@ export default function RootLayout() {
       <Stack screenOptions={{ headerStyle: { backgroundColor: '#6B1E2E' }, headerTintColor: '#fff' }}>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="ilan/[id]" options={{ title: 'İlan' }} />
+        <Stack.Screen name="mesaj/[id]" options={{ title: 'Mesajlar' }} />
       </Stack>
     </AppProvider>
   );
