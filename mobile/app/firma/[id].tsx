@@ -9,7 +9,7 @@ import { supabase, type Row } from '../../lib/supabase';
 
 export default function ProviderDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { session } = useApp();
+  const { session, netFavs, toggleNetFav } = useApp();
   const [stat, setStat] = useState<{ score: number; n: number } | null>(null);
   const [p, setP] = useState<Provider | null>(null);
   const [posts, setPosts] = useState<MarketPost[]>([]);
@@ -44,6 +44,7 @@ export default function ProviderDetail() {
         <Text><Text style={{ fontWeight: '600' }}>İş alanları: </Text>{p.specialties.join(', ')}</Text>
       </View>
       <Btn title="Telefonla ara" onPress={() => void call()} />
+      <Btn ghost title={netFavs.has(`firm:${id}`) ? 'Favorilerde · çıkar' : 'Favorilere ekle'} onPress={async () => { const err = await toggleNetFav('firm', String(id)); if (err) Alert.alert('Favoriler', err); }} />
       {inv.length ? <Text style={common.h2}>Envanter</Text> : null}
       {inv.map((i) => (
         <View key={String(i.id)} style={common.card}>

@@ -138,8 +138,6 @@ export default function NetworkTab() {
         <View style={{ flex: 1, backgroundColor: color.navy }}>
           <View style={s.sheetBar}>
             <Pressable onPress={() => setAcct(false)} hitSlop={12} accessibilityRole="button" accessibilityLabel="Geri" style={s.sheetBack}><Icon name="chevron-left" size={28} color="#fff" /></Pressable>
-            <PlainText style={s.sheetTitle}>İŞ AĞI HESABIM</PlainText>
-            <View style={{ width: 40 }} />
           </View>
           <NetAccountView embedded onNavigate={() => setAcct(false)} />
         </View>
@@ -150,7 +148,7 @@ export default function NetworkTab() {
 }
 
 const s = StyleSheet.create({
-  sheetBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 8, paddingVertical: 6 },
+  sheetBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', paddingHorizontal: 8, paddingVertical: 4 },
   sheetBack: { width: 40, height: 40, alignItems: 'flex-start', justifyContent: 'center', paddingLeft: 4 },
   sheetTitle: { color: '#fff', fontFamily: font.labelBold, fontSize: 18, letterSpacing: 1 },
   sheetClose: { width: 34, height: 34, borderRadius: 17, backgroundColor: 'rgba(255,255,255,0.14)', alignItems: 'center', justifyContent: 'center' },

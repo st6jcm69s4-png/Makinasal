@@ -57,8 +57,10 @@ export function NetAccountView({ onNavigate, embedded }: { onNavigate?: () => vo
   return (
     <ScrollView style={{ flex: 1, backgroundColor: color.bg }} contentContainerStyle={{ paddingBottom: 28 }} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); void load().finally(() => setRefreshing(false)); }} />}>
       <View style={s.head}>
-        <Label style={{ color: color.onNavy }}>İş ağı</Label>
-        <PlainText style={s.h1}>{embedded ? 'ÖZETİM' : 'HESABIM'}</PlainText>
+        <View style={s.titleWrap}>
+          <Label style={{ color: color.onNavy }}>İş ağı</Label>
+          <PlainText style={s.h1}>HESABIM</PlainText>
+        </View>
         <View style={s.stats}>
           {stats.map(([l, n, k], i) => (
             <Pressable key={l} style={[s.stat, i > 0 && { borderLeftWidth: 1, borderLeftColor: color.navy2 }, seg === k && s.statOn]} onPress={() => setSeg(k)} accessibilityRole="button">
@@ -116,7 +118,6 @@ export function NetAccountView({ onNavigate, embedded }: { onNavigate?: () => vo
           </View>
         </Pressable>
       )) : <Empty text={seg === 'incoming' ? 'Henüz gelen teklif yok.' : 'Henüz teklif vermedin.'} cta="İş ağına göz at" onPress={() => { if (onNavigate) onNavigate(); else router.navigate('/is-agi'); }} />) : null}
-      {embedded ? null : <View style={{ padding: 12 }}><Btn ghost title="Yenile" onPress={() => void load()} /></View>}
     </ScrollView>
   );
 }
@@ -139,8 +140,9 @@ function Empty({ text, cta, onPress }: { text: string; cta: string; onPress: () 
 }
 
 const s = StyleSheet.create({
-  head: { backgroundColor: color.navy, paddingTop: 14, gap: 2 },
-  h1: { color: '#fff', fontFamily: font.labelBold, fontSize: 34, letterSpacing: 0.6, paddingHorizontal: 16, lineHeight: 36 },
+  head: { backgroundColor: color.navy, paddingTop: 6 },
+  titleWrap: { paddingHorizontal: 16, gap: 2 },
+  h1: { color: '#fff', fontFamily: font.labelBold, fontSize: 38, letterSpacing: 0.8, lineHeight: 40 },
   stats: { flexDirection: 'row', marginTop: 10, borderTopWidth: 1, borderTopColor: color.navy2 },
   stat: { flex: 1, paddingVertical: 10, paddingHorizontal: 14, gap: 1, borderBottomWidth: 3, borderBottomColor: 'transparent' },
   statOn: { backgroundColor: color.navy2, borderBottomColor: color.accent },

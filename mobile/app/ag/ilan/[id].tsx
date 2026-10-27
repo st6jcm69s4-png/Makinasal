@@ -12,7 +12,7 @@ import { openWeb } from '../../../lib/web';
 
 export default function PostDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { session } = useApp();
+  const { session, netFavs, toggleNetFav } = useApp();
   const uid = session?.user.id;
   const [post, setPost] = useState<MarketPost | null>(null);
   const [quotes, setQuotes] = useState<Quote[]>([]);
@@ -88,6 +88,7 @@ export default function PostDetail() {
         <Text style={{ marginTop: 6 }}>{post.description}</Text>
       </View>
       {error ? <Text style={common.err}>{error}</Text> : null}
+      {!isOwner ? <Btn ghost title={netFavs.has(`post:${post.id}`) ? 'Favorilerde · çıkar' : 'Favorilere ekle'} onPress={async () => { const err = await toggleNetFav('post', post.id); if (err) Alert.alert('Favoriler', err); }} /> : null}
 
       {isOwner ? (
         <View style={{ gap: 8 }}>

@@ -1,6 +1,7 @@
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Alert, Pressable, StyleSheet, View } from 'react-native';
 import { Text } from './LText';
-import { Icon, type IconName } from './Icon';
+import { Heart, Icon, type IconName } from './Icon';
+import { useApp } from '../lib/AppContext';
 import { Label } from './ui';
 import { Badge } from './kit';
 import { router } from 'expo-router';
@@ -15,6 +16,16 @@ function Cell({ label, value, flex = 1, left }: { label: string; value: string; 
       <Label>{label}</Label>
       <Text style={s.val} numberOfLines={1}>{value || '–'}</Text>
     </View>
+  );
+}
+
+function NetHeart({ kind, id }: { kind: 'post' | 'firm'; id: string }) {
+  const { netFavs, toggleNetFav } = useApp();
+  const on = netFavs.has(`${kind}:${id}`);
+  return (
+    <Pressable hitSlop={10} accessibilityRole="button" accessibilityLabel={on ? 'Favorilerden çıkar' : 'Favorilere ekle'} onPress={async () => { const err = await toggleNetFav(kind, id); if (err) Alert.alert('Favoriler', err); }} style={{ padding: 2 }}>
+      <Heart on={on} size={22} color={on ? color.accent : color.muted} />
+    </Pressable>
   );
 }
 
@@ -33,6 +44,7 @@ export function PostCard({ p }: { p: MarketPost }) {
           </View>
           <Text style={s.title} numberOfLines={2}>{p.title}</Text>
         </View>
+        <NetHeart kind="post" id={p.id} />
       </View>
       <View style={s.strip}>
         <Cell label="İl" value={p.city} />
@@ -52,6 +64,7 @@ export function FirmCard({ p }: { p: Provider }) {
           <Text style={s.title} numberOfLines={2}>{p.name}</Text>
           <Text style={s.desc} numberOfLines={2}>{p.description}</Text>
         </View>
+        <NetHeart kind="firm" id={p.user_id} />
       </View>
       <View style={s.strip}>
         <Cell label="İl" value={p.city} />
