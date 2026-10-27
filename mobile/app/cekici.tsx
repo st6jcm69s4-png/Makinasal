@@ -4,6 +4,7 @@ import { PlainText, Text } from '../components/LText';
 import { Icon } from '../components/Icon';
 import { PickerModal } from '../components/PickerModal';
 import { Btn, Hatch, Label } from '../components/ui';
+import { AlertBox, RowSkeleton } from '../components/kit';
 import { router } from 'expo-router';
 import { useApp } from '../lib/AppContext';
 import { CITIES } from '../lib/data';
@@ -112,8 +113,8 @@ export default function Cekici() {
       <Hatch height={7} />
       <View style={s.sos}><Icon name="alert-triangle" size={16} color={color.warn} /><Text style={s.sosText}>Can güvenliği tehlikesinde önce 112'yi ara.</Text></View>
 
-      {rows === null ? <ActivityIndicator style={{ margin: 24 }} /> : null}
-      {error ? <Text style={s.err}>{error}</Text> : null}
+      {rows === null ? <RowSkeleton count={4} /> : null}
+      {error ? <View style={{ margin: 12 }}><AlertBox variant="destructive">{error}</AlertBox></View> : null}
       {rows && !rows.length && !error ? (
         <View style={s.empty}>
           <Text style={s.emptyT}>Henüz kayıtlı çekici yok.</Text>

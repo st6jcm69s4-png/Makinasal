@@ -2,6 +2,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { Text } from './LText';
 import { Icon, type IconName } from './Icon';
 import { Label } from './ui';
+import { Badge } from './kit';
 import { router } from 'expo-router';
 import { dateLabel, money, PERSONNEL_ROLES, PROVIDER_KINDS, RENTAL_MODES, type MarketPost, type Provider } from '../lib/network';
 import { color, radius } from '../lib/theme';
@@ -28,7 +29,7 @@ export function PostCard({ p }: { p: MarketPost }) {
         <View style={{ flex: 1, gap: 4 }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
             <Label style={{ color: color.accent }}>{who}</Label>
-            {fresh ? <View style={s.fresh}><Text style={s.freshText}>YENİ</Text></View> : null}
+            {fresh ? <Badge variant="default">YENİ</Badge> : null}
           </View>
           <Text style={s.title} numberOfLines={2}>{p.title}</Text>
         </View>

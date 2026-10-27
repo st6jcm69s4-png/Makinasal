@@ -3,6 +3,7 @@ import { ActivityIndicator, Alert, Image, Pressable, RefreshControl, ScrollView,
 import { PlainText, Text } from '../components/LText';
 import { Icon, type IconName } from '../components/Icon';
 import { Btn, Hatch, Label } from '../components/ui';
+import { AlertBox, Badge, StatusBadge, Tabs } from '../components/kit';
 import { router } from 'expo-router';
 import { useApp } from '../lib/AppContext';
 import { photoUrl, supabase, tl } from '../lib/supabase';
@@ -112,15 +113,8 @@ export default function Admin() {
           </View>
         ))}
       </View>
-      <View style={s.tabs}>
-        {tabs.map(([k, l, n], i) => (
-          <Pressable key={k} style={[s.tab, i > 0 && { borderLeftWidth: 1, borderLeftColor: color.line }, tab === k && s.tabOn]} onPress={() => setTab(k)} accessibilityRole="button" accessibilityState={{ selected: tab === k }}>
-            <Text style={[s.tabText, tab === k && { color: '#fff' }]}>{l}</Text>
-            {n > 0 ? <View style={[s.dot, tab === k && { backgroundColor: '#fff' }]}><Text style={[s.dotText, tab === k && { color: color.accent }]}>{n}</Text></View> : null}
-          </Pressable>
-        ))}
-      </View>
-      {error ? <Text style={s.err}>{error}</Text> : null}
+      <Tabs value={tab} onChange={setTab} items={tabs.map(([id, label, count]) => ({ id, label, count }))} />
+      {error ? <View style={{ padding: 12, paddingBottom: 0 }}><AlertBox variant="destructive">{error}</AlertBox></View> : null}
 
       <View style={{ padding: 12, gap: 10 }}>
         {tab === 'ilan' ? (ls.length ? ls.map((l) => {
@@ -171,9 +165,7 @@ export default function Admin() {
                 <Label style={{ color: color.accent }}>{KIND[q.kind] ?? q.kind}</Label>
                 <Text style={s.title}>{q.listing_title ?? q.full_name ?? '—'}</Text>
               </View>
-              <View style={[s.pill, { backgroundColor: q.status === 'new' ? color.warnBg : q.status === 'contacted' ? color.goodBg : color.plate }]}>
-                <Text style={[s.pillText, { color: q.status === 'new' ? color.warn : q.status === 'contacted' ? color.good : color.muted }]}>{q.status === 'new' ? 'Yeni' : q.status === 'contacted' ? 'Görüşüldü' : 'Kapandı'}</Text>
-              </View>
+              <StatusBadge status={q.status} text={q.status === 'new' ? 'Yeni' : q.status === 'contacted' ? 'Görüşüldü' : 'Kapandı'} />
             </View>
             <View style={s.strip}>
               <Cell label="Kişi" value={q.full_name ?? '—'} flex={1.2} />
@@ -201,7 +193,7 @@ export default function Admin() {
                   <Label style={{ color: color.accent }}>{DKIND[d.kind] ?? d.kind}</Label>
                   <Text style={s.title}>{pf?.full_name ?? '—'}</Text>
                 </View>
-                <View style={[s.pill, { backgroundColor: days <= 5 ? color.badBg : color.warnBg }]}><Text style={[s.pillText, { color: days <= 5 ? color.bad : color.warn }]}>{days} gün kaldı</Text></View>
+                <Badge variant={days <= 5 ? 'destructive' : 'warning'}>{`${days} gün kaldı`}</Badge>
               </View>
               {d.note ? <Text style={s.note}>{d.note}</Text> : null}
               <Text style={[s.when, { paddingHorizontal: 12, paddingBottom: 10 }]}>Başvuru: {new Date(d.created_at).toLocaleDateString('tr-TR')}</Text>

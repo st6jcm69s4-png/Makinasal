@@ -5,6 +5,7 @@ import { Icon, type IconName } from '../../components/Icon';
 import { router, useLocalSearchParams } from 'expo-router';
 import { PickerModal } from '../../components/PickerModal';
 import { Btn, Chip } from '../../components/ui';
+import { AlertBox, CardSkeleton } from '../../components/kit';
 import { FirmCard, PostCard } from '../../components/NetCards';
 import { NetAccountView } from '../../components/NetAccountView';
 import { CITIES } from '../../lib/data';
@@ -115,7 +116,7 @@ export default function NetworkTab() {
           <View style={{ flex: 3 }}><Btn title={tab === 'firma' ? 'Firma profilim' : section.cta[0]} onPress={create} /></View>
           <View style={{ flex: 2 }}><Btn ghost title="Hesabım" onPress={() => setAcct(true)} /></View>
         </View>
-        {error ? <Text style={s.err}>{error}</Text> : null}
+        {error ? <AlertBox variant="destructive">{error}</AlertBox> : null}
       </View>
     </View>
   );
@@ -130,7 +131,7 @@ export default function NetworkTab() {
         ListHeaderComponent={header}
         contentContainerStyle={{ paddingBottom: 24 }}
         ListEmptyComponent={loading ? null : <Text style={s.empty}>{empty}</Text>}
-        ListFooterComponent={loading ? <ActivityIndicator style={{ margin: 16 }} /> : more ? <View style={{ padding: 12 }}><Btn ghost title="Daha fazla yükle" onPress={() => void load(page + 1)} /></View> : null}
+        ListFooterComponent={loading ? <CardSkeleton count={(tab === 'firma' ? providers : posts).length ? 1 : 3} /> : more ? <View style={{ padding: 12 }}><Btn ghost title="Daha fazla yükle" onPress={() => void load(page + 1)} /></View> : null}
         renderItem={({ item }) => 'user_id' in item ? <FirmCard p={item} /> : <PostCard p={item} />}
       />
       <Modal visible={acct} animationType="slide" presentationStyle="pageSheet" onRequestClose={() => setAcct(false)}>

@@ -14,3 +14,6 @@ Renkler web ile aynıdır ve değişmez: lacivert #25272D, bordo #800020, kâğ�
 - Bölüm anahtarı (İş Ağı, Mesajlar): üstte 3px bordo çizgi, seçili hücre lacivert.
 - Fotoğraflı bloklar: gerçek ilan fotoğrafı + altında lacivert plaka şeridi (kategori kutuları, öne çıkan ilan). Gradyan ve gölge yok.
 - Hukuki: `app/hukuki`, `app/haklarim` (KVKK md. 11 başvuruları, `data_requests` tablosu, Yönetim'de 30 gün sayacıyla).
+
+## Arayüz kiti (components/kit.tsx)
+shadcn/ui kalıplarının React Native uyarlaması: Badge, StatusBadge, AlertBox, Skeleton (CardSkeleton/RowSkeleton), Tabs (filled/line), Avatar, Progress, Separator. Renkler ve 4px köşe Makinasal'a aittir; yüklenme için dönen çember yerine iskelet, hata/uyarı için AlertBox, durum için StatusBadge kullanılır.

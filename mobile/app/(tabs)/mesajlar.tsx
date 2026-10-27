@@ -2,7 +2,8 @@ import { useCallback, useRef, useState } from 'react';
 import { ActivityIndicator, FlatList, Image, Pressable, RefreshControl, StyleSheet, View } from 'react-native';
 import { PlainText, Text, TextInput } from '../../components/LText';
 import { Icon } from '../../components/Icon';
-import { Btn, Chip, Label } from '../../components/ui';
+import { Btn, Chip } from '../../components/ui';
+import { AlertBox, Avatar, Badge, RowSkeleton, Tabs } from '../../components/kit';
 import { router, useFocusEffect } from 'expo-router';
 import { useApp } from '../../lib/AppContext';
 import { money, QUOTE_STATUS } from '../../lib/network';
@@ -94,7 +95,7 @@ export default function Messages() {
       </View>
     );
   }
-  if (threads === null) return <ActivityIndicator style={{ margin: 32 }} />;
+  if (threads === null) return <RowSkeleton count={6} />;
 
   const term = q.trim().toLocaleLowerCase('tr-TR');
   const shown = threads.filter((t) => (filter === 'unread' ? t.unread > 0 : filter === 'offer' ? t.offer : true) && (!term || `${t.other} ${t.title} ${t.last}`.toLocaleLowerCase('tr-TR').includes(term)));
@@ -102,14 +103,7 @@ export default function Messages() {
 
   const head = (
     <View>
-      <View style={s.modes}>
-        {([['ilan', 'İlan mesajları', totalUnread], ['teklif', 'Teklifler', quotes.filter((x) => x.status === 'pending' && x.incoming).length]] as ['ilan' | 'teklif', string, number][]).map(([k, l, n], i) => (
-          <Pressable key={k} style={[s.mode, i > 0 && { borderLeftWidth: 1, borderLeftColor: color.line }, mode === k && s.modeOn]} onPress={() => setMode(k)} accessibilityRole="button" accessibilityState={{ selected: mode === k }}>
-            <Text style={[s.modeText, mode === k && { color: '#fff' }]}>{l}</Text>
-            {n > 0 ? <View style={[s.dot, mode === k && { backgroundColor: '#fff' }]}><Text style={[s.dotText, mode === k && { color: color.accent }]}>{n}</Text></View> : null}
-          </Pressable>
-        ))}
-      </View>
+      <Tabs value={mode} onChange={setMode} items={[{ id: 'ilan', label: 'İlan mesajları', count: totalUnread }, { id: 'teklif', label: 'Teklifler', count: quotes.filter((x) => x.status === 'pending' && x.incoming).length }]} />
       {mode === 'ilan' ? (
         <View style={{ padding: 12, gap: 10 }}>
           <View style={s.search}>
@@ -124,7 +118,7 @@ export default function Messages() {
           </View>
         </View>
       ) : <View style={{ height: 12 }} />}
-      {error ? <Text style={s.err}>{error}</Text> : null}
+      {error ? <View style={{ padding: 12 }}><AlertBox variant="destructive">{error}</AlertBox></View> : null}
     </View>
   );
 
@@ -146,7 +140,7 @@ export default function Messages() {
       }
       renderItem={({ item }) => 'unread' in item ? (
         <Pressable style={({ pressed }) => [s.row, pressed && { backgroundColor: color.plate }]} onPress={() => router.push(`/mesaj/${item.id}`)} accessibilityRole="button">
-          {item.photo ? <Image source={{ uri: item.photo }} style={s.thumb} /> : <View style={[s.thumb, s.avatar]}><PlainText style={s.avatarText}>{initials(item.other)}</PlainText></View>}
+          {item.photo ? <Image source={{ uri: item.photo }} style={s.thumb} /> : <Avatar name={item.other} size={56} />}
           <View style={{ flex: 1, gap: 2 }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
               <PlainText style={[s.other, item.unread > 0 && { color: color.ink }]} numberOfLines={1}>{item.other}</PlainText>
@@ -155,9 +149,9 @@ export default function Messages() {
             <Text style={s.listing} numberOfLines={1}>{item.title}</Text>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
               {item.mine ? <Icon name="check" size={14} color={color.muted} /> : null}
-              {item.offer ? <Label style={{ color: color.accent }}>Teklif</Label> : null}
+              {item.offer ? <Badge variant="default">Teklif</Badge> : null}
               <Text style={[s.last, item.unread > 0 && { color: color.ink, fontWeight: '600' }]} numberOfLines={1}>{item.last}</Text>
-              {item.unread > 0 ? <View style={s.badge}><Text style={s.badgeText}>{item.unread}</Text></View> : null}
+              {item.unread > 0 ? <Badge variant="default">{item.unread}</Badge> : null}
             </View>
           </View>
         </Pressable>

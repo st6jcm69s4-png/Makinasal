@@ -4,6 +4,7 @@ import { ActivityIndicator, FlatList, StyleSheet, View } from 'react-native';
 import { Text } from '../../components/LText';
 import { router } from 'expo-router';
 import { Pressable } from 'react-native';
+import { CardSkeleton } from '../../components/kit';
 import { ListingCard } from '../../components/ListingCard';
 import { useApp } from '../../lib/AppContext';
 import { supabase, type Row } from '../../lib/supabase';
@@ -50,7 +51,7 @@ export default function Favorites() {
         keyExtractor={(r) => r.id}
         contentContainerStyle={{ paddingTop: 12 }}
         renderItem={({ item }) => <ListingCard item={item} />}
-        ListEmptyComponent={loading ? <ActivityIndicator style={{ margin: 24 }} /> : <Text style={s.msg}>Henüz favori ilanın yok. İlanlardaki ♡ simgesine dokun.</Text>}
+        ListEmptyComponent={loading ? <CardSkeleton count={3} /> : <Text style={s.msg}>Henüz favori ilanın yok. İlanlardaki ♡ simgesine dokun.</Text>}
       />
     </View>
   );

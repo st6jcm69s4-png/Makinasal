@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { CardSkeleton } from '../../components/kit';
 import { useTabScrollTop } from '../../lib/scrollTop';
 import { ActivityIndicator, FlatList, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { Text, TextInput } from '../../components/LText';
@@ -110,7 +111,7 @@ export default function Listings() {
         onEndReachedThreshold={0.5}
         onEndReached={() => { if (!loading && rows.length < total) void load(page + 1, q.trim(), { cat, city, maxPrice, sort }, adv); }}
         ListEmptyComponent={loading ? null : <Text style={s.empty}>İlan bulunamadı.</Text>}
-        ListFooterComponent={loading ? <ActivityIndicator style={{ margin: 16 }} /> : null}
+        ListFooterComponent={loading ? <CardSkeleton count={rows.length ? 1 : 4} /> : null}
         renderItem={({ item }) => <ListingCard item={item} />}
       />
     </View>

@@ -5,6 +5,7 @@ import { PlainText, Text, TextInput } from '../../components/LText';
 import { router, useFocusEffect } from 'expo-router';
 import { Icon, type IconName } from '../../components/Icon';
 import { Btn, Field, Hatch, Label } from '../../components/ui';
+import { Avatar } from '../../components/kit';
 import { Group, type Item } from '../../components/Rows';
 import { color, font, radius } from '../../lib/theme';
 import { displayName, initials } from '../../lib/person';
@@ -48,7 +49,7 @@ function Member() {
   return (
     <ScrollView ref={scroller} style={{ backgroundColor: color.bg }} contentContainerStyle={{ paddingBottom: 32 }}>
       <View style={s.head}>
-        <View style={s.avatar}><PlainText style={s.avatarText}>{initials(name)}</PlainText></View>
+        <Avatar name={name} size={56} tone="accent" />
         <View style={{ flex: 1, gap: 2 }}>
           <PlainText style={s.name} numberOfLines={1}>{name}</PlainText>
           <Text style={s.sub}>{[profile?.is_store ? (profile.store_name || 'Mağaza') : 'Bireysel üye', profile?.city].filter(Boolean).join(' · ')}</Text>

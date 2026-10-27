@@ -3,6 +3,7 @@ import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from 'reac
 import { PlainText, Text } from './LText';
 import { Icon, type IconName } from './Icon';
 import { Btn, Hatch, Label } from './ui';
+import { AlertBox, RowSkeleton, StatusBadge } from './kit';
 import { router } from 'expo-router';
 import { useApp } from '../lib/AppContext';
 import { dateLabel, money, POST_KINDS, QUOTE_STATUS, type MarketPost } from '../lib/network';
@@ -41,7 +42,7 @@ export function NetAccountView({ onNavigate, embedded }: { onNavigate?: () => vo
 
   const go = (path: string) => { onNavigate?.(); router.push(path as never); };
   if (!session) return <Text style={s.empty}>Önce Hesabım sekmesinden giriş yap.</Text>;
-  if (loading) return <ActivityIndicator style={{ margin: 32 }} />;
+  if (loading) return <RowSkeleton count={4} />;
 
   const open = posts.filter((x) => x.status === 'open').length;
   const waiting = inc.filter((x) => x.status === 'pending').length;
@@ -71,7 +72,7 @@ export function NetAccountView({ onNavigate, embedded }: { onNavigate?: () => vo
           </Pressable>
         ))}
       </View>
-      {error ? <Text style={s.err}>{error}</Text> : null}
+      {error ? <View style={{ margin: 12 }}><AlertBox variant="destructive">{error}</AlertBox></View> : null}
 
       <Label style={s.sec}>{seg === 'posts' ? 'İlanlarım' : seg === 'incoming' ? 'Gelen teklifler ve başvurular' : 'Verdiğim teklifler'}</Label>
       {seg === 'posts' ? (posts.length ? posts.map((p) => (
@@ -81,7 +82,7 @@ export function NetAccountView({ onNavigate, embedded }: { onNavigate?: () => vo
               <Label style={{ color: color.accent }}>{POST_KINDS[p.kind] ?? p.kind}</Label>
               <Text style={s.title} numberOfLines={2}>{p.title}</Text>
             </View>
-            <Pill status={p.status} text={ST[p.status] ?? p.status} />
+            <StatusBadge status={p.status} text={ST[p.status] ?? p.status} />
           </View>
           <View style={s.strip}>
             <Cell label="İl" value={p.city} />
@@ -98,7 +99,7 @@ export function NetAccountView({ onNavigate, embedded }: { onNavigate?: () => vo
               <Label style={{ color: color.accent }}>{seg === 'incoming' ? q.display_name : 'Verdiğim teklif'}</Label>
               <Text style={s.title} numberOfLines={2}>{title(q)}</Text>
             </View>
-            <Pill status={q.status} text={QUOTE_STATUS[q.status] ?? q.status} />
+            <StatusBadge status={q.status} text={QUOTE_STATUS[q.status] ?? q.status} />
           </View>
           <View style={s.strip}>
             <Cell label="Tutar" value={money(q.amount, q.price_unit).replace(' toplam', '')} flex={1.4} />
@@ -111,10 +112,6 @@ export function NetAccountView({ onNavigate, embedded }: { onNavigate?: () => vo
   );
 }
 
-function Pill({ status, text }: { status: string; text: string }) {
-  const [bg, fg] = tone(status);
-  return <View style={[s.pill, { backgroundColor: bg }]}><Text style={[s.pillText, { color: fg }]}>{text}</Text></View>;
-}
 function Cell({ label, value, flex = 1, left }: { label: string; value: string; flex?: number; left?: boolean }) {
   return (
     <View style={[s.cell, { flex }, left && { borderLeftWidth: 1, borderLeftColor: color.line }]}>

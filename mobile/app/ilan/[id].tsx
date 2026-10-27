@@ -4,6 +4,7 @@ import { Text, TextInput } from '../../components/LText';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Heart, Icon } from '../../components/Icon';
 import { FieldCell, FieldGrid } from '../../components/ui';
+import { AlertBox } from '../../components/kit';
 import { checkMessage } from '../../lib/messageFilter';
 import { PickerModal } from '../../components/PickerModal';
 import { useApp } from '../../lib/AppContext';
@@ -165,7 +166,7 @@ export default function ListingScreen() {
         ) : null}
         <Pressable onPress={() => router.push(`/magaza/${item.seller_id}`)} accessibilityRole="button"><Text style={s.favText}>Satıcının profili ve ilanları</Text></Pressable>
         {item.description ? <Text style={s.desc}>{item.description}</Text> : null}
-        <Text style={s.warn}>Ürünü görmeden kapora, ön ödeme, havale ya da EFT göndermeyin.</Text>
+        <AlertBox variant="warning">Ürünü görmeden kapora, ön ödeme, havale ya da EFT göndermeyin.</AlertBox>
 
         {!own ? (
           <>

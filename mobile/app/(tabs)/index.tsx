@@ -6,6 +6,7 @@ import { router, useFocusEffect } from 'expo-router';
 import { SearchBox } from '../../components/SearchBox';
 import { ListingCard } from '../../components/ListingCard';
 import { Btn, Band, Hatch, Label } from '../../components/ui';
+import { AlertBox, CardSkeleton } from '../../components/kit';
 import { FirmCard, PostCard } from '../../components/NetCards';
 import { Icon, type IconName } from '../../components/Icon';
 import { caps, color, font, radius } from '../../lib/theme';
@@ -194,13 +195,14 @@ export default function Home() {
         </>
       ) : null}
 
-      {error ? <Text style={s.err}>Bazı bölümler yüklenemedi. Aşağı çekerek yenileyebilirsin.</Text> : null}
+      {error ? <View style={{ marginHorizontal: 12, marginTop: 12 }}><AlertBox variant="destructive">Bazı bölümler yüklenemedi. Aşağı çekerek yenileyebilirsin.</AlertBox></View> : null}
       {local.length ? <Band title={`${city} ilanları`} action="Tümünü gör" onAction={() => router.navigate({ pathname: '/ilanlar', params: { city } })} /> : null}
       {local.map((r) => <ListingCard key={'c' + r.id} item={r} />)}
       {spot ? <Spot item={spot} /> : null}
       {featured.length ? <Band title="Öne çıkanlar" action="Tümünü gör" onAction={() => router.navigate('/ilanlar')} /> : null}
       {featured.filter((r) => r.id !== spot?.id).map((r) => <ListingCard key={'f' + r.id} item={r} />)}
       <Band title="Yeni ilanlar" action="Tümünü gör" onAction={() => router.navigate('/ilanlar')} />
+      {busy && !latest.length ? <CardSkeleton count={3} /> : null}
       {latest.map((r) => <ListingCard key={r.id} item={r} />)}
       {more && latest.length ? <View style={{ marginHorizontal: 12 }}><Btn ghost disabled={moreBusy} title={moreBusy ? 'Yükleniyor…' : 'Daha fazla ilan göster'} onPress={() => void loadMore()} /></View> : null}
       {!busy && !latest.length ? <Text style={s.empty}>Henüz ilan yok.</Text> : null}
