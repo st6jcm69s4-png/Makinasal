@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Pressable, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
 import { PlainText, Text } from './LText';
 import { Icon, type IconName } from './Icon';
 import { Btn, Hatch, Label } from './ui';
-import { AlertBox, RowSkeleton, StatusBadge } from './kit';
+import { AlertBox, Badge, RowSkeleton, StatusBadge } from './kit';
 import { router } from 'expo-router';
 import { useApp } from '../lib/AppContext';
 import { dateLabel, money, POST_KINDS, QUOTE_STATUS, type MarketPost } from '../lib/network';
@@ -40,20 +40,25 @@ export function NetAccountView({ onNavigate, embedded }: { onNavigate?: () => vo
   }, [session]);
   useEffect(() => { void load(); }, [load]);
 
-  const go = (path: string) => { onNavigate?.(); router.push(path as never); };
+  // Panel kapanırken hemen yönlendirme iOS'ta yutulabiliyor: önce kapat, sonra git.
+  const go = (path: string) => {
+    if (onNavigate) { onNavigate(); setTimeout(() => router.push(path as never), 380); } else router.push(path as never);
+  };
+  const [refreshing, setRefreshing] = useState(false);
   if (!session) return <Text style={s.empty}>Önce Hesabım sekmesinden giriş yap.</Text>;
   if (loading) return <RowSkeleton count={4} />;
 
   const open = posts.filter((x) => x.status === 'open').length;
   const waiting = inc.filter((x) => x.status === 'pending').length;
+  const pendingBy = (id: string) => inc.filter((x) => x.post_id === id && x.status === 'pending').length;
   const title = (q: Q) => (Array.isArray(q.market_posts) ? q.market_posts[0]?.title : q.market_posts?.title) ?? 'İş ağı ilanı';
   const stats: [string, number, Seg][] = [['Açık ilan', open, 'posts'], ['Bekleyen teklif', waiting, 'incoming'], ['Verdiğim', sent.length, 'sent']];
 
   return (
-    <ScrollView style={{ flex: 1, backgroundColor: color.bg }} contentContainerStyle={{ paddingBottom: 28 }}>
+    <ScrollView style={{ flex: 1, backgroundColor: color.bg }} contentContainerStyle={{ paddingBottom: 28 }} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); void load().finally(() => setRefreshing(false)); }} />}>
       <View style={s.head}>
         <Label style={{ color: color.onNavy }}>İş ağı</Label>
-        <PlainText style={s.h1}>HESABIM</PlainText>
+        <PlainText style={s.h1}>{embedded ? 'ÖZETİM' : 'HESABIM'}</PlainText>
         <View style={s.stats}>
           {stats.map(([l, n, k], i) => (
             <Pressable key={l} style={[s.stat, i > 0 && { borderLeftWidth: 1, borderLeftColor: color.navy2 }, seg === k && s.statOn]} onPress={() => setSeg(k)} accessibilityRole="button">
@@ -82,7 +87,10 @@ export function NetAccountView({ onNavigate, embedded }: { onNavigate?: () => vo
               <Label style={{ color: color.accent }}>{POST_KINDS[p.kind] ?? p.kind}</Label>
               <Text style={s.title} numberOfLines={2}>{p.title}</Text>
             </View>
-            <StatusBadge status={p.status} text={ST[p.status] ?? p.status} />
+            <View style={{ alignItems: 'flex-end', gap: 4 }}>
+              <StatusBadge status={p.status} text={ST[p.status] ?? p.status} />
+              {pendingBy(p.id) ? <Badge variant="default" icon="inbox">{`${pendingBy(p.id)} bekleyen`}</Badge> : null}
+            </View>
           </View>
           <View style={s.strip}>
             <Cell label="İl" value={p.city} />
@@ -101,12 +109,13 @@ export function NetAccountView({ onNavigate, embedded }: { onNavigate?: () => vo
             </View>
             <StatusBadge status={q.status} text={QUOTE_STATUS[q.status] ?? q.status} />
           </View>
+          {q.note ? <Text style={s.noteLine} numberOfLines={2}>{q.note}</Text> : null}
           <View style={s.strip}>
             <Cell label="Tutar" value={money(q.amount, q.price_unit).replace(' toplam', '')} flex={1.4} />
             <Cell label="Tarih" value={new Date(q.created_at).toLocaleDateString('tr-TR')} left />
           </View>
         </Pressable>
-      )) : <Empty text={seg === 'incoming' ? 'Henüz gelen teklif yok.' : 'Henüz teklif vermedin.'} cta="İş ağına göz at" onPress={() => { onNavigate?.(); }} />) : null}
+      )) : <Empty text={seg === 'incoming' ? 'Henüz gelen teklif yok.' : 'Henüz teklif vermedin.'} cta="İş ağına göz at" onPress={() => { if (onNavigate) onNavigate(); else router.navigate('/is-agi'); }} />) : null}
       {embedded ? null : <View style={{ padding: 12 }}><Btn ghost title="Yenile" onPress={() => void load()} /></View>}
     </ScrollView>
   );
@@ -139,6 +148,7 @@ const s = StyleSheet.create({
   quick: { flexDirection: 'row', backgroundColor: color.surface, borderBottomWidth: 1, borderBottomColor: color.line },
   q: { flex: 1, alignItems: 'center', gap: 4, paddingVertical: 12 },
   qText: { fontSize: 13.5, fontWeight: '600', color: color.ink },
+  noteLine: { paddingHorizontal: 12, paddingBottom: 10, color: color.muted, fontSize: 14 },
   sec: { marginHorizontal: 14, marginTop: 18, marginBottom: 8 },
   err: { color: color.bad, margin: 12 },
   empty: { textAlign: 'center', color: color.muted, margin: 24 },
