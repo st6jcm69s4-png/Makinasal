@@ -3,7 +3,8 @@ import {cookies} from 'next/headers';
 import {legalIdentity,legalReady} from '@/lib/legal';
 import {pageMetadata} from '@/lib/seo';
 import {CookiePreferences} from '@/components/CookiePreferences';
-const sections={kvkk:['KVKK aydınlatma','Privacy notice'],kullanim:['Kullanım koşulları','Terms of use'],cerez:['Çerez politikası','Cookie policy'],satis:['Satış ve ödeme bilgileri','Sales and payments']} as const;
+import {LEGAL_TR,LEGAL_VERSION_LABEL,fillLegal,type LegalSlugTr} from '@/lib/legalTexts';
+const sections={kvkk:['KVKK aydınlatma','Privacy notice'],kullanim:['Kullanım koşulları','Terms of use'],cerez:['Çerez politikası','Cookie policy'],satis:['Satış ve ödeme bilgileri','Sales and payments'],'ilan-kurallari':['İlan yayınlama kuralları','Listing rules']} as const;
 type Props={params:Promise<{slug:string}>};
 export async function generateMetadata({params}:Props){const {slug:section}=await params;const v=sections[section as keyof typeof sections];return pageMetadata('/hukuki/'+section,v?.[0]||'Hukuki bilgiler','Makinasal hukuki bilgiler ve tercihler.',!legalReady());}
 export default async function Page({params}:Props){const {slug:section}=await params;const aliases:Record<string,string>={'kullanim-sozlesmesi':'kullanim','cerez-politikasi':'cerez','mesafeli-satis-ve-ticaret':'satis'};if(Object.prototype.hasOwnProperty.call(aliases,section))redirect('/hukuki/'+aliases[section]);if(!(section in sections))notFound();const en=(await cookies()).get('makinasal-language')?.value==='en';const identity=legalIdentity();const ready=legalReady();
@@ -49,6 +50,8 @@ export default async function Page({params}:Props){const {slug:section}=await pa
  ['Ücretli hizmet açılmadan önce','Sözleşmenin tarafı satıcı/hizmet sağlayıcı, adres, vergi ve iletişim bilgileri, toplam fiyat ve vergiler, teslim/ifa, iptal ve cayma koşulları, şikayet kanalları ve varsa istisnalar gerçek ürüne göre kabul öncesinde sunulmalıdır. Bu sayfa işleme özel ön bilgilendirme ve mesafeli sözleşmenin yerine geçmez.'],
  ['İlan üzerinden işlemler','Bireysel ve ticari satıcıların yükümlülükleri farklı olabilir. Makinenin durumu, teslim, ekspertiz, taşıma ve ödeme koşulları gerçek satıcıyla yazılı olarak belirlenmelidir. iyzico bağlantısı tek başına tüketici mevzuatına uyum sağlamaz.']
  ];
- const content=section==='kvkk'?kvkk:section==='kullanim'?terms:section==='cerez'?cookie:sales;
- return <><h1>{sections[section as keyof typeof sections][en?1:0]}</h1>{!ready?<p className="note" role="status">{en?'Private beta review draft · operator details and legal approval pending.':'Özel beta inceleme taslağı · işletmeci bilgileri ve hukuk onayı bekleniyor.'}</p>:null}<p className="sub">{en?'Version: 18 October 2026':'Sürüm: 18 Ekim 2026'}</p>{content.map(([title,body])=><section className="panel" style={{marginTop:16}} key={title}><h2>{title}</h2><p>{body}</p></section>)}{section==='cerez'?<CookiePreferences/>:null}<p><a href="/hukuki">{en?'All legal information':'Tüm hukuki bilgiler'}</a></p></>;
+ const enContent=section==='kvkk'?kvkk:section==='kullanim'?terms:section==='cerez'?cookie:sales;
+ const doc=LEGAL_TR[section as LegalSlugTr];
+ const showEn=en&&section!=='ilan-kurallari';
+ return <><h1>{showEn?sections[section as keyof typeof sections][1]:doc.title}</h1>{!ready?<p className="note" role="status">{en?'Private beta review draft · operator details and legal approval pending.':'Özel beta · işletmeci bilgileri ve hukuk onayı bekleniyor.'}</p>:null}<p className="sub">{en?'Version: '+LEGAL_VERSION_LABEL+(showEn?'':' · Turkish text'):'Sürüm: '+LEGAL_VERSION_LABEL}</p>{showEn?enContent.map(([title,body])=><section className="panel" style={{marginTop:16}} key={title}><h2>{title}</h2><p>{body}</p></section>):<>{doc.intro?<p>{fillLegal(doc.intro,identity)}</p>:null}{doc.sections.map(([title,paras])=><section className="panel" style={{marginTop:16}} key={title}><h2>{title}</h2>{paras.map(t=><p key={t}>{fillLegal(t,identity)}</p>)}</section>)}</>}{section==='cerez'?<CookiePreferences/>:null}<p><a href="/hukuki">{en?'All legal information':'Tüm hukuki bilgiler'}</a></p></>;
 }

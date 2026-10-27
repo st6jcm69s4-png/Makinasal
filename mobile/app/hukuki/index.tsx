@@ -15,6 +15,7 @@ export default function Legal() {
         { icon: 'file-text', label: 'Kullanım koşulları', sub: 'Üyelik sözleşmesi', go: () => openWeb('/hukuki/kullanim') },
         { icon: 'lock', label: 'KVKK aydınlatma metni', sub: 'Kişisel verilerin nasıl işlendiği', go: () => openWeb('/hukuki/kvkk') },
         { icon: 'settings', label: 'Çerez politikası', go: () => openWeb('/hukuki/cerez') },
+        { icon: 'check-square', label: 'İlan yayınlama kuralları', sub: 'Yasaklı ilanlar, doğru bilgi', go: () => openWeb('/hukuki/ilan-kurallari') },
         { icon: 'credit-card', label: 'Satış ve ödeme bilgileri', sub: 'Mesafeli satış, ön bilgilendirme', go: () => openWeb('/hukuki/satis') },
       ]} />
       <Group title="Haklarım" items={[

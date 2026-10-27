@@ -128,7 +128,7 @@ const extra: Record<string, string> = {
   'Aradığım parçayı paylaş': 'Share the part I am looking for',
   'Hesap güvenliği ve doğrulama ': 'Account security and verification',
   'E-posta ve telefonunun sana ait olduğunu doğrula.': 'Verify that your email and phone belong to you.', 'Doğrulandı': 'Verified', 'Onay bekleniyor': 'Awaiting confirmation', 'SMS doğrulaması gerekli': 'SMS verification required', 'Telefon': 'Phone',
-  'Hukuki metinler': 'Legal texts', 'KVKK aydınlatma': 'Privacy notice (KVKK)', 'Kullanım koşulları': 'Terms of use', 'Çerez politikası': 'Cookie policy', 'Satış ve ödeme bilgileri': 'Sales and payment information',
+  'Hukuki metinler': 'Legal texts', 'KVKK aydınlatma': 'Privacy notice (KVKK)', 'Kullanım koşulları': 'Terms of use', 'Çerez politikası': 'Cookie policy', 'Satış ve ödeme bilgileri': 'Sales and payment information', 'İlan yayınlama kuralları': 'Listing rules', 'Yasaklı ilanlar, doğru bilgi': 'Prohibited listings, accurate information',
   'Satıcı bulunamadı.': 'Seller not found.', 'Doğrulanmış': 'Verified', 'Doğrulanmadı': 'Not verified', 'Mağaza': 'Store', 'Bireysel satıcı': 'Individual seller', 'Değerlendirmeler': 'Reviews', 'Henüz değerlendirme yok.': 'No reviews yet.', 'Aktif ilan yok.': 'No active listings.',
   'Ödemelerini görmek için giriş yap.': 'Sign in to see your payments.', 'Ödemeler yüklenemedi.': 'Payments could not be loaded.', 'Henüz bir ödeme kaydın yok.': 'You have no payment records yet.',
   'Gönderdiğim ödeme': 'Payment I sent', 'Aldığım ödeme': 'Payment I received', "Ödeme sürecini web'de incele": 'See the payment process on the web',

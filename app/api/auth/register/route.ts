@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
   const response = NextResponse.json({ ok: true }, { headers: { "Cache-Control": "no-store" } });
   const callback = new URL("/auth/callback", request.url), destination = new URL("/hesap-dogrula", request.url);
   destination.searchParams.set("next",safeAuthNext(data.next)); callback.searchParams.set("next",destination.pathname+destination.search);
-  const { error } = await authRequest(request,response).auth.signUp({ email,password, options: { captchaToken:data.captchaToken, data: { full_name:name,city,district,contact_phone:phone,terms_version:"2026-10-18",terms_accepted_at:new Date().toISOString() }, emailRedirectTo:callback.toString() } });
+  const { error } = await authRequest(request,response).auth.signUp({ email,password, options: { captchaToken:data.captchaToken, data: { full_name:name,city,district,contact_phone:phone,terms_version:"2026-10-27",terms_accepted_at:new Date().toISOString() }, emailRedirectTo:callback.toString() } });
   if (error) return fail(authError(error.message)); return response;
  } catch { return fail("Kayıt tamamlanamadı. Daha sonra tekrar dene.",503); }
 }
