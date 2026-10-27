@@ -39,6 +39,8 @@ export default function Home() {
   const [moreBusy, setMoreBusy] = useState(false);
   const [counts, setCounts] = useState<{ offers: number; works: number } | null>(null);
   const [pname, setPname] = useState('');
+  const [city, setCity] = useState('');
+  const [local, setLocal] = useState<Row[]>([]);
   const [jobs, setJobs] = useState<MarketPost[]>([]);
   const [firms, setFirms] = useState<Provider[]>([]);
   const [busy, setBusy] = useState(false);
@@ -55,7 +57,7 @@ export default function Home() {
       supabase.from('service_providers').select('*').eq('published', true).order('created_at', { ascending: false }).limit(3),
       uid ? supabase.from('market_quotes').select('id', { count: 'exact', head: true }).eq('owner_id', uid).eq('status', 'pending') : Promise.resolve(null),
       uid ? supabase.from('market_posts').select('id', { count: 'exact', head: true }).eq('owner_id', uid).eq('status', 'open') : Promise.resolve(null),
-      uid ? supabase.from('profiles').select('full_name').eq('id', uid).maybeSingle() : Promise.resolve(null),
+      uid ? supabase.from('profiles').select('full_name,city').eq('id', uid).maybeSingle() : Promise.resolve(null),
     ]);
     setError(!!(l.error || j.error || f.error));
     const rows = ((l.data as { rows?: Row[] } | null)?.rows ?? []);
@@ -66,7 +68,14 @@ export default function Home() {
     setJobs((j.data ?? []) as MarketPost[]);
     setFirms((f.data ?? []) as Provider[]);
     setCounts(uid && o && w ? { offers: o.count ?? 0, works: w.count ?? 0 } : null);
-    setPname(((pr?.data as { full_name?: string } | null)?.full_name) ?? '');
+    const prof = (pr?.data as { full_name?: string; city?: string | null } | null) ?? null;
+    setPname(prof?.full_name ?? '');
+    const c = prof?.city ?? '';
+    setCity(c);
+    if (c) {
+      const near = await supabase.rpc('search_listings', { p: { ...base, city: c, page: 1, sort: 'new' }, count_only: false });
+      setLocal(((near.data as { rows?: Row[] } | null)?.rows ?? []).slice(0, 4));
+    } else setLocal([]);
     setBusy(false);
   }, [session]);
   async function loadMore() {
@@ -124,6 +133,8 @@ export default function Home() {
       </ScrollView>
 
       {error ? <Text style={s.err}>Bazı bölümler yüklenemedi. Aşağı çekerek yenileyebilirsin.</Text> : null}
+      {local.length ? <Band title={`${city} ilanları`} action="Tümünü gör" onAction={() => router.navigate({ pathname: '/ilanlar', params: { city } })} /> : null}
+      {local.map((r) => <ListingCard key={'c' + r.id} item={r} />)}
       {featured.length ? <Band title="Öne çıkanlar" action="Tümünü gör" onAction={() => router.navigate('/ilanlar')} /> : null}
       {featured.map((r) => <ListingCard key={'f' + r.id} item={r} />)}
       <Band title="Yeni ilanlar" action="Tümünü gör" onAction={() => router.navigate('/ilanlar')} />
@@ -155,6 +166,12 @@ export default function Home() {
         <View key={t} style={s.card}><Text style={s.cardTitle}>{i + 1}. {t}</Text><Text>{d}</Text></View>
       ))}
 
+      <View style={s.trust}>
+        {['Konuma göre keşfet', 'İki tarafa özel teklifler', 'Tek hesapla iş ve ilan yönetimi'].map((t) => (
+          <View key={t} style={s.trustRow}><Icon name="check" size={16} color={color.good} /><Text style={s.trustText}>{t}</Text></View>
+        ))}
+        <Pressable onPress={() => router.push('/guven')} accessibilityRole="button"><Text style={s.link2}>Güvenli işlem rehberi →</Text></Pressable>
+      </View>
       <View style={{ padding: 12, gap: 8 }}>
         <Text style={[s.h2b, { fontFamily: font.bold }]}>Şirketini sahaya çıkar</Text>
         <Text>Hafriyat şirketin, kamyonların ve makinelerin için tek bir şirket vitrini oluştur.</Text>
@@ -170,6 +187,10 @@ const s = StyleSheet.create({
   hub: { flexDirection: 'row', marginHorizontal: 12, marginTop: 14, backgroundColor: color.surface, borderWidth: 1, borderColor: color.line },
   hubCell: { flex: 1, paddingVertical: 10, paddingHorizontal: 8, gap: 2 },
   hubNum: { fontFamily: font.bold, fontSize: 22, color: color.accent },
+  trust: { marginHorizontal: 12, marginTop: 18, padding: 12, gap: 8, backgroundColor: color.surface, borderWidth: 1, borderColor: color.line, borderLeftWidth: 3, borderLeftColor: color.good },
+  trustRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  trustText: { color: color.ink },
+  link2: { color: color.accent, fontWeight: '600' },
   hero: { backgroundColor: color.navy, padding: 16, paddingTop: 12, gap: 8, borderBottomWidth: 3, borderBottomColor: color.accent },
   h1: { color: '#fff', fontSize: 27, fontWeight: '700', lineHeight: 31 },
   lead: { color: color.onNavy },
