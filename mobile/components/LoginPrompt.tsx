@@ -1,6 +1,7 @@
-import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Alert, Modal, Pressable, StyleSheet, View } from 'react-native';
-import { router } from 'expo-router';
+import { router, useGlobalSearchParams, usePathname } from 'expo-router';
+import { useApp } from '../lib/AppContext';
 import { PlainText, Text } from './LText';
 import { Icon, type IconName } from './Icon';
 import { Btn } from './ui';
@@ -8,17 +9,46 @@ import { Hatch } from './ui';
 import { openWeb } from '../lib/web';
 import { color, font, radius } from '../lib/theme';
 
-type Ctx = { askLogin: (reason?: string) => void; notify: (title: string, err: string) => void };
+type App = ReturnType<typeof useApp>;
+/** Giriş bittikten sonra kullanıcının başlattığı işi sürdüren işlev; güncel (girişli) uygulama durumunu alır. */
+type Retry = (app: App) => void;
+type Ctx = { askLogin: (reason?: string, retry?: Retry) => void; notify: (title: string, err: string, retry?: Retry) => void };
 const LoginCtx = createContext<Ctx>({ askLogin: () => {}, notify: () => {} });
 /** Misafir giriş gerektiren bir işleme dokununca alt panel açar: giriş yap, kayıt ol ya da gezmeye devam et. */
 export const useLoginPrompt = () => useContext(LoginCtx);
 
 export function LoginPromptProvider({ children }: { children: ReactNode }) {
   const [reason, setReason] = useState<string | null>(null);
-  const askLogin = useCallback((r?: string) => setReason(r ?? 'Bu işlem için giriş yapman gerekir.'), []);
+  const app = useApp();
+  const appRef = useRef(app); appRef.current = app;
+  const path = usePathname();
+  const params = useGlobalSearchParams();
+  const where = useRef(''); // misafirin giriş panelini açtığı ekran
+  where.current = (() => {
+    const q = Object.entries(params).filter(([, v]) => typeof v === 'string' && v && !path.includes(v)).map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(String(v))}`).join('&');
+    return q ? `${path}?${q}` : path;
+  })();
+  const pending = useRef<{ to: string; retry?: Retry; at: number } | null>(null);
+  const askLogin = useCallback((r?: string, retry?: Retry) => {
+    pending.current = { to: where.current, retry, at: Date.now() };
+    setReason(r ?? 'Bu işlem için giriş yapman gerekir.');
+  }, []);
   const close = () => setReason(null);
   // Hata metni giriş gerektiriyorsa panel, değilse normal uyarı gösterilir.
-  const notify = useCallback((title: string, err: string) => { if (/giriş/i.test(err)) askLogin(err); else Alert.alert(title, err); }, [askLogin]);
+  const notify = useCallback((title: string, err: string, retry?: Retry) => { if (/giriş/i.test(err)) askLogin(err, retry); else Alert.alert(title, err); }, [askLogin]);
+  // Giriş tamamlanınca: kullanıcıyı başladığı ekrana geri götür ve yarım kalan işi sürdür (10 dakika içinde).
+  const signedIn = !!app.session;
+  useEffect(() => {
+    const p = pending.current;
+    if (!signedIn || !p) return;
+    pending.current = null;
+    if (Date.now() - p.at > 10 * 60 * 1000) return;
+    const t = setTimeout(() => {
+      if (p.to && p.to !== '/hesap') router.navigate(p.to as never);
+      if (p.retry) setTimeout(() => p.retry?.(appRef.current), 450);
+    }, 250);
+    return () => clearTimeout(t);
+  }, [signedIn]);
   const value = useMemo(() => ({ askLogin, notify }), [askLogin, notify]);
   return (
     <LoginCtx.Provider value={value}>

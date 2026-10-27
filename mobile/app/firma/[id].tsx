@@ -46,7 +46,7 @@ export default function ProviderDetail() {
         <Text><Text style={{ fontWeight: '600' }}>İş alanları: </Text>{p.specialties.join(', ')}</Text>
       </View>
       <Btn title="Telefonla ara" onPress={() => void call()} />
-      <Btn ghost title={netFavs.has(`firm:${id}`) ? 'Favorilerde · çıkar' : 'Favorilere ekle'} onPress={async () => { const err = await toggleNetFav('firm', String(id)); if (err) notify('Favoriler', err); }} />
+      <Btn ghost title={netFavs.has(`firm:${id}`) ? 'Favorilerde · çıkar' : 'Favorilere ekle'} onPress={async () => { const err = await toggleNetFav('firm', String(id)); if (err) notify('Favoriler', err, (a) => void a.toggleNetFav('firm', String(id))); }} />
       {inv.length ? <Text style={common.h2}>Envanter</Text> : null}
       {inv.map((i) => (
         <View key={String(i.id)} style={common.card}>

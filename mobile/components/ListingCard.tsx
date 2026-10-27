@@ -24,7 +24,7 @@ export function ListingCard({ item }: { item: Row }) {
         <Pressable
           style={s.heart} hitSlop={8} accessibilityRole="button"
           accessibilityLabel={fav ? 'Favorilerden çıkar' : 'Favorilere ekle'}
-          onPress={async () => { const err = await toggleFav(item.id, item.price); if (err) notify('Favoriler', err); }}
+          onPress={async () => { const err = await toggleFav(item.id, item.price); if (err) notify('Favoriler', err, (a) => void a.toggleFav(item.id, item.price)); }}
         >
           <Heart on={fav} size={22} color={fav ? color.accent : color.muted} />
         </Pressable>

@@ -25,7 +25,7 @@ function NetHeart({ kind, id }: { kind: 'post' | 'firm'; id: string }) {
   const { notify } = useLoginPrompt();
   const on = netFavs.has(`${kind}:${id}`);
   return (
-    <Pressable hitSlop={10} accessibilityRole="button" accessibilityLabel={on ? 'Favorilerden çıkar' : 'Favorilere ekle'} onPress={async () => { const err = await toggleNetFav(kind, id); if (err) notify('Favoriler', err); }} style={{ padding: 2 }}>
+    <Pressable hitSlop={10} accessibilityRole="button" accessibilityLabel={on ? 'Favorilerden çıkar' : 'Favorilere ekle'} onPress={async () => { const err = await toggleNetFav(kind, id); if (err) notify('Favoriler', err, (a) => void a.toggleNetFav(kind, id)); }} style={{ padding: 2 }}>
       <Heart on={on} size={22} color={on ? color.accent : color.muted} />
     </Pressable>
   );

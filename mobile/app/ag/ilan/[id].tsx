@@ -90,7 +90,7 @@ export default function PostDetail() {
         <Text style={{ marginTop: 6 }}>{post.description}</Text>
       </View>
       {error ? <Text style={common.err}>{error}</Text> : null}
-      {!isOwner ? <Btn ghost title={netFavs.has(`post:${post.id}`) ? 'Favorilerde · çıkar' : 'Favorilere ekle'} onPress={async () => { const err = await toggleNetFav('post', post.id); if (err) notify('Favoriler', err); }} /> : null}
+      {!isOwner ? <Btn ghost title={netFavs.has(`post:${post.id}`) ? 'Favorilerde · çıkar' : 'Favorilere ekle'} onPress={async () => { const err = await toggleNetFav('post', post.id); if (err) notify('Favoriler', err, (a) => void a.toggleNetFav('post', post.id)); }} /> : null}
 
       {isOwner ? (
         <View style={{ gap: 8 }}>

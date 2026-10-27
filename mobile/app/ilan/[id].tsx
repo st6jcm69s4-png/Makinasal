@@ -148,7 +148,7 @@ export default function ListingScreen() {
       <View style={s.body}>
         <Text style={s.title}>{item.title}</Text>
         <Text style={s.price}>{tl(item.price)}</Text>
-        <Pressable style={s.favBtn} accessibilityRole="button" onPress={async () => { const err = await toggleFav(item.id, item.price); if (err) notify('Favoriler', err); }}>
+        <Pressable style={s.favBtn} accessibilityRole="button" onPress={async () => { const err = await toggleFav(item.id, item.price); if (err) notify('Favoriler', err, (a) => void a.toggleFav(item.id, item.price)); }}>
           <Heart on={favs.has(item.id)} size={18} color="#800020" /><Text style={s.favText}>{favs.has(item.id) ? 'Favorilerde' : 'Favorilere ekle'}</Text>
         </Pressable>
         <Pressable style={s.favBtn} accessibilityRole="button" onPress={() => { const err = toggleCmp(item.id); if (err) Alert.alert('Karşılaştır', err); }}>
