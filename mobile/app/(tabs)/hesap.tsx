@@ -149,9 +149,10 @@ export default function Account() {
         <View style={{ gap: 12 }}>
           <Field label="E-posta" autoCapitalize="none" keyboardType="email-address" value={email} onChangeText={setEmail} />
           <Field label="Şifre" secureTextEntry value={password} onChangeText={setPassword} />
+          <Pressable onPress={() => void forgot()} hitSlop={8} accessibilityRole="button" style={{ alignSelf: 'flex-end' }}><Text style={{ color: color.accent, fontWeight: '600' }}>Şifremi unuttum</Text></Pressable>
           {msg ? <Text style={s.err}>{msg}</Text> : null}
           <Btn title={busy ? 'Giriş yapılıyor…' : 'Giriş yap'} disabled={busy} onPress={() => void signIn()} />
-          <Pressable onPress={() => void forgot()} hitSlop={8} accessibilityRole="button"><Text style={{ color: color.accent, fontWeight: '600', textAlign: 'center' }}>Şifremi unuttum</Text></Pressable>
+          <Btn ghost title="Kayıt ol" onPress={() => router.push('/kayit' as never)} />
           <SocialAuth />
         </View>
         <View style={{ gap: 6 }}>
@@ -167,7 +168,6 @@ export default function Account() {
             </View>
           </View>
         </View>
-        <Group title="Hesabın yok mu?" items={[{ icon: 'user-plus', label: 'Kayıt ol', sub: 'Ücretsiz hesap oluştur', go: () => router.push('/kayit' as never) }]} />
         <Group title="Giriş yapmadan" items={[
           { icon: 'tool', label: 'Yedek parça ara', go: () => router.push('/yedek-parca') },
           { icon: 'map', label: 'İl haritası', go: () => router.push('/harita') },
