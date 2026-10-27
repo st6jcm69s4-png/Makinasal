@@ -12,6 +12,7 @@ import { displayName, initials } from '../../lib/person';
 import { ReferralBox } from '../../components/ReferralBox';
 import { useApp } from '../../lib/AppContext';
 import { configured, supabase, SITE_URL } from '../../lib/supabase';
+import { SocialAuth } from '../../components/SocialAuth';
 import { openWeb } from '../../lib/web';
 
 function Member() {
@@ -151,6 +152,7 @@ export default function Account() {
           {msg ? <Text style={s.err}>{msg}</Text> : null}
           <Btn title={busy ? 'Giriş yapılıyor…' : 'Giriş yap'} disabled={busy} onPress={() => void signIn()} />
           <Pressable onPress={() => void forgot()} hitSlop={8} accessibilityRole="button"><Text style={{ color: color.accent, fontWeight: '600', textAlign: 'center' }}>Şifremi unuttum</Text></Pressable>
+          <SocialAuth />
         </View>
         <View style={{ gap: 6 }}>
           <Label style={{ marginLeft: 2 }}>Misafir olarak</Label>
@@ -165,7 +167,7 @@ export default function Account() {
             </View>
           </View>
         </View>
-        <Group title="Hesabın yok mu?" items={[{ icon: 'user-plus', label: 'Kayıt ol (web sitesi)', sub: 'Yeni kayıt şimdilik web sitesinden yapılır.', go: () => openWeb('/giris') }]} />
+        <Group title="Hesabın yok mu?" items={[{ icon: 'user-plus', label: 'Kayıt ol', sub: 'Ücretsiz hesap oluştur', go: () => router.push('/kayit' as never) }]} />
         <Group title="Giriş yapmadan" items={[
           { icon: 'tool', label: 'Yedek parça ara', go: () => router.push('/yedek-parca') },
           { icon: 'map', label: 'İl haritası', go: () => router.push('/harita') },

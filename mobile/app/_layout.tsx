@@ -53,6 +53,8 @@ function Screens() {
         <Stack.Screen name="guven" options={{ title: T('Güven sistemi') }} />
         <Stack.Screen name="destek" options={{ title: T('Yardım') }} />
         <Stack.Screen name="hukuki/index" options={{ title: T('Hukuki bilgiler') }} />
+        <Stack.Screen name="hukuki/[slug]" options={{ title: T('Hukuki bilgiler') }} />
+        <Stack.Screen name="kayit" options={{ title: T('Üye ol') }} />
         <Stack.Screen name="hesap-dogrula" options={{ title: T('Hesap güvenliği') }} />
         <Stack.Screen name="harita" options={{ title: T('İl haritası') }} />
         <Stack.Screen name="yonetim" options={{ title: T('Yönetim') }} />

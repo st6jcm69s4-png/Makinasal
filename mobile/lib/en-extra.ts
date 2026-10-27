@@ -10,7 +10,7 @@ const extra: Record<string, string> = {
   'Şifre sıfırlama bağlantısı buradan gönderilemedi. Web sitesinden dene.': 'The reset link could not be sent from here. Try the website.',
   'Bu e-posta ile bir hesap varsa şifre sıfırlama bağlantısı gönderildi. Gelen kutunu ve spam klasörünü kontrol et.': 'If an account exists for this email, a reset link has been sent. Check your inbox and spam folder.',
   'İş ağı hesabım': 'My work network', 'İl haritası': 'Province map', 'Ayarlar, yardım ve hukuki bilgiler': 'Settings, help and legal',
-  'Kayıt ol (web sitesi)': 'Sign up (website)', 'Yedek parça ara': 'Search spare parts', 'Yardım ve hukuki bilgiler': 'Help and legal',
+  'Kayıt ol (web sitesi)': 'Sign up (website)', 'Kayıt ol': 'Sign up', 'Üye ol': 'Sign up', 'Ücretsiz hesap oluştur': 'Create a free account', 'İlan yayınlama kuralları': 'Listing rules', 'Yedek parça ara': 'Search spare parts', 'Yardım ve hukuki bilgiler': 'Help and legal',
   'Yeni kayıt şimdilik web sitesinden yapılır.': 'New sign-ups are done on the website for now.',
   'Giriş yap': 'Sign in', 'Şifre': 'Password', 'E-posta': 'Email', 'Çıkış yap': 'Sign out', 'Şifremi unuttum': 'Forgot password',
   'İlan ver': 'Post a listing', 'İlanlarım': 'My listings', 'Bildirimler': 'Notifications', 'Kayıtlı aramalar': 'Saved searches', 'Karşılaştırma': 'Compare', 'Profili düzenle': 'Edit profile',

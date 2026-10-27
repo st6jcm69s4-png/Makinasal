@@ -158,7 +158,7 @@ export default function NewListing() {
     } finally { setBusy(false); setProgress(''); }
   }
 
-  if (!session) return <GuestGate icon="plus-square" text="İlan vermek için giriş yap. Hesabın yoksa web sitesinden ücretsiz kayıt olabilirsin." />;
+  if (!session) return <GuestGate icon="plus-square" text="İlan vermek için giriş yap. Hesabın yoksa uygulamadan ücretsiz kayıt olabilirsin." />;
   if (!loadedEdit) return <ActivityIndicator style={{ margin: 32 }} />;
   const field = (label: string, value: string, set: (v: string) => void, extra: Record<string, unknown> = {}) => (
     <View style={s.field}><Text style={s.label}>{label}</Text><TextInput style={s.input} value={value} onChangeText={set} {...extra} /></View>

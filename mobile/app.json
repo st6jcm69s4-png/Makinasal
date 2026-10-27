@@ -6,9 +6,27 @@
     "version": "0.1.0",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
-    "plugins": ["expo-router", ["expo-location", { "locationWhenInUsePermission": "En yakın çekicileri göstermek için konumun kullanılır. Konum sunucuya kaydedilmez." }]],
-    "experiments": { "typedRoutes": false },
-    "ios": { "supportsTablet": false, "bundleIdentifier": "tr.com.makinasal.app" },
-    "android": { "package": "tr.com.makinasal.app" }
+    "plugins": [
+      "expo-router",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "En yakın çekicileri göstermek için konumun kullanılır. Konum sunucuya kaydedilmez."
+        }
+      ],
+      "expo-apple-authentication",
+      "expo-web-browser"
+    ],
+    "experiments": {
+      "typedRoutes": false
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "tr.com.makinasal.app",
+      "usesAppleSignIn": true
+    },
+    "android": {
+      "package": "tr.com.makinasal.app"
+    }
   }
 }

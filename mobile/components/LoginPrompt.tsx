@@ -6,7 +6,6 @@ import { PlainText, Text } from './LText';
 import { Icon, type IconName } from './Icon';
 import { Btn } from './ui';
 import { Hatch } from './ui';
-import { openWeb } from '../lib/web';
 import { color, font, radius } from '../lib/theme';
 
 type App = ReturnType<typeof useApp>;
@@ -63,7 +62,7 @@ export function LoginPromptProvider({ children }: { children: ReactNode }) {
               <PlainText style={s.title}>GİRİŞ YAP</PlainText>
               <Text style={s.text}>{reason}</Text>
               <Btn title="Giriş yap" onPress={() => { close(); router.navigate('/hesap'); }} />
-              <Btn ghost title="Kayıt ol (web sitesi)" onPress={() => { close(); openWeb('/giris'); }} />
+              <Btn ghost title="Kayıt ol" onPress={() => { close(); router.push('/kayit' as never); }} />
               <Pressable onPress={close} hitSlop={10} accessibilityRole="button" style={{ alignItems: 'center', paddingVertical: 8 }}><Text style={s.skip}>Şimdilik gezmeye devam et</Text></Pressable>
             </View>
           </View>
@@ -81,7 +80,7 @@ export function GuestGate({ text, icon = 'lock' }: { text: string; icon?: IconNa
       <Text style={g.text}>{text}</Text>
       <View style={{ alignSelf: 'stretch', gap: 8 }}>
         <Btn title="Giriş yap" onPress={() => router.navigate('/hesap')} />
-        <Btn ghost title="Kayıt ol (web sitesi)" onPress={() => openWeb('/giris')} />
+        <Btn ghost title="Kayıt ol" onPress={() => router.push('/kayit' as never)} />
       </View>
     </View>
   );
