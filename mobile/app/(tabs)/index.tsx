@@ -1,12 +1,13 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Pressable, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
-import { Text, } from '../../components/LText';
+import { PlainText, Text } from '../../components/LText';
 import { router, useFocusEffect } from 'expo-router';
 import { SearchBox } from '../../components/SearchBox';
 import { ListingCard } from '../../components/ListingCard';
-import { Btn, Band } from '../../components/ui';
+import { Btn, Band, Label } from '../../components/ui';
 import { Icon, type IconName } from '../../components/Icon';
 import { color, font } from '../../lib/theme';
+import { displayName, firstName } from '../../lib/person';
 import { useApp } from '../../lib/AppContext';
 import { CATEGORY_GROUPS } from '../../lib/machineryCatalog';
 import { money, type MarketPost, type Provider } from '../../lib/network';
@@ -32,32 +33,61 @@ export default function Home() {
   const { session } = useApp();
   const [q, setQ] = useState('');
   const [latest, setLatest] = useState<Row[]>([]);
+  const [featured, setFeatured] = useState<Row[]>([]);
+  const [page, setPage] = useState(1);
+  const [more, setMore] = useState(true);
+  const [moreBusy, setMoreBusy] = useState(false);
+  const [counts, setCounts] = useState<{ offers: number; works: number } | null>(null);
+  const [pname, setPname] = useState('');
   const [jobs, setJobs] = useState<MarketPost[]>([]);
   const [firms, setFirms] = useState<Provider[]>([]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(false);
 
+  const base = { q: '', categories: [], city: 'Tümü', maxPrice: 6000000 };
   const load = useCallback(async () => {
     setBusy(true);
-    const [l, j, f] = await Promise.all([
-      supabase.rpc('search_listings', { p: { q: '', page: 1, categories: [], city: 'Tümü', maxPrice: 6000000, sort: 'new' }, count_only: false }),
+    const uid = session?.user.id;
+    const [l, r, j, f, o, w, pr] = await Promise.all([
+      supabase.rpc('search_listings', { p: { ...base, page: 1, sort: 'new' }, count_only: false }),
+      supabase.rpc('search_listings', { p: { ...base, page: 1, sort: 'rec' }, count_only: false }),
       supabase.from('market_posts').select('*').eq('kind', 'job').eq('status', 'open').order('created_at', { ascending: false }).limit(3),
       supabase.from('service_providers').select('*').eq('published', true).order('created_at', { ascending: false }).limit(3),
+      uid ? supabase.from('market_quotes').select('id', { count: 'exact', head: true }).eq('owner_id', uid).eq('status', 'pending') : Promise.resolve(null),
+      uid ? supabase.from('market_posts').select('id', { count: 'exact', head: true }).eq('owner_id', uid).eq('status', 'open') : Promise.resolve(null),
+      uid ? supabase.from('profiles').select('full_name').eq('id', uid).maybeSingle() : Promise.resolve(null),
     ]);
     setError(!!(l.error || j.error || f.error));
-    setLatest(((l.data as { rows?: Row[] } | null)?.rows ?? []).slice(0, 6));
+    const rows = ((l.data as { rows?: Row[] } | null)?.rows ?? []);
+    setLatest(rows);
+    setPage(1);
+    setMore(rows.length >= 10);
+    setFeatured(((r.data as { rows?: Row[] } | null)?.rows ?? []).slice(0, 6));
     setJobs((j.data ?? []) as MarketPost[]);
     setFirms((f.data ?? []) as Provider[]);
+    setCounts(uid && o && w ? { offers: o.count ?? 0, works: w.count ?? 0 } : null);
+    setPname(((pr?.data as { full_name?: string } | null)?.full_name) ?? '');
     setBusy(false);
-  }, []);
+  }, [session]);
+  async function loadMore() {
+    setMoreBusy(true);
+    const { data, error: e } = await supabase.rpc('search_listings', { p: { ...base, page: page + 1, sort: 'new' }, count_only: false });
+    const rows = ((data as { rows?: Row[] } | null)?.rows ?? []);
+    if (!e) {
+      setLatest((cur) => [...cur, ...rows.filter((x) => !cur.some((c) => c.id === x.id))]);
+      setPage(page + 1);
+      setMore(rows.length >= 10);
+    }
+    setMoreBusy(false);
+  }
   useFocusEffect(useCallback(() => { void load(); }, [load]));
 
   const search = () => router.navigate({ pathname: '/ilanlar', params: { q: q.trim() } });
-  const name = (session?.user.user_metadata?.full_name as string | undefined)?.split(' ')[0] ?? '';
+  const name = firstName(displayName(session, pname));
   return (
     <ScrollView style={s.screen} contentContainerStyle={{ paddingBottom: 24 }} refreshControl={<RefreshControl refreshing={busy} onRefresh={() => void load()} />} keyboardShouldPersistTaps="handled">
       <View style={s.hero}>
-        <Text style={s.h1}>{session ? `Merhaba${name ? ', ' + name : ''}, tekrar hoş geldin` : 'Al, sat, kirala. İşini paylaş, fiyat al.'}</Text>
+        <Text style={s.h1}>{session ? `Merhaba, ${name}.` : 'Al, sat, kirala. İşini paylaş, fiyat al.'}</Text>
         <Text style={s.lead}>Makine, yedek parça ve işini yapacak hizmeti burada bul.</Text>
         <View style={s.searchRow}>
           <View style={{ flex: 1 }}><SearchBox value={q} onChangeText={setQ} onSubmit={search} placeholder="Marka, model veya parça numarası ara" /></View>
@@ -66,6 +96,16 @@ export default function Home() {
         {!session ? <Pressable onPress={() => router.navigate('/hesap')} accessibilityRole="button"><Text style={s.link}>Giriş yap / Kayıt ol →</Text></Pressable> : null}
       </View>
 
+      {session ? (
+        <View style={s.hub}>
+          {([['Gelen teklifler', counts?.offers, '/ag/hesabim'], ['Açık işlerim', counts?.works, '/ag/hesabim'], ['İlanlarım', undefined, '/ilanlarim'], ['Envanterim', undefined, '/ag/envanter']] as [string, number | undefined, string][]).map(([l, n, to], i) => (
+            <Pressable key={l} style={[s.hubCell, i > 0 && { borderLeftWidth: 1, borderLeftColor: color.line }]} onPress={() => router.push(to as never)} accessibilityRole="button">
+              <PlainText style={s.hubNum}>{n === undefined ? '→' : String(n)}</PlainText>
+              <Label>{l}</Label>
+            </Pressable>
+          ))}
+        </View>
+      ) : null}
       <Band title="Hızlı keşfet" />
       <View style={s.grid}>
         {QUICK.map(([label, icon, go]) => (
@@ -84,8 +124,11 @@ export default function Home() {
       </ScrollView>
 
       {error ? <Text style={s.err}>Bazı bölümler yüklenemedi. Aşağı çekerek yenileyebilirsin.</Text> : null}
-      <Band title="Satılık ilanlar" action="Tümünü gör" onAction={() => router.navigate('/ilanlar')} />
+      {featured.length ? <Band title="Öne çıkanlar" action="Tümünü gör" onAction={() => router.navigate('/ilanlar')} /> : null}
+      {featured.map((r) => <ListingCard key={'f' + r.id} item={r} />)}
+      <Band title="Yeni ilanlar" action="Tümünü gör" onAction={() => router.navigate('/ilanlar')} />
       {latest.map((r) => <ListingCard key={r.id} item={r} />)}
+      {more && latest.length ? <View style={{ marginHorizontal: 12 }}><Btn ghost disabled={moreBusy} title={moreBusy ? 'Yükleniyor…' : 'Daha fazla ilan göster'} onPress={() => void loadMore()} /></View> : null}
       {!busy && !latest.length ? <Text style={s.empty}>Henüz ilan yok.</Text> : null}
 
       <Band title="Yeni iş fırsatları" action="Tümünü gör" onAction={() => router.navigate({ pathname: '/is-agi', params: { kind: 'job' } })} />
@@ -124,6 +167,9 @@ export default function Home() {
 
 const s = StyleSheet.create({
   screen: { flex: 1, backgroundColor: '#F6F5F3' },
+  hub: { flexDirection: 'row', marginHorizontal: 12, marginTop: 14, backgroundColor: color.surface, borderWidth: 1, borderColor: color.line },
+  hubCell: { flex: 1, paddingVertical: 10, paddingHorizontal: 8, gap: 2 },
+  hubNum: { fontFamily: font.bold, fontSize: 22, color: color.accent },
   hero: { backgroundColor: color.navy, padding: 16, paddingTop: 12, gap: 8, borderBottomWidth: 3, borderBottomColor: color.accent },
   h1: { color: '#fff', fontSize: 27, fontWeight: '700', lineHeight: 31 },
   lead: { color: color.onNavy },

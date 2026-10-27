@@ -1,11 +1,125 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
-import { Text, TextInput } from '../../components/LText';
-import { router } from 'expo-router';
+import { PlainText, Text, TextInput } from '../../components/LText';
+import { router, useFocusEffect } from 'expo-router';
+import { Icon, type IconName } from '../../components/Icon';
+import { Btn, Field, Label } from '../../components/ui';
+import { color, font, radius } from '../../lib/theme';
+import { displayName, initials } from '../../lib/person';
 import { ReferralBox } from '../../components/ReferralBox';
 import { useApp } from '../../lib/AppContext';
 import { configured, supabase, SITE_URL } from '../../lib/supabase';
 import { openWeb } from '../../lib/web';
+
+type Item = { icon: IconName; label: string; sub?: string; go: () => void; badge?: number | string };
+
+function Row({ it, last }: { it: Item; last: boolean }) {
+  return (
+    <Pressable style={({ pressed }) => [s.row, !last && s.rowLine, pressed && { backgroundColor: color.plate }]} onPress={it.go} accessibilityRole="button">
+      <Icon name={it.icon} size={20} color={color.accent} />
+      <View style={{ flex: 1 }}>
+        <Text style={s.rowLabel}>{it.label}</Text>
+        {it.sub ? <Text style={s.rowSub}>{it.sub}</Text> : null}
+      </View>
+      {it.badge ? <View style={s.badge}><Text style={s.badgeText}>{it.badge}</Text></View> : null}
+      <Icon name="chevron-right" size={18} color={color.muted} />
+    </Pressable>
+  );
+}
+function Group({ title, items }: { title: string; items: Item[] }) {
+  return (
+    <View style={{ gap: 6 }}>
+      <Label style={{ marginLeft: 2 }}>{title}</Label>
+      <View style={s.group}>{items.map((it, i) => <Row key={it.label} it={it} last={i === items.length - 1} />)}</View>
+    </View>
+  );
+}
+
+function Member() {
+  const { session, favs } = useApp();
+  const uid = session?.user.id ?? '';
+  const [profile, setProfile] = useState<{ full_name: string | null; city: string | null; is_store: boolean; store_name: string | null } | null>(null);
+  const [active, setActive] = useState<number | null>(null);
+  const [unread, setUnread] = useState(0);
+  const [notif, setNotif] = useState(0);
+  useFocusEffect(useCallback(() => {
+    if (!uid) return;
+    let alive = true;
+    void (async () => {
+      const [p, l, u, n] = await Promise.all([
+        supabase.from('profiles').select('full_name,city,is_store,store_name').eq('id', uid).maybeSingle(),
+        supabase.from('listings').select('id', { count: 'exact', head: true }).eq('seller_id', uid).eq('status', 'active'),
+        supabase.rpc('unread_counts'),
+        supabase.from('notifications').select('id', { count: 'exact', head: true }).eq('user_id', uid).is('read_at', null),
+      ]);
+      if (!alive) return;
+      setProfile((p.data as typeof profile) ?? null);
+      setActive(l.error ? null : l.count ?? 0);
+      setUnread(u.error || !Array.isArray(u.data) ? 0 : (u.data as { n: number | string }[]).reduce((a, r) => a + Number(r.n), 0));
+      setNotif(n.error ? 0 : n.count ?? 0);
+    })();
+    return () => { alive = false; };
+  }, [uid]));
+
+  const name = displayName(session, profile?.full_name);
+  const isAdmin = (session?.user.app_metadata as { role?: string } | undefined)?.role === 'admin';
+  const go = (path: string) => () => router.push(path as never);
+  const stats: [string, string | number][] = [['Yayında ilan', active ?? '–'], ['Favori', favs.size], ['Yeni mesaj', unread]];
+  return (
+    <ScrollView style={{ backgroundColor: color.bg }} contentContainerStyle={{ paddingBottom: 32 }}>
+      <View style={s.head}>
+        <View style={s.avatar}><PlainText style={s.avatarText}>{initials(name)}</PlainText></View>
+        <View style={{ flex: 1, gap: 2 }}>
+          <PlainText style={s.name} numberOfLines={1}>{name}</PlainText>
+          <Text style={s.sub}>{[profile?.is_store ? (profile.store_name || 'Mağaza') : 'Bireysel üye', profile?.city].filter(Boolean).join(' · ')}</Text>
+        </View>
+        <Pressable onPress={go('/profil-duzenle')} hitSlop={10} accessibilityRole="button" accessibilityLabel="Profili düzenle"><Icon name="edit-2" size={19} color="#fff" /></Pressable>
+      </View>
+      <View style={s.stats}>
+        {stats.map(([l, v], i) => (
+          <View key={l} style={[s.stat, i > 0 && { borderLeftWidth: 1, borderLeftColor: color.navy2 }]}>
+            <PlainText style={s.statNum}>{String(v)}</PlainText>
+            <Label style={{ color: color.onNavy }}>{l}</Label>
+          </View>
+        ))}
+      </View>
+      <View style={s.body}>
+        <Pressable style={({ pressed }) => [s.cta, pressed && { opacity: 0.85 }]} onPress={go('/ilan-ver')} accessibilityRole="button">
+          <Icon name="plus" size={20} color="#fff" /><Text style={s.ctaText}>İlan ver</Text>
+        </Pressable>
+        <Group title="İlanlarım ve takip" items={[
+          { icon: 'list', label: 'İlanlarım', sub: active ? `${active} yayında` : undefined, go: go('/ilanlarim') },
+          { icon: 'message-square', label: 'Mesajlar', badge: unread || undefined, go: () => router.navigate('/mesajlar') },
+          { icon: 'bell', label: 'Bildirimler', badge: notif || undefined, go: go('/bildirimler') },
+          { icon: 'heart', label: 'Favorilerim', sub: `${favs.size} ilan`, go: () => router.navigate('/favoriler') },
+          { icon: 'bookmark', label: 'Kayıtlı aramalar', go: go('/kayitli-aramalar') },
+          { icon: 'repeat', label: 'Karşılaştırma', go: go('/karsilastir') },
+        ]} />
+        <Group title="İş ağı" items={[
+          { icon: 'briefcase', label: 'İş ağı hesabım', sub: 'Taleplerim, tekliflerim', go: go('/ag/hesabim') },
+          { icon: 'home', label: 'Firma profilim', go: go('/ag/firma-kaydi') },
+          { icon: 'truck', label: 'Envanterim', go: go('/ag/envanter') },
+        ]} />
+        <Group title="Hesap" items={[
+          { icon: 'user', label: 'Profili düzenle', go: go('/profil-duzenle') },
+          { icon: 'credit-card', label: 'Ödemelerim', go: go('/odemelerim') },
+          { icon: 'award', label: 'Üyelik ve ilan hakları', go: go('/premium') },
+          { icon: 'shield', label: 'Hesap güvenliği', go: go('/hesap-dogrula') },
+          ...(isAdmin ? [{ icon: 'sliders' as IconName, label: 'Yönetim', go: go('/yonetim') }] : []),
+        ]} />
+        <Group title="Keşfet ve destek" items={[
+          { icon: 'tool', label: 'Yedek parça', go: go('/yedek-parca') },
+          { icon: 'map', label: 'İl haritası', go: go('/harita') },
+          { icon: 'life-buoy', label: 'Ayarlar, yardım, hukuki bilgiler', go: go('/ayarlar') },
+        ]} />
+        <ReferralBox />
+        <Pressable style={s.out} onPress={() => void supabase.auth.signOut()} accessibilityRole="button">
+          <Icon name="log-out" size={18} color={color.accent} /><Text style={s.outText}>Çıkış yap</Text>
+        </Pressable>
+      </View>
+    </ScrollView>
+  );
+}
 
 export default function Account() {
   const { session } = useApp();
@@ -32,40 +146,33 @@ export default function Account() {
     else setMsg('Bu e-posta ile bir hesap varsa şifre sıfırlama bağlantısı gönderildi. Gelen kutunu ve spam klasörünü kontrol et.');
   }
 
-  if (session) {
-    return (
-      <ScrollView style={{ backgroundColor: '#F6F5F3' }} contentContainerStyle={s.screen}>
-        <Text style={s.h}>Hesabım</Text>
-        <Text>{session.user.email}</Text>
-        <Pressable style={s.btn} onPress={() => router.push('/ilan-ver')} accessibilityRole="button"><Text style={s.btnText}>İlan ver</Text></Pressable>
-        <Pressable style={s.btn} onPress={() => router.push('/ilanlarim')} accessibilityRole="button"><Text style={s.btnText}>İlanlarım</Text></Pressable>
-        <Pressable style={s.btnGhost} onPress={() => router.push('/bildirimler')} accessibilityRole="button"><Text style={s.btnGhostText}>Bildirimler</Text></Pressable>
-        <Pressable style={s.btnGhost} onPress={() => router.push('/kayitli-aramalar')} accessibilityRole="button"><Text style={s.btnGhostText}>Kayıtlı aramalar</Text></Pressable>
-        <Pressable style={s.btnGhost} onPress={() => router.push('/karsilastir')} accessibilityRole="button"><Text style={s.btnGhostText}>Karşılaştırma</Text></Pressable>
-        <Pressable style={s.btnGhost} onPress={() => router.push('/profil-duzenle')} accessibilityRole="button"><Text style={s.btnGhostText}>Profili düzenle</Text></Pressable>
-        <Pressable style={s.btnGhost} onPress={() => router.push('/ag/hesabim' as never)} accessibilityRole="button"><Text style={s.btnGhostText}>İş ağı hesabım</Text></Pressable>
-        <Pressable style={s.btnGhost} onPress={() => router.push('/yedek-parca')} accessibilityRole="button"><Text style={s.btnGhostText}>Yedek parça</Text></Pressable>
-        <Pressable style={s.btnGhost} onPress={() => router.push('/harita')} accessibilityRole="button"><Text style={s.btnGhostText}>İl haritası</Text></Pressable>
-        <Pressable style={s.btnGhost} onPress={() => router.push('/odemelerim')} accessibilityRole="button"><Text style={s.btnGhostText}>Ödemelerim</Text></Pressable>
-        <Pressable style={s.btnGhost} onPress={() => router.push('/ayarlar')} accessibilityRole="button"><Text style={s.btnGhostText}>Ayarlar, yardım ve hukuki bilgiler</Text></Pressable>
-        <ReferralBox />
-        <Pressable style={s.btnGhost} onPress={() => void supabase.auth.signOut()} accessibilityRole="button"><Text style={s.btnGhostText}>Çıkış yap</Text></Pressable>
-      </ScrollView>
-    );
-  }
+  if (session) return <Member />;
   return (
-    <View style={s.screen}>
-      <Text style={s.h}>Giriş yap</Text>
-      <TextInput style={s.input} placeholder="E-posta" autoCapitalize="none" keyboardType="email-address" value={email} onChangeText={setEmail} />
-      <TextInput style={s.input} placeholder="Şifre" secureTextEntry value={password} onChangeText={setPassword} />
-      {msg ? <Text style={s.err}>{msg}</Text> : null}
-      <Pressable style={s.btn} disabled={busy} onPress={() => void signIn()} accessibilityRole="button"><Text style={s.btnText}>Giriş yap</Text></Pressable>
-      <Pressable style={s.btnGhost} onPress={() => void forgot()} accessibilityRole="button"><Text style={s.btnGhostText}>Şifremi unuttum</Text></Pressable>
-      <Pressable style={s.btnGhost} onPress={() => openWeb('/giris')} accessibilityRole="button"><Text style={s.btnGhostText}>Kayıt ol (web sitesi)</Text></Pressable>
-      <Pressable style={s.btnGhost} onPress={() => router.push('/yedek-parca')} accessibilityRole="button"><Text style={s.btnGhostText}>Yedek parça ara</Text></Pressable>
-      <Pressable style={s.btnGhost} onPress={() => router.push('/destek')} accessibilityRole="button"><Text style={s.btnGhostText}>Yardım ve hukuki bilgiler</Text></Pressable>
-      <Text style={s.note}>Yeni kayıt şimdilik web sitesinden yapılır.</Text>
-    </View>
+    <ScrollView style={{ backgroundColor: color.bg }} contentContainerStyle={{ paddingBottom: 32 }} keyboardShouldPersistTaps="handled">
+      <View style={s.head}>
+        <View style={s.avatar}><Icon name="user" size={26} color="#fff" /></View>
+        <View style={{ flex: 1, gap: 2 }}>
+          <Text style={s.name}>Giriş yap</Text>
+          <Text style={s.sub}>İlan ver, mesajlaş, teklif al.</Text>
+        </View>
+      </View>
+      <View style={[s.stats, { height: 0, borderBottomWidth: 3 }]} />
+      <View style={s.body}>
+        <View style={{ gap: 12 }}>
+          <Field label="E-posta" autoCapitalize="none" keyboardType="email-address" value={email} onChangeText={setEmail} />
+          <Field label="Şifre" secureTextEntry value={password} onChangeText={setPassword} />
+          {msg ? <Text style={s.err}>{msg}</Text> : null}
+          <Btn title={busy ? 'Giriş yapılıyor…' : 'Giriş yap'} disabled={busy} onPress={() => void signIn()} />
+          <Pressable onPress={() => void forgot()} hitSlop={8} accessibilityRole="button"><Text style={{ color: color.accent, fontWeight: '600', textAlign: 'center' }}>Şifremi unuttum</Text></Pressable>
+        </View>
+        <Group title="Hesabın yok mu?" items={[{ icon: 'user-plus', label: 'Kayıt ol (web sitesi)', sub: 'Yeni kayıt şimdilik web sitesinden yapılır.', go: () => openWeb('/giris') }]} />
+        <Group title="Giriş yapmadan" items={[
+          { icon: 'tool', label: 'Yedek parça ara', go: () => router.push('/yedek-parca') },
+          { icon: 'map', label: 'İl haritası', go: () => router.push('/harita') },
+          { icon: 'life-buoy', label: 'Yardım ve hukuki bilgiler', go: () => router.push('/destek') },
+        ]} />
+      </View>
+    </ScrollView>
   );
 }
 
@@ -77,6 +184,26 @@ const s = StyleSheet.create({
   btnText: { color: '#fff', fontWeight: '600' },
   btnGhost: { borderWidth: 1, borderColor: '#800020', padding: 14, borderRadius: 4, alignItems: 'center' },
   btnGhostText: { color: '#800020', fontWeight: '600' },
-  err: { color: '#b00020' },
-  note: { color: '#666' },
+  err: { color: '#9C2626' },
+  note: { color: '#66616A' },
+  head: { backgroundColor: color.navy, flexDirection: 'row', alignItems: 'center', gap: 14, padding: 16 },
+  avatar: { width: 56, height: 56, borderRadius: radius, backgroundColor: color.accent, alignItems: 'center', justifyContent: 'center' },
+  avatarText: { color: '#fff', fontFamily: font.bold, fontSize: 24, letterSpacing: 1 },
+  name: { color: '#fff', fontFamily: font.bold, fontSize: 24 },
+  sub: { color: color.onNavy, fontSize: 14 },
+  stats: { flexDirection: 'row', backgroundColor: color.navy, borderTopWidth: 1, borderTopColor: color.navy2, borderBottomWidth: 3, borderBottomColor: color.accent },
+  stat: { flex: 1, paddingVertical: 10, paddingHorizontal: 14, gap: 1 },
+  statNum: { color: '#fff', fontFamily: font.bold, fontSize: 24 },
+  body: { padding: 12, gap: 18 },
+  cta: { backgroundColor: color.accent, borderRadius: radius, minHeight: 52, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
+  ctaText: { color: '#fff', fontSize: 17, fontWeight: '700' },
+  group: { backgroundColor: color.surface, borderWidth: 1, borderColor: color.line, borderRadius: radius },
+  row: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 13, paddingHorizontal: 12, minHeight: 50 },
+  rowLine: { borderBottomWidth: 1, borderBottomColor: color.line },
+  rowLabel: { fontSize: 16, color: color.ink, fontWeight: '500' },
+  rowSub: { fontSize: 13, color: color.muted },
+  badge: { minWidth: 22, height: 22, borderRadius: 11, backgroundColor: color.accent, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 6 },
+  badgeText: { color: '#fff', fontSize: 12, fontWeight: '700' },
+  out: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, borderWidth: 1, borderColor: color.accent, borderRadius: radius, minHeight: 48 },
+  outText: { color: color.accent, fontWeight: '600', fontSize: 16 },
 });
