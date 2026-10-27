@@ -322,7 +322,7 @@ function Actions({ l, part }: { l: Listing; part: boolean }) {
           </div>
         </div>
       ) : null}
-      {!own && !isDemo && /^[0-9a-f-]{36}$/i.test(l.id) ? <ServiceRequestBox listingId={l.id} city={l.city} part={isPartCategory(l.cat)} /> : null}
+      {!isDemo && /^[0-9a-f-]{36}$/i.test(l.id) ? <ServiceRequestBox listingId={l.id} city={l.city} part={isPartCategory(l.cat)} /> : null}
       {offerOpen ? (
         <form className="panel" onSubmit={sendOffer} noValidate>
           <h3>{tr("Teklif ver")}</h3>
