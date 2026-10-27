@@ -8,3 +8,9 @@ Renkler web ile aynıdır ve değişmez: lacivert #25272D, bordo #800020, kâğ�
 - **Simgeler:** Feather (emoji yok). Aktif sekme: üstte 3px bordo çubuk.
 - **Bileşenler:** `Label`, `Field`, `Select`, `Btn`, `Chip`, `Band`, `FieldCell/FieldGrid` (components/ui.tsx), `ListingCard` (yıl / il şeridi).
 - **Kural:** yeni ekranlar `lib/theme.ts` renklerini ve `radius=4` değerini kullanır; sabit hex yazılmaz.
+
+## Eklemeler
+- Geri düğmesi çerçevesiz ok; alt sekmeye basınca liste başa kayar (`lib/scrollTop.ts`).
+- Bölüm anahtarı (İş Ağı, Mesajlar): üstte 3px bordo çizgi, seçili hücre lacivert.
+- Fotoğraflı bloklar: gerçek ilan fotoğrafı + altında lacivert plaka şeridi (kategori kutuları, öne çıkan ilan). Gradyan ve gölge yok.
+- Hukuki: `app/hukuki`, `app/haklarim` (KVKK md. 11 başvuruları, `data_requests` tablosu, Yönetim'de 30 gün sayacıyla).

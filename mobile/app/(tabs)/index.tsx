@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTabScrollTop } from '../../lib/scrollTop';
-import { Pressable, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
+import { Image, Pressable, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
 import { PlainText, Text } from '../../components/LText';
 import { router, useFocusEffect } from 'expo-router';
 import { SearchBox } from '../../components/SearchBox';
@@ -12,7 +12,7 @@ import { displayName, firstName } from '../../lib/person';
 import { useApp } from '../../lib/AppContext';
 import { CATEGORY_GROUPS } from '../../lib/machineryCatalog';
 import { money, type MarketPost, type Provider } from '../../lib/network';
-import { supabase, type Row } from '../../lib/supabase';
+import { photoUrl, supabase, tl, type Row } from '../../lib/supabase';
 
 const QUICK: [string, IconName, () => void][] = [
   ['Satılık ilanlar', 'truck', () => router.navigate('/ilanlar')],
@@ -21,14 +21,31 @@ const QUICK: [string, IconName, () => void][] = [
   ['İş talepleri', 'clipboard', () => router.navigate({ pathname: '/is-agi', params: { kind: 'job' } })],
   ['Parça talepleri', 'tool', () => router.navigate({ pathname: '/is-agi', params: { kind: 'part_request' } })],
   ['Yedek parça', 'settings', () => router.push('/yedek-parca')],
+  ['Çekici çağır', 'life-buoy', () => router.push('/cekici' as never)],
   ['Şirketler ve filolar', 'briefcase', () => router.navigate({ pathname: '/is-agi', params: { kind: 'firma' } })],
-  ['İl haritası', 'map', () => router.push('/harita')],
 ];
 const STEPS: [string, string][] = [
   ['İhtiyacını paylaş', 'Konumu, tarihleri ve neye ihtiyacın olduğunu belirt.'],
   ['Teklifleri karşılaştır', 'Fiyatı, kapsamı ve şirket profilini birlikte değerlendir.'],
   ['Ayrıntıları konuş', 'Özel mesajlarla işi netleştir. Seçim ödeme oluşturmaz.'],
 ];
+
+function Spot({ item }: { item: Row }) {
+  const ph = [...(item.listing_photos ?? [])].sort((a, b) => a.position - b.position)[0];
+  if (!ph) return null;
+  return (
+    <Pressable style={({ pressed }) => [s.spot, pressed && { opacity: 0.9 }]} onPress={() => router.push(`/ilan/${item.id}`)} accessibilityRole="button">
+      <Image source={{ uri: photoUrl(ph.path) }} style={s.spotPhoto} />
+      <View style={s.spotBar}>
+        <View style={{ flex: 1, gap: 2 }}>
+          <Label style={{ color: color.onNavy }}>Öne çıkan ilan</Label>
+          <Text style={s.spotTitle} numberOfLines={1}>{item.title}</Text>
+        </View>
+        <View style={s.spotPrice}><PlainText style={s.spotPriceText}>{tl(item.price)}</PlainText></View>
+      </View>
+    </Pressable>
+  );
+}
 
 export default function Home() {
   const scroller = useRef<never>(null);
@@ -43,6 +60,7 @@ export default function Home() {
   const [counts, setCounts] = useState<{ offers: number; works: number } | null>(null);
   const [pname, setPname] = useState('');
   const [city, setCity] = useState('');
+  const [cats, setCats] = useState<{ id: string; label: string; photo: string; n: number }[]>([]);
   const [local, setLocal] = useState<Row[]>([]);
   const [jobs, setJobs] = useState<MarketPost[]>([]);
   const [firms, setFirms] = useState<Provider[]>([]);
@@ -53,7 +71,7 @@ export default function Home() {
   const load = useCallback(async () => {
     setBusy(true);
     const uid = session?.user.id;
-    const [l, r, j, f, o, w, pr] = await Promise.all([
+    const [l, r, j, f, o, w, pr, cp] = await Promise.all([
       supabase.rpc('search_listings', { p: { ...base, page: 1, sort: 'new' }, count_only: false }),
       supabase.rpc('search_listings', { p: { ...base, page: 1, sort: 'rec' }, count_only: false }),
       supabase.from('market_posts').select('*').eq('kind', 'job').eq('status', 'open').order('created_at', { ascending: false }).limit(3),
@@ -61,7 +79,16 @@ export default function Home() {
       uid ? supabase.from('market_quotes').select('id', { count: 'exact', head: true }).eq('owner_id', uid).eq('status', 'pending') : Promise.resolve(null),
       uid ? supabase.from('market_posts').select('id', { count: 'exact', head: true }).eq('owner_id', uid).eq('status', 'open') : Promise.resolve(null),
       uid ? supabase.from('profiles').select('full_name,city').eq('id', uid).maybeSingle() : Promise.resolve(null),
+      supabase.from('listings').select('category,listing_photos(path,position)').eq('status', 'active').eq('moderation_status', 'approved').order('created_at', { ascending: false }).limit(150),
     ]);
+    // Kategori kutuları: her grubun en yeni ilanının gerçek fotoğrafı.
+    const crow = (cp.data ?? []) as unknown as { category: string; listing_photos: { path: string; position: number }[] | null }[];
+    setCats(CATEGORY_GROUPS.map((g) => {
+      const mine = crow.filter((x) => g.categories.includes(x.category));
+      const withPhoto = mine.find((x) => x.listing_photos?.length);
+      const ph = withPhoto ? [...(withPhoto.listing_photos ?? [])].sort((a, b) => a.position - b.position)[0] : null;
+      return { id: g.id, label: g.label, photo: ph ? photoUrl(ph.path) : '', n: mine.length };
+    }).filter((c) => c.photo));
     setError(!!(l.error || j.error || f.error));
     const rows = ((l.data as { rows?: Row[] } | null)?.rows ?? []);
     setLatest(rows);
@@ -95,6 +122,7 @@ export default function Home() {
   useFocusEffect(useCallback(() => { void load(); }, [load]));
 
   const search = () => router.navigate({ pathname: '/ilanlar', params: { q: q.trim() } });
+  const spot = featured.find((r) => r.listing_photos?.length) ?? null;
   const name = firstName(displayName(session, pname));
   return (
     <ScrollView ref={scroller} style={s.screen} contentContainerStyle={{ paddingBottom: 24 }} refreshControl={<RefreshControl refreshing={busy} onRefresh={() => void load()} />} keyboardShouldPersistTaps="handled">
@@ -128,18 +156,29 @@ export default function Home() {
         ))}
       </View>
 
-      <Band title="Satılık kategorilerine göz at" />
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 12, gap: 8 }}>
-        {CATEGORY_GROUPS.map((g) => (
-          <Pressable key={g.id} style={s.cat} onPress={() => router.navigate({ pathname: '/ilanlar', params: { cat: 'group:' + g.id } })} accessibilityRole="button"><Text style={s.catText}>{g.label}</Text></Pressable>
-        ))}
-      </ScrollView>
+      {cats.length ? (
+        <>
+          <Band title="Satılık kategorilerine göz at" />
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 12, gap: 10 }}>
+            {cats.map((c) => (
+              <Pressable key={c.id} style={({ pressed }) => [s.catCard, pressed && { opacity: 0.85 }]} onPress={() => router.navigate({ pathname: '/ilanlar', params: { cat: 'group:' + c.id } })} accessibilityRole="button">
+                <Image source={{ uri: c.photo }} style={s.catPhoto} />
+                <View style={s.catPlate}>
+                  <Text style={s.catLabel} numberOfLines={2}>{c.label}</Text>
+                  <PlainText style={s.catN}>{String(c.n)}</PlainText>
+                </View>
+              </Pressable>
+            ))}
+          </ScrollView>
+        </>
+      ) : null}
 
       {error ? <Text style={s.err}>Bazı bölümler yüklenemedi. Aşağı çekerek yenileyebilirsin.</Text> : null}
       {local.length ? <Band title={`${city} ilanları`} action="Tümünü gör" onAction={() => router.navigate({ pathname: '/ilanlar', params: { city } })} /> : null}
       {local.map((r) => <ListingCard key={'c' + r.id} item={r} />)}
+      {spot ? <Spot item={spot} /> : null}
       {featured.length ? <Band title="Öne çıkanlar" action="Tümünü gör" onAction={() => router.navigate('/ilanlar')} /> : null}
-      {featured.map((r) => <ListingCard key={'f' + r.id} item={r} />)}
+      {featured.filter((r) => r.id !== spot?.id).map((r) => <ListingCard key={'f' + r.id} item={r} />)}
       <Band title="Yeni ilanlar" action="Tümünü gör" onAction={() => router.navigate('/ilanlar')} />
       {latest.map((r) => <ListingCard key={r.id} item={r} />)}
       {more && latest.length ? <View style={{ marginHorizontal: 12 }}><Btn ghost disabled={moreBusy} title={moreBusy ? 'Yükleniyor…' : 'Daha fazla ilan göster'} onPress={() => void loadMore()} /></View> : null}
@@ -194,6 +233,17 @@ const s = StyleSheet.create({
   trustRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   trustText: { color: color.ink },
   link2: { color: color.accent, fontWeight: '600' },
+  spot: { marginHorizontal: 12, marginTop: 14, borderWidth: 1, borderColor: color.navy, backgroundColor: color.navy },
+  spotPhoto: { width: '100%', height: 200, backgroundColor: color.plate },
+  spotBar: { flexDirection: 'row', alignItems: 'stretch', borderTopWidth: 3, borderTopColor: color.accent },
+  spotTitle: { color: '#fff', fontSize: 16, fontWeight: '600' },
+  spotPrice: { backgroundColor: color.accent, justifyContent: 'center', paddingHorizontal: 14 },
+  spotPriceText: { color: '#fff', fontFamily: font.bold, fontSize: 19 },
+  catCard: { width: 150, borderWidth: 1, borderColor: color.line, backgroundColor: color.surface },
+  catPhoto: { width: 150, height: 104, backgroundColor: color.plate },
+  catPlate: { backgroundColor: color.navy, flexDirection: 'row', alignItems: 'center', gap: 6, padding: 8, minHeight: 50, borderTopWidth: 2, borderTopColor: color.accent },
+  catLabel: { flex: 1, color: '#fff', fontSize: 14, fontWeight: '600', lineHeight: 17 },
+  catN: { color: color.onNavy, fontFamily: font.label, fontSize: 15 },
   hero: { backgroundColor: color.navy, padding: 16, paddingTop: 12, gap: 8, borderBottomWidth: 3, borderBottomColor: color.accent },
   h1: { color: '#fff', fontSize: 27, fontWeight: '700', lineHeight: 31 },
   lead: { color: color.onNavy },
