@@ -1,9 +1,11 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
+import { useTabScrollTop } from '../../lib/scrollTop';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { PlainText, Text, TextInput } from '../../components/LText';
 import { router, useFocusEffect } from 'expo-router';
 import { Icon, type IconName } from '../../components/Icon';
-import { Btn, Field, Label } from '../../components/ui';
+import { Btn, Field } from '../../components/ui';
+import { Group, type Item } from '../../components/Rows';
 import { color, font, radius } from '../../lib/theme';
 import { displayName, initials } from '../../lib/person';
 import { ReferralBox } from '../../components/ReferralBox';
@@ -11,31 +13,9 @@ import { useApp } from '../../lib/AppContext';
 import { configured, supabase, SITE_URL } from '../../lib/supabase';
 import { openWeb } from '../../lib/web';
 
-type Item = { icon: IconName; label: string; sub?: string; go: () => void; badge?: number | string };
-
-function Row({ it, last }: { it: Item; last: boolean }) {
-  return (
-    <Pressable style={({ pressed }) => [s.row, !last && s.rowLine, pressed && { backgroundColor: color.plate }]} onPress={it.go} accessibilityRole="button">
-      <Icon name={it.icon} size={20} color={color.accent} />
-      <View style={{ flex: 1 }}>
-        <Text style={s.rowLabel}>{it.label}</Text>
-        {it.sub ? <Text style={s.rowSub}>{it.sub}</Text> : null}
-      </View>
-      {it.badge ? <View style={s.badge}><Text style={s.badgeText}>{it.badge}</Text></View> : null}
-      <Icon name="chevron-right" size={18} color={color.muted} />
-    </Pressable>
-  );
-}
-function Group({ title, items }: { title: string; items: Item[] }) {
-  return (
-    <View style={{ gap: 6 }}>
-      <Label style={{ marginLeft: 2 }}>{title}</Label>
-      <View style={s.group}>{items.map((it, i) => <Row key={it.label} it={it} last={i === items.length - 1} />)}</View>
-    </View>
-  );
-}
-
 function Member() {
+  const scroller = useRef<never>(null);
+  useTabScrollTop('hesap', scroller);
   const { session, favs } = useApp();
   const uid = session?.user.id ?? '';
   const [profile, setProfile] = useState<{ full_name: string | null; city: string | null; is_store: boolean; store_name: string | null } | null>(null);
@@ -66,7 +46,7 @@ function Member() {
   const go = (path: string) => () => router.push(path as never);
   const stats: [string, string | number][] = [['Yayında ilan', active ?? '–'], ['Favori', favs.size], ['Yeni mesaj', unread]];
   return (
-    <ScrollView style={{ backgroundColor: color.bg }} contentContainerStyle={{ paddingBottom: 32 }}>
+    <ScrollView ref={scroller} style={{ backgroundColor: color.bg }} contentContainerStyle={{ paddingBottom: 32 }}>
       <View style={s.head}>
         <View style={s.avatar}><PlainText style={s.avatarText}>{initials(name)}</PlainText></View>
         <View style={{ flex: 1, gap: 2 }}>
@@ -109,8 +89,10 @@ function Member() {
         ]} />
         <Group title="Keşfet ve destek" items={[
           { icon: 'tool', label: 'Yedek parça', go: go('/yedek-parca') },
+          { icon: 'life-buoy', label: 'Çekici çağır', sub: 'En yakın çekiciler, puanlarıyla', go: go('/cekici') },
           { icon: 'map', label: 'İl haritası', go: go('/harita') },
-          { icon: 'life-buoy', label: 'Ayarlar, yardım, hukuki bilgiler', go: go('/ayarlar') },
+          { icon: 'file-text', label: 'Hukuki bilgiler ve veri haklarım', go: go('/hukuki') },
+          { icon: 'settings', label: 'Ayarlar ve yardım', go: go('/ayarlar') },
         ]} />
         <ReferralBox />
         <Pressable style={s.out} onPress={() => void supabase.auth.signOut()} accessibilityRole="button">

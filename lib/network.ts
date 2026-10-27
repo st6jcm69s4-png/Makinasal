@@ -13,8 +13,10 @@ export const PROVIDER_KINDS = {
   supplier: "Yedek parça satışı",
   operator: "Operatör",
   rental: "Makine kiralama",
+  tow: "Çekici / yol yardım",
 } as const;
 export const ACTIVITIES = [
+  "Çekici ve yol yardım",
   "Hafriyat",
   "Temel kazısı",
   "Yıkım",
@@ -127,6 +129,7 @@ export const COMPANY_CATEGORIES = [
   "Nakliye şirketi",
   "Makine kiralama şirketi",
   "Parça tedarikçisi",
+  "Çekici / yol yardım",
   "Diğer şirket",
 ] as const;
 export const EQUIPMENT_STATUS = {

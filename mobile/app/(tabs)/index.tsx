@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useTabScrollTop } from '../../lib/scrollTop';
 import { Pressable, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
 import { PlainText, Text } from '../../components/LText';
 import { router, useFocusEffect } from 'expo-router';
@@ -30,6 +31,8 @@ const STEPS: [string, string][] = [
 ];
 
 export default function Home() {
+  const scroller = useRef<never>(null);
+  useTabScrollTop('index', scroller);
   const { session } = useApp();
   const [q, setQ] = useState('');
   const [latest, setLatest] = useState<Row[]>([]);
@@ -94,7 +97,7 @@ export default function Home() {
   const search = () => router.navigate({ pathname: '/ilanlar', params: { q: q.trim() } });
   const name = firstName(displayName(session, pname));
   return (
-    <ScrollView style={s.screen} contentContainerStyle={{ paddingBottom: 24 }} refreshControl={<RefreshControl refreshing={busy} onRefresh={() => void load()} />} keyboardShouldPersistTaps="handled">
+    <ScrollView ref={scroller} style={s.screen} contentContainerStyle={{ paddingBottom: 24 }} refreshControl={<RefreshControl refreshing={busy} onRefresh={() => void load()} />} keyboardShouldPersistTaps="handled">
       <View style={s.hero}>
         <Text style={s.h1}>{session ? `Merhaba, ${name}.` : 'Al, sat, kirala. İşini paylaş, fiyat al.'}</Text>
         <Text style={s.lead}>Makine, yedek parça ve işini yapacak hizmeti burada bul.</Text>

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useTabScrollTop } from '../../lib/scrollTop';
 import { ActivityIndicator, FlatList, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { Text, TextInput } from '../../components/LText';
 import { SearchBox } from '../../components/SearchBox';
@@ -25,6 +26,8 @@ const PRICES = [
 type Sheet = null | 'cat' | 'city' | 'price' | 'sort';
 
 export default function Listings() {
+  const scroller = useRef<never>(null);
+  useTabScrollTop('ilanlar', scroller);
   const [cat, setCat] = useState('');
   const [city, setCity] = useState('Tümü');
   const [maxPrice, setMaxPrice] = useState('6000000');
@@ -101,6 +104,7 @@ export default function Listings() {
       <FilterModal visible={advOpen} value={adv} category={cat} part={isPart} onApply={setAdv} onClose={() => setAdvOpen(false)} />
       {error ? <Text style={s.err}>{error}</Text> : null}
       <FlatList
+        ref={scroller}
         data={rows}
         keyExtractor={(r) => r.id}
         onEndReachedThreshold={0.5}

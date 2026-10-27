@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useTabScrollTop } from '../../lib/scrollTop';
 import { ActivityIndicator, FlatList, StyleSheet, View } from 'react-native';
 import { Text } from '../../components/LText';
 import { router } from 'expo-router';
@@ -10,6 +11,8 @@ import { supabase, type Row } from '../../lib/supabase';
 const COLS = 'id,title,price,city,year,listing_photos(path,position)';
 
 export default function Favorites() {
+  const scroller = useRef<never>(null);
+  useTabScrollTop('favoriler', scroller);
   const { session, favs } = useApp();
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(false);
@@ -42,6 +45,7 @@ export default function Favorites() {
     <View style={{ flex: 1, backgroundColor: '#F6F5F3' }}>
       {error ? <Text style={s.err}>{error}</Text> : null}
       <FlatList
+        ref={scroller}
         data={rows}
         keyExtractor={(r) => r.id}
         contentContainerStyle={{ paddingTop: 12 }}

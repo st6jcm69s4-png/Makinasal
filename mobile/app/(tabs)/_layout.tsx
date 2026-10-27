@@ -8,6 +8,7 @@ import { useApp } from '../../lib/AppContext';
 import { tr } from '../../lib/i18n';
 import { useLang } from '../../lib/lang';
 import { supabase } from '../../lib/supabase';
+import { fireScrollTop } from '../../lib/scrollTop';
 
 const icon = (name: IconName) => ({ color, focused }: { color: string; focused: boolean }) => (
   <View style={{ alignItems: 'center' }}>
@@ -44,6 +45,7 @@ export default function TabsLayout() {
   }, [session]);
   return (
     <Tabs
+      screenListeners={({ route }) => ({ tabPress: () => fireScrollTop(route.name) })}
       screenOptions={{
         headerStyle: { backgroundColor: '#25272D', borderBottomWidth: 2, borderBottomColor: '#800020' } as object,
         headerTintColor: '#fff',

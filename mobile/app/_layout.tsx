@@ -31,6 +31,8 @@ function Screens() {
         <Stack.Screen name="ag/firma-kaydi" options={{ title: tr('Firma profilim') }} />
         <Stack.Screen name="ag/envanter" options={{ title: tr('Envanterim') }} />
         <Stack.Screen name="firma/[id]" options={{ title: tr('Firma') }} />
+        <Stack.Screen name="cekici" options={{ title: tr('Çekici') }} />
+        <Stack.Screen name="haklarim" options={{ title: tr('Veri haklarım') }} />
         <Stack.Screen name="yedek-parca" options={{ title: tr('Yedek parça') }} />
         <Stack.Screen name="magaza/[id]" options={{ title: tr('Satıcı') }} />
         <Stack.Screen name="odemelerim" options={{ title: tr('Ödemelerim') }} />

@@ -9,6 +9,8 @@ import { tl, supabase } from '../lib/supabase';
 type L = { id: string; title: string; city: string; price: number; created_at: string };
 type R = { id: string; ticket: number; listing_id: string | null; reason: string };
 type S = { id: string; kind: string; note: string | null; city: string | null; status: string; created_at: string; listing_title: string | null; full_name: string | null; phone: string | null; email: string | null };
+type D = { id: string; kind: string; note: string; status: string; created_at: string; profiles: { full_name: string | null } | { full_name: string | null }[] | null };
+const DKIND: Record<string, string> = { export: 'Verimin kopyası', correct: 'Düzeltme', delete: 'Silme', object: 'İtiraz' };
 const KIND: Record<string, string> = { finans: 'Finansman', nakliye: 'Nakliye', ekspertiz: 'Ekspertiz' };
 
 export default function Admin() {
@@ -17,6 +19,7 @@ export default function Admin() {
   const [ls, setLs] = useState<L[]>([]);
   const [rs, setRs] = useState<R[]>([]);
   const [ss, setSs] = useState<S[]>([]);
+  const [ds, setDs] = useState<D[]>([]);
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
 
@@ -33,10 +36,12 @@ export default function Admin() {
     setError(''); setLs((l.data ?? []) as L[]); setRs((r.data ?? []) as R[]);
     const sr = await supabase.rpc('admin_service_requests');
     if (!sr.error && Array.isArray(sr.data)) setSs(sr.data as S[]);
+    const dr = await supabase.from('data_requests').select('id,kind,note,status,created_at,profiles(full_name)').eq('status', 'open').order('created_at');
+    if (!dr.error) setDs((dr.data ?? []) as unknown as D[]);
   }, []);
   useEffect(() => { if (admin) void load(); }, [admin, load]);
 
-  async function act(table: 'listings' | 'reports' | 'service_requests', id: string, values: Record<string, unknown>) {
+  async function act(table: 'listings' | 'reports' | 'service_requests' | 'data_requests', id: string, values: Record<string, unknown>) {
     if (busy) return;
     setBusy(true); setError('');
     const r = await supabase.from(table).update(values).eq('id', id).select('id').maybeSingle();
@@ -92,6 +97,23 @@ export default function Admin() {
           </View>
         </View>
       ))}
+      <Text style={common.h2}>Veri hakları başvuruları (KVKK, 30 gün)</Text>
+      {ds.length === 0 ? <Text style={common.meta}>Açık başvuru yok.</Text> : null}
+      {ds.map((d) => {
+        const pf = Array.isArray(d.profiles) ? d.profiles[0] : d.profiles;
+        const days = Math.max(0, 30 - Math.floor((Date.now() - new Date(d.created_at).getTime()) / 86400000));
+        return (
+          <View key={d.id} style={common.card}>
+            <Text style={common.title}>{DKIND[d.kind] ?? d.kind} · {pf?.full_name ?? '—'}</Text>
+            {d.note ? <Text>{d.note}</Text> : null}
+            <Text style={common.meta}>{new Date(d.created_at).toLocaleDateString('tr-TR')} · yasal süreye {days} gün kaldı</Text>
+            <View style={{ flexDirection: 'row', gap: 8, marginTop: 6 }}>
+              <View style={{ flex: 1 }}><Btn title="Tamamlandı" disabled={busy} onPress={() => ask('Başvuru tamamlandı olarak işaretlensin mi? İşlemi önce yapmış olmalısın.', () => void act('data_requests', d.id, { status: 'done', handled_at: new Date().toISOString() }))} /></View>
+              <View style={{ flex: 1 }}><Btn ghost title="Reddet" disabled={busy} onPress={() => ask('Başvuru reddedilsin mi? Gerekçeyi kullanıcıya ayrıca bildirmelisin.', () => void act('data_requests', d.id, { status: 'rejected', handled_at: new Date().toISOString() }))} /></View>
+            </View>
+          </View>
+        );
+      })}
     </ScrollView>
   );
 }
