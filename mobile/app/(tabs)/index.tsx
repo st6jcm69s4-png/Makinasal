@@ -8,7 +8,7 @@ import { ListingCard } from '../../components/ListingCard';
 import { Btn, Band, Hatch, Label } from '../../components/ui';
 import { FirmCard, PostCard } from '../../components/NetCards';
 import { Icon, type IconName } from '../../components/Icon';
-import { caps, color, font } from '../../lib/theme';
+import { caps, color, font, radius } from '../../lib/theme';
 import { useLang } from '../../lib/lang';
 import { tr } from '../../lib/i18n';
 import { displayName, firstName } from '../../lib/person';
@@ -17,17 +17,35 @@ import { CATEGORY_GROUPS } from '../../lib/machineryCatalog';
 import { money, type MarketPost, type Provider } from '../../lib/network';
 import { photoUrl, supabase, tl, type Row } from '../../lib/supabase';
 
-// [etiket, simge, git, fotoğraf için tercih edilen kategoriler]
-const QUICK: [string, IconName, () => void, string[]][] = [
-  ['Satılık ilanlar', 'truck', () => router.navigate('/ilanlar'), []],
-  ['Kiralık makineler', 'key', () => router.navigate({ pathname: '/is-agi', params: { kind: 'rental_machine' } }), ['Ekskavatör', 'Yükleyici', 'Dozer']],
-  ['Operatör ve ustalar', 'user-check', () => router.navigate({ pathname: '/is-agi', params: { kind: 'rental_operator' } }), ['Kazıcı', 'Greyder', 'Vinç']],
-  ['İş talepleri', 'clipboard', () => router.navigate({ pathname: '/is-agi', params: { kind: 'job' } }), ['Damperli', 'Kamyon', 'Silindir']],
-  ['Parça talepleri', 'tool', () => router.navigate({ pathname: '/is-agi', params: { kind: 'part_request' } }), ['Yedek parça']],
-  ['Yedek parça', 'settings', () => router.push('/yedek-parca'), ['Lastik', 'Yedek parça']],
-  ['Çekici bul', 'life-buoy', () => router.push('/cekici' as never), ['Çekici', 'Kurtarıcı', 'Tır']],
-  ['Şirketler ve filolar', 'briefcase', () => router.navigate({ pathname: '/is-agi', params: { kind: 'firma' } }), ['Kamyon', 'Tır', 'Dorse']],
+type Tile = { label: string; tag: string; sub: string; icon: IconName; go: () => void; tone: 'navy' | 'accent' | 'paper'; wide?: boolean };
+const QUICK: Tile[] = [
+  { label: 'Satılık ilanlar', tag: 'Satış', sub: 'Makine, kamyon ve parça', icon: 'truck', tone: 'navy', wide: true, go: () => router.navigate('/ilanlar') },
+  { label: 'Kiralık makineler', tag: 'Kiralık', sub: 'Günlük, aylık', icon: 'key', tone: 'paper', go: () => router.navigate({ pathname: '/is-agi', params: { kind: 'rental_machine' } }) },
+  { label: 'Operatör ve ustalar', tag: 'Eleman', sub: 'Şoför, usta, operatör', icon: 'user-check', tone: 'paper', go: () => router.navigate({ pathname: '/is-agi', params: { kind: 'rental_operator' } }) },
+  { label: 'İş talepleri', tag: 'İş', sub: 'Teklif ver, işi al', icon: 'clipboard', tone: 'paper', go: () => router.navigate({ pathname: '/is-agi', params: { kind: 'job' } }) },
+  { label: 'Parça talepleri', tag: 'Talep', sub: 'Aradığın parçayı yaz', icon: 'search', tone: 'paper', go: () => router.navigate({ pathname: '/is-agi', params: { kind: 'part_request' } }) },
+  { label: 'Yedek parça', tag: 'Parça', sub: 'Numaraya göre ara', icon: 'settings', tone: 'navy', go: () => router.push('/yedek-parca') },
+  { label: 'Çekici bul', tag: 'Yol yardım', sub: 'En yakın, puanlı', icon: 'life-buoy', tone: 'accent', go: () => router.push('/cekici' as never) },
+  { label: 'Şirketler ve filolar', tag: 'Firma', sub: 'Hizmet bölgesine göre', icon: 'briefcase', tone: 'paper', wide: true, go: () => router.navigate({ pathname: '/is-agi', params: { kind: 'firma' } }) },
 ];
+function TileCard({ t }: { t: Tile }) {
+  const dark = t.tone !== 'paper';
+  const bg = t.tone === 'navy' ? color.navy : t.tone === 'accent' ? color.accent : color.surface;
+  const ink = dark ? '#fff' : color.ink;
+  const soft = t.tone === 'accent' ? '#F1D5DC' : dark ? color.onNavy : color.muted;
+  return (
+    <Pressable style={({ pressed }) => [s.tile, t.wide ? { width: '100%' } : { width: '48.5%' }, { backgroundColor: bg, borderColor: dark ? bg : color.line }, pressed && { opacity: 0.88 }]} onPress={t.go} accessibilityRole="button">
+      <View style={s.tileMark} pointerEvents="none"><Icon name={t.icon} size={t.wide ? 112 : 92} color={dark ? '#FFFFFF' : color.navy} /></View>
+      <Label style={{ color: soft }}>{t.tag}</Label>
+      <View style={{ flex: 1 }} />
+      <Text style={[s.tileTitle, { color: ink }]} numberOfLines={2}>{t.label}</Text>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+        <Text style={[s.tileSub, { color: soft }]} numberOfLines={1}>{t.sub}</Text>
+        <Icon name="arrow-right" size={14} color={dark ? '#fff' : color.accent} />
+      </View>
+    </Pressable>
+  );
+}
 const STEPS: [string, string][] = [
   ['İhtiyacını paylaş', 'Konumu, tarihleri ve neye ihtiyacın olduğunu belirt.'],
   ['Teklifleri karşılaştır', 'Fiyatı, kapsamı ve şirket profilini birlikte değerlendir.'],
@@ -129,15 +147,6 @@ export default function Home() {
   useFocusEffect(useCallback(() => { void load(); }, [load]));
 
   const search = () => router.navigate({ pathname: '/ilanlar', params: { q: q.trim() } });
-  // Kutu fotoğrafları: kendi ilanlarımızdan, tercih edilen kategoriye göre; aynı fotoğraf iki kez kullanılmaz.
-  const tilePhotos = (() => {
-    const used = new Set<string>();
-    return QUICK.map(([, , , prefs]) => {
-      const hit = pool.find((x) => !used.has(x.url) && prefs.some((p) => x.category.toLocaleLowerCase('tr-TR').includes(p.toLocaleLowerCase('tr-TR')))) ?? pool.find((x) => !used.has(x.url));
-      if (hit) used.add(hit.url);
-      return hit?.url ?? '';
-    });
-  })();
   const spot = featured.find((r) => r.listing_photos?.length) ?? null;
   const name = firstName(displayName(session, pname));
   return (
@@ -165,15 +174,7 @@ export default function Home() {
       ) : null}
       <Band title="Hızlı keşfet" />
       <View style={s.grid}>
-        {QUICK.map(([label, icon, go], i) => (
-          <Pressable key={label} style={({ pressed }) => [s.tile, pressed && { opacity: 0.85 }]} onPress={go} accessibilityRole="button">
-            {tilePhotos[i] ? <Image source={{ uri: tilePhotos[i] }} style={s.tilePhoto} /> : <View style={[s.tilePhoto, s.tileBlank]}><Icon name={icon} size={30} color={color.onNavy} /></View>}
-            <View style={s.tilePlate}>
-              <Icon name={icon} size={17} color="#fff" />
-              <Text style={s.tileText} numberOfLines={2}>{label}</Text>
-            </View>
-          </Pressable>
-        ))}
+        {QUICK.map((t) => <TileCard key={t.label} t={t} />)}
       </View>
 
       {cats.length ? (
@@ -260,12 +261,11 @@ const s = StyleSheet.create({
   goText: { color: '#fff', fontWeight: '700' },
   link: { color: '#fff', fontWeight: '600', textDecorationLine: 'underline' },
   h2b: { fontSize: 18, fontWeight: '700', color: color.ink },
-  grid: { flexDirection: 'row', flexWrap: 'wrap', marginHorizontal: 12, borderLeftWidth: 1, borderTopWidth: 1, borderColor: color.line, backgroundColor: color.surface },
-  tile: { width: '50%', borderRightWidth: 1, borderBottomWidth: 1, borderColor: color.line, backgroundColor: color.surface },
-  tilePhoto: { width: '100%', height: 92, backgroundColor: color.plate },
-  tileBlank: { backgroundColor: color.navy2, alignItems: 'center', justifyContent: 'center' },
-  tilePlate: { backgroundColor: color.navy, flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 10, minHeight: 46, borderTopWidth: 2, borderTopColor: color.accent },
-  tileText: { flex: 1, color: '#fff', fontWeight: '600', fontSize: 15, lineHeight: 18 },
+  grid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', rowGap: 10, marginHorizontal: 12 },
+  tile: { minHeight: 118, padding: 12, borderWidth: 1, overflow: 'hidden', borderRadius: radius },
+  tileMark: { position: 'absolute', right: -14, bottom: -18, opacity: 0.11 },
+  tileTitle: { fontFamily: font.bold, fontSize: 19, lineHeight: 21 },
+  tileSub: { fontSize: 13.5, flexShrink: 1 },
   cat: { backgroundColor: color.surface, borderRadius: 4, paddingVertical: 9, paddingHorizontal: 14, borderWidth: 1, borderColor: color.line },
   catText: { color: color.ink, fontWeight: '500' },
   card: { backgroundColor: color.surface, marginHorizontal: 12, marginBottom: 8, padding: 12, borderRadius: 4, gap: 4, borderWidth: 1, borderColor: color.line },

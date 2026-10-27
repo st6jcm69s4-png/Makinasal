@@ -16,7 +16,18 @@ function Screens() {
   return (
     <>
       <StatusBar style="light" />
-      <Stack screenOptions={{ headerStyle: { backgroundColor: '#25272D' }, headerTintColor: '#fff', headerTitleStyle: { fontFamily: fontState.ok ? 'BarlowCondensed_700Bold' : undefined, fontSize: 22, letterSpacing: 0.8 }, headerShadowVisible: false, headerLeft: () => <HeaderBack />, contentStyle: { backgroundColor: '#F6F5F3' } }}>
+      <Stack
+        screenOptions={({ navigation }) => ({
+          headerStyle: { backgroundColor: '#25272D' },
+          headerTintColor: '#fff',
+          headerTitleStyle: { fontFamily: fontState.ok ? 'BarlowCondensed_700Bold' : undefined, fontSize: 22, letterSpacing: 0.8 },
+          headerShadowVisible: false,
+          // Her uygulamadaki gibi: sistemin kendi geri oku. Geçmiş yoksa (bağlantıyla açılınca) ana sayfaya dönen düğme.
+          headerBackButtonDisplayMode: 'minimal',
+          headerLeft: navigation.canGoBack() ? undefined : () => <HeaderBack />,
+          contentStyle: { backgroundColor: '#F6F5F3' },
+        })}
+      >
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="ilan/[id]" options={{ title: T('İlan') }} />
         <Stack.Screen name="ilan-ver" options={{ title: T('İlan ver') }} />

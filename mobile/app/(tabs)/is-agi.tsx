@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, FlatList, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, FlatList, Modal, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { PlainText, Text, TextInput } from '../../components/LText';
 import { Icon, type IconName } from '../../components/Icon';
 import { router, useLocalSearchParams } from 'expo-router';
 import { PickerModal } from '../../components/PickerModal';
 import { Btn, Chip } from '../../components/ui';
 import { FirmCard, PostCard } from '../../components/NetCards';
+import { NetAccountView } from '../../components/NetAccountView';
 import { CITIES } from '../../lib/data';
 import { dateLabel, money, networkError, PERSONNEL_ROLES, PROVIDER_KINDS, RENTAL_MODES, type MarketPost, type PostKind, type Provider } from '../../lib/network';
 import { useTabScrollTop } from '../../lib/scrollTop';
@@ -35,6 +36,7 @@ export default function NetworkTab() {
   const [q, setQ] = useState('');
   const [role, setRole] = useState('');
   const [sheet, setSheet] = useState(false);
+  const [acct, setAcct] = useState(false);
   const [posts, setPosts] = useState<MarketPost[]>([]);
   const [providers, setProviders] = useState<Provider[]>([]);
   const [page, setPage] = useState(0);
@@ -111,7 +113,7 @@ export default function NetworkTab() {
         </View>
         <View style={{ flexDirection: 'row', gap: 8 }}>
           <View style={{ flex: 3 }}><Btn title={tab === 'firma' ? 'Firma profilim' : section.cta[0]} onPress={create} /></View>
-          <View style={{ flex: 2 }}><Btn ghost title="Hesabım" onPress={() => router.push('/ag/hesabim')} /></View>
+          <View style={{ flex: 2 }}><Btn ghost title="Hesabım" onPress={() => setAcct(true)} /></View>
         </View>
         {error ? <Text style={s.err}>{error}</Text> : null}
       </View>
@@ -131,12 +133,24 @@ export default function NetworkTab() {
         ListFooterComponent={loading ? <ActivityIndicator style={{ margin: 16 }} /> : more ? <View style={{ padding: 12 }}><Btn ghost title="Daha fazla yükle" onPress={() => void load(page + 1)} /></View> : null}
         renderItem={({ item }) => 'user_id' in item ? <FirmCard p={item} /> : <PostCard p={item} />}
       />
+      <Modal visible={acct} animationType="slide" presentationStyle="pageSheet" onRequestClose={() => setAcct(false)}>
+        <View style={{ flex: 1, backgroundColor: color.navy }}>
+          <View style={s.sheetBar}>
+            <View />
+            <Pressable onPress={() => setAcct(false)} hitSlop={10} accessibilityRole="button" accessibilityLabel="Kapat" style={s.sheetClose}><Icon name="x" size={20} color="#fff" /></Pressable>
+          </View>
+          <NetAccountView embedded onNavigate={() => setAcct(false)} />
+        </View>
+      </Modal>
       <PickerModal visible={sheet} title="İl" selected={city} options={[{ value: '', label: 'Tüm iller' }, ...CITIES.map((c) => ({ value: c, label: c }))]} onPick={setCity} onClose={() => setSheet(false)} />
     </View>
   );
 }
 
 const s = StyleSheet.create({
+  sheetBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 10 },
+  sheetTitle: { color: '#fff', fontFamily: font.labelBold, fontSize: 18, letterSpacing: 1 },
+  sheetClose: { width: 34, height: 34, borderRadius: 17, backgroundColor: 'rgba(255,255,255,0.14)', alignItems: 'center', justifyContent: 'center' },
   switch: { flexDirection: 'row', backgroundColor: color.surface, borderBottomWidth: 1, borderBottomColor: color.line },
   seg: { flex: 1, paddingVertical: 10, paddingHorizontal: 8, gap: 2, alignItems: 'flex-start', borderTopWidth: 3, borderTopColor: 'transparent' },
   segL: { borderLeftWidth: 1, borderLeftColor: color.line },
