@@ -4,7 +4,7 @@ import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { PlainText, Text, TextInput } from '../../components/LText';
 import { router, useFocusEffect } from 'expo-router';
 import { Icon, type IconName } from '../../components/Icon';
-import { Btn, Field } from '../../components/ui';
+import { Btn, Field, Label } from '../../components/ui';
 import { Group, type Item } from '../../components/Rows';
 import { color, font, radius } from '../../lib/theme';
 import { displayName, initials } from '../../lib/person';

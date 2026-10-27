@@ -91,7 +91,7 @@ export default function Thread() {
           const mine = item.sender_id === me;
           return (
             <View style={[s.bubble, mine ? s.mine : s.theirs, item.kind === 'offer' && s.offer]}>
-              {item.kind === 'offer' ? <Text style={mine ? s.mineText : s.theirsText}>💰 Teklif</Text> : null}
+              {item.kind === 'offer' ? <Text style={mine ? s.mineText : s.theirsText}>Teklif</Text> : null}
               <Text style={mine ? s.mineText : s.theirsText}>{item.body}</Text>
             </View>
           );

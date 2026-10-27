@@ -1,25 +1,39 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, FlatList, Pressable, ScrollView, StyleSheet, View } from 'react-native';
-import { Text, TextInput } from '../../components/LText';
+import { PlainText, Text, TextInput } from '../../components/LText';
+import { Icon, type IconName } from '../../components/Icon';
 import { router, useLocalSearchParams } from 'expo-router';
 import { PickerModal } from '../../components/PickerModal';
-import { Btn, Chip, common } from '../../components/ui';
+import { Btn, Chip, Label } from '../../components/ui';
 import { CITIES } from '../../lib/data';
-import { dateLabel, money, networkError, POST_KINDS, PROVIDER_KINDS, RENTAL_MODES, type MarketPost, type PostKind, type Provider } from '../../lib/network';
+import { dateLabel, money, networkError, PERSONNEL_ROLES, PROVIDER_KINDS, RENTAL_MODES, type MarketPost, type PostKind, type Provider } from '../../lib/network';
+import { useTabScrollTop } from '../../lib/scrollTop';
 import { supabase } from '../../lib/supabase';
+import { color, font, radius } from '../../lib/theme';
 
 type Tab = PostKind | 'firma';
-const TABS: [Tab, string][] = [['rental_machine', 'Kiralık'], ['rental_operator', 'Operatör / usta'], ['job', 'İşler'], ['part_request', 'Parça talepleri'], ['firma', 'Firmalar']];
+type Section = 'seek' | 'hire' | 'market';
+const SECTIONS: { id: Section; icon: IconName; title: string; sub: string; tabs: [Tab, string][]; cta: [string, string] }[] = [
+  { id: 'seek', icon: 'search', title: 'İş arıyorum', sub: 'Açık pozisyonlar', tabs: [['staff_wanted', 'Eleman ilanları']], cta: ['Kendimi tanıt: hizmet ilanı ver', 'rental_operator'] },
+  { id: 'hire', icon: 'users', title: 'Eleman arıyorum', sub: 'Operatör, şoför, usta', tabs: [['rental_operator', 'Hazır elemanlar']], cta: ['Eleman ilanı ver', 'staff_wanted'] },
+  { id: 'market', icon: 'truck', title: 'Makine ve iş', sub: 'Kiralık, iş, parça', tabs: [['rental_machine', 'Kiralık'], ['job', 'İşler'], ['part_request', 'Parça talepleri'], ['firma', 'Firmalar']], cta: ['İlan ver', ''] },
+];
+const sectionOf = (t: Tab): Section => (t === 'staff_wanted' ? 'seek' : t === 'rental_operator' ? 'hire' : 'market');
 const PAGE = 20;
+const ROLE_ICON: Record<string, IconName> = { operator: 'settings', driver: 'truck', mechanic: 'tool' };
 
 export default function NetworkTab() {
   const { kind } = useLocalSearchParams<{ kind?: string }>();
+  const scroller = useRef<never>(null);
+  useTabScrollTop('is-agi', scroller);
   const [tab, setTab] = useState<Tab>('rental_machine');
   useEffect(() => {
-    if (kind && TABS.some(([k]) => k === kind)) { setPosts([]); setProviders([]); setTab(kind as Tab); }
+    const all: string[] = ['rental_machine', 'rental_operator', 'job', 'part_request', 'staff_wanted', 'firma'];
+    if (kind && all.includes(kind)) { setPosts([]); setProviders([]); setTab(kind as Tab); }
   }, [kind]);
   const [city, setCity] = useState('');
   const [q, setQ] = useState('');
+  const [role, setRole] = useState('');
   const [sheet, setSheet] = useState(false);
   const [posts, setPosts] = useState<MarketPost[]>([]);
   const [providers, setProviders] = useState<Provider[]>([]);
@@ -27,6 +41,8 @@ export default function NetworkTab() {
   const [more, setMore] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const section = SECTIONS.find((x) => x.id === sectionOf(tab))!;
+  const personnel = tab === 'staff_wanted' || tab === 'rental_operator';
 
   const load = useCallback(async (p: number) => {
     setLoading(true); setError('');
@@ -45,6 +61,7 @@ export default function NetworkTab() {
       let query = supabase.from('market_posts').select('*').eq('status', 'open').eq('kind', tab).order('created_at', { ascending: false }).range(p * PAGE, (p + 1) * PAGE);
       if (city) query = query.eq('city', city);
       if (term) query = query.ilike('title', `%${term}%`);
+      if (personnel && role) query = query.eq('personnel_role', role);
       const r = await query;
       setLoading(false);
       if (r.error) { setError(networkError(r.error)); return; }
@@ -52,56 +69,148 @@ export default function NetworkTab() {
       setMore(rows.length > PAGE); setPage(p);
       setPosts((cur) => (p === 0 ? rows.slice(0, PAGE) : [...cur, ...rows.slice(0, PAGE)]));
     }
-  }, [tab, city, q]);
+  }, [tab, city, q, role, personnel]);
   useEffect(() => { const t = setTimeout(() => void load(0), 300); return () => clearTimeout(t); }, [load]);
 
+  const go = (t: Tab) => { setPosts([]); setProviders([]); setRole(''); setTab(t); };
+  const create = () => router.push(tab === 'firma' ? '/ag/firma-kaydi' : (`/ag/yeni?kind=${section.cta[1] || tab}` as never));
+
   const header = (
-    <View style={{ gap: 8, padding: 12 }}>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
-        {TABS.map(([k, l]) => <Chip key={k} title={l} on={tab === k} onPress={() => { setPosts([]); setProviders([]); setTab(k); }} />)}
-      </ScrollView>
-      <TextInput style={s.input} placeholder={tab === 'firma' ? 'Firma ara' : 'İlan ara'} value={q} onChangeText={setQ} />
-      <View style={{ flexDirection: 'row', gap: 8 }}>
-        <View style={{ flex: 1 }}><Chip title={city || 'Tüm iller'} on={!!city} onPress={() => setSheet(true)} /></View>
+    <View>
+      <View style={s.switch}>
+        {SECTIONS.map((x, i) => {
+          const on = x.id === section.id;
+          return (
+            <Pressable key={x.id} style={[s.seg, i > 0 && s.segL, on && s.segOn]} onPress={() => go(x.tabs[0][0])} accessibilityRole="button" accessibilityState={{ selected: on }}>
+              <Icon name={x.icon} size={19} color={on ? '#fff' : color.accent} />
+              <Text style={[s.segTitle, on && { color: '#fff' }]}>{x.title}</Text>
+              <Text style={[s.segSub, on && { color: color.onNavy }]} numberOfLines={1}>{x.sub}</Text>
+            </Pressable>
+          );
+        })}
       </View>
-      <View style={{ flexDirection: 'row', gap: 8 }}>
-        <View style={{ flex: 1 }}><Btn title={tab === 'firma' ? 'Firma profilim' : 'İlan ver'} onPress={() => router.push(tab === 'firma' ? '/ag/firma-kaydi' : (`/ag/yeni?kind=${tab}` as never))} /></View>
-        <View style={{ flex: 1 }}><Btn ghost title="İş ağı hesabım" onPress={() => router.push('/ag/hesabim')} /></View>
+      <View style={{ gap: 10, padding: 12 }}>
+        {section.tabs.length > 1 ? (
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
+            {section.tabs.map(([k, l]) => <Chip key={k} title={l} on={tab === k} onPress={() => go(k)} />)}
+          </ScrollView>
+        ) : null}
+        {personnel ? (
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
+            <Chip title="Tümü" on={!role} onPress={() => setRole('')} />
+            {Object.entries(PERSONNEL_ROLES).map(([k, l]) => <Chip key={k} title={l} on={role === k} onPress={() => setRole(k)} />)}
+          </ScrollView>
+        ) : null}
+        <View style={s.searchRow}>
+          <Icon name="search" size={18} color={color.muted} />
+          <TextInput style={s.input} placeholder={tab === 'firma' ? 'Firma ara' : tab === 'staff_wanted' ? 'Pozisyon ara' : 'İlan ara'} placeholderTextColor="#9A949A" value={q} onChangeText={setQ} />
+          <Pressable style={s.cityBtn} onPress={() => setSheet(true)} accessibilityRole="button">
+            <Icon name="map-pin" size={15} color={city ? color.accent : color.muted} />
+            <Text style={[s.cityText, city && { color: color.accent, fontWeight: '700' }]} numberOfLines={1}>{city || 'Tüm iller'}</Text>
+          </Pressable>
+        </View>
+        <View style={{ flexDirection: 'row', gap: 8 }}>
+          <View style={{ flex: 3 }}><Btn title={tab === 'firma' ? 'Firma profilim' : section.cta[0]} onPress={create} /></View>
+          <View style={{ flex: 2 }}><Btn ghost title="Hesabım" onPress={() => router.push('/ag/hesabim')} /></View>
+        </View>
+        {error ? <Text style={s.err}>{error}</Text> : null}
       </View>
-      {error ? <Text style={common.err}>{error}</Text> : null}
     </View>
   );
 
+  const empty = tab === 'firma' ? 'Firma bulunamadı.' : tab === 'staff_wanted' ? 'Şu an açık eleman ilanı yok.' : tab === 'rental_operator' ? 'Bu filtreye uygun eleman bulunamadı.' : 'İlan bulunamadı.';
   return (
-    <View style={common.screen}>
+    <View style={{ flex: 1, backgroundColor: color.bg }}>
       <FlatList<MarketPost | Provider>
+        ref={scroller}
         data={tab === 'firma' ? providers : posts}
         keyExtractor={(i) => ('user_id' in i ? i.user_id : i.id)}
         ListHeaderComponent={header}
         contentContainerStyle={{ paddingBottom: 24 }}
-        ListEmptyComponent={loading ? null : <Text style={common.empty}>{tab === 'firma' ? 'Firma bulunamadı.' : 'İlan bulunamadı.'}</Text>}
+        ListEmptyComponent={loading ? null : <Text style={s.empty}>{empty}</Text>}
         ListFooterComponent={loading ? <ActivityIndicator style={{ margin: 16 }} /> : more ? <View style={{ padding: 12 }}><Btn ghost title="Daha fazla yükle" onPress={() => void load(page + 1)} /></View> : null}
-        renderItem={({ item }) => 'user_id' in item ? (
-          <Pressable style={[common.card, s.item]} onPress={() => router.push(`/firma/${item.user_id}`)} accessibilityRole="button">
-            <Text style={common.title}>{item.name}</Text>
-            <Text style={common.meta}>{item.company_category ?? PROVIDER_KINDS[item.kind]} · {item.city}</Text>
-            <Text numberOfLines={2}>{item.description}</Text>
-          </Pressable>
-        ) : (
-          <Pressable style={[common.card, s.item]} onPress={() => router.push(`/ag/ilan/${item.id}`)} accessibilityRole="button">
-            <Text style={common.title}>{item.title}</Text>
-            <Text style={common.meta}>
-              {[item.category, item.city, item.rental_mode ? RENTAL_MODES[item.rental_mode as keyof typeof RENTAL_MODES] : '', item.start_date ? dateLabel(item.start_date) : ''].filter(Boolean).join(' · ')}
-            </Text>
-            <Text style={common.price}>{money(item.price, item.price_unit)}</Text>
-          </Pressable>
-        )}
+        renderItem={({ item }) => 'user_id' in item ? <FirmCard p={item} /> : <PostCard p={item} />}
       />
       <PickerModal visible={sheet} title="İl" selected={city} options={[{ value: '', label: 'Tüm iller' }, ...CITIES.map((c) => ({ value: c, label: c }))]} onPick={setCity} onClose={() => setSheet(false)} />
     </View>
   );
 }
+
+function Cell({ label, value, flex = 1, left }: { label: string; value: string; flex?: number; left?: boolean }) {
+  return (
+    <View style={[s.cell, { flex }, left && s.cellL]}>
+      <Label>{label}</Label>
+      <Text style={s.val} numberOfLines={1}>{value || '–'}</Text>
+    </View>
+  );
+}
+
+function PostCard({ p }: { p: MarketPost }) {
+  const fresh = Date.now() - new Date(p.created_at).getTime() < 3 * 86400000;
+  const who = p.personnel_role ? PERSONNEL_ROLES[p.personnel_role as keyof typeof PERSONNEL_ROLES] : p.rental_mode ? RENTAL_MODES[p.rental_mode as keyof typeof RENTAL_MODES] : p.category;
+  const isStaff = p.kind === 'staff_wanted';
+  return (
+    <Pressable style={({ pressed }) => [s.card, pressed && { opacity: 0.85 }]} onPress={() => router.push(`/ag/ilan/${p.id}` as never)} accessibilityRole="button">
+      <View style={s.cardTop}>
+        {p.personnel_role ? <View style={s.roleIcon}><Icon name={ROLE_ICON[p.personnel_role] ?? 'user'} size={22} color={color.accent} /></View> : null}
+        <View style={{ flex: 1, gap: 4 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+            <Label style={{ color: color.accent }}>{who}</Label>
+            {fresh ? <View style={s.fresh}><Text style={s.freshText}>YENİ</Text></View> : null}
+          </View>
+          <Text style={s.title} numberOfLines={2}>{p.title}</Text>
+        </View>
+      </View>
+      <View style={s.strip}>
+        <Cell label="İl" value={p.city} />
+        <Cell label={p.start_date ? 'Başlangıç' : 'Yayın'} value={p.start_date ? dateLabel(p.start_date) : new Date(p.created_at).toLocaleDateString('tr-TR')} left />
+        <Cell label={isStaff ? 'Ücret' : 'Bütçe'} value={p.price == null ? 'Belirtilmedi' : money(p.price, p.price_unit).replace(' toplam', '')} flex={1.4} left />
+      </View>
+    </Pressable>
+  );
+}
+function FirmCard({ p }: { p: Provider }) {
+  return (
+    <Pressable style={({ pressed }) => [s.card, pressed && { opacity: 0.85 }]} onPress={() => router.push(`/firma/${p.user_id}` as never)} accessibilityRole="button">
+      <View style={s.cardTop}>
+        <View style={s.roleIcon}><Icon name={p.kind === 'tow' ? 'life-buoy' : 'briefcase'} size={22} color={color.accent} /></View>
+        <View style={{ flex: 1, gap: 4 }}>
+          <Label style={{ color: color.accent }}>{p.company_category ?? PROVIDER_KINDS[p.kind]}</Label>
+          <Text style={s.title} numberOfLines={2}>{p.name}</Text>
+          <Text style={s.desc} numberOfLines={2}>{p.description}</Text>
+        </View>
+      </View>
+      <View style={s.strip}>
+        <Cell label="İl" value={p.city} />
+        <Cell label="Hizmet bölgesi" value={`${p.service_cities.length} il`} left />
+        <Cell label="İş alanı" value={p.specialties[0] ?? ''} flex={1.4} left />
+      </View>
+    </Pressable>
+  );
+}
+
 const s = StyleSheet.create({
-  input: { padding: 12, backgroundColor: '#fff', borderRadius: 4, borderWidth: 1, borderColor: '#DDD9DC' },
-  item: { marginHorizontal: 12, marginBottom: 8 },
+  switch: { flexDirection: 'row', backgroundColor: color.surface, borderBottomWidth: 1, borderBottomColor: color.line },
+  seg: { flex: 1, paddingVertical: 10, paddingHorizontal: 8, gap: 2, alignItems: 'flex-start', borderTopWidth: 3, borderTopColor: 'transparent' },
+  segL: { borderLeftWidth: 1, borderLeftColor: color.line },
+  segOn: { backgroundColor: color.navy, borderTopColor: color.accent },
+  segTitle: { fontSize: 15, fontFamily: font.bold, color: color.ink, marginTop: 2 },
+  segSub: { fontSize: 12, color: color.muted },
+  searchRow: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: color.surface, borderWidth: 1, borderColor: color.line, borderRadius: radius, paddingLeft: 10 },
+  input: { flex: 1, paddingVertical: 11, fontSize: 16, color: color.ink },
+  cityBtn: { flexDirection: 'row', alignItems: 'center', gap: 4, maxWidth: 120, minHeight: 44, paddingHorizontal: 10, borderLeftWidth: 1, borderLeftColor: color.line },
+  cityText: { color: color.muted, fontSize: 14, flexShrink: 1 },
+  err: { color: color.bad },
+  empty: { textAlign: 'center', color: color.muted, margin: 24 },
+  card: { marginHorizontal: 12, marginBottom: 10, backgroundColor: color.surface, borderWidth: 1, borderColor: color.line, borderRadius: radius, overflow: 'hidden' },
+  cardTop: { flexDirection: 'row', gap: 12, padding: 12, alignItems: 'flex-start' },
+  roleIcon: { width: 44, height: 44, borderRadius: radius, backgroundColor: color.accentSoft, alignItems: 'center', justifyContent: 'center' },
+  title: { fontSize: 17, fontWeight: '600', color: color.ink },
+  desc: { color: color.muted, fontSize: 14 },
+  fresh: { backgroundColor: color.accent, paddingHorizontal: 6, paddingVertical: 1, borderRadius: 2 },
+  freshText: { color: '#fff', fontSize: 10.5, fontWeight: '700', letterSpacing: 0.6 },
+  strip: { flexDirection: 'row', borderTopWidth: 1, borderTopColor: color.line },
+  cell: { paddingVertical: 7, paddingHorizontal: 12, gap: 1 },
+  cellL: { borderLeftWidth: 1, borderLeftColor: color.line },
+  val: { fontSize: 15, color: color.ink, fontWeight: '500' },
 });

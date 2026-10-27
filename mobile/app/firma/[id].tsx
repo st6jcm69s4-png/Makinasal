@@ -1,13 +1,16 @@
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, View } from 'react-native';
+import { ActivityIndicator, Alert, Linking, Pressable, ScrollView, View } from 'react-native';
 import { Text } from '../../components/LText';
 import { router, useLocalSearchParams } from 'expo-router';
-import { common } from '../../components/ui';
+import { Btn, common } from '../../components/ui';
+import { useApp } from '../../lib/AppContext';
 import { dateLabel, EQUIPMENT_STATUS, money, PROVIDER_KINDS, type MarketPost, type Provider } from '../../lib/network';
 import { supabase, type Row } from '../../lib/supabase';
 
 export default function ProviderDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
+  const { session } = useApp();
+  const [stat, setStat] = useState<{ score: number; n: number } | null>(null);
   const [p, setP] = useState<Provider | null>(null);
   const [posts, setPosts] = useState<MarketPost[]>([]);
   const [inv, setInv] = useState<Row[]>([]);
@@ -18,9 +21,16 @@ export default function ProviderDetail() {
       supabase.from('market_posts').select('*').eq('owner_id', id).eq('status', 'open').order('created_at', { ascending: false }).limit(20),
       supabase.from('company_inventory').select('*').eq('owner_id', id).order('created_at', { ascending: false }).limit(50),
     ]).then(([a, b, c]) => {
+      void supabase.from('user_stats').select('score,review_count').eq('id', id).maybeSingle().then((r) => { const d = r.data as { score: number | string; review_count: number | string } | null; if (d && Number(d.review_count) > 0) setStat({ score: Number(d.score), n: Number(d.review_count) }); });
       setP((a.data as Provider) ?? null); setPosts((b.data ?? []) as MarketPost[]); setInv((c.data ?? []) as Row[]); setLoading(false);
     });
   }, [id]);
+  async function call() {
+    if (!session) { Alert.alert('Telefon', 'Numarayı görmek için giriş yapmalısın.', [{ text: 'Vazgeç', style: 'cancel' }, { text: 'Giriş yap', onPress: () => router.navigate('/hesap') }]); return; }
+    const { data, error } = await supabase.rpc('provider_phone', { p_provider: id });
+    if (error || !data) { Alert.alert('Telefon', 'Bu firma telefon numarasını paylaşmıyor.'); return; }
+    void Linking.openURL(`tel:${String(data).replace(/[^\d+]/g, '')}`);
+  }
   if (loading) return <ActivityIndicator style={{ margin: 24 }} />;
   if (!p) return <Text style={common.empty}>Firma bulunamadı veya yayından kaldırıldı.</Text>;
   return (
@@ -28,10 +38,12 @@ export default function ProviderDetail() {
       <View style={common.card}>
         <Text style={{ fontSize: 18, fontWeight: '700' }}>{p.name}</Text>
         <Text style={common.meta}>{p.company_category ?? PROVIDER_KINDS[p.kind]} · {[p.city, p.district].filter(Boolean).join(' / ')}</Text>
+        {stat ? <Text style={{ color: '#800020', fontWeight: '700' }}>★ {stat.score.toFixed(1)} · {stat.n} değerlendirme</Text> : null}
         <Text style={{ marginTop: 6 }}>{p.description}</Text>
         <Text style={{ marginTop: 6 }}><Text style={{ fontWeight: '600' }}>Hizmet illeri: </Text>{p.service_cities.join(', ')}</Text>
         <Text><Text style={{ fontWeight: '600' }}>İş alanları: </Text>{p.specialties.join(', ')}</Text>
       </View>
+      <Btn title="Telefonla ara" onPress={() => void call()} />
       {inv.length ? <Text style={common.h2}>Envanter</Text> : null}
       {inv.map((i) => (
         <View key={String(i.id)} style={common.card}>

@@ -1,5 +1,5 @@
 // Web lib/network.ts içindeki sabitler ve yardımcılar (mobil kopya).
-export const POST_KINDS = { rental_machine: 'Kiralık makine / kamyon', rental_operator: 'Operatör ve ustalar', job: 'İş talepleri', part_request: 'Parça talepleri' } as const;
+export const POST_KINDS = { rental_machine: 'Kiralık makine / kamyon', rental_operator: 'Operatör ve ustalar', job: 'İş talepleri', part_request: 'Parça talepleri', staff_wanted: 'Eleman ilanı' } as const;
 export type PostKind = keyof typeof POST_KINDS;
 export const PERSONNEL_ROLES = { operator: 'Operatör', driver: 'Kamyon / tır şoförü', mechanic: 'Usta / servis' } as const;
 export const RENTAL_MODES = { with_operator: 'Operatörlü / şoförlü', machine_only: 'Sadece makine / araç' } as const;

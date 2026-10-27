@@ -98,21 +98,21 @@ export default function PostDetail() {
         </View>
       ) : null}
 
-      {!uid ? <Btn title="Teklif vermek için giriş yap" onPress={() => router.push('/(tabs)/hesap')} /> : null}
+      {!uid ? <Btn title={post.kind === 'staff_wanted' ? 'Başvurmak için giriş yap' : 'Teklif vermek için giriş yap'} onPress={() => router.push('/(tabs)/hesap')} /> : null}
 
       {uid && !isOwner && post.status === 'open' && !selected ? (
         <View style={[common.card, { gap: 10 }]}>
-          <Text style={common.h2}>{mine ? 'Teklifini güncelle' : 'Teklif ver'}</Text>
-          <Field label="Teklif veren (firma / kişi adı)" value={name} onChangeText={setName} />
-          <Field label="Tutar (₺)" value={amount} onChangeText={setAmount} keyboardType="decimal-pad" />
+          <Text style={common.h2}>{post.kind === 'staff_wanted' ? (mine ? 'Başvurunu güncelle' : 'Başvur') : mine ? 'Teklifini güncelle' : 'Teklif ver'}</Text>
+          <Field label={post.kind === 'staff_wanted' ? 'Ad soyad' : 'Teklif veren (firma / kişi adı)'} value={name} onChangeText={setName} />
+          <Field label={post.kind === 'staff_wanted' ? 'Talep ettiğin ücret (₺)' : 'Tutar (₺)'} value={amount} onChangeText={setAmount} keyboardType="decimal-pad" />
           <Select label="Birim" value={unit} onPress={() => setUnitSheet(true)} />
-          <Field label="Not" value={note} onChangeText={setNote} multiline />
-          <Btn title={mine ? 'Teklifi güncelle' : 'Teklifi gönder'} onPress={() => void submitQuote()} disabled={busy} />
+          <Field label={post.kind === 'staff_wanted' ? 'Kendini tanıt (deneyim, belgeler)' : 'Not'} value={note} onChangeText={setNote} multiline />
+          <Btn title={post.kind === 'staff_wanted' ? (mine ? 'Başvuruyu güncelle' : 'Başvuruyu gönder') : mine ? 'Teklifi güncelle' : 'Teklifi gönder'} onPress={() => void submitQuote()} disabled={busy} />
           <PickerModal visible={unitSheet} title="Birim" selected={unit} options={UNITS.map((u) => ({ value: u, label: u }))} onPick={setUnit} onClose={() => setUnitSheet(false)} />
         </View>
       ) : null}
 
-      {uid && quotes.length ? <Text style={common.h2}>{isOwner ? 'Gelen teklifler' : 'Teklifin'}</Text> : null}
+      {uid && quotes.length ? <Text style={common.h2}>{isOwner ? post.kind === 'staff_wanted' ? 'Gelen başvurular' : 'Gelen teklifler' : 'Teklifin'}</Text> : null}
       {quotes.map((q) => (
         <View key={q.id} style={common.card}>
           <Text style={common.title}>{q.display_name}</Text>
