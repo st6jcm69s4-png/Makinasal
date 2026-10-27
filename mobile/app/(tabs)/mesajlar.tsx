@@ -1,4 +1,5 @@
 import { useCallback, useRef, useState } from 'react';
+import { GuestGate } from '../../components/LoginPrompt';
 import { ActivityIndicator, FlatList, Image, Pressable, RefreshControl, StyleSheet, View } from 'react-native';
 import { PlainText, Text, TextInput } from '../../components/LText';
 import { Icon } from '../../components/Icon';
@@ -87,12 +88,7 @@ export default function Messages() {
 
   if (!session) {
     return (
-      <View style={s.center}>
-        <Icon name="message-square" size={34} color={color.accent} />
-        <Text style={s.emptyT}>Mesajların burada görünür</Text>
-        <Text style={s.emptyS}>Alıcı ve satıcılarla yazışmak, teklifleri takip etmek için giriş yap.</Text>
-        <Btn title="Giriş yap" onPress={() => router.navigate('/hesap')} />
-      </View>
+      <GuestGate icon="message-square" text="Satıcı ve alıcılarla yazışmak, teklifleri takip etmek için giriş yap." />
     );
   }
   if (threads === null) return <RowSkeleton count={6} />;

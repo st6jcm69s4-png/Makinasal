@@ -1,4 +1,5 @@
 import { useCallback, useState } from 'react';
+import { GuestGate } from '../components/LoginPrompt';
 import { ActivityIndicator, Alert, FlatList, Pressable, StyleSheet, View } from 'react-native';
 import { Text } from '../components/LText';
 import { router, useFocusEffect } from 'expo-router';
@@ -24,7 +25,7 @@ export default function SavedSearches() {
   }, [uid]);
   useFocusEffect(useCallback(() => { void load(); }, [load]));
 
-  if (!session) return <Text style={s.msg}>Kayıtlı aramalarını görmek için giriş yap.</Text>;
+  if (!session) return <GuestGate icon="bookmark" text="Kayıtlı aramalarını görmek için giriş yap." />;
   if (rows === null) return <ActivityIndicator style={{ margin: 32 }} />;
   return (
     <FlatList

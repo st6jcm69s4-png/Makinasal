@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { GuestGate } from './LoginPrompt';
 import { Pressable, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
 import { PlainText, Text } from './LText';
 import { Icon, type IconName } from './Icon';
@@ -45,7 +46,7 @@ export function NetAccountView({ onNavigate, embedded }: { onNavigate?: () => vo
     if (onNavigate) { onNavigate(); setTimeout(() => router.push(path as never), 380); } else router.push(path as never);
   };
   const [refreshing, setRefreshing] = useState(false);
-  if (!session) return <Text style={s.empty}>Önce Hesabım sekmesinden giriş yap.</Text>;
+  if (!session) return <GuestGate icon="briefcase" text="İş ağı hesabını görmek için giriş yap." />;
   if (loading) return <RowSkeleton count={4} />;
 
   const open = posts.filter((x) => x.status === 'open').length;

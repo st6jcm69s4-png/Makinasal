@@ -4,11 +4,13 @@ import { Heart } from './Icon';
 import { Label } from './ui';
 import { router } from 'expo-router';
 import { useApp } from '../lib/AppContext';
+import { useLoginPrompt } from './LoginPrompt';
 import { photoUrl, tl, type Row } from '../lib/supabase';
 import { color, font, radius } from '../lib/theme';
 
 export function ListingCard({ item }: { item: Row }) {
   const { favs, toggleFav } = useApp();
+  const { notify } = useLoginPrompt();
   const photo = [...(item.listing_photos ?? [])].sort((a, b) => a.position - b.position)[0];
   const fav = favs.has(item.id);
   return (
@@ -22,7 +24,7 @@ export function ListingCard({ item }: { item: Row }) {
         <Pressable
           style={s.heart} hitSlop={8} accessibilityRole="button"
           accessibilityLabel={fav ? 'Favorilerden çıkar' : 'Favorilere ekle'}
-          onPress={async () => { const err = await toggleFav(item.id, item.price); if (err) Alert.alert('Favoriler', err); }}
+          onPress={async () => { const err = await toggleFav(item.id, item.price); if (err) notify('Favoriler', err); }}
         >
           <Heart on={fav} size={22} color={fav ? color.accent : color.muted} />
         </Pressable>

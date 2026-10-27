@@ -2,6 +2,7 @@ import { Alert, Pressable, StyleSheet, View } from 'react-native';
 import { Text } from './LText';
 import { Heart, Icon, type IconName } from './Icon';
 import { useApp } from '../lib/AppContext';
+import { useLoginPrompt } from './LoginPrompt';
 import { Label } from './ui';
 import { Badge } from './kit';
 import { router } from 'expo-router';
@@ -21,9 +22,10 @@ function Cell({ label, value, flex = 1, left }: { label: string; value: string; 
 
 function NetHeart({ kind, id }: { kind: 'post' | 'firm'; id: string }) {
   const { netFavs, toggleNetFav } = useApp();
+  const { notify } = useLoginPrompt();
   const on = netFavs.has(`${kind}:${id}`);
   return (
-    <Pressable hitSlop={10} accessibilityRole="button" accessibilityLabel={on ? 'Favorilerden çıkar' : 'Favorilere ekle'} onPress={async () => { const err = await toggleNetFav(kind, id); if (err) Alert.alert('Favoriler', err); }} style={{ padding: 2 }}>
+    <Pressable hitSlop={10} accessibilityRole="button" accessibilityLabel={on ? 'Favorilerden çıkar' : 'Favorilere ekle'} onPress={async () => { const err = await toggleNetFav(kind, id); if (err) notify('Favoriler', err); }} style={{ padding: 2 }}>
       <Heart on={on} size={22} color={on ? color.accent : color.muted} />
     </Pressable>
   );

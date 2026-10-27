@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useLoginPrompt } from '../../components/LoginPrompt';
 import { CardSkeleton } from '../../components/kit';
 import { useTabScrollTop } from '../../lib/scrollTop';
 import { ActivityIndicator, FlatList, Pressable, ScrollView, StyleSheet, View } from 'react-native';
@@ -27,6 +28,7 @@ const PRICES = [
 type Sheet = null | 'cat' | 'city' | 'price' | 'sort';
 
 export default function Listings() {
+  const { askLogin } = useLoginPrompt();
   const scroller = useRef<never>(null);
   useTabScrollTop('ilanlar', scroller);
   const [cat, setCat] = useState('');
@@ -53,7 +55,7 @@ export default function Listings() {
   }, [params.q, params.cat, params.city, params.maxPrice, params.brand, params.n]);
 
   async function saveSearch() {
-    if (!session) { Alert.alert('Aramayı kaydet', 'Aramayı kaydetmek için giriş yapmalısın.'); return; }
+    if (!session) { askLogin('Aramayı kaydedip yeni ilanlardan haberdar olmak için giriş yapman gerekir.'); return; }
     const f = { cat: cat && !cat.startsWith('group:') ? cat : 'Tümü', city, maxPrice: Number(maxPrice), q: q.trim(), brand: adv.brand, unit: adv.unit, useMin: adv.useMin, useMax: adv.useMax, yMin: adv.yMin, yMax: adv.yMax, minScore: adv.minScore, incNew: true, ver: adv.ver, hide: adv.hide, takas: adv.takas, near: adv.near };
     const { error: e } = await supabase.from('saved_searches').insert({ user_id: session.user.id, query: { f } });
     Alert.alert('Aramayı kaydet', e ? 'Arama kaydedilemedi. Tekrar dene.' : 'Arama kaydedildi. Hesabım → Kayıtlı aramalar bölümünden görebilirsin.');

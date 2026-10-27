@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { GuestGate } from '../components/LoginPrompt';
 import { ActivityIndicator, Alert, Image, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Switch, View } from 'react-native';
 import { Text, TextInput } from '../components/LText';
 import * as ImagePicker from 'expo-image-picker';
@@ -157,7 +158,7 @@ export default function NewListing() {
     } finally { setBusy(false); setProgress(''); }
   }
 
-  if (!session) return <Text style={s.msg}>İlan vermek için giriş yap.</Text>;
+  if (!session) return <GuestGate icon="plus-square" text="İlan vermek için giriş yap. Hesabın yoksa web sitesinden ücretsiz kayıt olabilirsin." />;
   if (!loadedEdit) return <ActivityIndicator style={{ margin: 32 }} />;
   const field = (label: string, value: string, set: (v: string) => void, extra: Record<string, unknown> = {}) => (
     <View style={s.field}><Text style={s.label}>{label}</Text><TextInput style={s.input} value={value} onChangeText={set} {...extra} /></View>

@@ -1,4 +1,5 @@
 import { useCallback, useState } from 'react';
+import { GuestGate } from '../components/LoginPrompt';
 import { ActivityIndicator, Alert, FlatList, Image, Pressable, StyleSheet, View } from 'react-native';
 import { Text } from '../components/LText';
 import { router, useFocusEffect } from 'expo-router';
@@ -42,7 +43,7 @@ export default function MyListings() {
     Alert.alert(r.title, text, [{ text: 'Vazgeç', style: 'cancel' }, { text: 'Evet', onPress: () => void patch(r.id, status) }]);
   }
 
-  if (!session) return <Text style={s.msg}>İlanlarını görmek için giriş yap.</Text>;
+  if (!session) return <GuestGate icon="list" text="İlanlarını görmek ve yönetmek için giriş yap." />;
   if (rows === null) return <ActivityIndicator style={{ margin: 32 }} />;
   return (
     <View style={{ flex: 1, backgroundColor: '#F6F5F3' }}>

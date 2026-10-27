@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { GuestGate } from '../components/LoginPrompt';
 import { ActivityIndicator, Pressable, ScrollView } from 'react-native';
 import { Text } from '../components/LText';
 import { Btn, common } from '../components/ui';
@@ -22,7 +23,7 @@ export default function Payments() {
       setLoading(false);
     });
   }, [session]);
-  if (!session) return <Text style={common.empty}>Ödemelerini görmek için giriş yap.</Text>;
+  if (!session) return <GuestGate icon="credit-card" text="Ödemelerini görmek için giriş yap." />;
   if (loading) return <ActivityIndicator style={{ margin: 24 }} />;
   return (
     <ScrollView style={common.screen} contentContainerStyle={{ padding: 12, gap: 8 }}>

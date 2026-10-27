@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { GuestGate } from '../components/LoginPrompt';
 import { ScrollView, View } from 'react-native';
 import { Text } from '../components/LText';
 import { Btn, common } from '../components/ui';
@@ -18,7 +19,7 @@ export default function Verify() {
       setPhone({ confirmed: !!u?.phone_confirmed_at && !!u.phone, number: u?.phone ?? '' });
     });
   }, [session]);
-  if (!session) return <Text style={common.empty}>Önce giriş yap.</Text>;
+  if (!session) return <GuestGate icon="shield" text="Hesap güvenliği ayarları için giriş yap." />;
   return (
     <ScrollView style={common.screen} contentContainerStyle={{ padding: 12, gap: 10 }}>
       <Text>E-posta ve telefonunun sana ait olduğunu doğrula.</Text>

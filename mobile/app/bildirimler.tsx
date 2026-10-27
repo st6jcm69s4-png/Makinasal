@@ -1,4 +1,5 @@
 import { useCallback, useState } from 'react';
+import { GuestGate } from '../components/LoginPrompt';
 import { ActivityIndicator, FlatList, Pressable, StyleSheet, View } from 'react-native';
 import { Text } from '../components/LText';
 import { router, useFocusEffect } from 'expo-router';
@@ -36,7 +37,7 @@ export default function Notifications() {
     if (!e) setItems((cur) => (cur ?? []).map((n) => (ids.includes(n.id) ? { ...n, read_at: n.read_at ?? at } : n)));
   }
 
-  if (!session) return <Text style={s.msg}>Bildirimlerini görmek için giriş yap.</Text>;
+  if (!session) return <GuestGate icon="bell" text="Bildirimlerini görmek için giriş yap." />;
   if (items === null) return <ActivityIndicator style={{ margin: 32 }} />;
   const unread = items.filter((n) => !n.read_at).map((n) => n.id);
   return (

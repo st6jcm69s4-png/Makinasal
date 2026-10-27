@@ -9,6 +9,7 @@ import { HeaderBack } from '../components/HeaderBack';
 import { AppProvider } from '../lib/AppContext';
 import { tr } from '../lib/i18n';
 import { LangProvider, useLang } from '../lib/lang';
+import { LoginPromptProvider } from '../components/LoginPrompt';
 
 function Screens() {
   const { lang } = useLang();
@@ -71,7 +72,9 @@ export default function RootLayout() {
   return (
     <LangProvider>
       <AppProvider>
-        <Screens />
+        <LoginPromptProvider>
+          <Screens />
+        </LoginPromptProvider>
       </AppProvider>
     </LangProvider>
   );

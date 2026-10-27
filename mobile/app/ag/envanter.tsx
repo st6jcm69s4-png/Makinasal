@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { GuestGate } from '../../components/LoginPrompt';
 import { ActivityIndicator, Alert, ScrollView, View } from 'react-native';
 import { Text } from '../../components/LText';
 import { PickerModal } from '../../components/PickerModal';
@@ -27,7 +28,7 @@ export default function Inventory() {
     setLoading(false);
   }, [uid]);
   useEffect(() => { void load(); }, [load]);
-  if (!uid) return <Text style={common.empty}>Önce giriş yap.</Text>;
+  if (!uid) return <GuestGate icon="truck" text="Envanterini yönetmek için giriş yap." />;
   if (loading) return <ActivityIndicator style={{ margin: 24 }} />;
 
   async function save() {

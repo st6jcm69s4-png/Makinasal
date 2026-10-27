@@ -1,4 +1,5 @@
 import { useCallback, useState } from 'react';
+import { GuestGate } from '../components/LoginPrompt';
 import { Alert, ScrollView, StyleSheet, View } from 'react-native';
 import { Text, TextInput } from '../components/LText';
 import { Icon, type IconName } from '../components/Icon';
@@ -48,10 +49,7 @@ export default function Rights() {
 
   if (!session) {
     return (
-      <View style={s.center}>
-        <Text style={s.p}>Veri hakları başvurusu için giriş yapmalısın.</Text>
-        <Btn title="Giriş yap" onPress={() => router.navigate('/hesap')} />
-      </View>
+      <GuestGate icon="user-check" text="Veri hakları başvurusu için giriş yapmalısın." />
     );
   }
   return (

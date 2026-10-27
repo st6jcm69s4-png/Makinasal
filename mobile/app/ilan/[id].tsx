@@ -8,6 +8,7 @@ import { AlertBox } from '../../components/kit';
 import { checkMessage } from '../../lib/messageFilter';
 import { PickerModal } from '../../components/PickerModal';
 import { useApp } from '../../lib/AppContext';
+import { useLoginPrompt } from '../../components/LoginPrompt';
 import { SITE_URL, photoUrl, supabase, tl } from '../../lib/supabase';
 import { trustLevel, type TrustLevel } from '../../lib/trust';
 
@@ -26,6 +27,7 @@ const SERVICES = [
 export default function ListingScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { favs, toggleFav, session, cmp, toggleCmp } = useApp();
+  const { askLogin, notify } = useLoginPrompt();
   const [offerOpen, setOfferOpen] = useState(false);
   const [offerAmt, setOfferAmt] = useState('');
   const [offerNote, setOfferNote] = useState('');
@@ -67,7 +69,7 @@ export default function ListingScreen() {
     return () => { alive = false; };
   }, [id]);
 
-  const needLogin = (what: string) => Alert.alert(what, 'Bu işlem için giriş yapmalısın.', [{ text: 'Vazgeç', style: 'cancel' }, { text: 'Giriş yap', onPress: () => router.push('/hesap') }]);
+  const needLogin = (what: string) => askLogin(`${what} için giriş yapman gerekir.`);
 
   async function startThread(listingId: string, sellerId: string) {
     if (!session) return needLogin('Mesaj');
@@ -146,7 +148,7 @@ export default function ListingScreen() {
       <View style={s.body}>
         <Text style={s.title}>{item.title}</Text>
         <Text style={s.price}>{tl(item.price)}</Text>
-        <Pressable style={s.favBtn} accessibilityRole="button" onPress={async () => { const err = await toggleFav(item.id, item.price); if (err) Alert.alert('Favoriler', err); }}>
+        <Pressable style={s.favBtn} accessibilityRole="button" onPress={async () => { const err = await toggleFav(item.id, item.price); if (err) notify('Favoriler', err); }}>
           <Heart on={favs.has(item.id)} size={18} color="#800020" /><Text style={s.favText}>{favs.has(item.id) ? 'Favorilerde' : 'Favorilere ekle'}</Text>
         </Pressable>
         <Pressable style={s.favBtn} accessibilityRole="button" onPress={() => { const err = toggleCmp(item.id); if (err) Alert.alert('Karşılaştır', err); }}>

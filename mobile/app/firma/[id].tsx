@@ -4,12 +4,14 @@ import { Text } from '../../components/LText';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Btn, common } from '../../components/ui';
 import { useApp } from '../../lib/AppContext';
+import { useLoginPrompt } from '../../components/LoginPrompt';
 import { dateLabel, EQUIPMENT_STATUS, money, PROVIDER_KINDS, type MarketPost, type Provider } from '../../lib/network';
 import { supabase, type Row } from '../../lib/supabase';
 
 export default function ProviderDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { session, netFavs, toggleNetFav } = useApp();
+  const { askLogin, notify } = useLoginPrompt();
   const [stat, setStat] = useState<{ score: number; n: number } | null>(null);
   const [p, setP] = useState<Provider | null>(null);
   const [posts, setPosts] = useState<MarketPost[]>([]);
@@ -26,7 +28,7 @@ export default function ProviderDetail() {
     });
   }, [id]);
   async function call() {
-    if (!session) { Alert.alert('Telefon', 'Numarayı görmek için giriş yapmalısın.', [{ text: 'Vazgeç', style: 'cancel' }, { text: 'Giriş yap', onPress: () => router.navigate('/hesap') }]); return; }
+    if (!session) { askLogin('Firmanın telefon numarasını görmek için giriş yapman gerekir.'); return; }
     const { data, error } = await supabase.rpc('provider_phone', { p_provider: id });
     if (error || !data) { Alert.alert('Telefon', 'Bu firma telefon numarasını paylaşmıyor.'); return; }
     void Linking.openURL(`tel:${String(data).replace(/[^\d+]/g, '')}`);
@@ -44,7 +46,7 @@ export default function ProviderDetail() {
         <Text><Text style={{ fontWeight: '600' }}>İş alanları: </Text>{p.specialties.join(', ')}</Text>
       </View>
       <Btn title="Telefonla ara" onPress={() => void call()} />
-      <Btn ghost title={netFavs.has(`firm:${id}`) ? 'Favorilerde · çıkar' : 'Favorilere ekle'} onPress={async () => { const err = await toggleNetFav('firm', String(id)); if (err) Alert.alert('Favoriler', err); }} />
+      <Btn ghost title={netFavs.has(`firm:${id}`) ? 'Favorilerde · çıkar' : 'Favorilere ekle'} onPress={async () => { const err = await toggleNetFav('firm', String(id)); if (err) notify('Favoriler', err); }} />
       {inv.length ? <Text style={common.h2}>Envanter</Text> : null}
       {inv.map((i) => (
         <View key={String(i.id)} style={common.card}>

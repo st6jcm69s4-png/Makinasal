@@ -6,6 +6,7 @@ import { PickerModal } from '../../../components/PickerModal';
 import { QuoteChat } from '../../../components/QuoteChat';
 import { Btn, common, Field, Select } from '../../../components/ui';
 import { useApp } from '../../../lib/AppContext';
+import { useLoginPrompt } from '../../../components/LoginPrompt';
 import { dateLabel, money, networkError, PERSONNEL_ROLES, POST_KINDS, QUOTE_STATUS, RENTAL_MODES, UNITS, type MarketPost, type Quote } from '../../../lib/network';
 import { supabase } from '../../../lib/supabase';
 import { openWeb } from '../../../lib/web';
@@ -13,6 +14,7 @@ import { openWeb } from '../../../lib/web';
 export default function PostDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { session, netFavs, toggleNetFav } = useApp();
+  const { askLogin, notify } = useLoginPrompt();
   const uid = session?.user.id;
   const [post, setPost] = useState<MarketPost | null>(null);
   const [quotes, setQuotes] = useState<Quote[]>([]);
@@ -88,7 +90,7 @@ export default function PostDetail() {
         <Text style={{ marginTop: 6 }}>{post.description}</Text>
       </View>
       {error ? <Text style={common.err}>{error}</Text> : null}
-      {!isOwner ? <Btn ghost title={netFavs.has(`post:${post.id}`) ? 'Favorilerde · çıkar' : 'Favorilere ekle'} onPress={async () => { const err = await toggleNetFav('post', post.id); if (err) Alert.alert('Favoriler', err); }} /> : null}
+      {!isOwner ? <Btn ghost title={netFavs.has(`post:${post.id}`) ? 'Favorilerde · çıkar' : 'Favorilere ekle'} onPress={async () => { const err = await toggleNetFav('post', post.id); if (err) notify('Favoriler', err); }} /> : null}
 
       {isOwner ? (
         <View style={{ gap: 8 }}>
@@ -99,7 +101,7 @@ export default function PostDetail() {
         </View>
       ) : null}
 
-      {!uid ? <Btn title={post.kind === 'staff_wanted' ? 'Başvurmak için giriş yap' : 'Teklif vermek için giriş yap'} onPress={() => router.push('/(tabs)/hesap')} /> : null}
+      {!uid ? <Btn title={post.kind === 'staff_wanted' ? 'Başvurmak için giriş yap' : 'Teklif vermek için giriş yap'} onPress={() => askLogin(post.kind === 'staff_wanted' ? 'Başvuru yapmak için giriş yapman gerekir.' : 'Teklif vermek için giriş yapman gerekir.')} /> : null}
 
       {uid && !isOwner && post.status === 'open' && !selected ? (
         <View style={[common.card, { gap: 10 }]}>

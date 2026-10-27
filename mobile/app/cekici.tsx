@@ -7,6 +7,7 @@ import { Btn, Hatch, Label } from '../components/ui';
 import { AlertBox, RowSkeleton } from '../components/kit';
 import { router } from 'expo-router';
 import { useApp } from '../lib/AppContext';
+import { useLoginPrompt } from '../components/LoginPrompt';
 import { CITIES } from '../lib/data';
 import { COORDS } from '../lib/geo';
 import { caps, color, font, radius } from '../lib/theme';
@@ -26,6 +27,7 @@ const cityPos = (c: string): Pos | null => (COORDS[c] ? { lat: COORDS[c][0], lng
 
 export default function Cekici() {
   const { session } = useApp();
+  const { askLogin } = useLoginPrompt();
   const [rows, setRows] = useState<Tow[] | null>(null);
   const [stats, setStats] = useState<Record<string, Stat>>({});
   const [error, setError] = useState('');
@@ -84,7 +86,7 @@ export default function Cekici() {
   }, [rows, origin, city]);
 
   async function call(id: string) {
-    if (!session) { Alert.alert('Telefon', 'Çekici numarasını görmek için giriş yapmalısın.', [{ text: 'Vazgeç', style: 'cancel' }, { text: 'Giriş yap', onPress: () => router.navigate('/hesap') }]); return; }
+    if (!session) { askLogin('Çekicinin telefon numarasını görmek için giriş yapman gerekir.'); return; }
     let ph = phones[id];
     if (!ph) {
       const { data, error: e } = await supabase.rpc('provider_phone', { p_provider: id });

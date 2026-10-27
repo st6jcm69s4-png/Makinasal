@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { GuestGate } from '../../components/LoginPrompt';
 import { ActivityIndicator, ScrollView, Switch, View } from 'react-native';
 import { Text } from '../../components/LText';
 import { router } from 'expo-router';
@@ -35,7 +36,7 @@ export default function ProviderForm() {
       setLoading(false);
     });
   }, [session]);
-  if (!session) return <Text style={common.empty}>Önce Hesabım sekmesinden giriş yap.</Text>;
+  if (!session) return <GuestGate icon="briefcase" text="Firma profili oluşturmak için giriş yap." />;
   if (loading) return <ActivityIndicator style={{ margin: 24 }} />;
 
   const toggle = (arr: string[], v: string, set: (a: string[]) => void) => set(arr.includes(v) ? arr.filter((x) => x !== v) : [...arr, v]);

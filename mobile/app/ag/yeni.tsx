@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { GuestGate } from '../../components/LoginPrompt';
 import { ActivityIndicator, ScrollView } from 'react-native';
 import { Text } from '../../components/LText';
 import { router, useLocalSearchParams } from 'expo-router';
@@ -36,7 +37,7 @@ export default function NewPost() {
     });
   }, [edit, session]);
 
-  if (!session) return <Text style={common.empty}>İlan vermek için önce Hesabım sekmesinden giriş yap.</Text>;
+  if (!session) return <GuestGate icon="plus-square" text="İş ağında ilan vermek için giriş yap." />;
   if (loading) return <ActivityIndicator style={{ margin: 24 }} />;
 
   async function save() {

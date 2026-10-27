@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { GuestGate } from '../../components/LoginPrompt';
 import { Pressable, RefreshControl, ScrollView, SectionList, StyleSheet, View } from 'react-native';
 import { PlainText, Text, TextInput } from '../../components/LText';
 import { Icon } from '../../components/Icon';
@@ -114,12 +115,7 @@ export default function Favorites() {
 
   if (!session) {
     return (
-      <View style={s.center}>
-        <Icon name="heart" size={34} color={color.accent} />
-        <Text style={s.emptyT}>Favorilerin burada toplanır</Text>
-        <Text style={s.emptyS}>Beğendiğin ilanları kaydet, fiyatı düşünce haber ver.</Text>
-        <Btn title="Giriş yap" onPress={() => router.navigate('/hesap')} />
-      </View>
+      <GuestGate icon="heart" text="Beğendiğin ilanları kaydetmek, fiyatı düşünce görmek için giriş yap." />
     );
   }
 

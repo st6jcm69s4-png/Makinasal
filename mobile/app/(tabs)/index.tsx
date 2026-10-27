@@ -159,10 +159,19 @@ export default function Home() {
           <View style={{ flex: 1 }}><SearchBox value={q} onChangeText={setQ} onSubmit={search} placeholder="Marka, model veya parça numarası ara" /></View>
           <Pressable style={s.go} onPress={search} accessibilityRole="button"><Text style={s.goText}>Ara</Text></Pressable>
         </View>
-        {!session ? <Pressable onPress={() => router.navigate('/hesap')} accessibilityRole="button"><Text style={s.link}>Giriş yap / Kayıt ol →</Text></Pressable> : null}
       </View>
 
       <Hatch height={7} />
+      {!session ? (
+        <View style={s.guest}>
+          <Icon name="eye" size={20} color={color.navy} />
+          <View style={{ flex: 1 }}>
+            <Text style={s.guestT}>Misafir olarak geziyorsun</Text>
+            <Text style={s.guestS}>Giriş yaparak ilan ver, mesajlaş, favori ekle.</Text>
+          </View>
+          <Pressable style={s.guestBtn} onPress={() => router.navigate('/hesap')} accessibilityRole="button"><Text style={s.guestBtnT}>Giriş yap</Text></Pressable>
+        </View>
+      ) : null}
       {session ? (
         <View style={s.hub}>
           {([['Gelen teklifler', counts?.offers, '/ag/hesabim'], ['Açık işlerim', counts?.works, '/ag/hesabim'], ['İlanlarım', undefined, '/ilanlarim'], ['Envanterim', undefined, '/ag/envanter']] as [string, number | undefined, string][]).map(([l, n, to], i) => (
@@ -237,6 +246,11 @@ export default function Home() {
 
 const s = StyleSheet.create({
   screen: { flex: 1, backgroundColor: '#F6F5F3' },
+  guest: { flexDirection: 'row', alignItems: 'center', gap: 12, marginHorizontal: 12, marginTop: 14, padding: 12, backgroundColor: color.surface, borderWidth: 1, borderColor: color.line, borderLeftWidth: 3, borderLeftColor: color.navy },
+  guestT: { fontWeight: '700', color: color.ink, fontSize: 15 },
+  guestS: { color: color.muted, fontSize: 13.5 },
+  guestBtn: { backgroundColor: color.accent, paddingHorizontal: 14, minHeight: 40, justifyContent: 'center', borderRadius: radius },
+  guestBtnT: { color: '#fff', fontWeight: '700' },
   hub: { flexDirection: 'row', marginHorizontal: 12, marginTop: 14, backgroundColor: color.surface, borderWidth: 1, borderColor: color.line },
   hubCell: { flex: 1, paddingVertical: 10, paddingHorizontal: 8, gap: 2 },
   hubNum: { fontFamily: font.bold, fontSize: 22, color: color.accent },

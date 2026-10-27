@@ -152,6 +152,19 @@ export default function Account() {
           <Btn title={busy ? 'Giriş yapılıyor…' : 'Giriş yap'} disabled={busy} onPress={() => void signIn()} />
           <Pressable onPress={() => void forgot()} hitSlop={8} accessibilityRole="button"><Text style={{ color: color.accent, fontWeight: '600', textAlign: 'center' }}>Şifremi unuttum</Text></Pressable>
         </View>
+        <View style={{ gap: 6 }}>
+          <Label style={{ marginLeft: 2 }}>Misafir olarak</Label>
+          <View style={s.guestCard}>
+            <View style={s.guestCol}>
+              <Text style={s.guestH}>Yapabilirsin</Text>
+              {['İlanları ve kategorileri gezmek', 'Yedek parça ve çekici aramak', 'İş ağı ilanlarına ve firmalara bakmak', 'İl haritasını görmek'].map((t) => <View key={t} style={s.guestRow}><Icon name="check" size={15} color={color.good} /><Text style={s.guestT}>{t}</Text></View>)}
+            </View>
+            <View style={[s.guestCol, { borderLeftWidth: 1, borderLeftColor: color.line }]}>
+              <Text style={s.guestH}>Giriş gerekir</Text>
+              {['İlan vermek', 'Mesaj ve teklif', 'Favori ve kayıtlı arama', 'Telefon numarasını görmek'].map((t) => <View key={t} style={s.guestRow}><Icon name="lock" size={14} color={color.muted} /><Text style={[s.guestT, { color: color.muted }]}>{t}</Text></View>)}
+            </View>
+          </View>
+        </View>
         <Group title="Hesabın yok mu?" items={[{ icon: 'user-plus', label: 'Kayıt ol (web sitesi)', sub: 'Yeni kayıt şimdilik web sitesinden yapılır.', go: () => openWeb('/giris') }]} />
         <Group title="Giriş yapmadan" items={[
           { icon: 'tool', label: 'Yedek parça ara', go: () => router.push('/yedek-parca') },
@@ -173,6 +186,11 @@ const s = StyleSheet.create({
   btnGhostText: { color: '#800020', fontWeight: '600' },
   err: { color: '#9C2626' },
   note: { color: '#66616A' },
+  guestCard: { flexDirection: 'row', backgroundColor: color.surface, borderWidth: 1, borderColor: color.line, borderRadius: radius },
+  guestCol: { flex: 1, padding: 12, gap: 8 },
+  guestH: { fontFamily: font.bold, fontSize: 15, color: color.ink },
+  guestRow: { flexDirection: 'row', gap: 6, alignItems: 'flex-start' },
+  guestT: { flex: 1, fontSize: 13.5, color: color.ink, lineHeight: 17 },
   head: { backgroundColor: color.navy, flexDirection: 'row', alignItems: 'center', gap: 14, padding: 16 },
   avatar: { width: 56, height: 56, borderRadius: radius, backgroundColor: color.accent, alignItems: 'center', justifyContent: 'center' },
   avatarText: { color: '#fff', fontFamily: font.bold, fontSize: 24, letterSpacing: 1 },
