@@ -3,12 +3,12 @@ import { ActivityIndicator, Alert, Linking, Pressable, ScrollView, StyleSheet, V
 import { PlainText, Text } from '../components/LText';
 import { Icon } from '../components/Icon';
 import { PickerModal } from '../components/PickerModal';
-import { Btn, Label } from '../components/ui';
+import { Btn, Hatch, Label } from '../components/ui';
 import { router } from 'expo-router';
 import { useApp } from '../lib/AppContext';
 import { CITIES } from '../lib/data';
 import { COORDS } from '../lib/geo';
-import { color, font, radius } from '../lib/theme';
+import { caps, color, font, radius } from '../lib/theme';
 import type { Provider } from '../lib/network';
 import { supabase } from '../lib/supabase';
 
@@ -97,7 +97,7 @@ export default function Cekici() {
     <ScrollView style={{ flex: 1, backgroundColor: color.bg }} contentContainerStyle={{ paddingBottom: 32 }}>
       <View style={s.hero}>
         <Label style={{ color: color.onNavy }}>Yol yardım</Label>
-        <PlainText style={s.h1}>En yakın çekiciyi bul</PlainText>
+        <PlainText style={s.h1}>{caps('En yakın çekiciyi bul', 'tr')}</PlainText>
         <Text style={s.lead}>Konumunu paylaş ya da il seç; çekiciler yakınlığa göre, puanlarıyla sıralanır.</Text>
         <Pressable style={({ pressed }) => [s.locBtn, pressed && { opacity: 0.85 }]} onPress={() => void useMyLocation()} disabled={locBusy} accessibilityRole="button">
           {locBusy ? <ActivityIndicator color="#fff" /> : <Icon name="crosshair" size={20} color="#fff" />}
@@ -109,6 +109,7 @@ export default function Cekici() {
           <Icon name="chevron-down" size={18} color={color.onNavy} />
         </Pressable>
       </View>
+      <Hatch height={7} />
       <View style={s.sos}><Icon name="alert-triangle" size={16} color={color.warn} /><Text style={s.sosText}>Can güvenliği tehlikesinde önce 112'yi ara.</Text></View>
 
       {rows === null ? <ActivityIndicator style={{ margin: 24 }} /> : null}
@@ -166,8 +167,8 @@ export default function Cekici() {
 }
 
 const s = StyleSheet.create({
-  hero: { backgroundColor: color.navy, padding: 16, gap: 8, borderBottomWidth: 3, borderBottomColor: color.accent },
-  h1: { color: '#fff', fontFamily: font.bold, fontSize: 28, lineHeight: 31 },
+  hero: { backgroundColor: color.navy, padding: 16, gap: 8 },
+  h1: { color: '#fff', fontFamily: font.labelBold, fontSize: 34, lineHeight: 36, letterSpacing: 0.5 },
   lead: { color: color.onNavy },
   locBtn: { backgroundColor: color.accent, borderRadius: radius, minHeight: 50, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 6 },
   locText: { color: '#fff', fontSize: 16, fontWeight: '700' },

@@ -1,18 +1,23 @@
 import { Pressable } from 'react-native';
 import { router } from 'expo-router';
 import { Icon } from './Icon';
+import { color } from '../lib/theme';
 
-/** Sol üstteki geri düğmesi: çerçevesiz, net bir ok. Geçmiş yoksa ana sayfaya döner. */
+/** Sol üstteki geri düğmesi: yumuşak yarı saydam daire, basınca bordo. Geçmiş yoksa ana sayfaya döner. */
 export function HeaderBack() {
   return (
     <Pressable
       onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))}
-      hitSlop={{ top: 8, bottom: 8, left: 8, right: 16 }}
+      hitSlop={8}
       accessibilityRole="button"
       accessibilityLabel="Geri"
-      style={({ pressed }) => ({ width: 44, height: 44, alignItems: 'flex-start', justifyContent: 'center', paddingLeft: 6, opacity: pressed ? 0.55 : 1 })}
+      style={({ pressed }) => ({
+        width: 36, height: 36, borderRadius: 18, marginLeft: 6, marginRight: 4,
+        backgroundColor: pressed ? color.accent : 'rgba(255,255,255,0.14)',
+        alignItems: 'center', justifyContent: 'center',
+      })}
     >
-      <Icon name="arrow-left" size={26} color="#fff" />
+      <Icon name="chevron-left" size={24} color="#fff" />
     </Pressable>
   );
 }

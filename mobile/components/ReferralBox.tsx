@@ -39,7 +39,7 @@ export function ReferralBox() {
 
   return (
     <View style={s.box}>
-      <Text style={s.h}>Davet et, ilan hakkı kazan</Text>
+      <Text style={s.h}>İlan hakkı kazan</Text>
       <Text style={s.small}>Davet ettiğin kişinin ilk ilanı onaylanınca +1 ilan hakkı kazanırsın (en fazla 3).</Text>
       <Text>Davet kodun: <Text style={{ fontWeight: '700' }} selectable>{code || '…'}</Text></Text>
       <Text style={s.small}>Davet edilen: {invited.length} · Kazanılan hak: {rewarded}</Text>
@@ -55,7 +55,7 @@ export function ReferralBox() {
 }
 
 const s = StyleSheet.create({
-  box: { backgroundColor: '#fff', borderRadius: 4, padding: 14, gap: 8 },
+  box: { backgroundColor: '#fff', borderRadius: 4, padding: 14, gap: 8, borderWidth: 1, borderColor: '#DDD9DC' },
   h: { fontWeight: '700', fontSize: 16 },
   small: { color: '#666', fontSize: 12 },
   input: { padding: 10, backgroundColor: '#F6F5F3', borderRadius: 4 },

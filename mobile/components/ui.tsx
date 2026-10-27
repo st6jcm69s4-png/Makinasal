@@ -71,6 +71,17 @@ export function FieldGrid({ children, style }: { children: React.ReactNode; styl
   return <View style={[s.grid, style]}>{children}</View>;
 }
 
+/** Şantiye şeridi: bordo-lacivert eğik çizgiler (marka imzası). */
+export function Hatch({ height = 6 }: { height?: number }) {
+  return (
+    <View style={{ height, overflow: 'hidden', flexDirection: 'row', backgroundColor: color.navy }} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+      {Array.from({ length: 48 }, (_, i) => (
+        <View key={i} style={{ width: 9, height, marginRight: 9, backgroundColor: color.accent, transform: [{ skewX: '-35deg' }] }} />
+      ))}
+    </View>
+  );
+}
+
 export const common = StyleSheet.create({
   screen: { flex: 1, backgroundColor: color.bg },
   card: { backgroundColor: color.surface, padding: 12, borderRadius: radius, gap: 4, borderWidth: 1, borderColor: color.line },

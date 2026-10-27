@@ -4,7 +4,7 @@ import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { PlainText, Text, TextInput } from '../../components/LText';
 import { router, useFocusEffect } from 'expo-router';
 import { Icon, type IconName } from '../../components/Icon';
-import { Btn, Field, Label } from '../../components/ui';
+import { Btn, Field, Hatch, Label } from '../../components/ui';
 import { Group, type Item } from '../../components/Rows';
 import { color, font, radius } from '../../lib/theme';
 import { displayName, initials } from '../../lib/person';
@@ -63,6 +63,7 @@ function Member() {
           </View>
         ))}
       </View>
+      <Hatch height={7} />
       <View style={s.body}>
         <Pressable style={({ pressed }) => [s.cta, pressed && { opacity: 0.85 }]} onPress={go('/ilan-ver')} accessibilityRole="button">
           <Icon name="plus" size={20} color="#fff" /><Text style={s.ctaText}>İlan ver</Text>
@@ -89,12 +90,15 @@ function Member() {
         ]} />
         <Group title="Keşfet ve destek" items={[
           { icon: 'tool', label: 'Yedek parça', go: go('/yedek-parca') },
-          { icon: 'life-buoy', label: 'Çekici çağır', sub: 'En yakın çekiciler, puanlarıyla', go: go('/cekici') },
+          { icon: 'life-buoy', label: 'Çekici bul', sub: 'En yakın çekiciler, puanlarıyla', go: go('/cekici') },
           { icon: 'map', label: 'İl haritası', go: go('/harita') },
           { icon: 'file-text', label: 'Hukuki bilgiler ve veri haklarım', go: go('/hukuki') },
           { icon: 'settings', label: 'Ayarlar ve yardım', go: go('/ayarlar') },
         ]} />
-        <ReferralBox />
+        <View style={{ gap: 6 }}>
+          <Label style={{ marginLeft: 2 }}>Davet et</Label>
+          <ReferralBox />
+        </View>
         <Pressable style={s.out} onPress={() => void supabase.auth.signOut()} accessibilityRole="button">
           <Icon name="log-out" size={18} color={color.accent} /><Text style={s.outText}>Çıkış yap</Text>
         </Pressable>
@@ -138,7 +142,7 @@ export default function Account() {
           <Text style={s.sub}>İlan ver, mesajlaş, teklif al.</Text>
         </View>
       </View>
-      <View style={[s.stats, { height: 0, borderBottomWidth: 3 }]} />
+      <Hatch height={7} />
       <View style={s.body}>
         <View style={{ gap: 12 }}>
           <Field label="E-posta" autoCapitalize="none" keyboardType="email-address" value={email} onChangeText={setEmail} />
@@ -171,9 +175,9 @@ const s = StyleSheet.create({
   head: { backgroundColor: color.navy, flexDirection: 'row', alignItems: 'center', gap: 14, padding: 16 },
   avatar: { width: 56, height: 56, borderRadius: radius, backgroundColor: color.accent, alignItems: 'center', justifyContent: 'center' },
   avatarText: { color: '#fff', fontFamily: font.bold, fontSize: 24, letterSpacing: 1 },
-  name: { color: '#fff', fontFamily: font.bold, fontSize: 24 },
+  name: { color: '#fff', fontFamily: font.labelBold, fontSize: 28, letterSpacing: 0.4 },
   sub: { color: color.onNavy, fontSize: 14 },
-  stats: { flexDirection: 'row', backgroundColor: color.navy, borderTopWidth: 1, borderTopColor: color.navy2, borderBottomWidth: 3, borderBottomColor: color.accent },
+  stats: { flexDirection: 'row', backgroundColor: color.navy, borderTopWidth: 1, borderTopColor: color.navy2 },
   stat: { flex: 1, paddingVertical: 10, paddingHorizontal: 14, gap: 1 },
   statNum: { color: '#fff', fontFamily: font.bold, fontSize: 24 },
   body: { padding: 12, gap: 18 },

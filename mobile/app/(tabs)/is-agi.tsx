@@ -4,7 +4,8 @@ import { PlainText, Text, TextInput } from '../../components/LText';
 import { Icon, type IconName } from '../../components/Icon';
 import { router, useLocalSearchParams } from 'expo-router';
 import { PickerModal } from '../../components/PickerModal';
-import { Btn, Chip, Label } from '../../components/ui';
+import { Btn, Chip } from '../../components/ui';
+import { FirmCard, PostCard } from '../../components/NetCards';
 import { CITIES } from '../../lib/data';
 import { dateLabel, money, networkError, PERSONNEL_ROLES, PROVIDER_KINDS, RENTAL_MODES, type MarketPost, type PostKind, type Provider } from '../../lib/network';
 import { useTabScrollTop } from '../../lib/scrollTop';
@@ -20,7 +21,6 @@ const SECTIONS: { id: Section; icon: IconName; title: string; sub: string; tabs:
 ];
 const sectionOf = (t: Tab): Section => (t === 'staff_wanted' ? 'seek' : t === 'rental_operator' ? 'hire' : 'market');
 const PAGE = 20;
-const ROLE_ICON: Record<string, IconName> = { operator: 'settings', driver: 'truck', mechanic: 'tool' };
 
 export default function NetworkTab() {
   const { kind } = useLocalSearchParams<{ kind?: string }>();
@@ -133,59 +133,6 @@ export default function NetworkTab() {
       />
       <PickerModal visible={sheet} title="İl" selected={city} options={[{ value: '', label: 'Tüm iller' }, ...CITIES.map((c) => ({ value: c, label: c }))]} onPick={setCity} onClose={() => setSheet(false)} />
     </View>
-  );
-}
-
-function Cell({ label, value, flex = 1, left }: { label: string; value: string; flex?: number; left?: boolean }) {
-  return (
-    <View style={[s.cell, { flex }, left && s.cellL]}>
-      <Label>{label}</Label>
-      <Text style={s.val} numberOfLines={1}>{value || '–'}</Text>
-    </View>
-  );
-}
-
-function PostCard({ p }: { p: MarketPost }) {
-  const fresh = Date.now() - new Date(p.created_at).getTime() < 3 * 86400000;
-  const who = p.personnel_role ? PERSONNEL_ROLES[p.personnel_role as keyof typeof PERSONNEL_ROLES] : p.rental_mode ? RENTAL_MODES[p.rental_mode as keyof typeof RENTAL_MODES] : p.category;
-  const isStaff = p.kind === 'staff_wanted';
-  return (
-    <Pressable style={({ pressed }) => [s.card, pressed && { opacity: 0.85 }]} onPress={() => router.push(`/ag/ilan/${p.id}` as never)} accessibilityRole="button">
-      <View style={s.cardTop}>
-        {p.personnel_role ? <View style={s.roleIcon}><Icon name={ROLE_ICON[p.personnel_role] ?? 'user'} size={22} color={color.accent} /></View> : null}
-        <View style={{ flex: 1, gap: 4 }}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-            <Label style={{ color: color.accent }}>{who}</Label>
-            {fresh ? <View style={s.fresh}><Text style={s.freshText}>YENİ</Text></View> : null}
-          </View>
-          <Text style={s.title} numberOfLines={2}>{p.title}</Text>
-        </View>
-      </View>
-      <View style={s.strip}>
-        <Cell label="İl" value={p.city} />
-        <Cell label={p.start_date ? 'Başlangıç' : 'Yayın'} value={p.start_date ? dateLabel(p.start_date) : new Date(p.created_at).toLocaleDateString('tr-TR')} left />
-        <Cell label={isStaff ? 'Ücret' : 'Bütçe'} value={p.price == null ? 'Belirtilmedi' : money(p.price, p.price_unit).replace(' toplam', '')} flex={1.4} left />
-      </View>
-    </Pressable>
-  );
-}
-function FirmCard({ p }: { p: Provider }) {
-  return (
-    <Pressable style={({ pressed }) => [s.card, pressed && { opacity: 0.85 }]} onPress={() => router.push(`/firma/${p.user_id}` as never)} accessibilityRole="button">
-      <View style={s.cardTop}>
-        <View style={s.roleIcon}><Icon name={p.kind === 'tow' ? 'life-buoy' : 'briefcase'} size={22} color={color.accent} /></View>
-        <View style={{ flex: 1, gap: 4 }}>
-          <Label style={{ color: color.accent }}>{p.company_category ?? PROVIDER_KINDS[p.kind]}</Label>
-          <Text style={s.title} numberOfLines={2}>{p.name}</Text>
-          <Text style={s.desc} numberOfLines={2}>{p.description}</Text>
-        </View>
-      </View>
-      <View style={s.strip}>
-        <Cell label="İl" value={p.city} />
-        <Cell label="Hizmet bölgesi" value={`${p.service_cities.length} il`} left />
-        <Cell label="İş alanı" value={p.specialties[0] ?? ''} flex={1.4} left />
-      </View>
-    </Pressable>
   );
 }
 
