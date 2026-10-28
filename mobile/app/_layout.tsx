@@ -9,7 +9,7 @@ import { StatusBar } from 'expo-status-bar';
 import { HeaderBack } from '../components/HeaderBack';
 import { AppProvider } from '../lib/AppContext';
 import { tr } from '../lib/i18n';
-import { LangProvider, useLang } from '../lib/lang';
+import { LangProvider, LanguageGate, useLang } from '../lib/lang';
 import { LoginPromptProvider } from '../components/LoginPrompt';
 
 function Screens() {
@@ -79,6 +79,7 @@ export default function RootLayout() {
       <AppProvider>
         <LoginPromptProvider>
           <Screens />
+          <LanguageGate />
         </LoginPromptProvider>
       </AppProvider>
     </LangProvider>
