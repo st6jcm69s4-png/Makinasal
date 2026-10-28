@@ -4,6 +4,7 @@ import { Text, TextInput } from './LText';
 import { PickerModal } from './PickerModal';
 import { Btn, Chip } from './ui';
 import { brandsForCategory } from '../lib/machineryCatalog';
+import { color } from '../lib/theme';
 
 export type Adv = { brand: string; yMin: string; yMax: string; useMin: string; useMax: string; unit: 'sa' | 'km'; minScore: number; near: number; ver: boolean; hide: boolean; takas: boolean };
 export const NO_ADV: Adv = { brand: '', yMin: '', yMax: '', useMin: '', useMax: '', unit: 'sa', minScore: 0, near: 0, ver: false, hide: false, takas: false };
@@ -23,7 +24,7 @@ export function FilterModal({ visible, value, category, part, onApply, onClose }
             <View style={s.head}><Text style={s.title}>Gelişmiş filtreler</Text><Pressable onPress={onClose} hitSlop={10} accessibilityRole="button"><Text style={s.close}>Kapat</Text></Pressable></View>
             <ScrollView contentContainerStyle={{ padding: 14, gap: 12 }} keyboardShouldPersistTaps="handled">
               <Text style={s.label}>Marka</Text>
-              <Pressable style={s.input} onPress={() => setBrandSheet(true)} accessibilityRole="button"><Text style={{ color: a.brand ? '#25272D' : '#999' }}>{a.brand || 'Tümü'}</Text></Pressable>
+              <Pressable style={s.input} onPress={() => setBrandSheet(true)} accessibilityRole="button"><Text style={{ color: a.brand ? color.navy : color.muted }}>{a.brand || 'Tümü'}</Text></Pressable>
               {!part ? (
                 <>
                   <Text style={s.label}>Model yılı</Text>
@@ -65,12 +66,12 @@ export function FilterModal({ visible, value, category, part, onApply, onClose }
 }
 const s = StyleSheet.create({
   backdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' },
-  sheet: { backgroundColor: '#F6F5F3', borderTopLeftRadius: 16, borderTopRightRadius: 16, maxHeight: '88%' },
-  head: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, borderBottomWidth: 1, borderBottomColor: '#DDD9DC' },
+  sheet: { backgroundColor: color.bg, borderTopLeftRadius: 16, borderTopRightRadius: 16, maxHeight: '88%' },
+  head: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, borderBottomWidth: 1, borderBottomColor: color.line },
   title: { fontWeight: '700', fontSize: 16 },
-  close: { color: '#800020', fontWeight: '600' },
-  label: { fontWeight: '600', color: '#25272D' },
-  input: { padding: 12, backgroundColor: '#fff', borderRadius: 4, borderWidth: 1, borderColor: '#DDD9DC' },
+  close: { color: color.accentText, fontWeight: '600' },
+  label: { fontWeight: '600', color: color.ink },
+  input: { padding: 12, backgroundColor: color.surface, borderRadius: 4, borderWidth: 1, borderColor: color.line },
   row: { flexDirection: 'row', gap: 8 },
   sw: { flexDirection: 'row', alignItems: 'center' },
 });

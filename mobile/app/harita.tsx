@@ -4,6 +4,7 @@ import { Text } from '../components/LText';
 import { router } from 'expo-router';
 import { common } from '../components/ui';
 import { supabase } from '../lib/supabase';
+import { color } from '../lib/theme';
 
 export default function CityMap() {
   const [counts, setCounts] = useState<[string, number][] | null>(null);
@@ -29,7 +30,7 @@ export default function CityMap() {
       renderItem={({ item: [city, n] }) => (
         <Pressable style={[common.card, { marginHorizontal: 12, marginBottom: 6 }]} onPress={() => router.push({ pathname: '/ilanlar', params: { city } })} accessibilityRole="button">
           <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}><Text style={common.title}>{city}</Text><Text style={common.price}>{n} ilan</Text></View>
-          <View style={{ height: 6, backgroundColor: '#eee', borderRadius: 3 }}><View style={{ height: 6, width: `${Math.max(4, (n / max) * 100)}%`, backgroundColor: '#800020', borderRadius: 3 }} /></View>
+          <View style={{ height: 6, backgroundColor: color.plate, borderRadius: 3 }}><View style={{ height: 6, width: `${Math.max(4, (n / max) * 100)}%`, backgroundColor: color.accent, borderRadius: 3 }} /></View>
         </Pressable>
       )}
     />

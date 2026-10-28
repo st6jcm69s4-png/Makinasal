@@ -5,6 +5,7 @@ import { router } from 'expo-router';
 import { useApp } from '../lib/AppContext';
 import { supabase, tl } from '../lib/supabase';
 import { getLang, localeOf } from '../lib/i18n';
+import { color } from '../lib/theme';
 
 type L = { id: string; title: string; price: number | string; city: string; year: number | null; usage_value: number | null; usage_unit: string | null; brand: string | null; model: string | null; takas: boolean | null };
 
@@ -30,7 +31,7 @@ export default function Compare() {
         {rows.map((r) => (
           <View key={r.id} style={s.col}>
             <Pressable onPress={() => router.push(`/ilan/${r.id}`)}><Text style={s.title} numberOfLines={2}>{r.title}</Text></Pressable>
-            {lines.map(([l, f]) => <Text key={l} style={[s.val, l === 'Fiyat' && Number(r.price) === min && rows.length > 1 && { color: '#1b7f3b', fontWeight: '700' }]}>{f(r)}</Text>)}
+            {lines.map(([l, f]) => <Text key={l} style={[s.val, l === 'Fiyat' && Number(r.price) === min && rows.length > 1 && { color: color.good, fontWeight: '700' }]}>{f(r)}</Text>)}
             <Pressable onPress={() => toggleCmp(r.id)}><Text style={s.rm}>Çıkar</Text></Pressable>
           </View>
         ))}
@@ -39,10 +40,10 @@ export default function Compare() {
   );
 }
 const s = StyleSheet.create({
-  msg: { textAlign: 'center', color: '#666', margin: 24 },
-  col: { width: 150, backgroundColor: '#fff', padding: 10, borderRadius: 4, gap: 14 },
-  title: { fontWeight: '700', height: 40, color: '#25272D' },
-  lbl: { color: '#666', fontWeight: '600' },
-  val: { color: '#25272D' },
-  rm: { color: '#b00020', textAlign: 'center' },
+  msg: { textAlign: 'center', color: color.muted, margin: 24 },
+  col: { width: 150, backgroundColor: color.surface, padding: 10, borderRadius: 4, gap: 14 },
+  title: { fontWeight: '700', height: 40, color: color.ink },
+  lbl: { color: color.muted, fontWeight: '600' },
+  val: { color: color.ink },
+  rm: { color: color.bad, textAlign: 'center' },
 });

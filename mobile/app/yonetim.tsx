@@ -108,7 +108,7 @@ export default function Admin() {
       <View style={s.grid}>
         {stats.map((x) => (
           <View key={x.label} style={s.stat}>
-            <Icon name={x.icon} size={16} color={color.accent} />
+            <Icon name={x.icon} size={16} color={color.accentText} />
             <PlainText style={s.statNum}>{x.n == null ? '–' : String(x.n)}</PlainText>
             <Label>{x.label}</Label>
           </View>
@@ -146,12 +146,12 @@ export default function Admin() {
           <View key={r.id} style={s.card}>
             <View style={s.cardTop}>
               <View style={{ flex: 1, gap: 3 }}>
-                <Label style={{ color: color.accent }}>{`ŞK-${r.ticket}`}</Label>
+                <Label style={{ color: color.accentText }}>{`ŞK-${r.ticket}`}</Label>
                 <Text style={s.title}>{r.reason}</Text>
               </View>
               <Text style={s.when}>{ago(r.created_at)}</Text>
             </View>
-            {r.listing_id ? <Pressable style={s.link} onPress={() => router.push(`/ilan/${r.listing_id}`)} accessibilityRole="button"><Icon name="external-link" size={15} color={color.accent} /><Text style={s.linkText}>Şikayet edilen ilanı aç</Text></Pressable> : null}
+            {r.listing_id ? <Pressable style={s.link} onPress={() => router.push(`/ilan/${r.listing_id}`)} accessibilityRole="button"><Icon name="external-link" size={15} color={color.accentText} /><Text style={s.linkText}>Şikayet edilen ilanı aç</Text></Pressable> : null}
             <View style={s.actions}>
               <View style={{ flex: 1 }}><Btn title="Doğrula" disabled={busy} onPress={() => ask('Şikayet doğrulansın mı? Satıcının puanını etkiler.', () => void act('reports', r.id, { verified: true, status: 'resolved' }))} /></View>
               <View style={{ flex: 1 }}><Btn ghost title="Geçersiz" disabled={busy} onPress={() => void act('reports', r.id, { verified: false, status: 'dismissed' })} /></View>
@@ -163,7 +163,7 @@ export default function Admin() {
           <View key={q.id} style={s.card}>
             <View style={s.cardTop}>
               <View style={{ flex: 1, gap: 3 }}>
-                <Label style={{ color: color.accent }}>{KIND[q.kind] ?? q.kind}</Label>
+                <Label style={{ color: color.accentText }}>{KIND[q.kind] ?? q.kind}</Label>
                 <Text style={s.title}>{q.listing_title ?? q.full_name ?? '—'}</Text>
               </View>
               <StatusBadge status={q.status} text={q.status === 'new' ? 'Yeni' : q.status === 'contacted' ? 'Görüşüldü' : 'Kapandı'} />
@@ -191,7 +191,7 @@ export default function Admin() {
             <View key={d.id} style={s.card}>
               <View style={s.cardTop}>
                 <View style={{ flex: 1, gap: 3 }}>
-                  <Label style={{ color: color.accent }}>{DKIND[d.kind] ?? d.kind}</Label>
+                  <Label style={{ color: color.accentText }}>{DKIND[d.kind] ?? d.kind}</Label>
                   <Text style={s.title}>{pf?.full_name ?? '—'}</Text>
                 </View>
                 <Badge variant={days <= 5 ? 'destructive' : 'warning'}>{`${days} gün kaldı`}</Badge>
@@ -241,7 +241,7 @@ const s = StyleSheet.create({
   cardTop: { flexDirection: 'row', gap: 12, padding: 12, alignItems: 'flex-start' },
   thumb: { width: 84, height: 66, borderRadius: radius },
   title: { fontSize: 16, fontWeight: '600', color: color.ink },
-  price: { fontFamily: font.bold, fontSize: 18, color: color.accent },
+  price: { fontFamily: font.bold, fontSize: 18, color: color.accentText },
   when: { color: color.muted, fontSize: 12.5 },
   note: { paddingHorizontal: 12, paddingVertical: 8, color: color.ink },
   strip: { flexDirection: 'row', borderTopWidth: 1, borderTopColor: color.line },
@@ -249,7 +249,7 @@ const s = StyleSheet.create({
   val: { fontSize: 15, color: color.ink, fontWeight: '500' },
   actions: { flexDirection: 'row', gap: 8, padding: 12, borderTopWidth: 1, borderTopColor: color.line },
   link: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 12, paddingBottom: 10 },
-  linkText: { color: color.accent, fontWeight: '600' },
+  linkText: { color: color.accentText, fontWeight: '600' },
   pill: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 2 },
   pillText: { fontSize: 12, fontWeight: '700' },
   emptyBox: { flexDirection: 'row', alignItems: 'center', gap: 10, padding: 16, backgroundColor: color.surface, borderWidth: 1, borderColor: color.line },

@@ -76,7 +76,7 @@ export function NetAccountView({ onNavigate, embedded }: { onNavigate?: () => vo
       <View style={s.quick}>
         {([['briefcase', 'Firma profilim', '/ag/firma-kaydi'], ['truck', 'Envanterim', '/ag/envanter'], ['plus', 'Yeni ilan', '/ag/yeni']] as [IconName, string, string][]).map(([ic, l, to], i) => (
           <Pressable key={l} style={[s.q, i > 0 && { borderLeftWidth: 1, borderLeftColor: color.line }]} onPress={() => go(to)} accessibilityRole="button">
-            <Icon name={ic} size={20} color={color.accent} />
+            <Icon name={ic} size={20} color={color.accentText} />
             <Text style={s.qText}>{l}</Text>
           </Pressable>
         ))}
@@ -88,7 +88,7 @@ export function NetAccountView({ onNavigate, embedded }: { onNavigate?: () => vo
         <Pressable key={p.id} style={({ pressed }) => [s.card, pressed && { opacity: 0.85 }]} onPress={() => go(`/ag/ilan/${p.id}`)} accessibilityRole="button">
           <View style={s.cardTop}>
             <View style={{ flex: 1, gap: 3 }}>
-              <Label style={{ color: color.accent }}>{POST_KINDS[p.kind] ?? p.kind}</Label>
+              <Label style={{ color: color.accentText }}>{POST_KINDS[p.kind] ?? p.kind}</Label>
               <Text style={s.title} numberOfLines={2}>{p.title}</Text>
             </View>
             <View style={{ alignItems: 'flex-end', gap: 4 }}>
@@ -108,7 +108,7 @@ export function NetAccountView({ onNavigate, embedded }: { onNavigate?: () => vo
         <Pressable key={q.id} style={({ pressed }) => [s.card, pressed && { opacity: 0.85 }]} onPress={() => go(`/ag/ilan/${q.post_id}`)} accessibilityRole="button">
           <View style={s.cardTop}>
             <View style={{ flex: 1, gap: 3 }}>
-              <Label style={{ color: color.accent }}>{seg === 'incoming' ? q.display_name : 'Verdiğim teklif'}</Label>
+              <Label style={{ color: color.accentText }}>{seg === 'incoming' ? q.display_name : 'Verdiğim teklif'}</Label>
               <Text style={s.title} numberOfLines={2}>{title(q)}</Text>
             </View>
             <StatusBadge status={q.status} text={QUOTE_STATUS[q.status] ?? q.status} />

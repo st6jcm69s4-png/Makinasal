@@ -11,6 +11,7 @@ import { useApp } from '../../lib/AppContext';
 import { useLoginPrompt } from '../../components/LoginPrompt';
 import { SITE_URL, photoUrl, supabase, tl } from '../../lib/supabase';
 import { trustLevel, type TrustLevel } from '../../lib/trust';
+import { color } from '../../lib/theme';
 
 type Detail = {
   id: string; seller_id: string; category: string; title: string; description: string | null; price: number | string; city: string; year: number | null;
@@ -141,18 +142,18 @@ export default function ListingScreen() {
   const own = session?.user.id === item.seller_id;
   const part = item.category === 'Yedek parça' || item.category === 'Lastik ve jant';
   return (
-    <ScrollView style={{ backgroundColor: '#fff' }}>
+    <ScrollView style={{ backgroundColor: color.surface }}>
       <ScrollView horizontal pagingEnabled>
-        {photos.length ? photos.map((p) => <Image key={p.path} source={{ uri: photoUrl(p.path) }} style={s.photo} />) : <View style={[s.photo, { backgroundColor: '#e3e3e6' }]} />}
+        {photos.length ? photos.map((p) => <Image key={p.path} source={{ uri: photoUrl(p.path) }} style={s.photo} />) : <View style={[s.photo, { backgroundColor: color.plate }]} />}
       </ScrollView>
       <View style={s.body}>
         <Text style={s.title}>{item.title}</Text>
         <Text style={s.price}>{tl(item.price)}</Text>
         <Pressable style={s.favBtn} accessibilityRole="button" onPress={async () => { const err = await toggleFav(item.id, item.price); if (err) notify('Favoriler', err, (a) => void a.toggleFav(item.id, item.price)); }}>
-          <Heart on={favs.has(item.id)} size={18} color="#800020" /><Text style={s.favText}>{favs.has(item.id) ? 'Favorilerde' : 'Favorilere ekle'}</Text>
+          <Heart on={favs.has(item.id)} size={18} color={color.accentText} /><Text style={s.favText}>{favs.has(item.id) ? 'Favorilerde' : 'Favorilere ekle'}</Text>
         </Pressable>
         <Pressable style={s.favBtn} accessibilityRole="button" onPress={() => { const err = toggleCmp(item.id); if (err) Alert.alert('Karşılaştır', err); }}>
-          <Icon name="repeat" size={17} color="#800020" /><Text style={s.favText}>{cmp.includes(item.id) ? `Karşılaştırmada (${cmp.length}/3)` : 'Karşılaştırmaya ekle'}</Text>
+          <Icon name="repeat" size={17} color={color.accentText} /><Text style={s.favText}>{cmp.includes(item.id) ? `Karşılaştırmada (${cmp.length}/3)` : 'Karşılaştırmaya ekle'}</Text>
         </Pressable>
         {cmp.length >= 2 ? <Pressable onPress={() => router.push('/karsilastir')} accessibilityRole="button"><Text style={s.favText}>Karşılaştırmayı aç ({cmp.length})</Text></Pressable> : null}
         <FieldGrid style={{ marginTop: 4 }}>
@@ -203,7 +204,7 @@ export default function ListingScreen() {
             <TextInput style={s.input} value={offerAmt} onChangeText={setOfferAmt} placeholder={`Teklifin (₺${part ? ', birim fiyat' : ''})`} keyboardType="decimal-pad" />
             <TextInput style={s.input} value={offerNote} onChangeText={setOfferNote} placeholder="Not (isteğe bağlı)" maxLength={300} />
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}><Text style={{ flex: 1 }}>Takas da olabilir</Text><Switch value={offerTakas} onValueChange={setOfferTakas} /></View>
-            {offerErr ? <Text style={{ color: '#b00020' }}>{offerErr}</Text> : null}
+            {offerErr ? <Text style={{ color: color.bad }}>{offerErr}</Text> : null}
             <Text style={s.small}>Ürünü görmeden kapora, ön ödeme, havale veya EFT göndermeyin.</Text>
             <Pressable style={s.btn} disabled={msgBusy} onPress={() => void sendOffer()} accessibilityRole="button"><Text style={s.btnText}>Teklifi gönder</Text></Pressable>
             <Pressable onPress={() => setOfferOpen(false)} accessibilityRole="button"><Text style={s.report}>Vazgeç</Text></Pressable>
@@ -230,23 +231,23 @@ export default function ListingScreen() {
 const s = StyleSheet.create({
   photo: { width: Dimensions.get('window').width, height: 260 },
   body: { padding: 16, gap: 10 },
-  title: { fontSize: 23, fontWeight: '700', color: '#25272D', lineHeight: 27 },
-  price: { fontSize: 24, fontWeight: '700', color: '#800020' },
-  meta: { color: '#666' },
+  title: { fontSize: 23, fontWeight: '700', color: color.ink, lineHeight: 27 },
+  price: { fontSize: 24, fontWeight: '700', color: color.accentText },
+  meta: { color: color.muted },
   desc: { marginTop: 4, lineHeight: 20 },
-  warn: { color: '#7F5200', backgroundColor: '#FFF0C2', padding: 10, borderRadius: 4, borderLeftWidth: 3, borderLeftColor: '#7F5200' },
+  warn: { color: color.warn, backgroundColor: color.warnBg, padding: 10, borderRadius: 4, borderLeftWidth: 3, borderLeftColor: color.warn },
   favBtn: { alignSelf: 'flex-start', paddingVertical: 4, flexDirection: 'row', alignItems: 'center', gap: 6 },
-  favText: { color: '#800020', fontWeight: '600' },
-  btn: { backgroundColor: '#800020', padding: 14, borderRadius: 4, alignItems: 'center' },
+  favText: { color: color.accentText, fontWeight: '600' },
+  btn: { backgroundColor: color.accent, padding: 14, borderRadius: 4, alignItems: 'center' },
   btnText: { color: '#fff', fontWeight: '600' },
-  btnGhost: { borderWidth: 1, borderColor: '#800020', padding: 12, borderRadius: 4, alignItems: 'center' },
-  btnGhostText: { color: '#800020', fontWeight: '600' },
+  btnGhost: { borderWidth: 1, borderColor: color.accent, padding: 12, borderRadius: 4, alignItems: 'center' },
+  btnGhostText: { color: color.accentText, fontWeight: '600' },
   phone: { fontSize: 18, fontWeight: '700', textAlign: 'center', padding: 8 },
   section: { fontWeight: '700', fontSize: 16, marginTop: 8 },
-  report: { color: '#888', textAlign: 'center', padding: 10, textDecorationLine: 'underline' },
+  report: { color: color.muted, textAlign: 'center', padding: 10, textDecorationLine: 'underline' },
   msg: { margin: 24, textAlign: 'center' },
   backdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' },
-  sheet: { backgroundColor: '#fff', padding: 16, gap: 10, borderTopLeftRadius: 4, borderTopRightRadius: 4 },
-  input: { minHeight: 80, padding: 10, backgroundColor: '#F6F5F3', borderRadius: 4, textAlignVertical: 'top' },
-  small: { color: '#666', fontSize: 12 },
+  sheet: { backgroundColor: color.surface, padding: 16, gap: 10, borderTopLeftRadius: 4, borderTopRightRadius: 4 },
+  input: { minHeight: 80, padding: 10, backgroundColor: color.bg, borderRadius: 4, textAlignVertical: 'top' },
+  small: { color: color.muted, fontSize: 12 },
 });

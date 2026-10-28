@@ -136,5 +136,5 @@ const s = StyleSheet.create({
   check: { flexDirection: 'row', gap: 10, alignItems: 'flex-start' },
   box: { width: 22, height: 22, borderWidth: 1.5, borderColor: color.muted, borderRadius: 3, alignItems: 'center', justifyContent: 'center', marginTop: 1 },
   checkText: { flex: 1, color: color.ink, fontSize: 14, lineHeight: 19 },
-  link: { color: color.accent, fontWeight: '600', fontSize: 13.5 },
+  link: { color: color.accentText, fontWeight: '600', fontSize: 13.5 },
 });

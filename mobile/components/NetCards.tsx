@@ -39,10 +39,10 @@ export function PostCard({ p }: { p: MarketPost }) {
   return (
     <Pressable style={({ pressed }) => [s.card, pressed && { opacity: 0.85 }]} onPress={() => router.push(`/ag/ilan/${p.id}` as never)} accessibilityRole="button">
       <View style={s.cardTop}>
-        {p.personnel_role ? <View style={s.roleIcon}><Icon name={ROLE_ICON[p.personnel_role] ?? 'user'} size={22} color={color.accent} /></View> : null}
+        {p.personnel_role ? <View style={s.roleIcon}><Icon name={ROLE_ICON[p.personnel_role] ?? 'user'} size={22} color={color.accentText} /></View> : null}
         <View style={{ flex: 1, gap: 4 }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-            <Label style={{ color: color.accent }}>{who}</Label>
+            <Label style={{ color: color.accentText }}>{who}</Label>
             {fresh ? <Badge variant="default">YENİ</Badge> : null}
           </View>
           <Text style={s.title} numberOfLines={2}>{p.title}</Text>
@@ -61,9 +61,9 @@ export function FirmCard({ p }: { p: Provider }) {
   return (
     <Pressable style={({ pressed }) => [s.card, pressed && { opacity: 0.85 }]} onPress={() => router.push(`/firma/${p.user_id}` as never)} accessibilityRole="button">
       <View style={s.cardTop}>
-        <View style={s.roleIcon}><Icon name={p.kind === 'tow' ? 'life-buoy' : 'briefcase'} size={22} color={color.accent} /></View>
+        <View style={s.roleIcon}><Icon name={p.kind === 'tow' ? 'life-buoy' : 'briefcase'} size={22} color={color.accentText} /></View>
         <View style={{ flex: 1, gap: 4 }}>
-          <Label style={{ color: color.accent }}>{p.company_category ?? PROVIDER_KINDS[p.kind]}</Label>
+          <Label style={{ color: color.accentText }}>{p.company_category ?? PROVIDER_KINDS[p.kind]}</Label>
           <Text style={s.title} numberOfLines={2}>{p.name}</Text>
           <Text style={s.desc} numberOfLines={2}>{p.description}</Text>
         </View>

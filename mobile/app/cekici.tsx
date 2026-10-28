@@ -189,7 +189,7 @@ const s = StyleSheet.create({
   name: { fontSize: 17, fontWeight: '700', color: color.ink },
   where: { color: color.muted, fontSize: 14 },
   dist: { alignItems: 'flex-end' },
-  distNum: { fontFamily: font.bold, fontSize: 30, color: color.accent, lineHeight: 32 },
+  distNum: { fontFamily: font.bold, fontSize: 30, color: color.accentText, lineHeight: 32 },
   strip: { flexDirection: 'row', borderTopWidth: 1, borderTopColor: color.line },
   cell: { flex: 1, paddingVertical: 7, paddingHorizontal: 12, gap: 1 },
   cellL: { flex: 1.5, borderLeftWidth: 1, borderLeftColor: color.line },
@@ -198,5 +198,5 @@ const s = StyleSheet.create({
   call: { flex: 1, backgroundColor: color.accent, minHeight: 48, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
   callText: { color: '#fff', fontWeight: '700', fontSize: 16 },
   more: { flex: 1, minHeight: 48, alignItems: 'center', justifyContent: 'center' },
-  moreText: { color: color.accent, fontWeight: '600', fontSize: 15 },
+  moreText: { color: color.accentText, fontWeight: '600', fontSize: 15 },
 });

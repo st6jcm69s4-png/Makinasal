@@ -144,7 +144,7 @@ export default function Favorites() {
           <>
             <View style={s.search}>
               <Icon name="search" size={18} color={color.muted} />
-              <TextInput style={s.searchInput} placeholder="Favorilerinde ara" placeholderTextColor="#9A949A" value={q} onChangeText={setQ} />
+              <TextInput style={s.searchInput} placeholder="Favorilerinde ara" placeholderTextColor={color.muted} value={q} onChangeText={setQ} />
               {q ? <Pressable onPress={() => setQ('')} hitSlop={10} accessibilityRole="button" accessibilityLabel="Temizle"><Icon name="x" size={18} color={color.muted} /></Pressable> : null}
             </View>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { FlatList, KeyboardAvoidingView, Modal, Platform, Pressable, StyleSheet, View } from 'react-native';
 import { Text, TextInput } from './LText';
+import { color } from '../lib/theme';
 
 export type Option = { value: string; label: string };
 const norm = (v: string) => v.toLocaleLowerCase('tr-TR').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/ı/g, 'i').replace(/[^a-z0-9]/g, '');
@@ -55,12 +56,12 @@ export function PickerModal({ visible, title, options, selected, onPick, onClose
 
 const s = StyleSheet.create({
   backdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' },
-  sheet: { backgroundColor: '#fff', borderTopLeftRadius: 16, borderTopRightRadius: 16, maxHeight: '75%' },
-  head: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, borderBottomWidth: 1, borderBottomColor: '#eee' },
+  sheet: { backgroundColor: color.surface, borderTopLeftRadius: 16, borderTopRightRadius: 16, maxHeight: '75%' },
+  head: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, borderBottomWidth: 1, borderBottomColor: color.line },
   title: { fontWeight: '700', fontSize: 16 },
-  close: { color: '#800020', fontWeight: '600' },
-  search: { margin: 12, padding: 10, backgroundColor: '#F6F5F3', borderRadius: 4, borderWidth: 1, borderColor: '#DDD9DC' },
-  row: { paddingVertical: 14, paddingHorizontal: 16, borderBottomWidth: 1, borderBottomColor: '#f2f2f2' },
-  label: { color: '#25272D' },
-  sel: { color: '#800020', fontWeight: '700' },
+  close: { color: color.accentText, fontWeight: '600' },
+  search: { margin: 12, padding: 10, backgroundColor: color.bg, borderRadius: 4, borderWidth: 1, borderColor: color.line },
+  row: { paddingVertical: 14, paddingHorizontal: 16, borderBottomWidth: 1, borderBottomColor: color.line },
+  label: { color: color.ink },
+  sel: { color: color.accentText, fontWeight: '700' },
 });

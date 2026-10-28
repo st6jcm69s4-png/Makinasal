@@ -5,6 +5,7 @@ import { Text } from '../components/LText';
 import { router, useFocusEffect } from 'expo-router';
 import { useApp } from '../lib/AppContext';
 import { photoUrl, supabase, tl } from '../lib/supabase';
+import { color } from '../lib/theme';
 
 type Row = {
   id: string; title: string; price: number | string; city: string; status: string;
@@ -46,7 +47,7 @@ export default function MyListings() {
   if (!session) return <GuestGate icon="list" text="İlanlarını görmek ve yönetmek için giriş yap." />;
   if (rows === null) return <ActivityIndicator style={{ margin: 32 }} />;
   return (
-    <View style={{ flex: 1, backgroundColor: '#F6F5F3' }}>
+    <View style={{ flex: 1, backgroundColor: color.bg }}>
       {error ? <Text style={s.err}>{error}</Text> : null}
       <FlatList
         data={rows}
@@ -58,7 +59,7 @@ export default function MyListings() {
           return (
             <View style={s.card}>
               <Pressable style={s.top} onPress={() => router.push(`/ilan/${r.id}`)} accessibilityRole="button">
-                {photo ? <Image source={{ uri: photoUrl(photo.path) }} style={s.img} /> : <View style={[s.img, { backgroundColor: '#e3e3e6' }]} />}
+                {photo ? <Image source={{ uri: photoUrl(photo.path) }} style={s.img} /> : <View style={[s.img, { backgroundColor: color.plate }]} />}
                 <View style={{ flex: 1, gap: 4 }}>
                   <Text style={s.title} numberOfLines={2}>{r.title}</Text>
                   <Text style={s.price}>{tl(r.price)} · {r.city}</Text>
@@ -70,7 +71,7 @@ export default function MyListings() {
                 {r.status === 'active' ? <Pressable onPress={() => confirm(r, 'sold', 'Satıldı olarak işaretlensin mi?')}><Text style={s.link}>Satıldı yap</Text></Pressable> : null}
                 {r.status === 'active' ? <Pressable onPress={() => void patch(r.id, 'paused')}><Text style={s.link}>Duraklat</Text></Pressable> : null}
                 {r.status === 'paused' ? <Pressable onPress={() => void patch(r.id, 'active')}><Text style={s.link}>Yayına al</Text></Pressable> : null}
-                <Pressable onPress={() => confirm(r, 'removed', 'İlan kaldırılsın mı? İşlem ve değerlendirme geçmişi korunur.')}><Text style={[s.link, { color: '#b00020' }]}>Kaldır</Text></Pressable>
+                <Pressable onPress={() => confirm(r, 'removed', 'İlan kaldırılsın mı? İşlem ve değerlendirme geçmişi korunur.')}><Text style={[s.link, { color: color.bad }]}>Kaldır</Text></Pressable>
               </View>
             </View>
           );
@@ -81,14 +82,14 @@ export default function MyListings() {
 }
 
 const s = StyleSheet.create({
-  msg: { textAlign: 'center', color: '#666', margin: 24 },
-  err: { color: '#b00020', margin: 12 },
-  card: { backgroundColor: '#fff', borderRadius: 4, overflow: 'hidden' },
+  msg: { textAlign: 'center', color: color.muted, margin: 24 },
+  err: { color: color.bad, margin: 12 },
+  card: { backgroundColor: color.surface, borderRadius: 4, overflow: 'hidden' },
   top: { flexDirection: 'row', gap: 10, padding: 10 },
   img: { width: 90, height: 70, borderRadius: 4 },
-  title: { fontWeight: '600', color: '#25272D' },
-  price: { color: '#800020', fontWeight: '700' },
-  status: { color: '#666' },
-  actions: { flexDirection: 'row', gap: 18, padding: 10, borderTopWidth: 1, borderTopColor: '#f0f0f0' },
-  link: { color: '#800020', fontWeight: '600' },
+  title: { fontWeight: '600', color: color.ink },
+  price: { color: color.accentText, fontWeight: '700' },
+  status: { color: color.muted },
+  actions: { flexDirection: 'row', gap: 18, padding: 10, borderTopWidth: 1, borderTopColor: color.line },
+  link: { color: color.accentText, fontWeight: '600' },
 });

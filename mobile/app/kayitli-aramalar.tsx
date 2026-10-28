@@ -6,6 +6,7 @@ import { router, useFocusEffect } from 'expo-router';
 import { useApp } from '../lib/AppContext';
 import { supabase } from '../lib/supabase';
 import { getLang, localeOf } from '../lib/i18n';
+import { color } from '../lib/theme';
 
 type F = { cat?: string; city?: string; maxPrice?: number; q?: string; brand?: string };
 type Saved = { id: string; query: { f?: F } };
@@ -30,7 +31,7 @@ export default function SavedSearches() {
   if (rows === null) return <ActivityIndicator style={{ margin: 32 }} />;
   return (
     <FlatList
-      style={{ backgroundColor: '#F6F5F3' }}
+      style={{ backgroundColor: color.bg }}
       data={rows}
       keyExtractor={(r) => r.id}
       contentContainerStyle={{ padding: 12, gap: 8 }}
@@ -52,8 +53,8 @@ export default function SavedSearches() {
   );
 }
 const s = StyleSheet.create({
-  msg: { textAlign: 'center', color: '#666', margin: 24 },
-  card: { backgroundColor: '#fff', padding: 14, borderRadius: 4, flexDirection: 'row', alignItems: 'center', gap: 10 },
-  title: { fontWeight: '600', color: '#25272D' },
-  del: { color: '#b00020' },
+  msg: { textAlign: 'center', color: color.muted, margin: 24 },
+  card: { backgroundColor: color.surface, padding: 14, borderRadius: 4, flexDirection: 'row', alignItems: 'center', gap: 10 },
+  title: { fontWeight: '600', color: color.ink },
+  del: { color: color.bad },
 });

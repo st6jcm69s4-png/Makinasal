@@ -102,7 +102,7 @@ function Member() {
           <ReferralBox />
         </View>
         <Pressable style={s.out} onPress={() => void supabase.auth.signOut()} accessibilityRole="button">
-          <Icon name="log-out" size={18} color={color.accent} /><Text style={s.outText}>Çıkış yap</Text>
+          <Icon name="log-out" size={18} color={color.accentText} /><Text style={s.outText}>Çıkış yap</Text>
         </Pressable>
       </View>
     </ScrollView>
@@ -149,7 +149,7 @@ export default function Account() {
         <View style={{ gap: 12 }}>
           <Field label="E-posta" autoCapitalize="none" keyboardType="email-address" value={email} onChangeText={setEmail} />
           <Field label="Şifre" secureTextEntry value={password} onChangeText={setPassword} />
-          <Pressable onPress={() => void forgot()} hitSlop={8} accessibilityRole="button" style={{ alignSelf: 'flex-end' }}><Text style={{ color: color.accent, fontWeight: '600' }}>Şifremi unuttum</Text></Pressable>
+          <Pressable onPress={() => void forgot()} hitSlop={8} accessibilityRole="button" style={{ alignSelf: 'flex-end' }}><Text style={{ color: color.accentText, fontWeight: '600' }}>Şifremi unuttum</Text></Pressable>
           {msg ? <Text style={s.err}>{msg}</Text> : null}
           <Btn title={busy ? 'Giriş yapılıyor…' : 'Giriş yap'} disabled={busy} onPress={() => void signIn()} />
           <Btn ghost title="Kayıt ol" onPress={() => router.push('/kayit' as never)} />
@@ -179,15 +179,15 @@ export default function Account() {
 }
 
 const s = StyleSheet.create({
-  screen: { padding: 20, gap: 12, flexGrow: 1, backgroundColor: '#F6F5F3' },
+  screen: { padding: 20, gap: 12, flexGrow: 1, backgroundColor: color.bg },
   h: { fontSize: 22, fontWeight: '700' },
-  input: { padding: 12, backgroundColor: '#fff', borderRadius: 4, borderWidth: 1, borderColor: '#DDD9DC' },
-  btn: { backgroundColor: '#800020', padding: 14, borderRadius: 4, alignItems: 'center' },
+  input: { padding: 12, backgroundColor: color.surface, borderRadius: 4, borderWidth: 1, borderColor: color.line },
+  btn: { backgroundColor: color.accent, padding: 14, borderRadius: 4, alignItems: 'center' },
   btnText: { color: '#fff', fontWeight: '600' },
-  btnGhost: { borderWidth: 1, borderColor: '#800020', padding: 14, borderRadius: 4, alignItems: 'center' },
-  btnGhostText: { color: '#800020', fontWeight: '600' },
-  err: { color: '#9C2626' },
-  note: { color: '#66616A' },
+  btnGhost: { borderWidth: 1, borderColor: color.accent, padding: 14, borderRadius: 4, alignItems: 'center' },
+  btnGhostText: { color: color.accentText, fontWeight: '600' },
+  err: { color: color.bad },
+  note: { color: color.muted },
   guestCard: { flexDirection: 'row', backgroundColor: color.surface, borderWidth: 1, borderColor: color.line, borderRadius: radius },
   guestCol: { flex: 1, padding: 12, gap: 8 },
   guestH: { fontFamily: font.bold, fontSize: 15, color: color.ink },
@@ -212,5 +212,5 @@ const s = StyleSheet.create({
   badge: { minWidth: 22, height: 22, borderRadius: 11, backgroundColor: color.accent, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 6 },
   badgeText: { color: '#fff', fontSize: 12, fontWeight: '700' },
   out: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, borderWidth: 1, borderColor: color.accent, borderRadius: radius, minHeight: 48 },
-  outText: { color: color.accent, fontWeight: '600', fontSize: 16 },
+  outText: { color: color.accentText, fontWeight: '600', fontSize: 16 },
 });

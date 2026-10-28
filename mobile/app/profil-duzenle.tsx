@@ -7,6 +7,7 @@ import { useApp } from '../lib/AppContext';
 import { CITIES } from '../lib/data';
 import { districtsFor, formatPersonName, validRegion } from '../lib/regions';
 import { supabase } from '../lib/supabase';
+import { color } from '../lib/theme';
 
 type Sheet = null | 'city' | 'district';
 export default function EditProfile() {
@@ -63,7 +64,7 @@ export default function EditProfile() {
   );
   return (
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <ScrollView style={{ backgroundColor: '#F6F5F3' }} contentContainerStyle={{ padding: 16, gap: 12 }} keyboardShouldPersistTaps="handled">
+      <ScrollView style={{ backgroundColor: color.bg }} contentContainerStyle={{ padding: 16, gap: 12 }} keyboardShouldPersistTaps="handled">
         {input('Ad soyad', name, setName)}
         {input('Telefon', phone, setPhone, { keyboardType: 'phone-pad' })}
         <Text style={s.small}>Telefonunu değiştirirsen doğrulaman sıfırlanır; doğrulama web sitesinden yapılır.</Text>
@@ -81,11 +82,11 @@ export default function EditProfile() {
   );
 }
 const s = StyleSheet.create({
-  msg: { textAlign: 'center', color: '#666', margin: 24 },
+  msg: { textAlign: 'center', color: color.muted, margin: 24 },
   label: { fontWeight: '600' },
-  input: { padding: 12, backgroundColor: '#fff', borderRadius: 4, borderWidth: 1, borderColor: '#DDD9DC' },
-  small: { color: '#666', fontSize: 12 },
-  err: { color: '#b00020' },
-  btn: { backgroundColor: '#800020', padding: 14, borderRadius: 4, alignItems: 'center' },
+  input: { padding: 12, backgroundColor: color.surface, borderRadius: 4, borderWidth: 1, borderColor: color.line },
+  small: { color: color.muted, fontSize: 12 },
+  err: { color: color.bad },
+  btn: { backgroundColor: color.accent, padding: 14, borderRadius: 4, alignItems: 'center' },
   btnText: { color: '#fff', fontWeight: '600' },
 });

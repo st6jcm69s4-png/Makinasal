@@ -98,5 +98,5 @@ const s = StyleSheet.create({
   line: { flex: 1, height: 1, backgroundColor: color.line },
   orText: { color: color.muted, fontSize: 12, letterSpacing: 1 },
   note: { color: color.muted, fontSize: 12.5, lineHeight: 17, textAlign: 'center' },
-  link: { color: color.accent, fontWeight: '600', fontSize: 13 },
+  link: { color: color.accentText, fontWeight: '600', fontSize: 13 },
 });

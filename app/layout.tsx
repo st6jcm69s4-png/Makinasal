@@ -22,8 +22,9 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   const saved = jar.get(LANGUAGE_COOKIE)?.value;
   const language = saved ? validLanguage(saved) : detectLanguage((await headers()).get('accept-language'));
   return (
-    <html lang={language}>
+    <html lang={language} suppressHydrationWarning>
       <head>
+        <script dangerouslySetInnerHTML={{__html:"try{var t=localStorage.getItem('makinasal-theme');if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t);if(t==='dark'){var m=document.querySelector('meta[name=theme-color]');if(m)m.setAttribute('content','#202024')}}}catch(e){}"}} />
         <link rel="manifest" href="/manifest.webmanifest" />
         <link rel="apple-touch-icon" href="/icons/icon-192.png" />
         <meta name="theme-color" content="#25272D" />

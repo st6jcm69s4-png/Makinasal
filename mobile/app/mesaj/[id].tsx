@@ -6,6 +6,7 @@ import { useApp } from '../../lib/AppContext';
 import { DealBox } from '../../components/DealBox';
 import { checkMessage } from '../../lib/messageFilter';
 import { supabase } from '../../lib/supabase';
+import { color } from '../../lib/theme';
 
 type Msg = { id: string; sender_id: string; body: string; created_at: string; kind?: string | null; offer_amount?: number | null };
 type ThreadInfo = { buyer_id: string; seller_id: string; title: string };
@@ -78,7 +79,7 @@ export default function Thread() {
   }
 
   return (
-    <KeyboardAvoidingView style={{ flex: 1, backgroundColor: '#F6F5F3' }} behavior={Platform.OS === 'ios' ? 'padding' : undefined} keyboardVerticalOffset={90}>
+    <KeyboardAvoidingView style={{ flex: 1, backgroundColor: color.bg }} behavior={Platform.OS === 'ios' ? 'padding' : undefined} keyboardVerticalOffset={90}>
       {info ? <Text style={s.hint2} numberOfLines={1}>İlan: {info.title}</Text> : null}
       {info && me ? <DealBox threadId={id} me={me} buyerId={info.buyer_id} sellerId={info.seller_id} /> : null}
       <FlatList
@@ -110,16 +111,16 @@ export default function Thread() {
 const s = StyleSheet.create({
   bubble: { maxWidth: '80%', padding: 10, borderRadius: 4 },
   offer: { borderWidth: 2, borderColor: '#e0a100' },
-  hint2: { color: '#666', paddingHorizontal: 12, paddingTop: 8 },
-  mine: { alignSelf: 'flex-end', backgroundColor: '#800020' },
-  theirs: { alignSelf: 'flex-start', backgroundColor: '#fff' },
+  hint2: { color: color.muted, paddingHorizontal: 12, paddingTop: 8 },
+  mine: { alignSelf: 'flex-end', backgroundColor: color.accent },
+  theirs: { alignSelf: 'flex-start', backgroundColor: color.surface },
   mineText: { color: '#fff' },
-  theirsText: { color: '#25272D' },
-  empty: { textAlign: 'center', color: '#666', margin: 24, transform: [{ scaleY: -1 }] },
-  err: { color: '#b00020', marginHorizontal: 12 },
-  hint: { color: '#888', fontSize: 12, marginHorizontal: 12, marginBottom: 4 },
-  bar: { flexDirection: 'row', gap: 8, padding: 10, backgroundColor: '#fff', alignItems: 'flex-end' },
-  input: { flex: 1, maxHeight: 100, padding: 10, backgroundColor: '#F6F5F3', borderRadius: 4 },
-  send: { backgroundColor: '#800020', paddingVertical: 12, paddingHorizontal: 16, borderRadius: 4 },
+  theirsText: { color: color.ink },
+  empty: { textAlign: 'center', color: color.muted, margin: 24, transform: [{ scaleY: -1 }] },
+  err: { color: color.bad, marginHorizontal: 12 },
+  hint: { color: color.muted, fontSize: 12, marginHorizontal: 12, marginBottom: 4 },
+  bar: { flexDirection: 'row', gap: 8, padding: 10, backgroundColor: color.surface, alignItems: 'flex-end' },
+  input: { flex: 1, maxHeight: 100, padding: 10, backgroundColor: color.bg, borderRadius: 4 },
+  send: { backgroundColor: color.accent, paddingVertical: 12, paddingHorizontal: 16, borderRadius: 4 },
   sendText: { color: '#fff', fontWeight: '600' },
 });

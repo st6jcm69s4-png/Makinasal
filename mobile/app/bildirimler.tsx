@@ -6,6 +6,7 @@ import { router, useFocusEffect } from 'expo-router';
 import { useApp } from '../lib/AppContext';
 import { supabase } from '../lib/supabase';
 import { getLang, localeOf } from '../lib/i18n';
+import { color } from '../lib/theme';
 
 type Note = { id: string; title: string; body: string; url: string; read_at: string | null; created_at: string };
 const UUID = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}';
@@ -42,7 +43,7 @@ export default function Notifications() {
   if (items === null) return <ActivityIndicator style={{ margin: 32 }} />;
   const unread = items.filter((n) => !n.read_at).map((n) => n.id);
   return (
-    <View style={{ flex: 1, backgroundColor: '#F6F5F3' }}>
+    <View style={{ flex: 1, backgroundColor: color.bg }}>
       {error ? <Text style={s.err}>{error}</Text> : null}
       {unread.length ? <Pressable onPress={() => void mark(unread)} accessibilityRole="button"><Text style={s.link}>Hepsini okundu işaretle ({unread.length})</Text></Pressable> : null}
       <FlatList
@@ -62,11 +63,11 @@ export default function Notifications() {
   );
 }
 const s = StyleSheet.create({
-  msg: { textAlign: 'center', color: '#666', margin: 24 },
-  err: { color: '#b00020', margin: 12 },
-  link: { color: '#800020', fontWeight: '600', margin: 12 },
-  card: { backgroundColor: '#fff', padding: 12, borderRadius: 4, gap: 4 },
-  unread: { borderLeftWidth: 4, borderLeftColor: '#800020' },
+  msg: { textAlign: 'center', color: color.muted, margin: 24 },
+  err: { color: color.bad, margin: 12 },
+  link: { color: color.accentText, fontWeight: '600', margin: 12 },
+  card: { backgroundColor: color.surface, padding: 12, borderRadius: 4, gap: 4 },
+  unread: { borderLeftWidth: 4, borderLeftColor: color.accent },
   title: { fontWeight: '700' },
-  date: { color: '#888', fontSize: 12 },
+  date: { color: color.muted, fontSize: 12 },
 });

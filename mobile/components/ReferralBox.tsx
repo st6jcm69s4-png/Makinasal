@@ -94,7 +94,7 @@ export function ReferralBox() {
             <View style={s.claim}>
               {enter ? (
                 <>
-                  <TextInput style={s.input} value={input} onChangeText={setInput} placeholder="Davet kodu" placeholderTextColor="#9A949A" autoCapitalize="characters" maxLength={16} />
+                  <TextInput style={s.input} value={input} onChangeText={setInput} placeholder="Davet kodu" placeholderTextColor={color.muted} autoCapitalize="characters" maxLength={16} />
                   {msg ? <Text style={s.err}>{msg}</Text> : null}
                   <Pressable style={({ pressed }) => [s.use, pressed && { opacity: 0.85 }]} disabled={busy} onPress={() => void claim()} accessibilityRole="button"><Text style={s.useText}>{busy ? 'Kontrol ediliyor…' : 'Kodu kullan'}</Text></Pressable>
                 </>
@@ -117,8 +117,8 @@ const s = StyleSheet.create({
   body: { padding: 14, gap: 12 },
   p: { color: color.ink, lineHeight: 21 },
   show: { backgroundColor: color.navy, minHeight: 48, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, borderRadius: radius },
-  lead: { color: '#F1D5DC', fontSize: 14 },
-  ticket: { flexDirection: 'row', alignItems: 'center', gap: 12, borderWidth: 1.5, borderStyle: 'dashed', borderColor: '#5A5C64', padding: 12, backgroundColor: color.navy },
+  lead: { color: color.accentSoft, fontSize: 14 },
+  ticket: { flexDirection: 'row', alignItems: 'center', gap: 12, borderWidth: 1.5, borderStyle: 'dashed', borderColor: color.muted, padding: 12, backgroundColor: color.navy },
   code: { color: '#fff', fontFamily: font.labelBold, fontSize: 30, letterSpacing: 4 },
   share: { backgroundColor: color.accent, flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 14, minHeight: 44, borderRadius: radius },
   shareText: { color: '#fff', fontWeight: '700' },
@@ -134,5 +134,5 @@ const s = StyleSheet.create({
   err: { color: color.bad },
   use: { backgroundColor: color.navy, minHeight: 46, alignItems: 'center', justifyContent: 'center', borderRadius: radius },
   useText: { color: '#fff', fontWeight: '700' },
-  link: { color: color.accent, fontWeight: '600' },
+  link: { color: color.accentText, fontWeight: '600' },
 });

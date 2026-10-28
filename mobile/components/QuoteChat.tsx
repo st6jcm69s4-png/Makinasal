@@ -5,6 +5,7 @@ import { Btn, common } from './ui';
 import { checkMessage } from '../lib/messageFilter';
 import { networkError } from '../lib/network';
 import { supabase } from '../lib/supabase';
+import { color } from '../lib/theme';
 
 type Msg = { id: string; sender_id: string; body: string; created_at: string };
 
@@ -44,11 +45,11 @@ export function QuoteChat({ quoteId, userId }: { quoteId: string; userId: string
         <View style={{ gap: 6 }}>
           {msgs.length === 0 ? <Text style={common.meta}>Henüz mesaj yok.</Text> : null}
           {msgs.map((m) => (
-            <View key={m.id} style={{ alignSelf: m.sender_id === userId ? 'flex-end' : 'flex-start', backgroundColor: m.sender_id === userId ? '#EBD5DA' : '#eee', padding: 8, borderRadius: 4, maxWidth: '85%' }}>
+            <View key={m.id} style={{ alignSelf: m.sender_id === userId ? 'flex-end' : 'flex-start', backgroundColor: m.sender_id === userId ? color.accentSoft : color.line, padding: 8, borderRadius: 4, maxWidth: '85%' }}>
               <Text>{m.body}</Text>
             </View>
           ))}
-          <TextInput style={{ padding: 10, backgroundColor: '#fff', borderRadius: 4, borderWidth: 1, borderColor: '#DDD9DC' }} placeholder="Mesaj yaz" value={text} onChangeText={setText} multiline />
+          <TextInput style={{ padding: 10, backgroundColor: color.surface, borderRadius: 4, borderWidth: 1, borderColor: color.line }} placeholder="Mesaj yaz" value={text} onChangeText={setText} multiline />
           {error ? <Text style={common.err}>{error}</Text> : null}
           <Btn title="Gönder" onPress={() => void send()} disabled={busy} />
         </View>

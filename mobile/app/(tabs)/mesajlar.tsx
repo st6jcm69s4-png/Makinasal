@@ -105,7 +105,7 @@ export default function Messages() {
         <View style={{ padding: 12, gap: 10 }}>
           <View style={s.search}>
             <Icon name="search" size={18} color={color.muted} />
-            <TextInput style={s.searchInput} placeholder="Kişi, ilan veya mesaj ara" placeholderTextColor="#9A949A" value={q} onChangeText={setQ} />
+            <TextInput style={s.searchInput} placeholder="Kişi, ilan veya mesaj ara" placeholderTextColor={color.muted} value={q} onChangeText={setQ} />
             {q ? <Pressable onPress={() => setQ('')} hitSlop={10} accessibilityRole="button" accessibilityLabel="Temizle"><Icon name="x" size={18} color={color.muted} /></Pressable> : null}
           </View>
           <View style={{ flexDirection: 'row', gap: 8 }}>
@@ -189,7 +189,7 @@ const s = StyleSheet.create({
   avatarText: { color: '#fff', fontFamily: font.bold, fontSize: 20 },
   other: { flex: 1, fontSize: 16, fontFamily: font.semi, color: color.ink },
   time: { color: color.muted, fontSize: 12.5 },
-  listing: { color: color.accent, fontSize: 13.5, fontWeight: '500' },
+  listing: { color: color.accentText, fontSize: 13.5, fontWeight: '500' },
   last: { flex: 1, color: color.muted, fontSize: 14.5 },
   badge: { minWidth: 22, height: 22, borderRadius: 11, backgroundColor: color.accent, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 6 },
   badgeText: { color: '#fff', fontSize: 12, fontWeight: '700' },

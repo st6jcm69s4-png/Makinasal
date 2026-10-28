@@ -61,7 +61,7 @@ export default function Rights() {
       </View>
       <View style={{ gap: 6 }}>
         <Label>Açıklama (isteğe bağlı)</Label>
-        <TextInput style={s.input} multiline value={note} onChangeText={setNote} maxLength={1000} placeholder="Başvurunla ilgili eklemek istediklerin" placeholderTextColor="#9A949A" />
+        <TextInput style={s.input} multiline value={note} onChangeText={setNote} maxLength={1000} placeholder="Başvurunla ilgili eklemek istediklerin" placeholderTextColor={color.muted} />
       </View>
       {KINDS.map((k) => (
         <View key={k.kind} style={s.card}>

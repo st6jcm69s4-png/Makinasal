@@ -14,7 +14,7 @@ export function Field({ label, ...props }: { label: string } & TextInputProps) {
   return (
     <View style={s.cell}>
       <Label>{label}</Label>
-      <TextInput style={[s.input, props.multiline && { minHeight: 96, textAlignVertical: 'top' }]} placeholderTextColor="#9A949A" {...props} />
+      <TextInput style={[s.input, props.multiline && { minHeight: 96, textAlignVertical: 'top' }]} placeholderTextColor={color.muted} {...props} />
     </View>
   );
 }
@@ -23,7 +23,7 @@ export function Select({ label, value, onPress, placeholder = 'Seç' }: { label:
     <View style={s.cell}>
       <Label>{label}</Label>
       <Pressable style={[s.input, s.selectRow]} onPress={onPress} accessibilityRole="button" accessibilityLabel={tr(label)}>
-        <Text style={{ color: value ? color.ink : '#9A949A', fontSize: 16, flex: 1 }} numberOfLines={1}>{value || placeholder}</Text>
+        <Text style={{ color: value ? color.ink : color.muted, fontSize: 16, flex: 1 }} numberOfLines={1}>{value || placeholder}</Text>
         <Text style={{ color: color.muted, fontSize: 16 }}>▾</Text>
       </Pressable>
     </View>
@@ -62,7 +62,7 @@ export function FieldCell({ label, value, strong, style }: { label: string; valu
   return (
     <View style={[s.fcell, style]}>
       <Label>{label}</Label>
-      <Text style={[s.fvalue, strong && { color: color.accent, fontWeight: '700' }]} numberOfLines={2}>{value === null || value === undefined || value === '' ? '–' : String(value)}</Text>
+      <Text style={[s.fvalue, strong && { color: color.accentText, fontWeight: '700' }]} numberOfLines={2}>{value === null || value === undefined || value === '' ? '–' : String(value)}</Text>
     </View>
   );
 }
@@ -86,7 +86,7 @@ export const common = StyleSheet.create({
   screen: { flex: 1, backgroundColor: color.bg },
   card: { backgroundColor: color.surface, padding: 12, borderRadius: radius, gap: 4, borderWidth: 1, borderColor: color.line },
   title: { fontWeight: '600', color: color.ink, fontSize: 16 },
-  price: { fontWeight: '700', color: color.accent, fontSize: 17 },
+  price: { fontWeight: '700', color: color.accentText, fontSize: 17 },
   meta: { color: color.muted, fontSize: 14 },
   err: { color: color.bad, fontSize: 14 },
   empty: { textAlign: 'center', color: color.muted, margin: 24 },
@@ -100,14 +100,14 @@ const s = StyleSheet.create({
   btn: { backgroundColor: color.accent, paddingVertical: 13, paddingHorizontal: 14, borderRadius: radius, alignItems: 'center', minHeight: 48, justifyContent: 'center' },
   btnText: { color: color.accentInk, fontWeight: '600', fontSize: 16 },
   ghost: { backgroundColor: 'transparent', borderWidth: 1, borderColor: color.accent },
-  ghostText: { color: color.accent },
+  ghostText: { color: color.accentText },
   danger: { backgroundColor: 'transparent', borderWidth: 1, borderColor: color.bad },
   dangerText: { color: color.bad },
   chip: { paddingVertical: 9, paddingHorizontal: 13, backgroundColor: color.surface, borderRadius: radius, borderWidth: 1, borderColor: color.line, minHeight: 40, justifyContent: 'center' },
   chipOn: { backgroundColor: color.navy, borderColor: color.navy },
   chipText: { color: color.ink, fontSize: 15, fontWeight: '500' },
   band: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderTopWidth: 2, borderTopColor: color.navy, paddingTop: 8, marginTop: 22, marginBottom: 10, marginHorizontal: 12 },
-  bandAction: { color: color.accent, fontWeight: '600', fontSize: 14 },
+  bandAction: { color: color.accentText, fontWeight: '600', fontSize: 14 },
   grid: { flexDirection: 'row', flexWrap: 'wrap', borderLeftWidth: 1, borderTopWidth: 1, borderColor: color.line, backgroundColor: color.surface },
   fcell: { flexGrow: 1, flexBasis: '33%', minWidth: '30%', paddingVertical: 8, paddingHorizontal: 10, gap: 2, borderRightWidth: 1, borderBottomWidth: 1, borderColor: color.line },
   fvalue: { fontSize: 16, color: color.ink, fontWeight: '500' },

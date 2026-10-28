@@ -9,7 +9,7 @@ export type Item = { icon: IconName; label: string; sub?: string; go: () => void
 function Row({ it, last }: { it: Item; last: boolean }) {
   return (
     <Pressable style={({ pressed }) => [s.row, !last && s.rowLine, pressed && { backgroundColor: color.plate }]} onPress={it.go} accessibilityRole="button">
-      <Icon name={it.icon} size={20} color={color.accent} />
+      <Icon name={it.icon} size={20} color={color.accentText} />
       <View style={{ flex: 1 }}>
         <Text style={s.rowLabel}>{it.label}</Text>
         {it.sub ? <Text style={s.rowSub}>{it.sub}</Text> : null}

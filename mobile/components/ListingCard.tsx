@@ -44,7 +44,7 @@ const s = StyleSheet.create({
   noimg: { backgroundColor: color.plate },
   body: { flex: 1, padding: 10, gap: 4, justifyContent: 'space-between' },
   title: { fontWeight: '600', color: color.ink, fontSize: 16 },
-  price: { fontFamily: font.bold, fontWeight: '700', color: color.accent, fontSize: 19 },
+  price: { fontFamily: font.bold, fontWeight: '700', color: color.accentText, fontSize: 19 },
   heart: { padding: 10 },
   strip: { flexDirection: 'row', borderTopWidth: 1, borderTopColor: color.line },
   cell: { flex: 1, paddingVertical: 6, paddingHorizontal: 10, gap: 1 },

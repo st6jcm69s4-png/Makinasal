@@ -9,6 +9,7 @@ import { useApp } from '../lib/AppContext';
 import { CATEGORIES, CITIES, KM_CATEGORIES, LIMITS, MACHINE_CATEGORIES, PART_GROUPS } from '../lib/data';
 import { brandsForCategory, canonicalBrand } from '../lib/machineryCatalog';
 import { photoUrl, supabase } from '../lib/supabase';
+import { color } from '../lib/theme';
 
 const CONDITIONS = ['Sıfır', 'Çıkma', 'Revizyonlu'];
 const YEAR_MAX = new Date().getFullYear() + 1;
@@ -165,11 +166,11 @@ export default function NewListing() {
   );
   const select = (label: string, value: string, open: Sheet) => (
     <View style={s.field}><Text style={s.label}>{label}</Text>
-      <Pressable style={s.input} onPress={() => setSheet(open)} accessibilityRole="button"><Text style={{ color: value ? '#25272D' : '#999' }}>{value || 'Seç'}</Text></Pressable></View>
+      <Pressable style={s.input} onPress={() => setSheet(open)} accessibilityRole="button"><Text style={{ color: value ? color.navy : color.muted }}>{value || 'Seç'}</Text></Pressable></View>
   );
   return (
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <ScrollView style={{ backgroundColor: '#F6F5F3' }} contentContainerStyle={s.form} keyboardShouldPersistTaps="handled">
+      <ScrollView style={{ backgroundColor: color.bg }} contentContainerStyle={s.form} keyboardShouldPersistTaps="handled">
         {select('Kategori', cat, 'cat')}
         {part ? (
           <>
@@ -238,16 +239,16 @@ export default function NewListing() {
 const s = StyleSheet.create({
   form: { padding: 16, gap: 12 },
   field: { gap: 4 },
-  label: { fontWeight: '600', color: '#25272D' },
-  input: { padding: 12, backgroundColor: '#fff', borderRadius: 4, borderWidth: 1, borderColor: '#DDD9DC' },
+  label: { fontWeight: '600', color: color.ink },
+  input: { padding: 12, backgroundColor: color.surface, borderRadius: 4, borderWidth: 1, borderColor: color.line },
   rowSwitch: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   thumb: { width: 90, height: 70, borderRadius: 4 },
-  rm: { textAlign: 'center', color: '#b00020', fontSize: 12 },
-  btn: { backgroundColor: '#800020', padding: 14, borderRadius: 4, alignItems: 'center' },
+  rm: { textAlign: 'center', color: color.bad, fontSize: 12 },
+  btn: { backgroundColor: color.accent, padding: 14, borderRadius: 4, alignItems: 'center' },
   btnText: { color: '#fff', fontWeight: '600' },
-  btnGhost: { borderWidth: 1, borderColor: '#800020', padding: 12, borderRadius: 4, alignItems: 'center' },
-  btnGhostText: { color: '#800020', fontWeight: '600' },
-  err: { color: '#b00020' },
-  small: { color: '#666', fontSize: 12 },
-  msg: { textAlign: 'center', color: '#666', margin: 24 },
+  btnGhost: { borderWidth: 1, borderColor: color.accent, padding: 12, borderRadius: 4, alignItems: 'center' },
+  btnGhostText: { color: color.accentText, fontWeight: '600' },
+  err: { color: color.bad },
+  small: { color: color.muted, fontSize: 12 },
+  msg: { textAlign: 'center', color: color.muted, margin: 24 },
 });

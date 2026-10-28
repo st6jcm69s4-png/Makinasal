@@ -1,5 +1,6 @@
 // Mobil uygulamaya özgü İngilizce çeviriler (web en.json'da bulunmayanlar).
 const extra: Record<string, string> = {
+  'Görünüm': 'Appearance', 'Sistem': 'System', 'Açık tema': 'Light', 'Koyu tema': 'Dark',
   'Ana sayfa': 'Home', 'İlanlar': 'Listings', 'İş Ağı': 'Work network', 'Favoriler': 'Favorites', 'Mesajlar': 'Messages', 'Hesabım': 'My account',
   'Favoriler yüklenemedi. Bağlantını kontrol et.': 'Favorites could not be loaded. Check your connection.',
   'Favorilerini görmek için giriş yap.': 'Sign in to see your favorites.',

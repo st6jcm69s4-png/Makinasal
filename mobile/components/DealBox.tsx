@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Alert, Pressable, StyleSheet, View } from 'react-native';
 import { Text, TextInput } from './LText';
 import { supabase } from '../lib/supabase';
+import { color } from '../lib/theme';
 
 type Deal = { buyer_confirmed: boolean; seller_confirmed: boolean; completed_at: string | null };
 type Review = { score: number; comment: string | null; tags?: string[] };
@@ -98,15 +99,15 @@ export function DealBox({ threadId, me, buyerId, sellerId }: { threadId: string;
 }
 
 const s = StyleSheet.create({
-  box: { backgroundColor: '#fff', margin: 10, padding: 12, borderRadius: 4, gap: 8 },
+  box: { backgroundColor: color.surface, margin: 10, padding: 12, borderRadius: 4, gap: 8 },
   b: { fontWeight: '700' },
-  small: { color: '#666', fontSize: 12 },
-  btn: { backgroundColor: '#800020', padding: 12, borderRadius: 4, alignItems: 'center' },
+  small: { color: color.muted, fontSize: 12 },
+  btn: { backgroundColor: color.accent, padding: 12, borderRadius: 4, alignItems: 'center' },
   btnText: { color: '#fff', fontWeight: '600' },
-  star: { fontSize: 30, color: '#ccc' },
+  star: { fontSize: 30, color: color.line },
   tags: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
-  tag: { borderWidth: 1, borderColor: '#DDD9DC', borderRadius: 4, paddingVertical: 6, paddingHorizontal: 10 },
-  tagOn: { backgroundColor: '#800020', borderColor: '#800020' },
-  input: { padding: 10, backgroundColor: '#F6F5F3', borderRadius: 4, minHeight: 50 },
-  err: { color: '#b00020' },
+  tag: { borderWidth: 1, borderColor: color.line, borderRadius: 4, paddingVertical: 6, paddingHorizontal: 10 },
+  tagOn: { backgroundColor: color.accent, borderColor: color.accent },
+  input: { padding: 10, backgroundColor: color.bg, borderRadius: 4, minHeight: 50 },
+  err: { color: color.bad },
 });

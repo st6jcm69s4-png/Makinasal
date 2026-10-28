@@ -7,6 +7,7 @@ import { useApp } from '../../lib/AppContext';
 import { useLoginPrompt } from '../../components/LoginPrompt';
 import { dateLabel, EQUIPMENT_STATUS, money, PROVIDER_KINDS, type MarketPost, type Provider } from '../../lib/network';
 import { supabase, type Row } from '../../lib/supabase';
+import { color } from '../../lib/theme';
 
 export default function ProviderDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -40,7 +41,7 @@ export default function ProviderDetail() {
       <View style={common.card}>
         <Text style={{ fontSize: 18, fontWeight: '700' }}>{p.name}</Text>
         <Text style={common.meta}>{p.company_category ?? PROVIDER_KINDS[p.kind]} · {[p.city, p.district].filter(Boolean).join(' / ')}</Text>
-        {stat ? <Text style={{ color: '#800020', fontWeight: '700' }}>★ {stat.score.toFixed(1)} · {stat.n} değerlendirme</Text> : null}
+        {stat ? <Text style={{ color: color.accentText, fontWeight: '700' }}>★ {stat.score.toFixed(1)} · {stat.n} değerlendirme</Text> : null}
         <Text style={{ marginTop: 6 }}>{p.description}</Text>
         <Text style={{ marginTop: 6 }}><Text style={{ fontWeight: '600' }}>Hizmet illeri: </Text>{p.service_cities.join(', ')}</Text>
         <Text><Text style={{ fontWeight: '600' }}>İş alanları: </Text>{p.specialties.join(', ')}</Text>

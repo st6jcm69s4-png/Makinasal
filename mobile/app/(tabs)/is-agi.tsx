@@ -106,10 +106,10 @@ export default function NetworkTab() {
         ) : null}
         <View style={s.searchRow}>
           <Icon name="search" size={18} color={color.muted} />
-          <TextInput style={s.input} placeholder={tab === 'firma' ? 'Firma ara' : tab === 'staff_wanted' ? 'Pozisyon ara' : 'İlan ara'} placeholderTextColor="#9A949A" value={q} onChangeText={setQ} />
+          <TextInput style={s.input} placeholder={tab === 'firma' ? 'Firma ara' : tab === 'staff_wanted' ? 'Pozisyon ara' : 'İlan ara'} placeholderTextColor={color.muted} value={q} onChangeText={setQ} />
           <Pressable style={s.cityBtn} onPress={() => setSheet(true)} accessibilityRole="button">
             <Icon name="map-pin" size={15} color={city ? color.accent : color.muted} />
-            <Text style={[s.cityText, city && { color: color.accent, fontWeight: '700' }]} numberOfLines={1}>{city || 'Tüm iller'}</Text>
+            <Text style={[s.cityText, city && { color: color.accentText, fontWeight: '700' }]} numberOfLines={1}>{city || 'Tüm iller'}</Text>
           </Pressable>
         </View>
         <View style={{ flexDirection: 'row', gap: 8 }}>

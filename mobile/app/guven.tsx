@@ -1,13 +1,14 @@
 import { ScrollView, View } from 'react-native';
 import { Text } from '../components/LText';
 import { common } from '../components/ui';
+import { color } from '../lib/theme';
 
 const LEVELS: [string, string, string][] = [
-  ['Çok güvenilir', '#1b7f3b', '4,5 üzeri puan ve en az 10 onaylı işlem'],
-  ['Güvenilir', '#1b7f3b', '4,0 üzeri puan'],
-  ['Orta güven', '#b36b00', '4,0 altı puan'],
-  ['Yeni üye', '#666', '3 işlemden az, puan henüz oluşmadı'],
-  ['Riskli', '#b00020', '2 veya daha fazla doğrulanmış şikayet ya da 3+ işlemde 3 altı puan'],
+  ['Çok güvenilir', color.good, '4,5 üzeri puan ve en az 10 onaylı işlem'],
+  ['Güvenilir', color.good, '4,0 üzeri puan'],
+  ['Orta güven', color.warn, '4,0 altı puan'],
+  ['Yeni üye', color.muted, '3 işlemden az, puan henüz oluşmadı'],
+  ['Riskli', color.bad, '2 veya daha fazla doğrulanmış şikayet ya da 3+ işlemde 3 altı puan'],
 ];
 export default function Trust() {
   return (

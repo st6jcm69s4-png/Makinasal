@@ -7,11 +7,16 @@ import { useLang } from '../lib/lang';
 import { useApp } from '../lib/AppContext';
 import { supabase } from '../lib/supabase';
 import { openWeb } from '../lib/web';
+import { loadTheme, saveTheme, type ThemeChoice } from '../lib/themePref';
+import { themeSupportsChoice } from '../lib/theme';
 
 export default function Settings() {
   const { session } = useApp();
   const { lang, setLang } = useLang();
   const [admin, setAdmin] = useState(false);
+  const [theme, setTheme] = useState<ThemeChoice>('system');
+  useEffect(() => { void loadTheme().then(setTheme); }, []);
+  const pickTheme = (c: ThemeChoice) => { setTheme(c); void saveTheme(c); };
   useEffect(() => {
     if (!session) { setAdmin(false); return; }
     void supabase.auth.getUser().then(({ data }) => setAdmin(data.user?.app_metadata?.role === 'admin'));
@@ -27,6 +32,16 @@ export default function Settings() {
         </View>
         <Text style={common.meta}>Dil tercihin bu telefonda saklanır. İlanlar ve mesajlar yazıldıkları dilde kalır.</Text>
       </View>
+      {themeSupportsChoice ? (
+        <View style={common.card}>
+          <Text style={common.h2}>Görünüm</Text>
+          <View style={{ flexDirection: 'row', gap: 8 }}>
+            <Chip title="Sistem" on={theme === 'system'} onPress={() => pickTheme('system')} />
+            <Chip title="Açık tema" on={theme === 'light'} onPress={() => pickTheme('light')} />
+            <Chip title="Koyu tema" on={theme === 'dark'} onPress={() => pickTheme('dark')} />
+          </View>
+        </View>
+      ) : null}
       <View style={[common.card, { gap: 8 }]}>
         <Text style={common.h2}>Hesap</Text>
         {session ? (

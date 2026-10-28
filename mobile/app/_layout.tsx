@@ -3,7 +3,8 @@ import { BarlowCondensed_600SemiBold, BarlowCondensed_700Bold } from '@expo-goog
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { caps, fontState } from '../lib/theme';
+import { caps, color, fontState } from '../lib/theme';
+import { loadTheme } from '../lib/themePref';
 import { StatusBar } from 'expo-status-bar';
 import { HeaderBack } from '../components/HeaderBack';
 import { AppProvider } from '../lib/AppContext';
@@ -26,7 +27,7 @@ function Screens() {
           // Her uygulamadaki gibi: sistemin kendi geri oku. Geçmiş yoksa (bağlantıyla açılınca) ana sayfaya dönen düğme.
           headerBackButtonDisplayMode: 'minimal',
           headerLeft: navigation.canGoBack() ? undefined : () => <HeaderBack />,
-          contentStyle: { backgroundColor: '#F6F5F3' },
+          contentStyle: { backgroundColor: color.bg },
         })}
       >
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
@@ -68,9 +69,11 @@ export default function RootLayout() {
   const [loaded, error] = useFonts({ Barlow_400Regular, Barlow_500Medium, Barlow_600SemiBold, Barlow_700Bold, BarlowCondensed_600SemiBold, BarlowCondensed_700Bold });
   // Yazı tipi yüklenemese de (çevrimdışı vb.) uygulama sistem yazı tipiyle açılır.
   const [timedOut, setTimedOut] = useState(false);
+  const [themeReady, setThemeReady] = useState(false);
+  useEffect(() => { void loadTheme().finally(() => setThemeReady(true)); }, []);
   useEffect(() => { const t = setTimeout(() => setTimedOut(true), 4000); return () => clearTimeout(t); }, []);
   fontState.ok = !!loaded && !error;
-  if (!loaded && !error && !timedOut) return null;
+  if ((!loaded && !error && !timedOut) || !themeReady) return null;
   return (
     <LangProvider>
       <AppProvider>

@@ -15,6 +15,7 @@ import { Alert } from 'react-native';
 import { useApp } from '../../lib/AppContext';
 import { ListingCard } from '../../components/ListingCard';
 import { configured, supabase, type Row } from '../../lib/supabase';
+import { color } from '../../lib/theme';
 
 const SORTS = [
   { value: 'rec', label: 'Öne çıkanlar önce' }, { value: 'new', label: 'En yeni ilan' }, { value: 'pa', label: 'Fiyat: artan' },
@@ -121,13 +122,13 @@ export default function Listings() {
 }
 
 const s = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: '#F6F5F3' },
-  input: { margin: 12, padding: 12, backgroundColor: '#fff', borderRadius: 4, borderWidth: 1, borderColor: '#DDD9DC' },
+  screen: { flex: 1, backgroundColor: color.bg },
+  input: { margin: 12, padding: 12, backgroundColor: color.surface, borderRadius: 4, borderWidth: 1, borderColor: color.line },
   chips: { paddingHorizontal: 12, gap: 8, paddingBottom: 8 },
-  chip: { paddingVertical: 8, paddingHorizontal: 14, backgroundColor: '#fff', borderRadius: 4, borderWidth: 1, borderColor: '#DDD9DC' },
-  chipOn: { backgroundColor: '#800020', borderColor: '#800020' },
-  chipText: { color: '#25272D' },
+  chip: { paddingVertical: 8, paddingHorizontal: 14, backgroundColor: color.surface, borderRadius: 4, borderWidth: 1, borderColor: color.line },
+  chipOn: { backgroundColor: color.accent, borderColor: color.accent },
+  chipText: { color: color.ink },
   chipTextOn: { color: '#fff' },
-  err: { color: '#b00020', marginHorizontal: 12 },
-  empty: { textAlign: 'center', margin: 24, color: '#666' },
+  err: { color: color.bad, marginHorizontal: 12 },
+  empty: { textAlign: 'center', margin: 24, color: color.muted },
 });

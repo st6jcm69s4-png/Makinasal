@@ -1,5 +1,6 @@
 // Mobil uygulamaya özgü Almanca çeviriler (Sie-Form).
 const de: Record<string, string> = {
+  'Görünüm': 'Darstellung', 'Sistem': 'System', 'Açık tema': 'Hell', 'Koyu tema': 'Dunkel',
   'İlanlar': 'Inserate',
   'İş Ağı': 'Geschäftsnetzwerk',
   'Favoriler yüklenemedi. Bağlantını kontrol et.': 'Favoriten konnten nicht geladen werden. Prüfen Sie Ihre Verbindung.',

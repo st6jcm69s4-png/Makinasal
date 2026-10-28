@@ -33,7 +33,7 @@ function TileCard({ t }: { t: Tile }) {
   const dark = t.tone !== 'paper';
   const bg = t.tone === 'navy' ? color.navy : t.tone === 'accent' ? color.accent : color.surface;
   const ink = dark ? '#fff' : color.ink;
-  const soft = t.tone === 'accent' ? '#F1D5DC' : dark ? color.onNavy : color.muted;
+  const soft = t.tone === 'accent' ? color.accentSoft : dark ? color.onNavy : color.muted;
   return (
     <Pressable style={({ pressed }) => [s.tile, t.wide ? { width: '100%' } : { width: '48.5%' }, { backgroundColor: bg, borderColor: dark ? bg : color.line }, pressed && { opacity: 0.88 }]} onPress={t.go} accessibilityRole="button">
       <View style={s.tileMark} pointerEvents="none"><Icon name={t.icon} size={t.wide ? 112 : 92} color={dark ? '#FFFFFF' : color.navy} /></View>
@@ -245,7 +245,7 @@ export default function Home() {
 }
 
 const s = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: '#F6F5F3' },
+  screen: { flex: 1, backgroundColor: color.bg },
   guest: { flexDirection: 'row', alignItems: 'center', gap: 12, marginHorizontal: 12, marginTop: 14, padding: 12, backgroundColor: color.surface, borderWidth: 1, borderColor: color.line, borderLeftWidth: 3, borderLeftColor: color.navy },
   guestT: { fontWeight: '700', color: color.ink, fontSize: 15 },
   guestS: { color: color.muted, fontSize: 13.5 },
@@ -253,11 +253,11 @@ const s = StyleSheet.create({
   guestBtnT: { color: '#fff', fontWeight: '700' },
   hub: { flexDirection: 'row', marginHorizontal: 12, marginTop: 14, backgroundColor: color.surface, borderWidth: 1, borderColor: color.line },
   hubCell: { flex: 1, paddingVertical: 10, paddingHorizontal: 8, gap: 2 },
-  hubNum: { fontFamily: font.bold, fontSize: 22, color: color.accent },
+  hubNum: { fontFamily: font.bold, fontSize: 22, color: color.accentText },
   trust: { marginHorizontal: 12, marginTop: 18, padding: 12, gap: 8, backgroundColor: color.surface, borderWidth: 1, borderColor: color.line, borderLeftWidth: 3, borderLeftColor: color.good },
   trustRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   trustText: { color: color.ink },
-  link2: { color: color.accent, fontWeight: '600' },
+  link2: { color: color.accentText, fontWeight: '600' },
   spot: { marginHorizontal: 12, marginTop: 14, borderWidth: 1, borderColor: color.navy, backgroundColor: color.navy },
   spotPhoto: { width: '100%', height: 200, backgroundColor: color.plate },
   spotBar: { flexDirection: 'row', alignItems: 'stretch', borderTopWidth: 3, borderTopColor: color.accent },
@@ -286,10 +286,10 @@ const s = StyleSheet.create({
   catText: { color: color.ink, fontWeight: '500' },
   card: { backgroundColor: color.surface, marginHorizontal: 12, marginBottom: 8, padding: 12, borderRadius: 4, gap: 4, borderWidth: 1, borderColor: color.line },
   step: { flexDirection: 'row', gap: 14, alignItems: 'flex-start', marginHorizontal: 12, paddingVertical: 12, borderTopWidth: 1, borderTopColor: color.line },
-  stepNo: { fontFamily: font.labelBold, fontSize: 34, lineHeight: 34, color: color.accent, width: 48 },
+  stepNo: { fontFamily: font.labelBold, fontSize: 34, lineHeight: 34, color: color.accentText, width: 48 },
   cardTitle: { fontWeight: '700', color: color.ink, fontSize: 16 },
   meta: { color: color.muted },
-  price: { fontWeight: '700', color: color.accent },
+  price: { fontWeight: '700', color: color.accentText },
   empty: { color: color.muted, marginHorizontal: 12 },
   err: { color: color.bad, marginHorizontal: 12, marginTop: 8 },
 });

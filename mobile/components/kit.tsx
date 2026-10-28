@@ -111,7 +111,7 @@ export function Tabs<T extends string>({ items, value, onChange, variant = 'fill
             style={[k.tab, filled ? { borderTopWidth: 3, borderTopColor: on ? color.accent : 'transparent', backgroundColor: on ? color.navy : 'transparent' } : { borderBottomWidth: 3, borderBottomColor: on ? color.accent : 'transparent' }, filled && i > 0 && { borderLeftWidth: 1, borderLeftColor: color.line }]}
             onPress={() => onChange(t.id)} accessibilityRole="tab" accessibilityState={{ selected: on }}
           >
-            {t.icon ? <Icon name={t.icon} size={16} color={on && filled ? '#fff' : on ? color.accent : color.muted} /> : null}
+            {t.icon ? <Icon name={t.icon} size={16} color={on && filled ? '#fff' : on ? color.accentText : color.muted} /> : null}
             <Text style={[k.tabText, { color: on ? (filled ? '#fff' : color.ink) : color.muted }]}>{t.label}</Text>
             {t.count ? <Badge variant={on && filled ? 'outline' : 'default'}>{t.count}</Badge> : null}
           </Pressable>

@@ -3,6 +3,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { router } from 'expo-router';
 import { PlainText, Text, TextInput } from './LText';
 import { loadPopularity, matchingRanges, recordSuggestion, searchSuggestions, type Scope, type Suggestion } from '../lib/suggest';
+import { color } from '../lib/theme';
 
 function Highlight({ label, query, style }: { label: string; query: string; style?: object }) {
   const parts: { t: string; hit: boolean }[] = [];
@@ -54,7 +55,7 @@ export function SearchBox({ value, onChangeText, onSubmit, scope = 'all', placeh
       <TextInput
         style={[s.input, inputStyle]}
         placeholder={placeholder}
-        placeholderTextColor="#888"
+        placeholderTextColor={color.muted}
         value={value}
         onChangeText={(v) => { onChangeText(v); setOpen(true); }}
         onFocus={() => { clearTimeout(blur.current); setOpen(true); }}
@@ -82,13 +83,13 @@ export function SearchBox({ value, onChangeText, onSubmit, scope = 'all', placeh
 }
 
 const s = StyleSheet.create({
-  input: { backgroundColor: '#fff', borderRadius: 4, padding: 12, borderWidth: 1, borderColor: '#DDD9DC' },
-  box: { backgroundColor: '#fff', borderRadius: 4, marginTop: 4, borderWidth: 1, borderColor: '#DDD9DC', overflow: 'hidden' },
+  input: { backgroundColor: color.surface, borderRadius: 4, padding: 12, borderWidth: 1, borderColor: color.line },
+  box: { backgroundColor: color.surface, borderRadius: 4, marginTop: 4, borderWidth: 1, borderColor: color.line, overflow: 'hidden' },
   boxDark: { borderColor: '#fff' },
-  title: { fontSize: 12, fontWeight: '700', color: '#66616A', paddingHorizontal: 12, paddingTop: 8, paddingBottom: 4, textTransform: 'uppercase' },
-  row: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8, paddingVertical: 11, paddingHorizontal: 12, borderTopWidth: 1, borderTopColor: '#F0EBEB' },
-  label: { flex: 1, color: '#25272D', fontSize: 15 },
-  path: { color: '#66616A', fontSize: 12, maxWidth: '45%' },
-  mark: { backgroundColor: '#FFE066', color: '#25272D', fontWeight: '700' },
-  none: { padding: 12, color: '#66616A' },
+  title: { fontSize: 12, fontWeight: '700', color: color.muted, paddingHorizontal: 12, paddingTop: 8, paddingBottom: 4, textTransform: 'uppercase' },
+  row: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8, paddingVertical: 11, paddingHorizontal: 12, borderTopWidth: 1, borderTopColor: color.accentSoft },
+  label: { flex: 1, color: color.ink, fontSize: 15 },
+  path: { color: color.muted, fontSize: 12, maxWidth: '45%' },
+  mark: { backgroundColor: '#FFE066', color: color.ink, fontWeight: '700' },
+  none: { padding: 12, color: color.muted },
 });
