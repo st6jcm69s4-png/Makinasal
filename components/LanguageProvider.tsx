@@ -13,8 +13,11 @@ export function LanguageProvider({children,initialLanguage='tr'}:{children:React
   document.cookie=`${LANGUAGE_COOKIE}=${next}; Path=/; Max-Age=31536000; SameSite=Lax${location.protocol==='https:'?'; Secure':''}`;
   try{localStorage.setItem(LANGUAGE_COOKIE,next);}catch{/* cookie and in-memory preference still work */}
  },[]);
+ const [ask,setAsk]=useState(false);
+ useEffect(()=>{try{const has=document.cookie.split(';').some(part=>part.trim().startsWith(LANGUAGE_COOKIE+'='))||localStorage.getItem(LANGUAGE_COOKIE);if(!has)setAsk(true);}catch{/* sorulmaz */}},[]);
+ const choose=(l:Language)=>{setLanguage(l);setAsk(false);};
  const value=useMemo(()=>({language,setLanguage,t:(value:string|null|undefined, values?:Record<string,string|number>)=>translate(value,language,values)}),[language,setLanguage]);
- return <Context.Provider value={value}>{children}</Context.Provider>;
+ return <Context.Provider value={value}>{children}{ask?<div className="lang-welcome" role="dialog" aria-modal="true" aria-label="Language / Dil / Sprache"><div className="lang-welcome-box"><h2>Dil / Language / Sprache</h2><p>Dilini seç · Choose your language · Sprache wählen</p><div className="lang-welcome-btns">{LANGUAGES.map(l=><button key={l.code} type="button" lang={l.code} className={'btn'+(l.code===language?'':' ghost')} onClick={()=>choose(l.code)}>{l.label}</button>)}</div><p className="sub">Ayarlar sayfasından istediğin zaman değiştirebilirsin · You can change this anytime in Settings · Sie können dies jederzeit in den Einstellungen ändern</p></div></div>:null}</Context.Provider>;
 }
 export const useLanguage=()=>useContext(Context);
 export function Text({value}:{value:string}) {const {t}=useLanguage();return <>{t(value)}</>;}
