@@ -5,6 +5,7 @@ import { Text } from '../components/LText';
 import { router, useFocusEffect } from 'expo-router';
 import { useApp } from '../lib/AppContext';
 import { supabase } from '../lib/supabase';
+import { getLang, localeOf } from '../lib/i18n';
 
 type Note = { id: string; title: string; body: string; url: string; read_at: string | null; created_at: string };
 const UUID = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}';
@@ -53,7 +54,7 @@ export default function Notifications() {
           <Pressable style={[s.card, !n.read_at && s.unread]} accessibilityRole="button" onPress={() => { if (!n.read_at) void mark([n.id]); const t = target(n.url); if (t) router.push(t as never); }}>
             <Text style={s.title}>{n.title}</Text>
             <Text>{n.body}</Text>
-            <Text style={s.date}>{new Date(n.created_at).toLocaleString('tr-TR')}</Text>
+            <Text style={s.date}>{new Date(n.created_at).toLocaleString(localeOf(getLang()))}</Text>
           </Pressable>
         )}
       />

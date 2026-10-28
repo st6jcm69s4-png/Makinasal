@@ -1,9 +1,9 @@
 import { SITE_ORIGIN, PUBLIC_INDEXING, jsonLd } from '@/lib/seo';
 import { UsageMeasurement } from '@/components/UsageMeasurement';
 import { CookiePreferences } from '@/components/CookiePreferences';
-import { cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 import { LanguageProvider, SiteFooter, Text } from '@/components/LanguageProvider';
-import { LANGUAGE_COOKIE, validLanguage } from '@/lib/i18n';
+import { LANGUAGE_COOKIE, detectLanguage, validLanguage } from '@/lib/i18n';
 import type { ReactNode } from 'react';
 import './globals.css';
 import { MarketProvider } from '@/components/MarketProvider';
@@ -18,7 +18,9 @@ export const metadata = {
 };
 
 export default async function RootLayout({ children }: { children: ReactNode }) {
-  const language = validLanguage((await cookies()).get(LANGUAGE_COOKIE)?.value);
+  const jar = await cookies();
+  const saved = jar.get(LANGUAGE_COOKIE)?.value;
+  const language = saved ? validLanguage(saved) : detectLanguage((await headers()).get('accept-language'));
   return (
     <html lang={language}>
       <head>
@@ -30,7 +32,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@600;700&family=Noto+Sans:wght@400;500;600&display=swap" />
       </head>
       <body>
-        <script type="application/ld+json" dangerouslySetInnerHTML={{__html:jsonLd({"@context":"https://schema.org","@type":"WebSite",name:"Makinasal",url:SITE_ORIGIN,inLanguage:["tr","en"]})}} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{__html:jsonLd({"@context":"https://schema.org","@type":"WebSite",name:"Makinasal",url:SITE_ORIGIN,inLanguage:["tr","en","de"]})}} />
         <LanguageProvider initialLanguage={language}>
         <a className="skip-link" href="#main-content"><Text value="Ana içeriğe geç" /></a>
         <AppServiceWorker />

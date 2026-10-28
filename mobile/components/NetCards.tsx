@@ -8,6 +8,7 @@ import { Badge } from './kit';
 import { router } from 'expo-router';
 import { dateLabel, money, PERSONNEL_ROLES, PROVIDER_KINDS, RENTAL_MODES, type MarketPost, type Provider } from '../lib/network';
 import { color, radius } from '../lib/theme';
+import { getLang, localeOf } from '../lib/i18n';
 
 const ROLE_ICON: Record<string, IconName> = { operator: 'settings', driver: 'truck', mechanic: 'tool' };
 
@@ -50,7 +51,7 @@ export function PostCard({ p }: { p: MarketPost }) {
       </View>
       <View style={s.strip}>
         <Cell label="İl" value={p.city} />
-        <Cell label={p.start_date ? 'Başlangıç' : 'Yayın'} value={p.start_date ? dateLabel(p.start_date) : new Date(p.created_at).toLocaleDateString('tr-TR')} left />
+        <Cell label={p.start_date ? 'Başlangıç' : 'Yayın'} value={p.start_date ? dateLabel(p.start_date) : new Date(p.created_at).toLocaleDateString(localeOf(getLang()))} left />
         <Cell label={isStaff ? 'Ücret' : 'Bütçe'} value={p.price == null ? 'Belirtilmedi' : money(p.price, p.price_unit).replace(' toplam', '')} flex={1.4} left />
       </View>
     </Pressable>

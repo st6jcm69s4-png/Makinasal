@@ -1,3 +1,4 @@
+import { getLang, localeOf } from './i18n';
 // Web lib/network.ts içindeki sabitler ve yardımcılar (mobil kopya).
 export const POST_KINDS = { rental_machine: 'Kiralık makine / kamyon', rental_operator: 'Operatör ve ustalar', job: 'İş talepleri', part_request: 'Parça talepleri', staff_wanted: 'Eleman ilanı' } as const;
 export type PostKind = keyof typeof POST_KINDS;
@@ -26,7 +27,7 @@ export type Quote = {
 };
 
 export function money(amount: number | string | null, unit = 'toplam') {
-  return amount == null ? 'Bütçe belirtilmedi' : `${Number(amount).toLocaleString('tr-TR', { maximumFractionDigits: 2 })} ₺${unit === 'toplam' ? ' toplam' : ` / ${unit}`}`;
+  return amount == null ? 'Bütçe belirtilmedi' : `${Number(amount).toLocaleString(localeOf(getLang()), { maximumFractionDigits: 2 })} ₺${unit === 'toplam' ? ' toplam' : ` / ${unit}`}`;
 }
 export function networkError(error: { code?: string; message?: string } | null) {
   if (error?.message?.includes('MESSAGE_PROFANITY')) return 'Küfür veya hakaret içeren mesaj gönderilemez. Lütfen mesajını düzenle.';
@@ -35,5 +36,5 @@ export function networkError(error: { code?: string; message?: string } | null) 
   if (error?.code === '42501') return 'Bu işlem için yetkin yok. Hesabını ve oturumunu kontrol et.';
   return 'İşlem tamamlanamadı. Bağlantını kontrol edip tekrar dene.';
 }
-export const dateLabel = (v: string | null) => (v ? new Date(v + 'T12:00:00').toLocaleDateString('tr-TR') : '');
+export const dateLabel = (v: string | null) => (v ? new Date(v + 'T12:00:00').toLocaleDateString(localeOf(getLang())) : '');
 export const validDate = (v: string) => /^\d{4}-\d{2}-\d{2}$/.test(v) && !Number.isNaN(Date.parse(v));

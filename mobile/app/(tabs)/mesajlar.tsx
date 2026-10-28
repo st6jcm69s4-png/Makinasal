@@ -12,6 +12,7 @@ import { initials } from '../../lib/person';
 import { useTabScrollTop } from '../../lib/scrollTop';
 import { photoUrl, supabase } from '../../lib/supabase';
 import { color, font, radius } from '../../lib/theme';
+import { getLang, localeOf } from '../../lib/i18n';
 
 type Thread = { id: string; title: string; other: string; photo: string | null; last: string; lastAt: string; mine: boolean; offer: boolean; unread: number };
 type Quote = { id: string; post_id: string; other: string; title: string; amount: number; unit: string; status: string; at: string; incoming: boolean };
@@ -20,10 +21,10 @@ const short = (iso: string) => {
   const d = new Date(iso), now = new Date();
   const day = (x: Date) => Math.floor(new Date(x.getFullYear(), x.getMonth(), x.getDate()).getTime() / 86400000);
   const diff = day(now) - day(d);
-  if (diff === 0) return d.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+  if (diff === 0) return d.toLocaleTimeString(localeOf(getLang()), { hour: '2-digit', minute: '2-digit' });
   if (diff === 1) return 'Dün';
-  if (diff < 7) return d.toLocaleDateString('tr-TR', { weekday: 'short' });
-  return d.toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit' });
+  if (diff < 7) return d.toLocaleDateString(localeOf(getLang()), { weekday: 'short' });
+  return d.toLocaleDateString(localeOf(getLang()), { day: '2-digit', month: '2-digit' });
 };
 
 export default function Messages() {

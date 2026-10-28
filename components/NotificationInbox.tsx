@@ -35,11 +35,11 @@ export function NotificationInbox(){
   }catch{if(alive.current&&requestVersion===version.current)setError(true);}finally{if(alive.current)setWriting(false);}
  }
  if(!uid)return null;
- return <section className="panel" style={{marginTop:16}}><h2>{language==='en'?'Notification history':'Bildirim geçmişi'}</h2>
+ return <section className="panel" style={{marginTop:16}}><h2>{language!=='tr'?'Notification history':'Bildirim geçmişi'}</h2>
  {error?<p className="err" role="alert">{t('Bildirimler yüklenemedi. Bağlantını kontrol edip tekrar dene.')}</p>:null}
  {!items.length?(loading?<p role="status">{t('Yükleniyor…')}</p>:!error?<p>{t('Henüz bildirimin yok.')}</p>:null):<>
- <button className="btn ghost sm" disabled={writing||!items.some(n=>!n.read_at)} onClick={()=>void mark(items.filter(n=>!n.read_at).map(n=>n.id))}>{language==='en'?'Mark shown notifications as read':'Gösterilenleri okundu işaretle'}</button>
- <ul style={{listStyle:'none',padding:0}}>{items.map(n=><li key={n.id} style={{padding:'12px 0',opacity:n.read_at?0.7:1}}><a href={notificationHref(n.url)} onClick={()=>{if(!n.read_at)void mark([n.id]);}}>{t(n.title)}</a><p>{n.body}</p><time dateTime={n.created_at}>{new Date(n.created_at).toLocaleString(language==='en'?'en-GB':'tr-TR')}</time></li>)}</ul>
+ <button className="btn ghost sm" disabled={writing||!items.some(n=>!n.read_at)} onClick={()=>void mark(items.filter(n=>!n.read_at).map(n=>n.id))}>{language!=='tr'?'Mark shown notifications as read':'Gösterilenleri okundu işaretle'}</button>
+ <ul style={{listStyle:'none',padding:0}}>{items.map(n=><li key={n.id} style={{padding:'12px 0',opacity:n.read_at?0.7:1}}><a href={notificationHref(n.url)} onClick={()=>{if(!n.read_at)void mark([n.id]);}}>{t(n.title)}</a><p>{n.body}</p><time dateTime={n.created_at}>{new Date(n.created_at).toLocaleString(language!=='tr'?'en-GB':'tr-TR')}</time></li>)}</ul>
  {more?<button className="btn ghost sm" disabled={loading} onClick={()=>void load(true)}>{loading?t('Yükleniyor…'):t('Daha eski bildirimleri yükle')}</button>:null}</>}
  <button className="btn ghost sm" disabled={loading} onClick={()=>void load()}>{t('Yenile')}</button></section>;
 }

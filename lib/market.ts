@@ -188,13 +188,13 @@ export function filterLabel(f: Filters, language: Language = "tr"): string {
   if (f.cat !== "Tümü") p.push(tr(categoryLabel(f.cat)));
   if (f.q.trim()) p.push(`"${f.q.trim()}"`);
   if (f.city !== "Tümü") p.push(f.city);
-  if (f.near > 0) p.push(language === "en" ? `within ${f.near} km` : `${f.near} km içinde`);
+  if (f.near > 0) p.push(language!=="tr" ? `within ${f.near} km` : `${f.near} km içinde`);
   if (f.yMin !== "" || f.yMax !== "")
-    p.push(`${language === "en" ? "year" : "yıl"} ${f.yMin || "…"}–${f.yMax || "…"}`);
+    p.push(`${language!=="tr" ? "year" : "yıl"} ${f.yMin || "…"}–${f.yMax || "…"}`);
   if (f.useMin !== "" || f.useMax !== "")
     p.push(`${f.useMin || "0"}–${f.useMax || "…"} ${f.unit}`);
-  if (f.minScore > 0) p.push(`${language === "en" ? "rating" : "puan"} ${String(f.minScore).replace(".", language === "en" ? "." : ",")}+`);
-  if (f.maxPrice < MAX_PRICE) p.push(`${language === "en" ? "up to" : "en çok"} ${formatTL(f.maxPrice, language)}`);
+  if (f.minScore > 0) p.push(`${language!=="tr" ? "rating" : "puan"} ${String(f.minScore).replace(".", language!=="tr" ? "." : ",")}+`);
+  if (f.maxPrice < MAX_PRICE) p.push(`${language!=="tr" ? "up to" : "en çok"} ${formatTL(f.maxPrice, language)}`);
   if (f.takas) p.push(tr("Takas olur"));
   if (f.ver) p.push(tr("Doğrulanmış"));
   return p.length ? p.join(" · ") : tr("Tüm ilanlar");

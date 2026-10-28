@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createClient } from '@supabase/supabase-js';
+import { getLang, localeOf } from './i18n';
 
 export const SUPABASE_URL = process.env.EXPO_PUBLIC_SUPABASE_URL ?? '';
 const KEY = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY ?? '';
@@ -11,7 +12,7 @@ export const supabase = createClient(SUPABASE_URL || 'http://localhost', KEY || 
 });
 
 export const photoUrl = (path: string) => `${SUPABASE_URL}/storage/v1/object/public/listing-photos/${path}`;
-export const tl = (n: number | string) => `${Number(n).toLocaleString('tr-TR')} ₺`;
+export const tl = (n: number | string) => `${Number(n).toLocaleString(localeOf(getLang()))} ₺`;
 
 export type Row = {
   id: string; title: string; price: number | string; city: string; year?: number | null;

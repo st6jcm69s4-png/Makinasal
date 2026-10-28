@@ -19,4 +19,4 @@ export const font = {
 } as const;
 
 /** Etiketler Türkçe büyük harfle yazılır (i→İ). */
-export const caps = (s: string, lang: 'tr' | 'en' = 'tr') => s.toLocaleUpperCase(lang === 'en' ? 'en-US' : 'tr-TR');
+export const caps = (s: string, lang: 'tr' | 'en' | 'de' = 'tr') => s.toLocaleUpperCase(lang === 'en' ? 'en-US' : lang === 'de' ? 'de-DE' : 'tr-TR');

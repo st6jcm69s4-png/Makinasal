@@ -6,6 +6,7 @@ import { ListingCard } from '../../components/ListingCard';
 import { common } from '../../components/ui';
 import { trustLevel } from '../../lib/trust';
 import { supabase, type Row } from '../../lib/supabase';
+import { getLang, localeOf } from '../../lib/i18n';
 
 type Review = { who: string; role: string; rating: number; text: string; date: string; tags: string[] };
 type Store = { name: string; store: boolean; premium: boolean; verified: boolean; city: string; bio: string; companyBio: string; since: number; s: number | null; b: number | null; deals: number; rep: number };
@@ -51,7 +52,7 @@ export default function StorePage() {
         for (const x of ps ?? []) names.set(x.id as string, ((x.is_store && x.store_name) || x.full_name || 'Üye') as string);
       }
       if (!alive) return;
-      setReviews(rrows.map((r) => ({ who: names.get(r.reviewer_id) ?? 'Üye', role: r.role === 'seller' ? 'Alıcı' : 'Satıcı', rating: Number(r.score), text: r.comment ?? '', date: new Date(r.created_at).toLocaleDateString('tr-TR'), tags: r.tags ?? [] })));
+      setReviews(rrows.map((r) => ({ who: names.get(r.reviewer_id) ?? 'Üye', role: r.role === 'seller' ? 'Alıcı' : 'Satıcı', rating: Number(r.score), text: r.comment ?? '', date: new Date(r.created_at).toLocaleDateString(localeOf(getLang())), tags: r.tags ?? [] })));
       setLoading(false);
     })();
     return () => { alive = false; };

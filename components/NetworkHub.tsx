@@ -2179,7 +2179,7 @@ function NetworkAccountData() {
                 >
                   <span>
                     {tr(QUOTE_STATUS[q.status])} ·{" "}
-                    {new Date(q.created_at).toLocaleDateString(language === "en" ? "en-GB" : "tr-TR")}
+                    {new Date(q.created_at).toLocaleDateString(language === "de" ? "de-DE" : language!=="tr" ? "en-GB" : "tr-TR")}
                   </span>
                   <strong>{money(q.amount, q.price_unit, language)}</strong>
                   <span className="linkbtn">{tr("İlana ve mesajlara git →")}</span>

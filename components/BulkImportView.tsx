@@ -5,7 +5,7 @@ import {useMarket} from './MarketProvider';
 import {getSupabase} from '@/lib/supabase/client';
 import {csvRecords,importValues,IMPORT_FIELDS} from '@/lib/bulkImport';
 type Row={id:string;raw:Record<string,string>;valid:boolean;done:boolean;error:string};
-export function BulkImportView(){const {language}=useLanguage(),en=language==='en';const {profile,authReady}=useMarket();const [rows,setRows]=useState<Row[]>([]),[error,setError]=useState(''),[busy,setBusy]=useState(false),[accepted,setAccepted]=useState(false);
+export function BulkImportView(){const {language}=useLanguage(),en=language!=='tr';const {profile,authReady}=useMarket();const [rows,setRows]=useState<Row[]>([]),[error,setError]=useState(''),[busy,setBusy]=useState(false),[accepted,setAccepted]=useState(false);
  async function file(file:File|undefined){if(!file||busy)return;setError('');setRows([]);setAccepted(false);try{if(file.size>2_000_000)throw new Error();const text=await file.text();let records:Record<string,string>[];
  if(file.name.toLowerCase().endsWith('.xml')){if(/<!DOCTYPE|<!ENTITY/i.test(text))throw new Error();const doc=new DOMParser().parseFromString(text,'application/xml');if(doc.querySelector('parsererror')||doc.documentElement.tagName!=='listings')throw new Error();records=Array.from(doc.documentElement.children).map(node=>{if(node.tagName!=='listing'||new Set(Array.from(node.children).map(c=>c.tagName)).size!==node.children.length)throw new Error();return Object.fromEntries(Array.from(node.children).map(c=>{if(!(IMPORT_FIELDS as readonly string[]).includes(c.tagName)||c.children.length)throw new Error();return [c.tagName,c.textContent?.trim()||''];}));});if(records.length>100)throw new Error();}
  else records=csvRecords(text);

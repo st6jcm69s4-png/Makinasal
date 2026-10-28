@@ -3,7 +3,7 @@ import {useState,useEffect} from 'react';
 import {useLanguage} from './LanguageProvider';
 export const CONSENT_KEY='makinasal-consent-v1';
 export function CookiePreferences({banner=false}:{banner?:boolean}){
- const {language}=useLanguage();const en=language==='en';
+ const {language}=useLanguage();const en=language!=='tr';
  const [ready,setReady]=useState(false),[choice,setChoice]=useState('');
  useEffect(()=>{try{setChoice(localStorage.getItem(CONSENT_KEY)||'');}catch{}setReady(true);},[]);
  function save(value:string){try{localStorage.setItem(CONSENT_KEY,value);}catch{}setChoice(value);window.dispatchEvent(new Event('makinasal-consent'));}

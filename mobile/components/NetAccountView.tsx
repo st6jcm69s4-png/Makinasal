@@ -10,6 +10,7 @@ import { useApp } from '../lib/AppContext';
 import { dateLabel, money, POST_KINDS, QUOTE_STATUS, type MarketPost } from '../lib/network';
 import { supabase } from '../lib/supabase';
 import { color, font, radius } from '../lib/theme';
+import { getLang, localeOf } from '../lib/i18n';
 
 type Q = { id: string; post_id: string; owner_id: string; bidder_id: string; display_name: string; amount: number; price_unit: string; status: string; created_at: string; market_posts: { title: string; kind: string } | { title: string; kind: string }[] | null };
 type Seg = 'posts' | 'incoming' | 'sent';
@@ -115,7 +116,7 @@ export function NetAccountView({ onNavigate, embedded }: { onNavigate?: () => vo
           {q.note ? <Text style={s.noteLine} numberOfLines={2}>{q.note}</Text> : null}
           <View style={s.strip}>
             <Cell label="Tutar" value={money(q.amount, q.price_unit).replace(' toplam', '')} flex={1.4} />
-            <Cell label="Tarih" value={new Date(q.created_at).toLocaleDateString('tr-TR')} left />
+            <Cell label="Tarih" value={new Date(q.created_at).toLocaleDateString(localeOf(getLang()))} left />
           </View>
         </Pressable>
       )) : <Empty text={seg === 'incoming' ? 'Henüz gelen teklif yok.' : 'Henüz teklif vermedin.'} cta="İş ağına göz at" onPress={() => { if (onNavigate) onNavigate(); else router.navigate('/is-agi'); }} />) : null}

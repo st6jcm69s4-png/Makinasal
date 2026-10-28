@@ -6,10 +6,11 @@ import { Btn, common } from '../components/ui';
 import { useApp } from '../lib/AppContext';
 import { supabase } from '../lib/supabase';
 import { openWeb } from '../lib/web';
+import { getLang, localeOf } from '../lib/i18n';
 
 const STATUS: Record<string, string> = { initializing: 'Hazırlanıyor', pending: 'Sonuç bekleniyor', review: 'Ödeme inceleniyor', paid: 'Ödeme alındı', failed: 'Ödeme tamamlanamadı' };
 type Order = { id: string; buyer_id: string; title: string; amount_minor: number; status: string; created_at: string };
-const money = (m: number) => `${(Number(m) / 100).toLocaleString('tr-TR', { style: 'currency', currency: 'TRY' })}`;
+const money = (m: number) => `${(Number(m) / 100).toLocaleString(localeOf(getLang()), { style: 'currency', currency: 'TRY' })}`;
 
 export default function Payments() {
   const { session } = useApp();
@@ -32,7 +33,7 @@ export default function Payments() {
       {!error && orders.length === 0 ? <Text style={common.meta}>Henüz bir ödeme kaydın yok.</Text> : null}
       {orders.map((o) => (
         <Pressable key={o.id} style={common.card} onPress={() => openWeb('/odeme?order=' + o.id)} accessibilityRole="button">
-          <Text style={common.meta}>{o.buyer_id === session.user.id ? 'Gönderdiğim ödeme' : 'Aldığım ödeme'} · {new Date(o.created_at).toLocaleDateString('tr-TR')}</Text>
+          <Text style={common.meta}>{o.buyer_id === session.user.id ? 'Gönderdiğim ödeme' : 'Aldığım ödeme'} · {new Date(o.created_at).toLocaleDateString(localeOf(getLang()))}</Text>
           <Text style={common.title}>{o.title}</Text>
           <Text style={common.price}>{money(o.amount_minor)}</Text>
           <Text>{STATUS[o.status] ?? o.status}</Text>

@@ -43,5 +43,5 @@ export function searchSuggestions(query:string,{language='tr',scope='all',city='
   if(scope!=='jobs')for(const brand of ALL_BRANDS)add({id:'brand:'+brand,label:brand,parent:tr('Marka'),kind:'brand',href:url(route,{brand})});
  }
  const order={section:0,category:1,part:2,brand:3};
- return out.sort((a,b)=>a.rank-b.rank||order[a.kind]-order[b.kind]||a.label.localeCompare(b.label,language==='en'?'en':'tr')).slice(0,Math.max(1,Math.min(limit,20)));
+ return out.sort((a,b)=>a.rank-b.rank||order[a.kind]-order[b.kind]||a.label.localeCompare(b.label,language==='de'?'de':language!=='tr'?'en':'tr')).slice(0,Math.max(1,Math.min(limit,20)));
 }

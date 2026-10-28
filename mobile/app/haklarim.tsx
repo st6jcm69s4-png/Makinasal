@@ -9,6 +9,7 @@ import { useApp } from '../lib/AppContext';
 import { color, radius } from '../lib/theme';
 import { supabase } from '../lib/supabase';
 import { openWeb } from '../lib/web';
+import { getLang, localeOf } from '../lib/i18n';
 
 type Req = { id: string; kind: string; status: 'open' | 'done' | 'rejected'; created_at: string };
 const KINDS: { kind: string; icon: IconName; title: string; text: string; confirm?: string }[] = [
@@ -81,7 +82,7 @@ export default function Rights() {
             {reqs.map((r, i) => (
               <View key={r.id} style={[s.row, i > 0 && { borderTopWidth: 1, borderTopColor: color.line }]}>
                 <Text style={{ flex: 1, color: color.ink }}>{KINDS.find((k) => k.kind === r.kind)?.title ?? r.kind}</Text>
-                <Text style={s.sub}>{new Date(r.created_at).toLocaleDateString('tr-TR')} · {STATUS[r.status]}</Text>
+                <Text style={s.sub}>{new Date(r.created_at).toLocaleDateString(localeOf(getLang()))} · {STATUS[r.status]}</Text>
               </View>
             ))}
           </View>

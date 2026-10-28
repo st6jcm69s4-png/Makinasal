@@ -4,6 +4,7 @@ import { Text } from '../components/LText';
 import { router } from 'expo-router';
 import { useApp } from '../lib/AppContext';
 import { supabase, tl } from '../lib/supabase';
+import { getLang, localeOf } from '../lib/i18n';
 
 type L = { id: string; title: string; price: number | string; city: string; year: number | null; usage_value: number | null; usage_unit: string | null; brand: string | null; model: string | null; takas: boolean | null };
 
@@ -20,7 +21,7 @@ export default function Compare() {
   const min = Math.min(...rows.map((r) => Number(r.price)));
   const lines: [string, (r: L) => string][] = [
     ['Fiyat', (r) => tl(r.price)], ['İl', (r) => r.city], ['Model yılı', (r) => (r.year ? String(r.year) : '–')],
-    ['Kullanım', (r) => (r.usage_value != null ? `${r.usage_value.toLocaleString('tr-TR')} ${r.usage_unit ?? ''}` : '–')], ['Takas', (r) => (r.takas ? 'Olur' : 'Yok')],
+    ['Kullanım', (r) => (r.usage_value != null ? `${r.usage_value.toLocaleString(localeOf(getLang()))} ${r.usage_unit ?? ''}` : '–')], ['Takas', (r) => (r.takas ? 'Olur' : 'Yok')],
   ];
   return (
     <ScrollView horizontal contentContainerStyle={{ padding: 12 }}>

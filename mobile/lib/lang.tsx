@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
-import { applyLang, type Lang } from './i18n';
+import { applyLang, detectLang, type Lang } from './i18n';
 
 const KEY = 'mk-language';
 const Ctx = createContext<{ lang: Lang; setLang: (l: Lang) => void }>({ lang: 'tr', setLang: () => {} });
@@ -9,7 +9,10 @@ export const useLang = () => useContext(Ctx);
 export function LangProvider({ children }: { children: ReactNode }) {
   const [lang, set] = useState<Lang>('tr');
   useEffect(() => {
-    void AsyncStorage.getItem(KEY).then((v) => { if (v === 'en') { applyLang('en'); set('en'); } }).catch(() => {});
+    void AsyncStorage.getItem(KEY).then((v) => {
+      const l: Lang = v === 'en' || v === 'de' || v === 'tr' ? v : detectLang();
+      if (l !== 'tr') { applyLang(l); set(l); }
+    }).catch(() => {});
   }, []);
   const setLang = useCallback((l: Lang) => {
     applyLang(l); set(l);

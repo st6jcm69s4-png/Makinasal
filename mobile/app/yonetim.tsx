@@ -8,6 +8,7 @@ import { router } from 'expo-router';
 import { useApp } from '../lib/AppContext';
 import { photoUrl, supabase, tl } from '../lib/supabase';
 import { color, font, radius } from '../lib/theme';
+import { getLang, localeOf } from '../lib/i18n';
 
 type L = { id: string; title: string; city: string; price: number; created_at: string; seller_id: string; listing_photos: { path: string; position: number }[] | null };
 type R = { id: string; ticket: number; listing_id: string | null; reason: string; created_at: string };
@@ -173,7 +174,7 @@ export default function Admin() {
               <Cell label="İl" value={q.city ?? '—'} left />
             </View>
             {q.note ? <Text style={s.note}>{q.note}</Text> : null}
-            <Text style={[s.when, { paddingHorizontal: 12, paddingBottom: 10 }]}>{q.email ?? ''} · {new Date(q.created_at).toLocaleString('tr-TR')}</Text>
+            <Text style={[s.when, { paddingHorizontal: 12, paddingBottom: 10 }]}>{q.email ?? ''} · {new Date(q.created_at).toLocaleString(localeOf(getLang()))}</Text>
             {q.status !== 'closed' ? (
               <View style={s.actions}>
                 {q.status === 'new' ? <View style={{ flex: 1 }}><Btn ghost title="Görüşüldü" disabled={busy} onPress={() => void act('service_requests', q.id, { status: 'contacted' })} /></View> : null}
@@ -196,7 +197,7 @@ export default function Admin() {
                 <Badge variant={days <= 5 ? 'destructive' : 'warning'}>{`${days} gün kaldı`}</Badge>
               </View>
               {d.note ? <Text style={s.note}>{d.note}</Text> : null}
-              <Text style={[s.when, { paddingHorizontal: 12, paddingBottom: 10 }]}>Başvuru: {new Date(d.created_at).toLocaleDateString('tr-TR')}</Text>
+              <Text style={[s.when, { paddingHorizontal: 12, paddingBottom: 10 }]}>Başvuru: {new Date(d.created_at).toLocaleDateString(localeOf(getLang()))}</Text>
               <View style={s.actions}>
                 <View style={{ flex: 1 }}><Btn title="Tamamlandı" disabled={busy} onPress={() => ask('Başvuru tamamlandı olarak işaretlensin mi? İşlemi önce yapmış olmalısın.', () => void act('data_requests', d.id, { status: 'done', handled_at: new Date().toISOString() }))} /></View>
                 <View style={{ flex: 1 }}><Btn ghost title="Reddet" disabled={busy} onPress={() => ask('Başvuru reddedilsin mi? Gerekçeyi kullanıcıya ayrıca bildirmelisin.', () => void act('data_requests', d.id, { status: 'rejected', handled_at: new Date().toISOString() }))} /></View>

@@ -16,7 +16,7 @@ type Msg = { id: string; sender_id: string; body: string; created_at: string; ki
 type Trust = { rep: number; deals: number; s: number | null };
 
 const one = <T,>(x: T | T[] | null | undefined): T | null => (Array.isArray(x) ? x[0] ?? null : x ?? null);
-const fmt = (s: string, language: 'tr'|'en') => new Date(s).toLocaleString(language === 'en' ? 'en-GB' : 'tr-TR', { dateStyle: 'short', timeStyle: 'short' });
+const fmt = (s: string, language: 'tr'|'en'|'de') => new Date(s).toLocaleString(language === 'de' ? 'de-DE' : language!=='tr' ? 'en-GB' : 'tr-TR', { dateStyle: 'short', timeStyle: 'short' });
 
 export function MessagesView({ activeId }: { activeId?: string }) {
   const { t: tr, language } = useLanguage();

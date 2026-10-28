@@ -5,12 +5,13 @@ import { Text } from '../components/LText';
 import { router, useFocusEffect } from 'expo-router';
 import { useApp } from '../lib/AppContext';
 import { supabase } from '../lib/supabase';
+import { getLang, localeOf } from '../lib/i18n';
 
 type F = { cat?: string; city?: string; maxPrice?: number; q?: string; brand?: string };
 type Saved = { id: string; query: { f?: F } };
 
 function label(f: F) {
-  const parts = [f.q, f.cat && f.cat !== 'Tümü' ? f.cat : '', f.brand, f.city && f.city !== 'Tümü' ? f.city : '', f.maxPrice && f.maxPrice < 6000000 ? `≤ ${f.maxPrice.toLocaleString('tr-TR')} ₺` : ''].filter(Boolean);
+  const parts = [f.q, f.cat && f.cat !== 'Tümü' ? f.cat : '', f.brand, f.city && f.city !== 'Tümü' ? f.city : '', f.maxPrice && f.maxPrice < 6000000 ? `≤ ${f.maxPrice.toLocaleString(localeOf(getLang()))} ₺` : ''].filter(Boolean);
   return parts.length ? parts.join(' · ') : 'Tüm ilanlar';
 }
 
