@@ -153,7 +153,7 @@ export default function Home() {
   return (
     <ScrollView ref={scroller} style={s.screen} contentContainerStyle={{ paddingBottom: 24 }} refreshControl={<RefreshControl refreshing={busy} onRefresh={() => void load()} />} keyboardShouldPersistTaps="handled">
       <View style={s.hero}>
-        <PlainText style={s.h1}>{session ? `${tr('Merhaba,')} ${name}.` : caps(tr('Al, sat, kirala. İşini paylaş, fiyat al.'), lang)}</PlainText>
+        {session ? <PlainText style={s.h1}>{`${tr('Merhaba,')} ${name}.`}</PlainText> : null}
         <Text style={s.lead}>Makine, yedek parça ve işini yapacak hizmeti burada bul.</Text>
         <View style={s.searchRow}>
           <View style={{ flex: 1 }}><SearchBox value={q} onChangeText={setQ} onSubmit={search} placeholder="Marka, model veya parça numarası ara" /></View>
