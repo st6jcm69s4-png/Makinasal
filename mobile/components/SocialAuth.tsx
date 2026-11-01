@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
-import { Alert, Platform, StyleSheet, View } from 'react-native';
+import { Alert, Appearance, Image, Platform, Pressable, StyleSheet, View } from 'react-native';
 import * as Linking from 'expo-linking';
 import * as WebBrowser from 'expo-web-browser';
 import * as AppleAuthentication from 'expo-apple-authentication';
 import { router } from 'expo-router';
 import { PlainText, Text } from './LText';
 import { Btn } from './ui';
-import { color } from '../lib/theme';
+import { color, radius } from '../lib/theme';
 import { fetchProviders, type AuthProviders } from '../lib/auth';
 import { LEGAL_VERSION } from '../lib/legalTexts';
 import { supabase } from '../lib/supabase';
@@ -83,8 +83,21 @@ export function SocialAuth() {
   return (
     <View style={{ gap: 10 }}>
       <View style={s.or}><View style={s.line} /><PlainText style={s.orText}>VEYA</PlainText><View style={s.line} /></View>
-      {showApple ? <Btn title="Apple ile devam et" disabled={busy} onPress={() => void apple()} /> : null}
-      {p.google ? <Btn ghost title="Google ile devam et" disabled={busy} onPress={() => void google()} /> : null}
+      {showApple ? (
+        <AppleAuthentication.AppleAuthenticationButton
+          buttonType={AppleAuthentication.AppleAuthenticationButtonType.CONTINUE}
+          buttonStyle={Appearance.getColorScheme() === 'dark' ? AppleAuthentication.AppleAuthenticationButtonStyle.WHITE : AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
+          cornerRadius={radius}
+          style={{ height: 48, opacity: busy ? 0.5 : 1 }}
+          onPress={() => { if (!busy) void apple(); }}
+        />
+      ) : null}
+      {p.google ? (
+        <Pressable onPress={() => void google()} disabled={busy} accessibilityRole="button" accessibilityLabel="Google ile devam et" style={({ pressed }) => [s.google, (busy || pressed) && { opacity: 0.6 }]}>
+          <Image source={require('../assets/google-g.png')} style={s.gLogo} />
+          <Text style={s.gText}>Google ile devam et</Text>
+        </Pressable>
+      ) : null}
       <Text style={s.note}>Devam ederek Kullanım koşullarını ve KVKK aydınlatma metnini okuduğunu kabul edersin.</Text>
       <View style={{ flexDirection: 'row', gap: 16, justifyContent: 'center' }}>
         <Text style={s.link} onPress={() => router.push('/hukuki/kullanim' as never)}>Kullanım koşulları</Text>
@@ -94,6 +107,9 @@ export function SocialAuth() {
   );
 }
 const s = StyleSheet.create({
+  google: { height: 48, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10, backgroundColor: color.surface, borderWidth: 1, borderColor: color.line, borderRadius: radius },
+  gLogo: { width: 20, height: 20 },
+  gText: { color: color.ink, fontSize: 16, fontWeight: '600' },
   or: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   line: { flex: 1, height: 1, backgroundColor: color.line },
   orText: { color: color.muted, fontSize: 12, letterSpacing: 1 },
