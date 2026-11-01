@@ -22,6 +22,7 @@ export default function Forgot() {
   const [err, setErr] = useState('');
   const [info, setInfo] = useState('');
   const [busy, setBusy] = useState(false);
+  const [verified, setVerified] = useState(false);
 
   async function send() {
     setErr(''); setInfo('');
@@ -41,12 +42,16 @@ export default function Forgot() {
   async function reset() {
     setErr('');
     const clean = code.replace(/\s/g, '');
-    if (clean.length < 6) return setErr('E-postandaki kodu yaz.');
+    if (!verified && clean.length < 6) return setErr('E-postandaki kodu yaz.');
     if (!passwordValid(password)) return setErr('Şifre aşağıdaki koşulların hepsini karşılamalı.');
     if (password !== again) return setErr('Şifreler eşleşmiyor.');
     setBusy(true);
-    const v = await supabase.auth.verifyOtp({ email: email.trim(), token: clean, type: 'recovery' });
-    if (v.error) { setBusy(false); return setErr('Kod hatalı veya süresi dolmuş. Yeni bir kod iste.'); }
+    // Kod bir kez doğrulanınca tüketilir; şifre hatası olursa aynı kodu yeniden denemeden devam ederiz.
+    if (!verified) {
+      const v = await supabase.auth.verifyOtp({ email: email.trim(), token: clean, type: 'recovery' });
+      if (v.error) { setBusy(false); return setErr('Kod hatalı veya süresi dolmuş. Yeni bir kod iste.'); }
+      setVerified(true);
+    }
     const u = await supabase.auth.updateUser({ password });
     if (u.error) { setBusy(false); setErr(authMessage(u.error.message)); return; }
     await supabase.auth.signOut();
@@ -78,7 +83,7 @@ export default function Forgot() {
         ) : (
           <>
             {info ? <AlertBox variant="success">{info}</AlertBox> : null}
-            <Field label="E-postadaki kod" value={code} onChangeText={setCode} keyboardType="number-pad" autoCapitalize="none" autoCorrect={false} maxLength={10} textContentType="oneTimeCode" />
+            <Field label="E-postadaki kod" value={code} onChangeText={setCode} keyboardType="number-pad" autoCapitalize="none" autoCorrect={false} maxLength={6} textContentType="oneTimeCode" />
             <Field label="Yeni şifre" value={password} onChangeText={setPassword} secureTextEntry autoCapitalize="none" autoCorrect={false} textContentType="newPassword" />
             <View style={{ gap: 4 }}>
               {PASSWORD_RULES.map((r) => {
@@ -95,7 +100,7 @@ export default function Forgot() {
             {again && password !== again ? <Text style={[s.ruleText, { color: color.bad }]}>Şifreler eşleşmiyor.</Text> : null}
             {err ? <AlertBox variant="destructive">{err}</AlertBox> : null}
             <Btn title={busy ? 'Kaydediliyor…' : 'Şifreyi güncelle'} disabled={busy} onPress={() => void reset()} />
-            <Btn ghost title="Kodu yeniden gönder" onPress={() => { setStep('email'); setCode(''); setErr(''); setInfo(''); }} />
+            <Btn ghost title="Kodu yeniden gönder" onPress={() => { setStep('email'); setCode(''); setVerified(false); setErr(''); setInfo(''); }} />
           </>
         )}
       </ScrollView>

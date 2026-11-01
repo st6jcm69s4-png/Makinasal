@@ -36,7 +36,7 @@ async function recordTerms(fullName?: string) {
 
 /** Google ve Apple ile giriş. Yalnızca Supabase'de açık olan sağlayıcılar gösterilir. */
 export function SocialAuth() {
-  const [p, setP] = useState<AuthProviders>({ google: false, apple: false });
+  const [p, setP] = useState<AuthProviders>({ google: false, apple: false, phone: false });
   const [appleOk, setAppleOk] = useState(false);
   const [busy, setBusy] = useState(false);
   useEffect(() => {
