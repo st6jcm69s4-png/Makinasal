@@ -44,6 +44,8 @@ export function authMessage(raw: string) {
   if (m.includes('already registered') || m.includes('already been registered')) return 'Bu e-posta ile zaten bir hesap var. Giriş yapmayı dene.';
   if (m.includes('invalid login') || m.includes('invalid_credentials')) return 'E-posta/telefon veya şifre hatalı.';
   if (m.includes('captcha')) return 'Güvenlik doğrulaması tamamlanamadı. Kutuyu yenileyip tekrar dene.';
+  if (m.includes('different from the old') || m.includes('same_password')) return 'Yeni şifre eskisiyle aynı olamaz.';
+  if (m.includes('weak') || m.includes('pwned') || m.includes('known to be')) return 'Bu şifre çok yaygın veya veri sızıntılarında görülmüş. Farklı bir şifre dene.';
   if (m.includes('password')) return 'Şifre koşulları karşılanmıyor veya çok yaygın bir şifre. Başka bir şifre dene.';
   if (m.includes('rate') || m.includes('too many')) return 'Çok fazla deneme yapıldı. Biraz bekleyip tekrar dene.';
   if (m.includes('signup') && m.includes('disabled')) return 'Yeni kayıtlar şu an kapalı.';

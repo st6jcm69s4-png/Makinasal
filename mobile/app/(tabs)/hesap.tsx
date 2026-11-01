@@ -14,9 +14,8 @@ import { color, font, radius } from '../../lib/theme';
 import { displayName, initials } from '../../lib/person';
 import { ReferralBox } from '../../components/ReferralBox';
 import { useApp } from '../../lib/AppContext';
-import { configured, supabase, SITE_URL } from '../../lib/supabase';
+import { configured, supabase } from '../../lib/supabase';
 import { SocialAuth } from '../../components/SocialAuth';
-import { openWeb } from '../../lib/web';
 
 function Member() {
   const scroller = useRef<never>(null);
@@ -147,17 +146,6 @@ export default function Account() {
     }
   }
 
-  async function forgot() {
-    const mail = email.trim();
-    if (!mail) { setMsg('Önce e-posta adresini yaz, sonra "Şifremi unuttum"a bas.'); return; }
-    setBusy(true); setMsg('');
-    if (TURNSTILE_SITE_KEY && !token) { setBusy(false); setMsg('Önce güvenlik doğrulamasını tamamla.'); return; }
-    const { error } = await supabase.auth.resetPasswordForEmail(mail, { captchaToken: token ?? undefined, redirectTo: `${SITE_URL.replace(/\/$/, '')}/auth/callback?next=/sifre-yenile` });
-    setBusy(false); setToken(null); setCapKey((k) => k + 1);
-    if (error) { setMsg('Şifre sıfırlama bağlantısı buradan gönderilemedi. Web sitesinden dene.'); openWeb('/giris'); }
-    else setMsg('Bu e-posta ile bir hesap varsa şifre sıfırlama bağlantısı gönderildi. Gelen kutunu ve spam klasörünü kontrol et.');
-  }
-
   if (session) return <Member />;
   return (
     <ScrollView style={{ backgroundColor: color.bg }} contentContainerStyle={{ paddingBottom: 32 }} keyboardShouldPersistTaps="handled">
@@ -182,7 +170,7 @@ export default function Account() {
             : <Field label="E-posta" autoCapitalize="none" autoCorrect={false} keyboardType="email-address" value={email} onChangeText={setEmail} />}
           <Field label="Şifre" secureTextEntry autoCapitalize="none" autoCorrect={false} value={password} onChangeText={setPassword} />
           {TURNSTILE_SITE_KEY ? <Captcha key={capKey} onToken={setToken} /> : null}
-          <Pressable onPress={() => void forgot()} hitSlop={8} accessibilityRole="button" style={{ alignSelf: 'flex-end' }}><Text style={{ color: color.accentText, fontWeight: '600' }}>Şifremi unuttum</Text></Pressable>
+          <Pressable onPress={() => router.push('/sifremi-unuttum' as never)} hitSlop={8} accessibilityRole="button" style={{ alignSelf: 'flex-end' }}><Text style={{ color: color.accentText, fontWeight: '600' }}>Şifremi unuttum</Text></Pressable>
           {msg ? <Text style={s.err}>{msg}</Text> : null}
           <Btn title={busy ? 'Giriş yapılıyor…' : 'Giriş yap'} disabled={busy} onPress={() => void signIn()} />
           <Btn ghost title="Kayıt ol" onPress={() => router.push('/kayit' as never)} />
