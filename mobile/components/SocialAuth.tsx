@@ -51,7 +51,8 @@ export function SocialAuth() {
       const { data, error } = await supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo, skipBrowserRedirect: true } });
       if (error || !data.url) throw new Error(error?.message ?? 'no url');
       const res = await WebBrowser.openAuthSessionAsync(data.url, redirectTo);
-      if (res.type !== 'success') return;
+      // Geçici teşhis: dönüş adresi ve sonuç türü gösterilir.
+      if (res.type !== 'success') { Alert.alert('Google ile giriş', `Dönüş tamamlanmadı (${res.type}).\nGönderilen adres: ${redirectTo}`); return; }
       const q = parseParams(res.url);
       const code = q.code;
       const at = q.access_token;
@@ -60,7 +61,7 @@ export function SocialAuth() {
       else if (at && rt) { const r = await supabase.auth.setSession({ access_token: at, refresh_token: rt }); if (r.error) throw r.error; }
       else throw new Error('no token');
       await recordTerms();
-    } catch { Alert.alert('Google ile giriş', 'Giriş tamamlanamadı. Tekrar dene.'); }
+    } catch (e) { Alert.alert('Google ile giriş', 'Giriş tamamlanamadı. Tekrar dene.\n' + String((e as Error)?.message ?? e)); }
     finally { setBusy(false); }
   }
 
