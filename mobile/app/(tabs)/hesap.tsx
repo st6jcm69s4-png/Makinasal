@@ -6,7 +6,8 @@ import { router, useFocusEffect } from 'expo-router';
 import { Icon, type IconName } from '../../components/Icon';
 import { Btn, Chip, Field, Hatch, Label } from '../../components/ui';
 import { Captcha } from '../../components/Captcha';
-import { fetchProviders, normalizePhone, TURNSTILE_SITE_KEY } from '../../lib/auth';
+import { fetchProviders, TURNSTILE_SITE_KEY } from '../../lib/auth';
+import { PhoneField, emptyPhone, phoneToE164, type PhoneValue } from '../../components/PhoneField';
 import { Avatar } from '../../components/kit';
 import { Group, type Item } from '../../components/Rows';
 import { color, font, radius } from '../../lib/theme';
@@ -90,6 +91,7 @@ function Member() {
           { icon: 'credit-card', label: 'Ödemelerim', go: go('/odemelerim') },
           { icon: 'award', label: 'Üyelik ve ilan hakları', go: go('/premium') },
           { icon: 'shield', label: 'Hesap güvenliği', go: go('/hesap-dogrula') },
+          { icon: 'lock', label: 'Şifreyi değiştir', go: go('/sifre-degistir') },
           ...(isAdmin ? [{ icon: 'sliders' as IconName, label: 'Yönetim', go: go('/yonetim') }] : []),
         ]} />
         <Group title="Keşfet ve destek" items={[
@@ -114,7 +116,7 @@ function Member() {
 export default function Account() {
   const { session } = useApp();
   const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
+  const [phone, setPhone] = useState<PhoneValue>(emptyPhone);
   const [via, setVia] = useState<'email' | 'phone'>('email');
   const [phoneOk, setPhoneOk] = useState(false);
   const [password, setPassword] = useState('');
@@ -131,8 +133,8 @@ export default function Account() {
     const opts = token ? { captchaToken: token } : undefined;
     let error;
     if (via === 'phone') {
-      const p = normalizePhone(phone);
-      if (!p) { setBusy(false); setMsg('Geçerli bir Türkiye cep telefonu numarası gir (05XX XXX XX XX).'); return; }
+      const p = phoneToE164(phone);
+      if (!p) { setBusy(false); setMsg('Geçerli bir telefon numarası gir.'); return; }
       ({ error } = await supabase.auth.signInWithPassword({ phone: p, password, options: opts }));
     } else {
       ({ error } = await supabase.auth.signInWithPassword({ email: email.trim(), password, options: opts }));
@@ -176,7 +178,7 @@ export default function Account() {
             </View>
           ) : null}
           {via === 'phone'
-            ? <Field label="Cep telefonu" autoCapitalize="none" keyboardType="phone-pad" placeholder="05XX XXX XX XX" value={phone} onChangeText={setPhone} />
+            ? <PhoneField label="Cep telefonu" value={phone} onChange={setPhone} />
             : <Field label="E-posta" autoCapitalize="none" autoCorrect={false} keyboardType="email-address" value={email} onChangeText={setEmail} />}
           <Field label="Şifre" secureTextEntry autoCapitalize="none" autoCorrect={false} value={password} onChangeText={setPassword} />
           {TURNSTILE_SITE_KEY ? <Captcha key={capKey} onToken={setToken} /> : null}

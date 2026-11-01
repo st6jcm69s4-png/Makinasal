@@ -8,9 +8,10 @@ import { AlertBox } from '../components/kit';
 import { PickerModal } from '../components/PickerModal';
 import { Captcha } from '../components/Captcha';
 import { SocialAuth } from '../components/SocialAuth';
+import { PhoneField, emptyPhone, phoneToE164, type PhoneValue } from '../components/PhoneField';
 import { CITIES } from '../lib/data';
 import { districtsFor, formatPersonName, validRegion } from '../lib/regions';
-import { PASSWORD_RULES, SIGNUP_OPEN, TURNSTILE_SITE_KEY, authMessage, normalizePhone, passwordValid } from '../lib/auth';
+import { PASSWORD_RULES, SIGNUP_OPEN, TURNSTILE_SITE_KEY, authMessage, passwordValid } from '../lib/auth';
 import { LEGAL_VERSION } from '../lib/legalTexts';
 import { supabase, SITE_URL } from '../lib/supabase';
 import { color, font, radius } from '../lib/theme';
@@ -18,7 +19,8 @@ import { color, font, radius } from '../lib/theme';
 export default function Register() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
+  const [phone, setPhone] = useState<PhoneValue>(emptyPhone);
+  const [password2, setPassword2] = useState('');
   const [city, setCity] = useState('');
   const [district, setDistrict] = useState('');
   const [password, setPassword] = useState('');
@@ -32,12 +34,13 @@ export default function Register() {
   async function submit() {
     setErr('');
     const cleanName = formatPersonName(name);
-    const cleanPhone = normalizePhone(phone);
+    const cleanPhone = phoneToE164(phone);
     if (cleanName.length < 2) return setErr('Ad soyadını yaz.');
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) return setErr('Geçerli bir e-posta yaz.');
-    if (!cleanPhone) return setErr('Telefon numarasını 05XX XXX XX XX biçiminde yaz.');
+    if (!cleanPhone) return setErr(phone.iso === 'TR' ? 'Telefon numarasını 05XX XXX XX XX biçiminde yaz.' : 'Geçerli bir telefon numarası yaz.');
     if (!validRegion(city, district)) return setErr('İl ve ilçeni seç.');
     if (!passwordValid(password)) return setErr('Şifre aşağıdaki koşulların hepsini karşılamalı.');
+    if (password !== password2) return setErr('Şifreler eşleşmiyor.');
     if (!accepted) return setErr('Kullanım koşullarını kabul etmelisin.');
     if (!token) return setErr('Güvenlik doğrulamasını tamamla.');
     setBusy(true);
@@ -51,6 +54,8 @@ export default function Register() {
     });
     setBusy(false);
     if (error) { setErr(authMessage(error.message)); setToken(null); return; }
+    // Kayıtlı bir e-postada Supabase sessizce başarılı döner ve e-posta göndermez; bunu açıkça söyleriz.
+    if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) { setErr('Bu e-posta ile zaten bir hesap var. Giriş yap veya "Şifremi unuttum" ile şifreni yenile.'); setToken(null); return; }
     if (data.session) { router.replace('/hesap-dogrula' as never); return; }
     setSent(true);
   }
@@ -86,10 +91,10 @@ export default function Register() {
         <View style={s.body}>
           <Field label="Ad soyad" value={name} onChangeText={setName} autoCapitalize="words" textContentType="name" />
           <Field label="E-posta" value={email} onChangeText={setEmail} autoCapitalize="none" keyboardType="email-address" textContentType="emailAddress" />
-          <Field label="Telefon" value={phone} onChangeText={setPhone} keyboardType="phone-pad" placeholder="05XX XXX XX XX" textContentType="telephoneNumber" />
+          <PhoneField label="Telefon" value={phone} onChange={setPhone} />
           <Select label="İl" value={city} onPress={() => setSheet('city')} />
           <Select label="İlçe" value={district} onPress={() => (city ? setSheet('district') : setErr('Önce il seç.'))} />
-          <Field label="Şifre" value={password} onChangeText={setPassword} secureTextEntry textContentType="newPassword" />
+          <Field label="Şifre" value={password} onChangeText={setPassword} secureTextEntry autoCapitalize="none" textContentType="newPassword" />
           <View style={{ gap: 4 }}>
             {PASSWORD_RULES.map((r) => {
               const ok = r.test(password);
@@ -101,6 +106,8 @@ export default function Register() {
               );
             })}
           </View>
+          <Field label="Şifre tekrar" value={password2} onChangeText={setPassword2} secureTextEntry autoCapitalize="none" textContentType="newPassword" />
+          {password2 && password !== password2 ? <Text style={[s.ruleText, { color: color.bad }]}>Şifreler eşleşmiyor.</Text> : null}
           <Pressable style={s.check} onPress={() => setAccepted((a) => !a)} accessibilityRole="checkbox" accessibilityState={{ checked: accepted }}>
             <View style={[s.box, accepted && { backgroundColor: color.accent, borderColor: color.accent }]}>{accepted ? <Icon name="check" size={15} color="#fff" /> : null}</View>
             <Text style={s.checkText}>Kullanım koşullarını ve KVKK aydınlatma metnini okudum, kabul ediyorum.</Text>
