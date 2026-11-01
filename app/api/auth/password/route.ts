@@ -10,6 +10,6 @@ export async function POST(request: NextRequest) {
  const { password } = JSON.parse(raw); if(typeof password!=="string" || !passwordValid(password)) return fail("Şifre tüm güvenlik koşullarını karşılamalı.");
  const response=NextResponse.json({ok:true},{headers:{"Cache-Control":"no-store"}}), db=authRequest(request,response);
  const {data,error:sessionError}=await db.auth.getUser(); if(sessionError||!data.user) return fail("Önce giriş yap veya şifre sıfırlama bağlantısını aç.",401);
- const {error}=await db.auth.updateUser({password}); if(error)return fail(authError(error.message));return response;
+ const {error}=await db.auth.updateUser({password}); if(error)return fail(authError(error.message));await db.auth.signOut();return response;
  }catch{return fail("Şifre güncellenemedi.",503);}
 }

@@ -24,6 +24,7 @@ export function AuthForm() {
   const [region, setRegion] = useState({ city: '', district: '' });
   const [skipRegion, setSkipRegion] = useState(false);
   const [phone, setPhone] = useState('');
+  const [via, setVia] = useState<'email'|'phone'>('email');
   const [confirmation, setConfirmation] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [options, setOptions] = useState<AuthOptions | null>(null);
@@ -73,7 +74,9 @@ export function AuthForm() {
         if (!response.ok) setError(result.error || 'Kayıt tamamlanamadı.');
         else { setConfirmationPending(true); setPassword(''); setConfirmation(''); setCooldown(60); setInfo("Kayıt isteğin alındı. E-postandaki onay bağlantısını aç; ardından telefonuna gelen SMS koduyla doğrulamayı tamamla."); }
       } else {
-        const { error } = await supabase.auth.signInWithPassword({ email: cleanEmail, password,options:{captchaToken} });
+        let credentials: { email: string } | { phone: string } = { email: cleanEmail };
+        if (via === 'phone') { const p = normalizePhone(phone); if (!p) { setError("Geçerli bir Türkiye cep telefonu numarası gir."); return; } credentials = { phone: p }; }
+        const { error } = await supabase.auth.signInWithPassword({ ...credentials, password, options:{captchaToken} });
         if (error) setError(authError(error.message));
         else { window.location.assign(next); }
       }
@@ -106,8 +109,9 @@ export function AuthForm() {
     {mode !== 'reset' && <div className="social-auth"><button type="button" className="btn ghost" disabled={busy || !options?.google} onClick={() => void social('google')}>{tr("Google ile giriş yap")}</button><button type="button" className="btn ghost" disabled={busy || !options?.apple} onClick={() => void social('apple')}>{tr("Apple ile giriş yap")}</button>{options && (!options.google || !options.apple) && <p className="sub">{tr("Gri görünen giriş seçenekleri şu anda kullanılamıyor.")}</p>}<span>{tr("veya e-posta ile devam et")}</span></div>}
     {mode === 'register' && options && !options.registration && <p className="auth-notice" role="status">{tr("E-posta ve SMS doğrulaması açılana kadar yeni kayıt alınamıyor. Mevcut hesabınla giriş yapabilirsin.")}</p>}
     {mode === 'register' ? <><label htmlFor="name">{tr("Ad soyad")}</label><input id="name" value={name} onChange={e => setName(capitalizeName(e.target.value))} onBlur={() => setName(formatPersonName(name))} autoCapitalize="words" required minLength={2} maxLength={80} autoComplete="name" /></> : null}
-    <label htmlFor="email">{tr("E-posta")}</label>
-    <input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)} required autoComplete="email" />
+    {mode === 'login' && options?.phone ? <div className="theme-switch" role="group" aria-label={tr("Giriş yöntemi")}><button type="button" aria-pressed={via === 'email'} onClick={() => setVia('email')}>{tr("E-posta")}</button><button type="button" aria-pressed={via === 'phone'} onClick={() => setVia('phone')}>{tr("Telefon")}</button></div> : null}
+    {mode === 'login' && via === 'phone' && options?.phone ? <><label htmlFor="login-phone">{tr("Cep telefonu")}</label><input id="login-phone" type="tel" inputMode="tel" autoComplete="tel" required value={phone} maxLength={24} placeholder={tr("05XX XXX XX XX")} onChange={e => setPhone(e.target.value)} /></> : <><label htmlFor="email">{tr("E-posta")}</label>
+    <input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)} required autoComplete="email" /></>}
     {mode === 'register' && <><label htmlFor="signup-phone">{tr("Cep telefonu")}</label><input id="signup-phone" type="tel" inputMode="tel" autoComplete="tel" required value={phone} maxLength={24} placeholder={tr("05XX XXX XX XX")} onChange={e => setPhone(e.target.value)} /><small className="sub">{tr("E-posta onayından sonra SMS koduyla doğrulanır.")}</small></>}
     {mode !== 'reset' && <><label htmlFor="pw">{tr("Şifre")}{mode === 'register' ? tr(" (en az 8 karakter)") : ''}</label>
       <input id="pw" type={showPassword ? "text" : "password"} maxLength={128} value={password} onChange={e => setPassword(e.target.value)} required minLength={mode === 'register' ? 8 : 1} autoComplete={mode === 'login' ? 'current-password' : 'new-password'} />

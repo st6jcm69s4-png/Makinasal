@@ -45,7 +45,7 @@ export function PasswordResetForm() {
   }
 
   if (!ready) return <div className="empty" role="status">{tr("Bağlantı doğrulanıyor…")}</div>;
-  if (done) return <div className="panel"><h1>{tr("Şifren güncellendi")}</h1><p role="status">{tr("Yeni şifrenle giriş yapabilirsin.")}</p><a className="btn" href="/profil">{tr("Hesabıma git")}</a></div>;
+  if (done) return <div className="panel"><h1>{tr("Şifren güncellendi")}</h1><p role="status">{tr("Yeni şifrenle giriş yapabilirsin.")}</p><a className="btn" href="/giris">{tr("Giriş yap")}</a></div>;
   if (!allowed) return <div className="panel"><h1>{tr("Bağlantı geçersiz veya süresi dolmuş")}</h1><p>{tr("Şifre sıfırlama bağlantısını istediğin tarayıcıda aç veya yeni bir bağlantı iste.")}</p><a className="btn" href="/giris">{tr("Giriş sayfasına dön")}</a></div>;
   return <form className="panel auth" style={{ maxWidth: 420 }} onSubmit={submit}>
     <h1>{tr("Yeni şifre belirle")}</h1>

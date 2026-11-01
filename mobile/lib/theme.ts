@@ -31,8 +31,8 @@ export const hair = 1;
 /** Yazı tipi aileleri (yüklenemezse sistem yazı tipine düşer). */
 export const fontState = { ok: false };
 export const font = {
-  regular: 'Barlow_400Regular', medium: 'Barlow_500Medium', semi: 'Barlow_600SemiBold', bold: 'Barlow_700Bold',
-  label: 'BarlowCondensed_600SemiBold', labelBold: 'BarlowCondensed_700Bold',
+  regular: 'Inter_400Regular', medium: 'Inter_500Medium', semi: 'Inter_600SemiBold', bold: 'Inter_700Bold',
+  label: 'Inter_600SemiBold', labelBold: 'Inter_700Bold',
 } as const;
 
 /** Etiketler Türkçe büyük harfle yazılır (i→İ). */

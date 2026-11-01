@@ -1383,5 +1383,12 @@
   "Görünüm": "Appearance",
   "Sistem": "System",
   "Açık tema": "Light",
-  "Koyu tema": "Dark"
+  "Koyu tema": "Dark",
+  "Giri\u015f y\u00f6ntemi": "Sign-in method",
+  "\u00d6nce g\u00fcvenlik do\u011frulamas\u0131n\u0131 tamamla.": "Complete the security check first.",
+  "Ge\u00e7erli bir T\u00fcrkiye cep telefonu numaras\u0131 gir (05XX XXX XX XX).": "Enter a valid Turkish mobile number (05XX XXX XX XX).",
+  "G\u00fcvenlik do\u011frulamas\u0131 tamamlanamad\u0131. Kutuyu yenileyip tekrar dene.": "Security check failed. Refresh the box and try again.",
+  "Hesab\u0131n hen\u00fcz do\u011frulanmam\u0131\u015f. E-postandaki ba\u011flant\u0131y\u0131 a\u00e7.": "Your account is not verified yet. Open the link in your email.",
+  "Giri\u015f yap\u0131lamad\u0131. Bilgilerini kontrol et.": "Could not sign in. Check your details.",
+  "E-posta/telefon veya \u015fifre hatal\u0131.": "Email/phone or password is incorrect."
 }

@@ -4,8 +4,8 @@
   --bg:#F6F5F3; --surface:#FFFFFF; --plate:#EEECEA; --ink:#25272D; --muted:#66616A; --line:#DDD9DC;
   --accent:#800020; --accent-ink:#FFFFFF; --accent-text:#800020; --accent-soft:#F0EBEB;
   --good:#1B6F40; --good-bg:#DCEFE3; --warn:#7F5200; --warn-bg:#FFF0C2; --bad:#9C2626; --bad-bg:#F5DADA; --neutral-bg:#EEECEE;
-  --f-display:'Barlow','Arial',sans-serif;
-  --f-body:'Noto Sans','Segoe UI',system-ui,sans-serif;
+  --f-display:'Inter','Segoe UI',system-ui,sans-serif;
+  --f-body:'Inter','Segoe UI',system-ui,sans-serif;
   color-scheme:light;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){

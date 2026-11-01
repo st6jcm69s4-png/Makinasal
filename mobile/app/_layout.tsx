@@ -1,5 +1,4 @@
-import { Barlow_400Regular, Barlow_500Medium, Barlow_600SemiBold, Barlow_700Bold } from '@expo-google-fonts/barlow';
-import { BarlowCondensed_600SemiBold, BarlowCondensed_700Bold } from '@expo-google-fonts/barlow-condensed';
+import { Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import { useEffect, useState } from 'react';
@@ -22,7 +21,7 @@ function Screens() {
         screenOptions={({ navigation }) => ({
           headerStyle: { backgroundColor: '#25272D' },
           headerTintColor: '#fff',
-          headerTitleStyle: { fontFamily: fontState.ok ? 'BarlowCondensed_700Bold' : undefined, fontSize: 22, letterSpacing: 0.8 },
+          headerTitleStyle: { fontFamily: fontState.ok ? 'Inter_700Bold' : undefined, fontSize: 18, letterSpacing: 0.2 },
           headerShadowVisible: false,
           // Her uygulamadaki gibi: sistemin kendi geri oku. Geçmiş yoksa (bağlantıyla açılınca) ana sayfaya dönen düğme.
           headerBackButtonDisplayMode: 'minimal',
@@ -66,7 +65,7 @@ function Screens() {
 }
 
 export default function RootLayout() {
-  const [loaded, error] = useFonts({ Barlow_400Regular, Barlow_500Medium, Barlow_600SemiBold, Barlow_700Bold, BarlowCondensed_600SemiBold, BarlowCondensed_700Bold });
+  const [loaded, error] = useFonts({ Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold });
   // Yazı tipi yüklenemese de (çevrimdışı vb.) uygulama sistem yazı tipiyle açılır.
   const [timedOut, setTimedOut] = useState(false);
   const [themeReady, setThemeReady] = useState(false);

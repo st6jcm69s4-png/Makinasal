@@ -22,18 +22,18 @@ export function normalizePhone(value: string) {
   return /^5[0-9]{9}$/.test(d) ? '+90' + d : '';
 }
 
-export type AuthProviders = { google: boolean; apple: boolean };
+export type AuthProviders = { google: boolean; apple: boolean; phone: boolean };
 let cache: AuthProviders | null = null;
 /** Supabase'de hangi giriş sağlayıcıları açık? Kapalıysa düğme gösterilmez. */
 export async function fetchProviders(): Promise<AuthProviders> {
   if (cache) return cache;
-  const none = { google: false, apple: false };
+  const none = { google: false, apple: false, phone: false };
   try {
     const key = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY ?? '';
     const r = await fetch(`${SUPABASE_URL}/auth/v1/settings`, { headers: { apikey: key } });
     if (!r.ok) return none;
     const j = (await r.json()) as { external?: Record<string, boolean> };
-    cache = { google: j.external?.google === true, apple: j.external?.apple === true };
+    cache = { google: j.external?.google === true, apple: j.external?.apple === true, phone: j.external?.phone === true };
     return cache;
   } catch { return none; }
 }
@@ -42,6 +42,7 @@ export async function fetchProviders(): Promise<AuthProviders> {
 export function authMessage(raw: string) {
   const m = raw.toLowerCase();
   if (m.includes('already registered') || m.includes('already been registered')) return 'Bu e-posta ile zaten bir hesap var. Giriş yapmayı dene.';
+  if (m.includes('invalid login') || m.includes('invalid_credentials')) return 'E-posta/telefon veya şifre hatalı.';
   if (m.includes('captcha')) return 'Güvenlik doğrulaması tamamlanamadı. Kutuyu yenileyip tekrar dene.';
   if (m.includes('password')) return 'Şifre koşulları karşılanmıyor veya çok yaygın bir şifre. Başka bir şifre dene.';
   if (m.includes('rate') || m.includes('too many')) return 'Çok fazla deneme yapıldı. Biraz bekleyip tekrar dene.';

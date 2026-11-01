@@ -1,5 +1,6 @@
 // Mobil uygulamaya özgü Almanca çeviriler (Sie-Form).
 const de: Record<string, string> = {
+  'Giriş yöntemi': 'Anmeldemethode', 'Önce güvenlik doğrulamasını tamamla.': 'Schließen Sie zuerst die Sicherheitsprüfung ab.', 'Geçerli bir Türkiye cep telefonu numarası gir (05XX XXX XX XX).': 'Geben Sie eine gültige türkische Handynummer ein (05XX XXX XX XX).', 'Güvenlik doğrulaması tamamlanamadı. Kutuyu yenileyip tekrar dene.': 'Sicherheitsprüfung fehlgeschlagen. Aktualisieren Sie das Feld und versuchen Sie es erneut.', 'Hesabın henüz doğrulanmamış. E-postandaki bağlantıyı aç.': 'Ihr Konto ist noch nicht verifiziert. Öffnen Sie den Link in Ihrer E-Mail.', 'Giriş yapılamadı. Bilgilerini kontrol et.': 'Anmeldung nicht möglich. Prüfen Sie Ihre Angaben.', 'E-posta/telefon veya şifre hatalı.': 'E-Mail/Telefon oder Passwort ist falsch.', 'Cep telefonu': 'Handynummer',
   'Görünüm': 'Darstellung', 'Sistem': 'System', 'Açık tema': 'Hell', 'Koyu tema': 'Dunkel',
   'İlanlar': 'Inserate',
   'İş Ağı': 'Geschäftsnetzwerk',

@@ -1,5 +1,6 @@
 // Mobil uygulamaya özgü İngilizce çeviriler (web en.json'da bulunmayanlar).
 const extra: Record<string, string> = {
+  'Giriş yöntemi': 'Sign-in method', 'Önce güvenlik doğrulamasını tamamla.': 'Complete the security check first.', 'Geçerli bir Türkiye cep telefonu numarası gir (05XX XXX XX XX).': 'Enter a valid Turkish mobile number (05XX XXX XX XX).', 'Güvenlik doğrulaması tamamlanamadı. Kutuyu yenileyip tekrar dene.': 'Security check failed. Refresh the box and try again.', 'Hesabın henüz doğrulanmamış. E-postandaki bağlantıyı aç.': 'Your account is not verified yet. Open the link in your email.', 'Giriş yapılamadı. Bilgilerini kontrol et.': 'Could not sign in. Check your details.', 'E-posta/telefon veya şifre hatalı.': 'Email/phone or password is incorrect.', 'Cep telefonu': 'Mobile phone',
   'Görünüm': 'Appearance', 'Sistem': 'System', 'Açık tema': 'Light', 'Koyu tema': 'Dark',
   'Ana sayfa': 'Home', 'İlanlar': 'Listings', 'İş Ağı': 'Work network', 'Favoriler': 'Favorites', 'Mesajlar': 'Messages', 'Hesabım': 'My account',
   'Favoriler yüklenemedi. Bağlantını kontrol et.': 'Favorites could not be loaded. Check your connection.',

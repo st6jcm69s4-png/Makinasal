@@ -1,10 +1,12 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTabScrollTop } from '../../lib/scrollTop';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { PlainText, Text, TextInput } from '../../components/LText';
 import { router, useFocusEffect } from 'expo-router';
 import { Icon, type IconName } from '../../components/Icon';
-import { Btn, Field, Hatch, Label } from '../../components/ui';
+import { Btn, Chip, Field, Hatch, Label } from '../../components/ui';
+import { Captcha } from '../../components/Captcha';
+import { fetchProviders, normalizePhone, TURNSTILE_SITE_KEY } from '../../lib/auth';
 import { Avatar } from '../../components/kit';
 import { Group, type Item } from '../../components/Rows';
 import { color, font, radius } from '../../lib/theme';
@@ -112,24 +114,44 @@ function Member() {
 export default function Account() {
   const { session } = useApp();
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [via, setVia] = useState<'email' | 'phone'>('email');
+  const [phoneOk, setPhoneOk] = useState(false);
   const [password, setPassword] = useState('');
   const [msg, setMsg] = useState('');
   const [busy, setBusy] = useState(false);
+  const [token, setToken] = useState<string | null>(null);
+  const [capKey, setCapKey] = useState(0);
+  useEffect(() => { void fetchProviders().then((p) => setPhoneOk(p.phone)); }, []);
 
   async function signIn() {
     if (!configured) { setMsg('Uygulama ayarları eksik (.env dosyası).'); return; }
     setBusy(true); setMsg('');
-    const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
+    if (TURNSTILE_SITE_KEY && !token) { setBusy(false); setMsg('Önce güvenlik doğrulamasını tamamla.'); return; }
+    const opts = token ? { captchaToken: token } : undefined;
+    let error;
+    if (via === 'phone') {
+      const p = normalizePhone(phone);
+      if (!p) { setBusy(false); setMsg('Geçerli bir Türkiye cep telefonu numarası gir (05XX XXX XX XX).'); return; }
+      ({ error } = await supabase.auth.signInWithPassword({ phone: p, password, options: opts }));
+    } else {
+      ({ error } = await supabase.auth.signInWithPassword({ email: email.trim(), password, options: opts }));
+    }
     setBusy(false);
-    if (error) setMsg('Giriş yapılamadı. E-posta veya şifreyi kontrol et.');
+    if (error) {
+      const m = error.message.toLowerCase();
+      setMsg(m.includes('captcha') ? 'Güvenlik doğrulaması tamamlanamadı. Kutuyu yenileyip tekrar dene.' : m.includes('confirm') ? 'Hesabın henüz doğrulanmamış. E-postandaki bağlantıyı aç.' : 'Giriş yapılamadı. Bilgilerini kontrol et.');
+      setToken(null); setCapKey((k) => k + 1);
+    }
   }
 
   async function forgot() {
     const mail = email.trim();
     if (!mail) { setMsg('Önce e-posta adresini yaz, sonra "Şifremi unuttum"a bas.'); return; }
     setBusy(true); setMsg('');
-    const { error } = await supabase.auth.resetPasswordForEmail(mail, { redirectTo: `${SITE_URL.replace(/\/$/, '')}/auth/callback?next=/sifre-yenile` });
-    setBusy(false);
+    if (TURNSTILE_SITE_KEY && !token) { setBusy(false); setMsg('Önce güvenlik doğrulamasını tamamla.'); return; }
+    const { error } = await supabase.auth.resetPasswordForEmail(mail, { captchaToken: token ?? undefined, redirectTo: `${SITE_URL.replace(/\/$/, '')}/auth/callback?next=/sifre-yenile` });
+    setBusy(false); setToken(null); setCapKey((k) => k + 1);
     if (error) { setMsg('Şifre sıfırlama bağlantısı buradan gönderilemedi. Web sitesinden dene.'); openWeb('/giris'); }
     else setMsg('Bu e-posta ile bir hesap varsa şifre sıfırlama bağlantısı gönderildi. Gelen kutunu ve spam klasörünü kontrol et.');
   }
@@ -147,8 +169,17 @@ export default function Account() {
       <Hatch height={7} />
       <View style={s.body}>
         <View style={{ gap: 12 }}>
-          <Field label="E-posta" autoCapitalize="none" keyboardType="email-address" value={email} onChangeText={setEmail} />
-          <Field label="Şifre" secureTextEntry value={password} onChangeText={setPassword} />
+          {phoneOk ? (
+            <View style={{ flexDirection: 'row', gap: 8 }}>
+              <Chip title="E-posta" on={via === 'email'} onPress={() => setVia('email')} />
+              <Chip title="Telefon" on={via === 'phone'} onPress={() => setVia('phone')} />
+            </View>
+          ) : null}
+          {via === 'phone'
+            ? <Field label="Cep telefonu" autoCapitalize="none" keyboardType="phone-pad" placeholder="05XX XXX XX XX" value={phone} onChangeText={setPhone} />
+            : <Field label="E-posta" autoCapitalize="none" autoCorrect={false} keyboardType="email-address" value={email} onChangeText={setEmail} />}
+          <Field label="Şifre" secureTextEntry autoCapitalize="none" autoCorrect={false} value={password} onChangeText={setPassword} />
+          {TURNSTILE_SITE_KEY ? <Captcha key={capKey} onToken={setToken} /> : null}
           <Pressable onPress={() => void forgot()} hitSlop={8} accessibilityRole="button" style={{ alignSelf: 'flex-end' }}><Text style={{ color: color.accentText, fontWeight: '600' }}>Şifremi unuttum</Text></Pressable>
           {msg ? <Text style={s.err}>{msg}</Text> : null}
           <Btn title={busy ? 'Giriş yapılıyor…' : 'Giriş yap'} disabled={busy} onPress={() => void signIn()} />
