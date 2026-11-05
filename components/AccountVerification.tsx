@@ -18,7 +18,7 @@ export function AccountVerification() {
  const confirmedPhone=!!user?.phone_confirmed_at && !!user.phone;
  async function send() {
   const db=getSupabase(), normalized=normalizePhone(phone);if(!db||busy||cooldown||!options?.phone)return;
-  if(!normalized){setError("Geçerli bir Türkiye cep telefonu numarası gir.");return;}
+  if(!normalized){setError("Geçerli bir cep telefonu numarası gir.");return;}
   setBusy(true);setError("");setInfo("");
   try{const {error}=await db.auth.updateUser({phone:normalized});if(error)throw error;setPhone(normalized);setSent(true);setCooldown(60);setInfo("SMS kodu gönderildi. Kodu aşağıya gir.");}catch(e){setError(authError(e instanceof Error?e.message:""));}finally{setBusy(false);}
  }

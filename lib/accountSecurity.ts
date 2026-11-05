@@ -8,6 +8,7 @@ export const PASSWORD_RULES = [
 export function passwordValid(value: string) { return value.length <= 128 && PASSWORD_RULES.every(rule => rule.test(value)); }
 export function normalizePhone(value: string) {
   const n = value.replace(/[\s()\-]/g, "");
+  if (n.startsWith("+") && !n.startsWith("+90")) return /^\+[1-9][0-9]{7,14}$/.test(n) ? n : "";
   const digits = n.startsWith("+90") ? n.slice(3) : n.startsWith("0090") ? n.slice(4) : n.startsWith("90") && n.length === 12 ? n.slice(2) : n.startsWith("0") ? n.slice(1) : n;
   return /^5[0-9]{9}$/.test(digits) ? "+90" + digits : "";
 }

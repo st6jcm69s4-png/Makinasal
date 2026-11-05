@@ -1391,5 +1391,8 @@
  "Güvenlik doğrulaması tamamlanamadı. Kutuyu yenileyip tekrar dene.": "Sicherheitsprüfung fehlgeschlagen. Aktualisieren Sie das Feld und versuchen Sie es erneut.",
  "Hesabın henüz doğrulanmamış. E-postandaki bağlantıyı aç.": "Ihr Konto ist noch nicht verifiziert. Öffnen Sie den Link in Ihrer E-Mail.",
  "Giriş yapılamadı. Bilgilerini kontrol et.": "Anmeldung nicht möglich. Prüfen Sie Ihre Angaben.",
- "E-posta/telefon veya şifre hatalı.": "E-Mail/Telefon oder Passwort ist falsch."
+ "E-posta/telefon veya şifre hatalı.": "E-Mail/Telefon oder Passwort ist falsch.",
+  "Ge\u00e7erli bir cep telefonu numaras\u0131 gir.": "Geben Sie eine g\u00fcltige Handynummer ein.",
+  "\u00dclke kodu": "L\u00e4ndervorwahl",
+  "Numara": "Nummer"
 }

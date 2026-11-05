@@ -10,6 +10,7 @@ import { authError, safeAuthNext } from '@/lib/auth';
 import { capitalizeName, formatPersonName, validRegion } from '@/lib/profile';
 import { RegionFields } from './RegionFields';
 import { PasswordRules } from './PasswordRules';
+import { PhoneField } from './PhoneField';
 import { passwordValid, normalizePhone, publicAuthOptions, type AuthOptions } from '@/lib/accountSecurity';
 
 type Mode = 'login' | 'register' | 'reset';
@@ -68,14 +69,14 @@ export function AuthForm() {
         if (!validRegion(region.city, region.district)) { setError("Lütfen seçtiğin ile ait bir ilçe seç."); return; }
         if (!passwordValid(password)) { setError("Şifren aşağıdaki güvenlik koşullarının tamamını karşılamalı."); return; }
         if (password !== confirmation) { setError("Şifreler eşleşmiyor."); return; }
-        if (!normalizePhone(phone)) { setError("Geçerli bir Türkiye cep telefonu numarası gir."); return; }
+        if (!normalizePhone(phone)) { setError("Geçerli bir cep telefonu numarası gir."); return; }
         const response = await fetch('/api/auth/register', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ name:formatPersonName(name),email:cleanEmail,password,phone,city:region.city,district:region.district,next,captchaToken,acceptedTerms }) });
         const result = await readApiJson(response);
         if (!response.ok) setError(result.error || 'Kayıt tamamlanamadı.');
         else { setConfirmationPending(true); setPassword(''); setConfirmation(''); setCooldown(60); setInfo("Kayıt isteğin alındı. E-postandaki onay bağlantısını aç; ardından telefonuna gelen SMS koduyla doğrulamayı tamamla."); }
       } else {
         let credentials: { email: string } | { phone: string } = { email: cleanEmail };
-        if (via === 'phone') { const p = normalizePhone(phone); if (!p) { setError("Geçerli bir Türkiye cep telefonu numarası gir."); return; } credentials = { phone: p }; }
+        if (via === 'phone') { const p = normalizePhone(phone); if (!p) { setError("Geçerli bir cep telefonu numarası gir."); return; } credentials = { phone: p }; }
         const { error } = await supabase.auth.signInWithPassword({ ...credentials, password, options:{captchaToken} });
         if (error) setError(authError(error.message));
         else { window.location.assign(next); }
@@ -110,9 +111,9 @@ export function AuthForm() {
     {mode === 'register' && options && !options.registration && <p className="auth-notice" role="status">{tr("E-posta ve SMS doğrulaması açılana kadar yeni kayıt alınamıyor. Mevcut hesabınla giriş yapabilirsin.")}</p>}
     {mode === 'register' ? <><label htmlFor="name">{tr("Ad soyad")}</label><input id="name" value={name} onChange={e => setName(capitalizeName(e.target.value))} onBlur={() => setName(formatPersonName(name))} autoCapitalize="words" required minLength={2} maxLength={80} autoComplete="name" /></> : null}
     {mode === 'login' && options?.phone ? <div className="theme-switch" role="group" aria-label={tr("Giriş yöntemi")}><button type="button" aria-pressed={via === 'email'} onClick={() => setVia('email')}>{tr("E-posta")}</button><button type="button" aria-pressed={via === 'phone'} onClick={() => setVia('phone')}>{tr("Telefon")}</button></div> : null}
-    {mode === 'login' && via === 'phone' && options?.phone ? <><label htmlFor="login-phone">{tr("Cep telefonu")}</label><input id="login-phone" type="tel" inputMode="tel" autoComplete="tel" required value={phone} maxLength={24} placeholder={tr("05XX XXX XX XX")} onChange={e => setPhone(e.target.value)} /></> : <><label htmlFor="email">{tr("E-posta")}</label>
+    {mode === 'login' && via === 'phone' && options?.phone ? <><label htmlFor="login-phone">{tr("Cep telefonu")}</label><PhoneField id="login-phone" onChange={setPhone} /></> : <><label htmlFor="email">{tr("E-posta")}</label>
     <input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)} required autoComplete="email" /></>}
-    {mode === 'register' && <><label htmlFor="signup-phone">{tr("Cep telefonu")}</label><input id="signup-phone" type="tel" inputMode="tel" autoComplete="tel" required value={phone} maxLength={24} placeholder={tr("05XX XXX XX XX")} onChange={e => setPhone(e.target.value)} /><small className="sub">{tr("E-posta onayından sonra SMS koduyla doğrulanır.")}</small></>}
+    {mode === 'register' && <><label htmlFor="signup-phone">{tr("Cep telefonu")}</label><PhoneField id="signup-phone" onChange={setPhone} /><small className="sub">{tr("E-posta onayından sonra SMS koduyla doğrulanır.")}</small></>}
     {mode !== 'reset' && <><label htmlFor="pw">{tr("Şifre")}{mode === 'register' ? tr(" (en az 8 karakter)") : ''}</label>
       <input id="pw" type={showPassword ? "text" : "password"} maxLength={128} value={password} onChange={e => setPassword(e.target.value)} required minLength={mode === 'register' ? 8 : 1} autoComplete={mode === 'login' ? 'current-password' : 'new-password'} />
       <button type="button" className="password-toggle" aria-pressed={showPassword} onClick={() => setShowPassword(v => !v)}>{showPassword ? tr("Şifreyi gizle") : tr("Şifreyi göster")}</button>

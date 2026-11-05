@@ -1390,5 +1390,8 @@
   "G\u00fcvenlik do\u011frulamas\u0131 tamamlanamad\u0131. Kutuyu yenileyip tekrar dene.": "Security check failed. Refresh the box and try again.",
   "Hesab\u0131n hen\u00fcz do\u011frulanmam\u0131\u015f. E-postandaki ba\u011flant\u0131y\u0131 a\u00e7.": "Your account is not verified yet. Open the link in your email.",
   "Giri\u015f yap\u0131lamad\u0131. Bilgilerini kontrol et.": "Could not sign in. Check your details.",
-  "E-posta/telefon veya \u015fifre hatal\u0131.": "Email/phone or password is incorrect."
+  "E-posta/telefon veya \u015fifre hatal\u0131.": "Email/phone or password is incorrect.",
+  "Ge\u00e7erli bir cep telefonu numaras\u0131 gir.": "Enter a valid mobile phone number.",
+  "\u00dclke kodu": "Country code",
+  "Numara": "Number"
 }
