@@ -161,3 +161,6 @@ begin
  d := replace(d, '-''is_premium''', '-''is_premium''-''premium_plan''-''premium_until''');
  execute d;
 end $do$;
+
+-- Tetikleyici fonksiyonları API üzerinden çağrılamasın.
+revoke execute on function public.set_post_premium_rank(), public.set_provider_premium_rank() from public, anon, authenticated;
