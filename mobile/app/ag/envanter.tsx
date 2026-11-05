@@ -6,15 +6,15 @@ import { PickerModal } from '../../components/PickerModal';
 import { Btn, common, Field, Select } from '../../components/ui';
 import { useApp } from '../../lib/AppContext';
 import { MACHINE_CATEGORIES } from '../../lib/data';
-import { EQUIPMENT_STATUS, networkError } from '../../lib/network';
-import { supabase, type Row } from '../../lib/supabase';
+import { EQUIPMENT_STATUS, networkError, type InventoryItem } from '../../lib/network';
+import { supabase } from '../../lib/supabase';
 
 const empty = { category: '', brand: '', model: '', year: '', quantity: '1', capacity: '', description: '', availability: 'available' };
 
 export default function Inventory() {
   const { session } = useApp();
   const uid = session?.user.id;
-  const [items, setItems] = useState<Row[]>([]);
+  const [items, setItems] = useState<InventoryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState<typeof empty | null>(null);
   const [editId, setEditId] = useState<string | null>(null);
@@ -24,7 +24,7 @@ export default function Inventory() {
   const load = useCallback(async () => {
     if (!uid) { setLoading(false); return; }
     const r = await supabase.from('company_inventory').select('*').eq('owner_id', uid).order('created_at', { ascending: false }).limit(200);
-    if (r.error) setError('Envanter yüklenemedi.'); else setItems((r.data ?? []) as Row[]);
+    if (r.error) setError('Envanter yüklenemedi.'); else setItems((r.data ?? []) as InventoryItem[]);
     setLoading(false);
   }, [uid]);
   useEffect(() => { void load(); }, [load]);
@@ -42,7 +42,7 @@ export default function Inventory() {
     setBusy(false);
     if (r.error) setError(networkError(r.error)); else { setForm(null); setEditId(null); void load(); }
   }
-  function remove(i: Row) {
+  function remove(i: InventoryItem) {
     Alert.alert('Sil', `${i.brand ?? ''} ${i.model} kaydı silinsin mi?`, [{ text: 'Vazgeç', style: 'cancel' }, { text: 'Sil', style: 'destructive', onPress: async () => {
       const r = await supabase.from('company_inventory').delete().eq('id', i.id).eq('owner_id', uid!).select('id').single();
       if (r.error) setError(networkError(r.error)); else void load();

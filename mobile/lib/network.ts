@@ -21,6 +21,11 @@ export type Provider = {
   user_id: string; name: string; kind: keyof typeof PROVIDER_KINDS; company_category: string | null; description: string; city: string; district: string;
   service_cities: string[]; specialties: string[]; published: boolean;
 };
+export type InventoryItem = {
+  id: string; owner_id: string; category: string; brand: string; model: string; year: number | null;
+  quantity: number; capacity: string; description: string; availability: 'available' | 'busy' | 'maintenance';
+  published: boolean; created_at: string;
+};
 export type Quote = {
   id: string; post_id: string; owner_id: string; bidder_id: string; display_name: string; amount: number; price_unit: string; note: string;
   status: 'pending' | 'accepted' | 'declined' | 'withdrawn'; created_at: string;

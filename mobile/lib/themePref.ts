@@ -9,7 +9,7 @@ export async function loadTheme(): Promise<ThemeChoice> {
   try {
     const v = await AsyncStorage.getItem(KEY);
     const c: ThemeChoice = v === 'light' || v === 'dark' ? v : 'system';
-    Appearance.setColorScheme(c === 'system' ? null : c);
+    Appearance.setColorScheme(c === 'system' ? 'auto' : c);
     return c;
   } catch {
     return 'system';
@@ -17,7 +17,7 @@ export async function loadTheme(): Promise<ThemeChoice> {
 }
 
 export async function saveTheme(c: ThemeChoice): Promise<void> {
-  Appearance.setColorScheme(c === 'system' ? null : c);
+  Appearance.setColorScheme(c === 'system' ? 'auto' : c);
   try {
     if (c === 'system') await AsyncStorage.removeItem(KEY);
     else await AsyncStorage.setItem(KEY, c);

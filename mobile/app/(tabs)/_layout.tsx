@@ -1,6 +1,6 @@
 import { Tabs, router } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Pressable, View } from 'react-native';
+import { Pressable, View, type ColorValue } from 'react-native';
 import { Icon, type IconName } from '../../components/Icon';
 import { PlainText } from '../../components/LText';
 import { color, font } from '../../lib/theme';
@@ -10,10 +10,10 @@ import { useLang } from '../../lib/lang';
 import { supabase } from '../../lib/supabase';
 import { fireScrollTop } from '../../lib/scrollTop';
 
-const icon = (name: IconName) => ({ color: tint, focused }: { color: string; focused: boolean }) => (
+const icon = (name: IconName) => ({ color: tint, focused }: { color: ColorValue | null; focused: boolean }) => (
   <View style={{ alignItems: 'center' }}>
     <View style={{ position: 'absolute', top: -9, width: 44, height: 3, backgroundColor: focused ? color.pop : 'transparent' }} />
-    <Icon name={name} size={21} color={tint} />
+    <Icon name={name} size={21} color={typeof tint === 'string' ? tint : focused ? color.pop : color.muted} />
   </View>
 );
 

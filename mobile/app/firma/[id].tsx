@@ -5,8 +5,8 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { Btn, common } from '../../components/ui';
 import { useApp } from '../../lib/AppContext';
 import { useLoginPrompt } from '../../components/LoginPrompt';
-import { dateLabel, EQUIPMENT_STATUS, money, PROVIDER_KINDS, type MarketPost, type Provider } from '../../lib/network';
-import { supabase, type Row } from '../../lib/supabase';
+import { dateLabel, EQUIPMENT_STATUS, money, PROVIDER_KINDS, type InventoryItem, type MarketPost, type Provider } from '../../lib/network';
+import { supabase } from '../../lib/supabase';
 import { color } from '../../lib/theme';
 
 export default function ProviderDetail() {
@@ -16,7 +16,7 @@ export default function ProviderDetail() {
   const [stat, setStat] = useState<{ score: number; n: number } | null>(null);
   const [p, setP] = useState<Provider | null>(null);
   const [posts, setPosts] = useState<MarketPost[]>([]);
-  const [inv, setInv] = useState<Row[]>([]);
+  const [inv, setInv] = useState<InventoryItem[]>([]);
   const [loading, setLoading] = useState(true);
   useEffect(() => {
     void Promise.all([
@@ -25,7 +25,7 @@ export default function ProviderDetail() {
       supabase.from('company_inventory').select('*').eq('owner_id', id).order('created_at', { ascending: false }).limit(50),
     ]).then(([a, b, c]) => {
       void supabase.from('user_stats').select('score,review_count').eq('id', id).maybeSingle().then((r) => { const d = r.data as { score: number | string; review_count: number | string } | null; if (d && Number(d.review_count) > 0) setStat({ score: Number(d.score), n: Number(d.review_count) }); });
-      setP((a.data as Provider) ?? null); setPosts((b.data ?? []) as MarketPost[]); setInv((c.data ?? []) as Row[]); setLoading(false);
+      setP((a.data as Provider) ?? null); setPosts((b.data ?? []) as MarketPost[]); setInv((c.data ?? []) as InventoryItem[]); setLoading(false);
     });
   }, [id]);
   async function call() {

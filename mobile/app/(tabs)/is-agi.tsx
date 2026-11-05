@@ -130,8 +130,8 @@ export default function NetworkTab() {
         keyExtractor={(i) => ('user_id' in i ? i.user_id : i.id)}
         ListHeaderComponent={header}
         contentContainerStyle={{ paddingBottom: 24 }}
-        ListEmptyComponent={loading ? null : <Text style={s.empty}>{empty}</Text>}
-        ListFooterComponent={loading ? <CardSkeleton count={(tab === 'firma' ? providers : posts).length ? 1 : 3} /> : more ? <View style={{ padding: 12 }}><Btn ghost title="Daha fazla yükle" onPress={() => void load(page + 1)} /></View> : null}
+        ListEmptyComponent={loading ? undefined : <Text style={s.empty}>{empty}</Text>}
+        ListFooterComponent={loading ? <CardSkeleton count={(tab === 'firma' ? providers : posts).length ? 1 : 3} /> : more ? <View style={{ padding: 12 }}><Btn ghost title="Daha fazla yükle" onPress={() => void load(page + 1)} /></View> : undefined}
         renderItem={({ item }) => 'user_id' in item ? <FirmCard p={item} /> : <PostCard p={item} />}
       />
       <Modal visible={acct} animationType="slide" presentationStyle="pageSheet" onRequestClose={() => setAcct(false)}>

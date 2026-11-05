@@ -95,13 +95,13 @@ export default function Parts() {
         renderItem={({ item }) => <ListingCard item={item} />}
         onEndReachedThreshold={0.5}
         onEndReached={() => { if (!loading && rows.length < total) void load(Math.ceil(rows.length / PAGE)); }}
-        ListEmptyComponent={loading ? null : (
+        ListEmptyComponent={loading ? undefined : (
           <View style={{ padding: 16, gap: 8 }}>
             <Text style={common.empty}>Bu seçimde henüz ilan yok. Aradığın parça için İş Ağı'nda talep açabilirsin.</Text>
             <Btn ghost title="Aradığım parçayı paylaş" onPress={() => router.push('/ag/yeni?kind=part_request' as never)} />
           </View>
         )}
-        ListFooterComponent={loading ? <ActivityIndicator style={{ margin: 16 }} /> : null}
+        ListFooterComponent={loading ? <ActivityIndicator style={{ margin: 16 }} /> : undefined}
       />
       <PickerModal visible={sheet === 'eq'} title="Makine veya araç" selected={equipment} options={[{ value: '', label: 'Tümü' }, ...MACHINE_CATEGORIES.map((c) => ({ value: c, label: c }))]} onPick={(v) => { setEquipment(v); setGroup(''); }} onClose={() => setSheet(null)} />
       <PickerModal visible={sheet === 'group'} title="Parça grubu" selected={group} options={[{ value: '', label: 'Tümü' }, ...partGroupsFor(equipment).map((g) => ({ value: g.id, label: g.label }))]} onPick={setGroup} onClose={() => setSheet(null)} />

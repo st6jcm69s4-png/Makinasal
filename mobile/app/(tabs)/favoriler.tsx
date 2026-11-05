@@ -197,7 +197,7 @@ export default function Favorites() {
           </View>
         )
       }
-      ListFooterComponent={shown && !isNet && shown !== tabRows.length ? <Text style={s.foot}>{shown} / {tabRows.length} ilan gösteriliyor</Text> : null}
+      ListFooterComponent={shown && !isNet && shown !== tabRows.length ? <Text style={s.foot}>{shown} / {tabRows.length} ilan gösteriliyor</Text> : undefined}
     />
   );
 }

@@ -40,7 +40,7 @@ export function PickerModal({ visible, title, options, selected, onPick, onClose
                 <Pressable style={s.row} onPress={() => { onPick(custom); close(); }} accessibilityRole="button">
                   <Text style={[s.label, s.sel]}>Bunu kullan: “{custom}”</Text>
                 </Pressable>
-              ) : null}
+              ) : undefined}
               renderItem={({ item }) => (
                 <Pressable style={s.row} onPress={() => { onPick(item.value); close(); }} accessibilityRole="button">
                   <Text style={[s.label, item.value === selected && s.sel]}>{item.label}{item.value === selected ? '  ✓' : ''}</Text>

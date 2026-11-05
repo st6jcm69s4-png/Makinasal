@@ -7,12 +7,12 @@ import { Btn, Hatch, Label } from './ui';
 import { AlertBox, Badge, RowSkeleton, StatusBadge } from './kit';
 import { router } from 'expo-router';
 import { useApp } from '../lib/AppContext';
-import { dateLabel, money, POST_KINDS, QUOTE_STATUS, type MarketPost } from '../lib/network';
+import { dateLabel, money, POST_KINDS, QUOTE_STATUS, type MarketPost, type Quote } from '../lib/network';
 import { supabase } from '../lib/supabase';
 import { color, font, radius } from '../lib/theme';
 import { getLang, localeOf } from '../lib/i18n';
 
-type Q = { id: string; post_id: string; owner_id: string; bidder_id: string; display_name: string; amount: number; price_unit: string; status: string; created_at: string; market_posts: { title: string; kind: string } | { title: string; kind: string }[] | null };
+type Q = Quote & { market_posts: { title: string; kind: string } | { title: string; kind: string }[] | null };
 type Seg = 'posts' | 'incoming' | 'sent';
 const ST: Record<string, string> = { open: 'Açık', closed: 'Kapalı', removed: 'Kaldırıldı' };
 const tone = (s: string) => (s === 'accepted' || s === 'open' ? [color.goodBg, color.good] : s === 'declined' || s === 'removed' ? [color.badBg, color.bad] : s === 'pending' ? [color.warnBg, color.warn] : [color.plate, color.muted]);

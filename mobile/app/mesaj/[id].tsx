@@ -24,10 +24,11 @@ export default function Thread() {
   const alive = useRef(true);
 
   const load = useCallback(async () => {
-    let res = await supabase.from('messages').select('id,sender_id,body,created_at,kind,offer_amount')
+    const detailed = await supabase.from('messages').select('id,sender_id,body,created_at,kind,offer_amount')
       .eq('thread_id', id).order('created_at', { ascending: false }).limit(PAGE);
-    if (res.error) res = await supabase.from('messages').select('id,sender_id,body,created_at').eq('thread_id', id).order('created_at', { ascending: false }).limit(PAGE);
-    const { data, error: e } = res;
+    const { data, error: e } = detailed.error
+      ? await supabase.from('messages').select('id,sender_id,body,created_at').eq('thread_id', id).order('created_at', { ascending: false }).limit(PAGE)
+      : detailed;
     if (!alive.current) return;
     if (e) { setError('Mesajlar yüklenemedi. Bağlantını kontrol et.'); return; }
     setError('');
