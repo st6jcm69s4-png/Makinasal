@@ -1,4 +1,26 @@
-# Geliştirme durumu — 16 Ekim 2026
+# Geliştirme durumu — 5 Kasım 2026
+
+## Moderasyon, itibar ve RPC güvenliği
+
+Canlı Supabase geçmişinde `20261018210606 production_moderation_and_stats` kayıtlı. Canlı `public.user_stats` görünümü `security_invoker=true` ile çalışıyor ve herkese açık, salt okunur `user_stats_summary` tablosunu kullanıyor. Aşağıdaki 16 Ekim notları o tarihteki durumu anlatıyor.
+
+Yeni [migration](../supabase/migrations/20261105174605_harden_moderation_reputation_and_rpcs.sql) mevcut özet mimarisini koruyor. Riskler olası etkilerine göre sıralandı. Testleri, örnek veritabanında [rollback ile çalışan regresyon dosyasından](../supabase/tests/moderation_reputation_rpcs.sql) çalıştırın.
+
+| Öncelik | Risk ve kaynak | En küçük güvenli test |
+| --- | --- | --- |
+| Yüksek | `schema.sql` içindeki `guard_deal` rolü istemcinin önerdiği konuşmadan seçebiliyordu. Tek taraf karşı tarafın onayını taklit ederek ilanı satıldı işaretleyebilir ve itibar sayaçlarını etkileyebilirdi. | Aynı kullanıcının farklı rollerde olduğu iki konuşma oluştur. İlk anlaşmayı güncellerken ikinci konuşmanın kimliğini ver. Karşı tarafın onayı, tamamlanma zamanı ve itibar sayısı değişmemeli. Gerçek ikinci onaydan sonra özet artmalı. |
+| Yüksek | `20261018211119_respect_moderation_in_contact_and_notifications.sql` içindeki `listing_phone` hesap kotası olmadan numara döndürüyor ve tekrar çağrıları sayıyordu. | Onaylı bir ilanda ilk 20 çağrı başarılı ve sayaç artışı bir olmalı. 21. çağrı başka ilanla da 429 dönmeli. Günlük sayaç 100 iken yeni dakika aynı şekilde engellenmeli. Bekleyen ilan ve anonim Auth hesabı numara alamamalı. |
+| Orta | `20261016210353_production_moderation_and_stats.sql` rapor alanlarını daraltan bir sütun grant'i ekliyordu, fakat varsayılan tablo UPDATE yetkisi kalabiliyordu. `schema.sql` içindeki konuşma politikası da moderatörün görebildiği bekleyen ilana konuşma açmasına izin veriyordu. | Moderatör bekleyen ilana konuşma açamamalı. Raporu doğrulayabilmeli ve `reason` sütununu güncelleyememeli. |
+| Orta | `005-ozellikler.sql` içindeki `mark_thread_read` her çağrıda satır yazıyor ve itibar tetikleyicisini çalıştırıyordu. | Yabancı bir hesap iki zaman damgasını da değiştirememeli. Katılımcı yalnız kendi damgasını ilerletmeli ve aynı çağrıyı tekrar etmek yeni satır sürümü üretmemeli. |
+| Orta | `20261018204256_server_search_and_abuse_guards.sql` içindeki `track_view` tekil görüntüleme ve hesap kotası uyguluyor, fakat reddedilen istekler limit satırını yeniden yazıyordu. | Aynı ilanı 120 kez çağır, sonra ikinci ilana geç. İlk ilan bir kez sayılmalı. İkinci ilan, kendi ilanı ve bekleyen ilan sayılmamalı. |
+| Düşük | `005-ozellikler.sql` içindeki `my_phone` yalnız çağıranın numarasını okuyordu. Özel sütun için sabit arama yolu ve açık erişim testi eklendi. | Girişli hesap yalnız kendi numarasını almalı. Başka profilin telefon sütununa doğrudan SELECT izni ve anonim role RPC izni verilmemeli. |
+| Düşük | `user_stats` özel anlaşma ve şikayetlerden türetilen toplamları yayımlıyor. Özetin doğruluğu ve dayanak satırların gizliliği birlikte doğrulanmalı. | Bir anlaşma ve bir doğrulanmış şikayet oluştur. Ziyaretçi ve üçüncü hesap aynı özeti görmeli. Üçüncü hesap dayanak anlaşmayı okuyamamalı, ziyaretçi özeti güncelleyememeli. |
+
+Telefon açma kotası hesap başına dakikada 20, günde 100 başarılı açmadır. Aynı hesap ve ilan bir 24 saatlik pencerede sayaçta bir kez görünür. `my_phone` için ayrı kota eklenmedi çünkü hedef almayan, yazma yapmayan bir hesap okuması. Okundu çağrısı için sayısal kota yerine yeni bir gelen mesaj bulunması şartı kullanıldı.
+
+Yeni migration için canlı ve repo sürüm numaraları farklı. Önce uzak migration geçmişiyle eşleştirin ve yalnız yeni SQL'i hedef ortamda uygulayın. Canlı geçmişteki eski migration'ları yeniden çalıştırmayın.
+
+## 16 Ekim 2026 kaydı
 
 ## Tamamlanan geliştirmeler
 - Mevcut Supabase sorgu geri dönüşlerinin TypeScript hataları giderildi; üretim derlemesi açıldı.
