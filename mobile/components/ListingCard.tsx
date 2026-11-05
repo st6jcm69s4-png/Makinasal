@@ -50,7 +50,7 @@ const s = StyleSheet.create({
   body: { paddingHorizontal: 14, paddingTop: 12, paddingBottom: 14, gap: 8 },
   title: { fontFamily: font.semi, color: color.ink, fontSize: 17, lineHeight: 22 },
   row: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12 },
-  price: { fontFamily: font.bold, color: color.accentText, fontSize: 21 },
+  price: { fontFamily: font.bold, color: color.tealText, fontSize: 21 },
   where: { flexDirection: 'row', alignItems: 'center', gap: 4, flexShrink: 1 },
   whereText: { color: color.muted, fontSize: 14, flexShrink: 1 },
 });

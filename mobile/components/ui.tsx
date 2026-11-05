@@ -40,7 +40,7 @@ export function Btn({ title, onPress, ghost, danger, disabled }: { title: string
 export function Chip({ title, on, onPress }: { title: string; on?: boolean; onPress: () => void }) {
   return (
     <Pressable style={({ pressed }) => [s.chip, on && s.chipOn, pressed && { opacity: 0.8 }]} onPress={onPress} accessibilityRole="button" accessibilityState={{ selected: !!on }}>
-      <Text style={[s.chipText, on && { color: color.accentInk }]}>{title}</Text>
+      <Text style={[s.chipText, on && { color: color.tealInk }]}>{title}</Text>
     </Pressable>
   );
 }
@@ -91,16 +91,16 @@ const s = StyleSheet.create({
   selectRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   btn: { backgroundColor: color.accent, paddingVertical: 13, paddingHorizontal: 18, borderRadius: radius, alignItems: 'center', minHeight: 50, justifyContent: 'center' },
   btnText: { color: color.accentInk, fontWeight: '600', fontSize: 16 },
-  ghost: { backgroundColor: 'transparent', borderWidth: 1, borderColor: color.accent },
-  ghostText: { color: color.accentText },
+  ghost: { backgroundColor: 'transparent', borderWidth: 1.5, borderColor: color.teal },
+  ghostText: { color: color.tealText },
   danger: { backgroundColor: 'transparent', borderWidth: 1, borderColor: color.bad },
   dangerText: { color: color.bad },
   chip: { paddingVertical: 9, paddingHorizontal: 15, backgroundColor: color.surface, borderRadius: 999, borderWidth: 1, borderColor: color.line, minHeight: 40, justifyContent: 'center' },
-  chipOn: { backgroundColor: color.accent, borderColor: color.accent },
+  chipOn: { backgroundColor: color.teal, borderColor: color.teal },
   chipText: { color: color.ink, fontSize: 15, fontWeight: '500' },
   band: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', marginTop: 30, marginBottom: 12, marginHorizontal: 16 },
   bandTitle: { fontFamily: font.bold, fontSize: 21, lineHeight: 26, color: color.ink, flexShrink: 1 },
-  bandAction: { color: color.accentText, fontWeight: '600', fontSize: 14 },
+  bandAction: { color: color.tealText, fontFamily: font.semi, fontSize: 14.5 },
   grid: { flexDirection: 'row', flexWrap: 'wrap', borderLeftWidth: 1, borderTopWidth: 1, borderColor: color.line, backgroundColor: color.surface },
   fcell: { flexGrow: 1, flexBasis: '33%', minWidth: '30%', paddingVertical: 8, paddingHorizontal: 10, gap: 2, borderRightWidth: 1, borderBottomWidth: 1, borderColor: color.line },
   fvalue: { fontSize: 16, color: color.ink, fontWeight: '500' },

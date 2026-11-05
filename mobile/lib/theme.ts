@@ -5,7 +5,7 @@ import { Appearance, DynamicColorIOS, Platform } from 'react-native';
 const light = {
   navy: '#D2E0F7', navy2: '#B4C7E9', accent: '#2563EB', accentText: '#1D55D6', accentInk: '#FFFFFF', accentSoft: '#D8E5FD',
   pop: '#0B635C', popInk: '#FFFFFF', popSoft: '#CFEDE8',
-  teal: '#0B635C', tealInk: '#FFFFFF', tealSoft: '#CFEDE8',
+  teal: '#0B635C', tealInk: '#FFFFFF', tealSoft: '#CFEDE8', tealText: '#0B635C',
   bg: '#E3EAF4', surface: '#F7F9FD', plate: '#D6E0EE', ink: '#1E2530', muted: '#4F5B6C', line: '#BFCCE0',
   good: '#1B6F40', goodBg: '#DCEFE3', warn: '#7F5200', warnBg: '#FFF0C2', bad: '#9C2626', badBg: '#F5DADA',
   onNavy: '#4A5870', onBar: '#1B2330',
@@ -14,11 +14,13 @@ const light = {
 const dark: Record<keyof typeof light, string> = {
   navy: '#1F2630', navy2: '#323C4A', accent: '#3B73F5', accentText: '#9DBBFF', accentInk: '#FFFFFF', accentSoft: '#273C66',
   pop: '#14867B', popInk: '#FFFFFF', popSoft: '#1E4A4A',
-  teal: '#14867B', tealInk: '#FFFFFF', tealSoft: '#1E4A4A',
+  teal: '#14867B', tealInk: '#FFFFFF', tealSoft: '#1E4A4A', tealText: '#5FD3C4',
   bg: '#252D38', surface: '#2F3946', plate: '#3A4655', ink: '#F3F6FA', muted: '#B7C1CF', line: '#4C596A',
   good: '#79D6A2', goodBg: '#173226', warn: '#F0C45E', warnBg: '#38300F', bad: '#F4A0A0', badBg: '#3B1C1C',
   onNavy: '#D2DAE6', onBar: '#FFFFFF',
 };
+/** Gerçek renk değerleri (yerel başlık çubuğu gibi dinamik rengi okuyamayan yerler için). */
+export const palettes = { light, dark } as const;
 type ColorKey = keyof typeof light;
 // iOS: renkler sistem görünümüne (veya Ayarlar'daki seçime) göre anında değişir.
 // Android: uygulama açılırken sistem görünümü okunur.

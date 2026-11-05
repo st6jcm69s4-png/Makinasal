@@ -2,7 +2,8 @@ import { Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } f
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { caps, color, fontState } from '../lib/theme';
+import { useColorScheme } from 'react-native';
+import { caps, fontState, palettes } from '../lib/theme';
 import { loadTheme } from '../lib/themePref';
 import { StatusBar } from 'expo-status-bar';
 import { HeaderBack } from '../components/HeaderBack';
@@ -14,19 +15,21 @@ import { LoginPromptProvider } from '../components/LoginPrompt';
 function Screens() {
   const { lang } = useLang();
   const T = (x: string) => caps(tr(x), lang);
+  // Yerel başlık çubuğu dinamik rengi okuyamaz; gerçek renk değerini seçili temaya göre veriyoruz.
+  const p = useColorScheme() === 'dark' ? palettes.dark : palettes.light;
   return (
     <>
       <StatusBar style="auto" />
       <Stack
         screenOptions={({ navigation }) => ({
-          headerStyle: { backgroundColor: color.navy },
-          headerTintColor: color.onBar,
-          headerTitleStyle: { fontFamily: fontState.ok ? 'Inter_700Bold' : undefined, fontSize: 18, letterSpacing: 0.2 },
+          headerStyle: { backgroundColor: p.navy },
+          headerTintColor: p.onBar,
+          headerTitleStyle: { fontFamily: fontState.ok ? 'Inter_700Bold' : undefined, fontSize: 18, letterSpacing: 0.2, color: p.onBar },
           headerShadowVisible: false,
           // Her uygulamadaki gibi: sistemin kendi geri oku. Geçmiş yoksa (bağlantıyla açılınca) ana sayfaya dönen düğme.
           headerBackButtonDisplayMode: 'minimal',
           headerLeft: navigation.canGoBack() ? undefined : () => <HeaderBack />,
-          contentStyle: { backgroundColor: color.bg },
+          contentStyle: { backgroundColor: p.bg },
         })}
       >
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />

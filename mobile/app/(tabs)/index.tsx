@@ -30,8 +30,8 @@ const SHORTS: Short[] = [
   { label: 'Şirketler ve filolar', sub: 'Hizmet bölgesine göre', icon: 'briefcase', tint: 'teal', wide: true, go: () => router.navigate({ pathname: '/is-agi', params: { kind: 'firma' } }) },
 ];
 function ShortCard({ t }: { t: Short }) {
-  const fg = t.tint === 'accent' ? color.accentText : color.teal;
-  const bg = t.tint === 'accent' ? color.accentSoft : color.tealSoft;
+  const fg = color.tealText;
+  const bg = color.tealSoft;
   return (
     <Pressable style={({ pressed }) => [s.short, t.wide ? { width: '100%' } : { width: '48.5%' }, pressed && { opacity: 0.88 }]} onPress={t.go} accessibilityRole="button">
       <View style={[s.shortIcon, { backgroundColor: bg }]}><Icon name={t.icon} size={20} color={fg} /></View>
@@ -172,10 +172,18 @@ export default function Home() {
       ) : null}
       {session ? (
         <View style={s.hub}>
-          {([['Gelen teklifler', counts?.offers, '/ag/hesabim'], ['Açık işlerim', counts?.works, '/ag/hesabim'], ['İlanlarım', undefined, '/ilanlarim'], ['Envanterim', undefined, '/ag/envanter']] as [string, number | undefined, string][]).map(([l, n, to], i) => (
-            <Pressable key={l} style={[s.hubCell, i > 0 && { borderLeftWidth: 1, borderLeftColor: color.line }]} onPress={() => router.push(to as never)} accessibilityRole="button">
-              <PlainText style={s.hubNum}>{n === undefined ? '→' : String(n)}</PlainText>
-              <Label>{l}</Label>
+          {([
+            ['Gelen teklifler', counts?.offers, '/ag/hesabim', 'inbox'],
+            ['Açık işlerim', counts?.works, '/ag/hesabim', 'clipboard'],
+            ['İlanlarım', undefined, '/ilanlarim', 'list'],
+            ['Envanterim', undefined, '/ag/envanter', 'package'],
+          ] as [string, number | undefined, string, IconName][]).map(([l, n, to, ic]) => (
+            <Pressable key={l} style={({ pressed }) => [s.hubCell, pressed && { opacity: 0.88 }]} onPress={() => router.push(to as never)} accessibilityRole="button">
+              <View style={s.hubIcon}><Icon name={ic} size={20} color={color.tealText} /></View>
+              <View style={{ flex: 1 }}>
+                {n !== undefined ? <PlainText style={s.hubNum}>{String(n)}</PlainText> : null}
+                <Text style={s.hubLabel} numberOfLines={2}>{l}</Text>
+              </View>
             </Pressable>
           ))}
         </View>
@@ -259,11 +267,13 @@ const s = StyleSheet.create({
   guest: { flexDirection: 'row', alignItems: 'center', gap: 12, marginHorizontal: 16, marginTop: 16, padding: 14, backgroundColor: color.surface, borderRadius: radius + 4, ...shadow },
   guestT: { fontFamily: font.semi, color: color.ink, fontSize: 15 },
   guestS: { color: color.muted, fontSize: 14, marginTop: 2 },
-  guestBtn: { backgroundColor: color.accent, paddingHorizontal: 16, minHeight: 42, justifyContent: 'center', borderRadius: 21 },
-  guestBtnT: { color: color.accentInk, fontFamily: font.semi },
-  hub: { flexDirection: 'row', marginHorizontal: 16, marginTop: 16, backgroundColor: color.surface, borderRadius: radius + 4, paddingVertical: 4, ...shadow },
-  hubCell: { flex: 1, paddingVertical: 10, paddingHorizontal: 10, gap: 2 },
-  hubNum: { fontFamily: font.bold, fontSize: 22, color: color.accentText },
+  guestBtn: { backgroundColor: color.teal, paddingHorizontal: 16, minHeight: 42, justifyContent: 'center', borderRadius: 21 },
+  guestBtnT: { color: color.tealInk, fontFamily: font.semi },
+  hub: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', rowGap: 10, marginHorizontal: 16, marginTop: 16 },
+  hubCell: { width: '48.5%', flexDirection: 'row', alignItems: 'center', gap: 10, minHeight: 64, paddingVertical: 10, paddingHorizontal: 12, backgroundColor: color.surface, borderRadius: radius + 4, ...shadow },
+  hubIcon: { width: 40, height: 40, borderRadius: 13, backgroundColor: color.tealSoft, alignItems: 'center', justifyContent: 'center' },
+  hubNum: { fontFamily: font.bold, fontSize: 20, lineHeight: 22, color: color.tealText },
+  hubLabel: { fontFamily: font.semi, fontSize: 14.5, lineHeight: 18, color: color.ink },
   spot: { marginHorizontal: 16, marginTop: 4, marginBottom: 16, backgroundColor: color.surface, borderRadius: radius + 8, overflow: 'hidden', ...shadow },
   spotPhoto: { width: '100%', height: 220, backgroundColor: color.plate },
   spotTag: { position: 'absolute', top: 12, left: 12, backgroundColor: 'rgba(0,0,0,0.55)', paddingHorizontal: 12, paddingVertical: 5, borderRadius: 14 },
@@ -276,17 +286,17 @@ const s = StyleSheet.create({
   catPhoto: { width: 156, height: 112, backgroundColor: color.plate },
   catPlate: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 12, paddingVertical: 10, minHeight: 56 },
   catLabel: { flex: 1, color: color.ink, fontFamily: font.semi, fontSize: 14.5, lineHeight: 18 },
-  catN: { color: color.accentText, fontFamily: font.semi, fontSize: 14 },
+  catN: { color: color.tealText, fontFamily: font.semi, fontSize: 14 },
   steps: { marginHorizontal: 16, backgroundColor: color.surface, borderRadius: radius + 4, paddingHorizontal: 14, ...shadow },
   step: { flexDirection: 'row', gap: 14, alignItems: 'center', paddingVertical: 14 },
-  stepNo: { width: 34, height: 34, borderRadius: 17, backgroundColor: color.accentSoft, alignItems: 'center', justifyContent: 'center' },
-  stepNoText: { fontFamily: font.bold, fontSize: 16, color: color.accentText },
+  stepNo: { width: 34, height: 34, borderRadius: 17, backgroundColor: color.tealSoft, alignItems: 'center', justifyContent: 'center' },
+  stepNoText: { fontFamily: font.bold, fontSize: 16, color: color.tealText },
   cardTitle: { fontFamily: font.semi, color: color.ink, fontSize: 16 },
   meta: { color: color.muted, fontSize: 14.5, lineHeight: 20 },
   trust: { marginHorizontal: 16, marginTop: 16, padding: 16, gap: 10, backgroundColor: color.tealSoft, borderRadius: radius + 4 },
   trustRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   trustText: { color: color.ink, fontSize: 15 },
-  link2: { color: color.accentText, fontFamily: font.semi, marginTop: 2 },
+  link2: { color: color.tealText, fontFamily: font.semi, marginTop: 2 },
   cta: { marginHorizontal: 16, marginTop: 24, padding: 20, gap: 8, backgroundColor: color.navy, borderRadius: radius + 8 },
   ctaTitle: { color: color.onBar, fontFamily: font.bold, fontSize: 22, lineHeight: 28 },
   ctaText: { color: color.onNavy, fontSize: 15.5, lineHeight: 22 },

@@ -57,7 +57,7 @@ export default function TabsLayout() {
             <Icon name="search" size={22} color={color.onBar} />
           </Pressable>
         ),
-        tabBarActiveTintColor: color.accentText,
+        tabBarActiveTintColor: color.tealText,
         tabBarInactiveTintColor: color.muted,
         tabBarStyle: { backgroundColor: color.navy, borderTopWidth: 1, borderTopColor: color.navy2, paddingTop: 0 },
         tabBarItemStyle: { borderLeftWidth: 1, borderLeftColor: color.navy2, paddingTop: 6 },
