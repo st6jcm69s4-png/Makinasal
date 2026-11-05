@@ -1,23 +1,23 @@
 import { Appearance, DynamicColorIOS, Platform } from 'react-native';
 // Makinasal mobil tasarım dili: "ruhsat alanları".
 // Her bilgi etiketli bir alanda durur: küçük, sıkı büyük harfli etiket + büyük değer, ince ortak çizgiler.
-// Renkler web ile aynıdır: kömür siyahı zemin, kraliyet mavisi ana renk, mandalina turuncusu vurgu.
+// Renkler web ile aynıdır: kömür gri zemin ve petrol yeşili ana renk.
 const light = {
-  navy: '#D2E0F7', navy2: '#B4C7E9', accent: '#2563EB', accentText: '#1D55D6', accentInk: '#FFFFFF', accentSoft: '#D8E5FD',
+  navy: '#D3E4E0', navy2: '#B6CEC9', accent: '#0B635C', accentText: '#0B635C', accentInk: '#FFFFFF', accentSoft: '#CFEDE8',
   pop: '#0B635C', popInk: '#FFFFFF', popSoft: '#CFEDE8',
   teal: '#0B635C', tealInk: '#FFFFFF', tealSoft: '#CFEDE8', tealText: '#0B635C',
-  bg: '#E3EAF4', surface: '#F7F9FD', plate: '#D6E0EE', ink: '#1E2530', muted: '#4F5B6C', line: '#BFCCE0',
+  bg: '#E6EBEA', surface: '#F8FAFA', plate: '#D9E0DF', ink: '#1F2625', muted: '#505B59', line: '#C4CECC',
   good: '#1B6F40', goodBg: '#DCEFE3', warn: '#7F5200', warnBg: '#FFF0C2', bad: '#9C2626', badBg: '#F5DADA',
-  onNavy: '#4A5870', onBar: '#1B2330',
+  onNavy: '#46544F', onBar: '#16201D',
 } as const;
 // Koyu görünüm: web ile aynı koyu palet.
 const dark: Record<keyof typeof light, string> = {
-  navy: '#1F2630', navy2: '#323C4A', accent: '#3B73F5', accentText: '#9DBBFF', accentInk: '#FFFFFF', accentSoft: '#273C66',
+  navy: '#191C1E', navy2: '#2E3437', accent: '#14867B', accentText: '#5FD3C4', accentInk: '#FFFFFF', accentSoft: '#1E4A44',
   pop: '#14867B', popInk: '#FFFFFF', popSoft: '#1E4A4A',
   teal: '#14867B', tealInk: '#FFFFFF', tealSoft: '#1E4A4A', tealText: '#5FD3C4',
-  bg: '#252D38', surface: '#2F3946', plate: '#3A4655', ink: '#F3F6FA', muted: '#B7C1CF', line: '#4C596A',
+  bg: '#222628', surface: '#2C3134', plate: '#383E41', ink: '#F3F5F5', muted: '#B5BDBF', line: '#4A5154',
   good: '#79D6A2', goodBg: '#173226', warn: '#F0C45E', warnBg: '#38300F', bad: '#F4A0A0', badBg: '#3B1C1C',
-  onNavy: '#D2DAE6', onBar: '#FFFFFF',
+  onNavy: '#CBD3D1', onBar: '#FFFFFF',
 };
 /** Gerçek renk değerleri (yerel başlık çubuğu gibi dinamik rengi okuyamayan yerler için). */
 export const palettes = { light, dark } as const;
