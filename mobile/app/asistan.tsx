@@ -60,6 +60,7 @@ export default function Assistant() {
       const code = error ? await errorCode(error) : 'unknown';
       setErr(code === 'quota' ? tr('Bu ayki soru hakkın doldu. Yeni ayda yenilenir.')
         : code === 'not_premium' ? tr('Asistan premium üyelere özeldir.')
+        : code === 'global_limit' ? tr('Asistan bu ay çok yoğun. Kısa süre sonra tekrar dene.')
         : code === 'not_configured' ? tr('Asistan henüz etkinleştirilmedi. Kısa süre sonra tekrar dene.')
         : tr('Yanıt alınamadı. Bağlantını kontrol edip tekrar dene.'));
       setMsgs(msgs);
