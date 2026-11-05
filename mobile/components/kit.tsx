@@ -9,7 +9,7 @@ import { color, font, radius } from '../lib/theme';
 /* ───────── Badge ───────── */
 export type BadgeVariant = 'default' | 'secondary' | 'outline' | 'success' | 'warning' | 'destructive';
 const BADGE: Record<BadgeVariant, { bg: string; fg: string; border: string }> = {
-  default: { bg: color.accent, fg: '#fff', border: color.accent },
+  default: { bg: color.pop, fg: color.popInk, border: color.pop },
   secondary: { bg: color.plate, fg: color.ink, border: color.plate },
   outline: { bg: 'transparent', fg: color.ink, border: color.line },
   success: { bg: color.goodBg, fg: color.good, border: color.goodBg },
@@ -108,7 +108,7 @@ export function Tabs<T extends string>({ items, value, onChange, variant = 'fill
         return (
           <Pressable
             key={t.id}
-            style={[k.tab, filled ? { borderTopWidth: 3, borderTopColor: on ? color.accent : 'transparent', backgroundColor: on ? color.navy : 'transparent' } : { borderBottomWidth: 3, borderBottomColor: on ? color.accent : 'transparent' }, filled && i > 0 && { borderLeftWidth: 1, borderLeftColor: color.line }]}
+            style={[k.tab, filled ? { borderTopWidth: 3, borderTopColor: on ? color.pop : 'transparent', backgroundColor: on ? color.navy : 'transparent' } : { borderBottomWidth: 3, borderBottomColor: on ? color.accent : 'transparent' }, filled && i > 0 && { borderLeftWidth: 1, borderLeftColor: color.line }]}
             onPress={() => onChange(t.id)} accessibilityRole="tab" accessibilityState={{ selected: on }}
           >
             {t.icon ? <Icon name={t.icon} size={16} color={on && filled ? '#fff' : on ? color.accentText : color.muted} /> : null}

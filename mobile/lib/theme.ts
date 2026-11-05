@@ -1,19 +1,21 @@
 import { Appearance, DynamicColorIOS, Platform } from 'react-native';
 // Makinasal mobil tasarım dili: "ruhsat alanları".
 // Her bilgi etiketli bir alanda durur: küçük, sıkı büyük harfli etiket + büyük değer, ince ortak çizgiler.
-// Renkler web ile aynıdır ve değiştirilmez.
+// Renkler web ile aynıdır: kömür siyahı zemin, kraliyet mavisi ana renk, mandalina turuncusu vurgu.
 const light = {
-  navy: '#25272D', navy2: '#34363D', accent: '#800020', accentText: '#800020', accentInk: '#FFFFFF', accentSoft: '#F0EBEB',
-  bg: '#F6F5F3', surface: '#FFFFFF', plate: '#EEECEA', ink: '#25272D', muted: '#66616A', line: '#DDD9DC',
+  navy: '#1C1F23', navy2: '#2A2E34', accent: '#1D4ED8', accentText: '#1D4ED8', accentInk: '#FFFFFF', accentSoft: '#E7EDFC',
+  pop: '#F28500', popInk: '#1C1F23', popSoft: '#FFEFD9',
+  bg: '#F3F5F8', surface: '#FFFFFF', plate: '#E8ECF2', ink: '#1C1F23', muted: '#566070', line: '#D5DBE5',
   good: '#1B6F40', goodBg: '#DCEFE3', warn: '#7F5200', warnBg: '#FFF0C2', bad: '#9C2626', badBg: '#F5DADA',
-  onNavy: '#D5CDD2',
+  onNavy: '#C9D1DD',
 } as const;
-// Koyu görünüm: web ile aynı koyu palet (açık görünümdeki renkler değişmez).
+// Koyu görünüm: web ile aynı koyu palet.
 const dark: Record<keyof typeof light, string> = {
-  navy: '#202024', navy2: '#303036', accent: '#800020', accentText: '#D4C7C9', accentInk: '#FFFFFF', accentSoft: '#33292B',
-  bg: '#181719', surface: '#242225', plate: '#302C30', ink: '#F4F1F2', muted: '#C0B8BE', line: '#484047',
+  navy: '#111316', navy2: '#22262B', accent: '#3B6CF0', accentText: '#8DAAFF', accentInk: '#FFFFFF', accentSoft: '#1A2442',
+  pop: '#FF9A1F', popInk: '#1C1F23', popSoft: '#3A2A12',
+  bg: '#121417', surface: '#1B1E23', plate: '#262B32', ink: '#F1F4F8', muted: '#AAB3C0', line: '#38404A',
   good: '#79D6A2', goodBg: '#173226', warn: '#F0C45E', warnBg: '#38300F', bad: '#F4A0A0', badBg: '#3B1C1C',
-  onNavy: '#D5CDD2',
+  onNavy: '#C9D1DD',
 };
 type ColorKey = keyof typeof light;
 // iOS: renkler sistem görünümüne (veya Ayarlar'daki seçime) göre anında değişir.

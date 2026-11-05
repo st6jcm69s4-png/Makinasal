@@ -19,7 +19,7 @@ function Screens() {
       <StatusBar style="light" />
       <Stack
         screenOptions={({ navigation }) => ({
-          headerStyle: { backgroundColor: '#25272D' },
+          headerStyle: { backgroundColor: color.navy },
           headerTintColor: '#fff',
           headerTitleStyle: { fontFamily: fontState.ok ? 'Inter_700Bold' : undefined, fontSize: 18, letterSpacing: 0.2 },
           headerShadowVisible: false,
