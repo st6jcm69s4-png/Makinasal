@@ -10,7 +10,7 @@ function apply(choice: ThemeChoice) {
   if (choice === "system") el.removeAttribute("data-theme");
   else el.setAttribute("data-theme", choice);
   const dark = choice === "dark" || (choice === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
-  document.querySelector('meta[name="theme-color"]')?.setAttribute("content", dark ? "#111316" : "#1C1F23");
+  document.querySelector('meta[name="theme-color"]')?.setAttribute("content", dark ? "#1F2630" : "#2B3440");
 }
 
 export function ThemeSwitcher() {

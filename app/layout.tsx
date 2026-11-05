@@ -24,10 +24,10 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   return (
     <html lang={language} suppressHydrationWarning>
       <head>
-        <script dangerouslySetInnerHTML={{__html:"try{var t=localStorage.getItem('makinasal-theme');if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t);if(t==='dark'){var m=document.querySelector('meta[name=theme-color]');if(m)m.setAttribute('content','#111316')}}}catch(e){}"}} />
+        <script dangerouslySetInnerHTML={{__html:"try{var t=localStorage.getItem('makinasal-theme');if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t);if(t==='dark'){var m=document.querySelector('meta[name=theme-color]');if(m)m.setAttribute('content','#1F2630')}}}catch(e){}"}} />
         <link rel="manifest" href="/manifest.webmanifest" />
         <link rel="apple-touch-icon" href="/icons/icon-192.png" />
-        <meta name="theme-color" content="#1C1F23" />
+        <meta name="theme-color" content="#2B3440" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
