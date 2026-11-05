@@ -11,19 +11,19 @@
   color-scheme:light;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --navy:#1B1914; --navy-2:#332E25;
-  --bg:#23201A; --surface:#2E2A22; --plate:#3A352B; --ink:#F5F0E6; --muted:#C3B9A6; --line:#4D4639;
-  --accent:#117A70; --accent-ink:#FFFFFF; --accent-text:#5FD3C4; --accent-soft:#1F433C;
-  --pop:#117A70; --pop-ink:#FFFFFF; --pop-soft:#1F433C;
-  --teal:#117A70; --teal-ink:#FFFFFF; --teal-soft:#1F433C;
-  --good:#79D6A2; --good-bg:#173226; --warn:#F0C45E; --warn-bg:#38300F; --bad:#F4A0A0; --bad-bg:#3B1C1C; --neutral-bg:#3A352B; color-scheme:dark}}
+  --navy:#100F0D; --navy-2:#25221D;
+  --bg:#151412; --surface:#201E1A; --plate:#2C2924; --ink:#F5F0E6; --muted:#BDB4A3; --line:#3A362F;
+  --accent:#117A70; --accent-ink:#FFFFFF; --accent-text:#5FD3C4; --accent-soft:#173B35;
+  --pop:#117A70; --pop-ink:#FFFFFF; --pop-soft:#173B35;
+  --teal:#117A70; --teal-ink:#FFFFFF; --teal-soft:#173B35;
+  --good:#79D6A2; --good-bg:#173226; --warn:#F0C45E; --warn-bg:#38300F; --bad:#F4A0A0; --bad-bg:#3B1C1C; --neutral-bg:#2C2924; color-scheme:dark}}
 :root[data-theme="dark"]{
-  --navy:#1B1914; --navy-2:#332E25;
-  --bg:#23201A; --surface:#2E2A22; --plate:#3A352B; --ink:#F5F0E6; --muted:#C3B9A6; --line:#4D4639;
-  --accent:#117A70; --accent-ink:#FFFFFF; --accent-text:#5FD3C4; --accent-soft:#1F433C;
-  --pop:#117A70; --pop-ink:#FFFFFF; --pop-soft:#1F433C;
-  --teal:#117A70; --teal-ink:#FFFFFF; --teal-soft:#1F433C;
-  --good:#79D6A2; --good-bg:#173226; --warn:#F0C45E; --warn-bg:#38300F; --bad:#F4A0A0; --bad-bg:#3B1C1C; --neutral-bg:#3A352B; color-scheme:dark}
+  --navy:#100F0D; --navy-2:#25221D;
+  --bg:#151412; --surface:#201E1A; --plate:#2C2924; --ink:#F5F0E6; --muted:#BDB4A3; --line:#3A362F;
+  --accent:#117A70; --accent-ink:#FFFFFF; --accent-text:#5FD3C4; --accent-soft:#173B35;
+  --pop:#117A70; --pop-ink:#FFFFFF; --pop-soft:#173B35;
+  --teal:#117A70; --teal-ink:#FFFFFF; --teal-soft:#173B35;
+  --good:#79D6A2; --good-bg:#173226; --warn:#F0C45E; --warn-bg:#38300F; --bad:#F4A0A0; --bad-bg:#3B1C1C; --neutral-bg:#2C2924; color-scheme:dark}
 .top{position:sticky;top:0;z-index:5;background:var(--navy);color:#fff;padding:10px 0}
 .top::after{content:"";position:absolute;left:0;right:0;bottom:-2px;height:2px;background:var(--pop)}
 .top .wrap{display:flex;flex-wrap:wrap;align-items:center;gap:8px 18px}

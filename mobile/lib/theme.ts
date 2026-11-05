@@ -12,10 +12,10 @@ const light = {
 } as const;
 // Koyu görünüm: web ile aynı koyu palet.
 const dark: Record<keyof typeof light, string> = {
-  navy: '#1B1914', navy2: '#332E25', accent: '#117A70', accentText: '#5FD3C4', accentInk: '#FFFFFF', accentSoft: '#1F433C',
-  pop: '#117A70', popInk: '#FFFFFF', popSoft: '#1F433C',
-  teal: '#117A70', tealInk: '#FFFFFF', tealSoft: '#1F433C', tealText: '#5FD3C4',
-  bg: '#23201A', surface: '#2E2A22', plate: '#3A352B', ink: '#F5F0E6', muted: '#C3B9A6', line: '#4D4639',
+  navy: '#100F0D', navy2: '#25221D', accent: '#117A70', accentText: '#5FD3C4', accentInk: '#FFFFFF', accentSoft: '#173B35',
+  pop: '#117A70', popInk: '#FFFFFF', popSoft: '#173B35',
+  teal: '#117A70', tealInk: '#FFFFFF', tealSoft: '#173B35', tealText: '#5FD3C4',
+  bg: '#151412', surface: '#201E1A', plate: '#2C2924', ink: '#F5F0E6', muted: '#BDB4A3', line: '#3A362F',
   good: '#79D6A2', goodBg: '#173226', warn: '#F0C45E', warnBg: '#38300F', bad: '#F4A0A0', badBg: '#3B1C1C',
   onNavy: '#D4CAB7', onBar: '#FFFFFF',
 };
