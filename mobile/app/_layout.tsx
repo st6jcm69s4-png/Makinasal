@@ -61,6 +61,7 @@ function Screens() {
         <Stack.Screen name="harita" options={{ title: T('İl haritası') }} />
         <Stack.Screen name="yonetim" options={{ title: T('Yönetim') }} />
         <Stack.Screen name="ayarlar" options={{ title: T('Ayarlar') }} />
+        <Stack.Screen name="ara" options={{ title: T('Uygulamada ara') }} />
       </Stack>
     </>
   );

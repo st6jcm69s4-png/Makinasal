@@ -1,6 +1,6 @@
-import { Tabs } from 'expo-router';
+import { Tabs, router } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { View } from 'react-native';
+import { Pressable, View } from 'react-native';
 import { Icon, type IconName } from '../../components/Icon';
 import { PlainText } from '../../components/LText';
 import { color, font } from '../../lib/theme';
@@ -52,6 +52,11 @@ export default function TabsLayout() {
         headerShadowVisible: false,
         headerTitleAlign: 'left',
         headerTitle: () => <Logo />,
+        headerRight: () => (
+          <Pressable onPress={() => router.push('/ara' as never)} hitSlop={10} accessibilityRole="button" accessibilityLabel={tr('Uygulamada ara')} style={{ paddingHorizontal: 16 }}>
+            <Icon name="search" size={22} color={color.onBar} />
+          </Pressable>
+        ),
         tabBarActiveTintColor: color.accentText,
         tabBarInactiveTintColor: color.muted,
         tabBarStyle: { backgroundColor: color.navy, borderTopWidth: 1, borderTopColor: color.navy2, paddingTop: 0 },

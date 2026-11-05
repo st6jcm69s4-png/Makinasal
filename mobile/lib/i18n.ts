@@ -3,6 +3,7 @@ import en from './en.json';
 import extra from './en-extra';
 import de from './de.json';
 import deExtra from './de-extra';
+import { searchDe, searchEn } from './search-i18n';
 
 export type Lang = 'tr' | 'en' | 'de';
 export const LANGS: { code: Lang; label: string; locale: string }[] = [
@@ -19,8 +20,8 @@ export function detectLang(): Lang {
   } catch { return 'tr'; }
 }
 let current: Lang = 'tr';
-const map = { ...(en as Record<string, string>), ...extra } as Record<string, string>;
-const mapDe = { ...(de as Record<string, string>), ...deExtra } as Record<string, string>;
+const map = { ...searchEn, ...(en as Record<string, string>), ...extra } as Record<string, string>;
+const mapDe = { ...searchDe, ...(de as Record<string, string>), ...deExtra } as Record<string, string>;
 
 export const getLang = () => current;
 export const applyLang = (l: Lang) => { current = l; };
