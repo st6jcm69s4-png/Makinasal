@@ -242,5 +242,8 @@ const de: Record<string, string> = {
   'Satış onayı': 'Verkaufsbestätigung',
   'Türkçe': 'Türkçe',
   'English': 'English',
+  'Satıcının profili ve ilanları': 'Profil und Inserate des Verkäufers',
+  "Bu seçimde henüz ilan yok. Aradığın parça için İş Ağı'nda talep açabilirsin.": 'Für diese Auswahl gibt es noch keine Inserate. Für das gesuchte Teil können Sie unter „Aufträge und Dienstleistungen“ eine Anfrage erstellen.',
+  "İlan duraklatılmış olarak saklanır. İlanlarım bölümünde Düzenle'ye bas, eksik fotoğrafları ekle ve kaydet.": 'Das Inserat wird pausiert gespeichert. Tippen Sie unter „Meine Inserate“ auf „Bearbeiten“, fügen Sie die fehlenden Fotos hinzu und speichern Sie.',
 };
 export default de;
