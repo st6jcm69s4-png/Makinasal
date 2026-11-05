@@ -52,7 +52,8 @@ function Screens() {
         <Stack.Screen name="yedek-parca" options={{ title: T('Yedek parça') }} />
         <Stack.Screen name="magaza/[id]" options={{ title: T('Satıcı') }} />
         <Stack.Screen name="odemelerim" options={{ title: T('Ödemelerim') }} />
-        <Stack.Screen name="premium" options={{ title: T('Üyelik ve ilan hakları') }} />
+        <Stack.Screen name="premium" options={{ title: T('Premium') }} />
+        <Stack.Screen name="asistan" options={{ title: T('Yapay zeka asistanı') }} />
         <Stack.Screen name="guven" options={{ title: T('Güven sistemi') }} />
         <Stack.Screen name="destek" options={{ title: T('Yardım') }} />
         <Stack.Screen name="hukuki/index" options={{ title: T('Hukuki bilgiler') }} />

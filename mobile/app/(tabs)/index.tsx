@@ -94,8 +94,8 @@ export default function Home() {
     const [l, r, j, f, o, w, pr, cp] = await Promise.all([
       supabase.rpc('search_listings', { p: { ...base, page: 1, sort: 'new' }, count_only: false }),
       supabase.rpc('search_listings', { p: { ...base, page: 1, sort: 'rec' }, count_only: false }),
-      supabase.from('market_posts').select('*').eq('kind', 'job').eq('status', 'open').order('created_at', { ascending: false }).limit(3),
-      supabase.from('service_providers').select('*').eq('published', true).order('created_at', { ascending: false }).limit(3),
+      supabase.from('market_posts').select('*').eq('kind', 'job').eq('status', 'open').order('premium_rank', { ascending: false }).order('created_at', { ascending: false }).limit(3),
+      supabase.from('service_providers').select('*').eq('published', true).order('premium_rank', { ascending: false }).order('created_at', { ascending: false }).limit(3),
       uid ? supabase.from('market_quotes').select('id', { count: 'exact', head: true }).eq('owner_id', uid).eq('status', 'pending') : Promise.resolve(null),
       uid ? supabase.from('market_posts').select('id', { count: 'exact', head: true }).eq('owner_id', uid).eq('status', 'open') : Promise.resolve(null),
       uid ? supabase.from('profiles').select('full_name,city').eq('id', uid).maybeSingle() : Promise.resolve(null),

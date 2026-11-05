@@ -72,6 +72,10 @@ function Member() {
         <Pressable style={({ pressed }) => [s.cta, pressed && { opacity: 0.85 }]} onPress={go('/ilan-ver')} accessibilityRole="button">
           <Icon name="plus" size={20} color="#fff" /><Text style={s.ctaText}>İlan ver</Text>
         </Pressable>
+        <Group title="Premium" items={[
+          { icon: 'cpu', label: 'Yapay zeka asistanı', sub: 'Profilini ve ilanlarını güçlendir', go: go('/asistan') },
+          { icon: 'award', label: 'Premium tarifeler', sub: 'Üstte görün, daha çok iş bul', go: go('/premium') },
+        ]} />
         <Group title="İlanlarım ve takip" items={[
           { icon: 'list', label: 'İlanlarım', sub: active ? `${active} yayında` : undefined, go: go('/ilanlarim') },
           { icon: 'message-square', label: 'Mesajlar', badge: unread || undefined, go: () => router.navigate('/mesajlar') },
@@ -88,8 +92,7 @@ function Member() {
         <Group title="Hesap" items={[
           { icon: 'user', label: 'Profili düzenle', go: go('/profil-duzenle') },
           { icon: 'credit-card', label: 'Ödemelerim', go: go('/odemelerim') },
-          { icon: 'award', label: 'Üyelik ve ilan hakları', go: go('/premium') },
-          { icon: 'shield', label: 'Hesap güvenliği', go: go('/hesap-dogrula') },
+                    { icon: 'shield', label: 'Hesap güvenliği', go: go('/hesap-dogrula') },
           { icon: 'lock', label: 'Şifreyi değiştir', go: go('/sifre-degistir') },
           ...(isAdmin ? [{ icon: 'sliders' as IconName, label: 'Yönetim', go: go('/yonetim') }] : []),
         ]} />

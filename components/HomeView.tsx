@@ -171,21 +171,21 @@ export function HomeView() {
       .select("*")
       .eq("kind", "job")
       .eq("status", "open")
-      .order("created_at", { ascending: false })
+      .order("premium_rank", { ascending: false }).order("created_at", { ascending: false })
       .limit(4);
     let rentals = db
       .from("market_posts")
       .select("*")
       .eq("kind", "rental_machine")
       .eq("status", "open")
-      .order("created_at", { ascending: false })
+      .order("premium_rank", { ascending: false }).order("created_at", { ascending: false })
       .limit(4);
     let firms = db
       .from("service_providers")
       .select("*")
       .eq("published", true)
       .or("company_category.not.is.null,kind.neq.operator")
-      .order("created_at", { ascending: false })
+      .order("premium_rank", { ascending: false }).order("created_at", { ascending: false })
       .limit(4);
     if (city) {
       jobs = jobs.eq("city", city);

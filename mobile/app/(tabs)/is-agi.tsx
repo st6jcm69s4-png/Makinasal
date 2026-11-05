@@ -51,7 +51,7 @@ export default function NetworkTab() {
     setLoading(true); setError('');
     const term = q.trim().replace(/[%_\\]/g, '');
     if (tab === 'firma') {
-      let query = supabase.from('service_providers').select('*').eq('published', true).order('created_at', { ascending: false }).range(p * PAGE, (p + 1) * PAGE);
+      let query = supabase.from('service_providers').select('*').eq('published', true).order('premium_rank', { ascending: false }).order('created_at', { ascending: false }).range(p * PAGE, (p + 1) * PAGE);
       if (city) query = query.contains('service_cities', [city]);
       if (term) query = query.ilike('name', `%${term}%`);
       const r = await query;
@@ -61,7 +61,7 @@ export default function NetworkTab() {
       setMore(rows.length > PAGE); setPage(p);
       setProviders((cur) => (p === 0 ? rows.slice(0, PAGE) : [...cur, ...rows.slice(0, PAGE)]));
     } else {
-      let query = supabase.from('market_posts').select('*').eq('status', 'open').eq('kind', tab).order('created_at', { ascending: false }).range(p * PAGE, (p + 1) * PAGE);
+      let query = supabase.from('market_posts').select('*').eq('status', 'open').eq('kind', tab).order('premium_rank', { ascending: false }).order('created_at', { ascending: false }).range(p * PAGE, (p + 1) * PAGE);
       if (city) query = query.eq('city', city);
       if (term) query = query.ilike('title', `%${term}%`);
       if (personnel && role) query = query.eq('personnel_role', role);

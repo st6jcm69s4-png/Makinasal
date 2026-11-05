@@ -272,7 +272,7 @@ export function NetworkBrowse({ kind: fixedKind, rentalHub = false }: { kind?: P
       .from("market_posts")
       .select("*")
       .eq("status", "open")
-      .order("created_at", { ascending: false })
+      .order("premium_rank", { ascending: false }).order("created_at", { ascending: false })
       .range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
     if (kind) query = query.eq("kind", kind);
     if (rentalMode && kind !== "rental_operator") query = query.eq("rental_mode", rentalMode);
@@ -1505,7 +1505,7 @@ export function ProviderDirectory({
       .from("service_providers")
       .select("*")
       .eq("published", true)
-      .order("created_at", { ascending: false })
+      .order("premium_rank", { ascending: false }).order("created_at", { ascending: false })
       .range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
     if (companyOnly)
       query = query.or("company_category.not.is.null,kind.neq.operator");
@@ -2089,7 +2089,7 @@ function NetworkAccountData() {
         .select("*")
         .eq("preferred_provider", profile!.id)
         .eq("status", "open")
-        .order("created_at", { ascending: false })
+        .order("premium_rank", { ascending: false }).order("created_at", { ascending: false })
         .limit(100),
     ]).then(([p, q, i, r]) => {
       if (!active) return;

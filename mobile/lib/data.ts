@@ -186,6 +186,10 @@ export const LIMITS = {
     photos: 20,
     listings: 30,
   },
+  business: {
+    photos: 20,
+    listings: 100,
+  },
 } as const;
 
 // Web lib/parts.ts içindeki parça grupları.

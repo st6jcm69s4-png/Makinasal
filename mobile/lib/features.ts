@@ -52,7 +52,8 @@ export const FEATURES: Feature[] = [
   { id: 'compare', title: 'Karşılaştır', sub: 'İlanları yan yana gör', icon: 'columns', words: 'karşılaştır karşılaştırma compare vergleichen', run: open('/karsilastir') },
   { id: 'parts', title: 'Yedek parça', sub: 'Numaraya göre ara', icon: 'settings', words: 'yedek parça lastik filtre pompa spare parts tyres ersatzteile reifen', run: open('/yedek-parca') },
   { id: 'map', title: 'İl haritası', sub: 'İllere göre ilan dağılımı', icon: 'map', words: 'harita il şehir map province karte', run: open('/harita') },
-  { id: 'premium', title: 'Üyelik ve ilan hakları', sub: 'Limitler ve premium', icon: 'award', words: 'premium üyelik abonelik limit hak membership abo mitgliedschaft', run: open('/premium') },
+  { id: 'premium', title: 'Premium tarifeler', sub: 'Üstte görün, daha çok iş bul', icon: 'award', words: 'premium üyelik abonelik tarife paket fiyat limit hak reklamsız membership subscription plan abo mitgliedschaft', run: open('/premium') },
+  { id: 'assistant', title: 'Yapay zeka asistanı', sub: 'Profilini ve ilanlarını güçlendir', icon: 'cpu', words: 'yapay zeka asistan ai öneri yardım chatgpt claude bot assistant ki assistent', run: open('/asistan') },
   // İş ağı
   { id: 'rent', title: 'Kiralık makineler', sub: 'Günlük, aylık', icon: 'key', words: 'kiralık kira kiralama rent rental mieten vermietung', run: net('rental_machine') },
   { id: 'operators', title: 'Operatör ve ustalar', sub: 'Şoför, usta, operatör', icon: 'user-check', words: 'operatör usta şoför eleman personel operator driver fahrer mitarbeiter', run: net('rental_operator') },

@@ -123,7 +123,7 @@ export function MarketProvider({ children }: { children: ReactNode }) {
     const supabase = getSupabase();
     if (!supabase || !uid) { setProfile(null); return; }
     let res = await supabase.from('profiles')
-      .select('id,full_name,city,district,bio,company_bio,is_store,store_name,is_premium,verified_phone,verified_id,verified_tax,created_at').eq('id', uid).maybeSingle();
+      .select('id,full_name,city,district,bio,company_bio,is_store,store_name,is_premium,premium_plan,premium_until,verified_phone,verified_id,verified_tax,created_at').eq('id', uid).maybeSingle();
     if (res.error) {
       res = await supabase.from('profiles')
         .select('id,full_name,city,district,bio,company_bio,is_store,store_name,is_premium,verified_phone,created_at').eq('id', uid).maybeSingle();
