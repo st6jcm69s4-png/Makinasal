@@ -53,7 +53,7 @@ export default function Premium() {
         {(['monthly', 'yearly'] as Period[]).map((p) => (
           <Pressable key={p} style={[s.toggleBtn, period === p && s.toggleOn]} onPress={() => setPeriod(p)} accessibilityRole="tab" accessibilityState={{ selected: period === p }}>
             <Text style={[s.toggleT, period === p && { color: color.tealInk }]}>{p === 'monthly' ? 'Aylık' : 'Yıllık'}</Text>
-            {p === 'yearly' ? <View style={[s.save, period === p && { backgroundColor: 'rgba(255,255,255,0.22)' }]}><Text style={[s.saveT, period === p && { color: color.tealInk }]}>%15 indirim</Text></View> : null}
+            {p === 'yearly' ? <View style={[s.save, period === p && { backgroundColor: 'rgba(255,255,255,0.22)' }]}><Text style={[s.saveT, period === p && { color: color.tealInk }]}>2 ay bedava</Text></View> : null}
           </Pressable>
         ))}
       </View>

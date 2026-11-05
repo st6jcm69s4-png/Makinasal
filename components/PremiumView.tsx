@@ -15,7 +15,7 @@ export function PremiumView() {
     <h1>Makinasal Premium</h1>
     <p className="lead">{tr("İlanların ve firman üstte görünsün, yapay zeka asistanı profilini ve ilanlarını güçlendirsin.")}</p>
     <div className="premium-toggle" role="tablist">
-      {(['monthly', 'yearly'] as Period[]).map(p => <button key={p} type="button" role="tab" aria-selected={period === p} onClick={() => setPeriod(p)}>{tr(p === 'monthly' ? 'Aylık' : 'Yıllık')}{p === 'yearly' ? <span>{tr('%15 indirim')}</span> : null}</button>)}
+      {(['monthly', 'yearly'] as Period[]).map(p => <button key={p} type="button" role="tab" aria-selected={period === p} onClick={() => setPeriod(p)}>{tr(p === 'monthly' ? 'Aylık' : 'Yıllık')}{p === 'yearly' ? <span>{tr('2 ay bedava')}</span> : null}</button>)}
     </div>
     <div className="premium-plans">
       {PLANS.map(p => {
