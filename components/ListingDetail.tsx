@@ -24,33 +24,41 @@ const r1000 = (n: number) => Math.round(n / 1000) * 1000;
 export function ListingDetail({ id, initial = null }: { id: string; initial?: { listing: Listing; seller: Seller | null } | null }) {
   const { t: tr, language } = useLanguage();
 
-  const { find, sellers, stats, ready, favs, toggleFav, cmp, toggleCmp, myCity, profile } = useMarket();
-  const [extra, setExtra] = useState<{ listing: Listing; seller: Seller | null } | null>(initial);
-  const [missing, setMissing] = useState(false);
-  const [loadError, setLoadError] = useState('');
+  const { find, sellers, stats, authReady, favs, toggleFav, cmp, toggleCmp, myCity, profile } = useMarket();
   const [attempt, setAttempt] = useState(0);
-  const fromPool = find(id);
+  const demo = /^\d+$/.test(id);
+  const scope = JSON.stringify([id, authReady, profile?.id, attempt]);
+  const [result, setResult] = useState<{
+    scope: string;
+    data?: Awaited<ReturnType<typeof fetchListingById>>;
+    error?: boolean;
+  } | null>(null);
 
-  // Havuzda olmayan (satıldı/duraklatıldı) gerçek ilanı doğrudan çek; satıcı yorumlarını da getir
   useEffect(() => {
-    if (!ready || /^\d+$/.test(id)) return;
+    if (!authReady || demo) return;
     let alive = true;
-    setMissing(false); setLoadError('');
-    fetchListingById(getSupabase(), id).then((r) => { if (!alive) return; if (r) setExtra(r); else if (!fromPool) setMissing(true); })
-      .catch(() => { if (alive) setLoadError('İlan yüklenemedi. Bağlantını kontrol edip tekrar dene.'); });
+    const client = getSupabase();
+    if (!client) { setResult({ scope, error: true }); return; }
+    void fetchListingById(client, id).then(data => {
+      if (alive) setResult({ scope, data });
+    }).catch(() => {
+      if (alive) setResult({ scope, error: true });
+    });
     return () => { alive = false; };
-  }, [id, ready, fromPool, attempt,profile?.id]);
+  }, [id, authReady, demo, scope]);
 
   useEffect(() => {
-    if (!/^\d+$/.test(id)) void getSupabase()?.rpc('track_view', { p_listing: id });
-  }, [id,profile?.id]);
+    if (!demo && profile?.id) void getSupabase()?.rpc('track_view', { p_listing: id });
+  }, [id, demo, profile?.id]);
 
-  const current = extra?.listing.id === id ? extra : null;
-  const l = current?.listing ?? fromPool;
+  const settled = result?.scope === scope ? result : null;
+  const publicInitial = initial?.listing.moderation === 'approved' && ['active', 'sold'].includes(initial.listing.status ?? '');
+  const current = settled ? settled.data : publicInitial && String(initial?.listing.id) === id ? initial : null;
+  const l = demo ? find(id) : current?.listing;
   const m = (l && (current?.seller ?? sellers[l.sel])) || null;
-  if (loadError && !l) return <div className="panel" role="alert">{tr(loadError)} <button className="btn" onClick={() => setAttempt(n => n + 1)}>{tr("Tekrar dene")}</button></div>;
-  if ((!ready || (!/^\d+$/.test(id) && !missing)) && !l) return <div className="empty">{tr("Yükleniyor…")}</div>;
-  if (!l || !m) return missing || ready ? <div className="empty">{tr("Bu ilan bulunamadı. ")}<a className="linkbtn" href="/ilanlar">{tr("İlanlara dön")}</a></div> : <div className="empty">{tr("Yükleniyor…")}</div>;
+  if (settled?.error) return <div className="panel" role="alert">{tr('İlan yüklenemedi. Bağlantını kontrol edip tekrar dene.')} <button className="btn" onClick={() => setAttempt(n => n + 1)}>{tr("Tekrar dene")}</button></div>;
+  if ((!l || !m) && !demo && !settled) return <div className="empty" role="status">{tr("Yükleniyor…")}</div>;
+  if (!l || !m) return <div className="empty">{tr("Bu ilan bulunamadı. ")}<a className="linkbtn" href="/ilanlar">{tr("İlanlara dön")}</a></div>;
 
   const seller: Seller = { ...m, reviews: current?.seller?.reviews ?? m.reviews };
   const own = !!profile && l.sel === profile.id;
@@ -74,7 +82,7 @@ function Body({ l, seller: m, own, stats, favs, toggleFav, cmp, toggleCmp, myCit
   const d = distanceLabel(myCity, l.city);
   const key = listingKey(l);
   const photos = l.photos ?? [];
-  const inactive = l.status && l.status !== 'active';
+  const inactive = (l.status && l.status !== 'active') || (!l.demo && l.moderation !== 'approved');
 
   const rows: [string, ReactNode][] = [];
   if (part) {

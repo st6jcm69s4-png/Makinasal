@@ -4,7 +4,7 @@ export function safeAuthNext(value: string | null | undefined): string {
   try {
     const base = 'https://makinasal.invalid';
     const url = new URL(value, base);
-    return url.origin === base && !url.pathname.startsWith('/auth/')
+    return url.origin === base && !url.pathname.startsWith('//') && url.pathname !== '/auth' && !url.pathname.startsWith('/auth/')
       ? url.pathname + url.search + url.hash : '/ilanlar';
   } catch { return '/ilanlar'; }
 }

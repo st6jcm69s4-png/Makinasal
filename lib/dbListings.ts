@@ -155,7 +155,7 @@ export async function fetchReviews(supabase: SupabaseClient, userId: string, lim
 /** Tek ilan (satıldı/duraklatıldı da dahil; silinenler RLS ile gizli). */
 export async function fetchListingById(supabase: SupabaseClient | null, id: string): Promise<{ listing: Listing; seller: Seller | null } | null> {
   if (!supabase) return null;
-  const { data, error } = await selectListings(supabase, (cols) => supabase.from('listings').select(cols).eq('id', id).maybeSingle());
+  const { data, error } = await selectListings(supabase, (cols) => supabase.from('listings').select(cols).eq('id', id).neq('status', 'removed').maybeSingle());
   if (error) throw new Error('İlan yüklenemedi. Lütfen tekrar dene.');
   if (!data) return null;
   const listing = rowToListing(data as unknown as Row, photoUrlFn(supabase));

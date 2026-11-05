@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { mergeMessages, messageOrder, olderMessagesFilter, MESSAGE_PAGE_SIZE } from '../lib/messages.ts';
-import { fetchListingsByIds } from '../lib/dbListings.ts';
+import { fetchListingById, fetchListingsByIds } from '../lib/dbListings.ts';
 const uuid = n => `10000000-0000-4000-8000-${String(n).padStart(12,'0')}`;
 const message = (n,time='2026-10-18T12:00:00.123456+00:00') => ({id:uuid(n),created_at:time,body:`Message ${n}`});
 const input = Array.from({length:150},(_,n)=>message(n+1));
@@ -44,3 +44,15 @@ const {parseIyzicoResult}=await import('../lib/iyzico.ts');
 assert.equal(parseIyzicoResult({status:'success',token:'token',itemTransactions:[{itemId:uuid(1),paymentTransactionId:'123'}]}).token,'token');
 for(const malformed of [{status:true},{token:12},{fraudStatus:'1'},{itemTransactions:{}},{itemTransactions:[{}]}])assert.throws(()=>parseIyzicoResult(malformed));
 console.log('API yanıtları: nesne kontrolü, giriş seçeneği türleri ve ödeme yanıtı doğrulaması geçti ✔');
+
+// Even an owner who can read a removed row under RLS must not open its detail.
+const removed = {...rows[0], status:'removed'};
+const detailDb={from(table){
+  assert.equal(table,'listings');
+  let found=removed;
+  const query={select(){return query},eq(field,id){assert.equal(field,'id');assert.equal(id,removed.id);return query},
+    neq(field,value){if(removed[field]===value)found=null;return query},
+    async maybeSingle(){return {data:found,error:null}}};
+  return query;
+}};
+assert.equal(await fetchListingById(detailDb,removed.id),null);

@@ -26,7 +26,7 @@ for (const l of LISTINGS) assert.ok(SELLERS[l.sel], `satıcı yok: ${l.sel}`);
 console.log('Tüm kontroller geçti ✔', LISTINGS.length, 'ilan');
 
 // Email callback destinations must stay on this site.
-for (const unsafe of ['https://evil.example', '//evil.example', '/\\evil.example', '/auth/callback?code=secret', '/\n/evil.example']) {
+for (const unsafe of ['https://evil.example', '//evil.example', '/.//evil.example', '/%2e//evil.example', '/a/..//evil.example', '/auth', '/\\evil.example', '/auth/callback?code=secret', '/\n/evil.example']) {
   assert.equal(safeAuthNext(unsafe), '/ilanlar');
 }
 assert.equal(safeAuthNext('/ilan-ver?duzenle=123'), '/ilan-ver?duzenle=123');
