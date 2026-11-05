@@ -105,7 +105,7 @@ export default function Home() {
     const crow = (cp.data ?? []) as unknown as { category: string; listing_photos: { path: string; position: number }[] | null }[];
     setPool(crow.filter((x) => x.listing_photos?.length).map((x) => ({ category: x.category, url: photoUrl([...(x.listing_photos ?? [])].sort((a, b) => a.position - b.position)[0].path) })));
     setCats(CATEGORY_GROUPS.map((g) => {
-      const mine = crow.filter((x) => g.categories.includes(x.category));
+      const mine = crow.filter((x) => (g.categories as readonly string[]).includes(x.category));
       const withPhoto = mine.find((x) => x.listing_photos?.length);
       const ph = withPhoto ? [...(withPhoto.listing_photos ?? [])].sort((a, b) => a.position - b.position)[0] : null;
       return { id: g.id, label: g.label, photo: ph ? photoUrl(ph.path) : '', n: mine.length };

@@ -113,8 +113,8 @@ export default function Listings() {
         keyExtractor={(r) => r.id}
         onEndReachedThreshold={0.5}
         onEndReached={() => { if (!loading && rows.length < total) void load(page + 1, q.trim(), { cat, city, maxPrice, sort }, adv); }}
-        ListEmptyComponent={loading ? null : <Text style={s.empty}>İlan bulunamadı.</Text>}
-        ListFooterComponent={loading ? <CardSkeleton count={rows.length ? 1 : 4} /> : null}
+        ListEmptyComponent={loading ? undefined : <Text style={s.empty}>İlan bulunamadı.</Text>}
+        ListFooterComponent={loading ? <CardSkeleton count={rows.length ? 1 : 4} /> : undefined}
         renderItem={({ item }) => <ListingCard item={item} />}
       />
     </View>
