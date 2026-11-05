@@ -90,7 +90,6 @@ export default function Listings() {
 
   return (
     <View style={s.screen}>
-      <View style={s.resultHeading}><Text style={s.resultLabel}>Saha Defteri</Text></View>
       <View style={{ marginHorizontal: 12, marginTop: 12, marginBottom: 8 }}><SearchBox value={q} onChangeText={setQ} placeholder="Marka, model veya parça numarası ara" /></View>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flexGrow: 0 }} contentContainerStyle={s.chips}>
         <Pressable style={[s.chip, !!cat && s.chipOn]} onPress={() => setSheet('cat')}><Text style={[s.chipText, !!cat && s.chipTextOn]}>{cat ? categoryLabel(cat) : 'Kategori'}</Text></Pressable>
@@ -114,8 +113,8 @@ export default function Listings() {
         keyExtractor={(r) => r.id}
         onEndReachedThreshold={0.5}
         onEndReached={() => { if (!loading && rows.length < total) void load(page + 1, q.trim(), { cat, city, maxPrice, sort }, adv); }}
-        ListEmptyComponent={loading ? undefined : <Text style={s.empty}>İlan bulunamadı.</Text>}
-        ListFooterComponent={loading ? <CardSkeleton count={rows.length ? 1 : 4} /> : undefined}
+        ListEmptyComponent={loading ? null : <Text style={s.empty}>İlan bulunamadı.</Text>}
+        ListFooterComponent={loading ? <CardSkeleton count={rows.length ? 1 : 4} /> : null}
         renderItem={({ item }) => <ListingCard item={item} />}
       />
     </View>
@@ -123,8 +122,6 @@ export default function Listings() {
 }
 
 const s = StyleSheet.create({
-  resultHeading: { borderTopWidth: 3, borderTopColor: color.ink, marginHorizontal: 12, marginTop: 8, paddingTop: 6 },
-  resultLabel: { color: color.good, fontSize: 12, fontWeight: '800' },
   screen: { flex: 1, backgroundColor: color.bg },
   input: { margin: 12, padding: 12, backgroundColor: color.surface, borderRadius: 4, borderWidth: 1, borderColor: color.line },
   chips: { paddingHorizontal: 12, gap: 8, paddingBottom: 8 },

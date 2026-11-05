@@ -23,7 +23,7 @@ export function CompareView() {
   if (items.length < 2) {
     return (
       <>
-        <p className="saha-results-label">{tr("Saha Defteri")}</p><h1>{tr("Künyeleri karşılaştır")}</h1>
+        <h1>{tr("İlan karşılaştırma")}</h1>
         <div className="empty" style={{ marginTop: 16 }}>{tr("Karşılaştırmak için en az 2 ilan seç. İlan kartlarındaki ")}<b>⇅</b> {tr(" düğmesine bas. ")}<a className="linkbtn" href="/ilanlar">{tr("İlanlara git")}</a></div>
       </>
     );
@@ -32,12 +32,9 @@ export function CompareView() {
   const sameUnit = allMach && items.every((l) => usageUnit(l) === usageUnit(items[0]));
   const rows: { label: string; cells: ReactNode[]; best: number }[] = [];
   const row = (label: string, cells: ReactNode[], best = -1) => rows.push({ label, cells, best });
-  const signed = (delta: number, value: string) => (delta > 0 ? '+' : delta < 0 ? '−' : '') + value;
-  const unitLabel = usageUnit(items[0]) === "sa" && language !== "tr" ? "h" : usageUnit(items[0]);
-  const deltaText = (value: string) => <small className="saha-delta">{tr("İlk ilana göre")}: {value}</small>;
-  row('Fiyat', items.map((l,i) => <span key={l.id}><b>{formatTL(l.price, language)}</b>{i > 0 && deltaText(signed(l.price - items[0].price, formatTL(Math.abs(l.price - items[0].price), language)))}</span>), bestIdx(items.map((l) => l.price), 'min'));
+  row('Fiyat', items.map((l) => <b key={l.id}>{formatTL(l.price, language)}</b>), bestIdx(items.map((l) => l.price), 'min'));
   row('Model yılı', items.map((l) => l.year ?? '–'), bestIdx(items.map((l) => l.year ?? null), 'max'));
-  row('Kullanım', items.map((l,i) => <span key={l.id}>{isPartCategory(l.cat) ? '–' : usageLabel(l, language) || '–'}{i > 0 && sameUnit && l.use != null && items[0].use != null && deltaText(signed(l.use - items[0].use, `${formatNum(Math.abs(l.use - items[0].use), language)} ${unitLabel}`))}</span>), sameUnit ? bestIdx(items.map((l) => l.use ?? null), 'min') : -1);
+  row('Kullanım', items.map((l) => (isPartCategory(l.cat) ? '–' : usageLabel(l, language) || '–')), sameUnit ? bestIdx(items.map((l) => l.use ?? null), 'min') : -1);
   row('Şehir', items.map((l) => l.city));
   row('Uzaklık', items.map((l) => distanceLabel(myCity, l.city) || '–'), bestIdx(items.map((l) => distanceKm(myCity, l.city)), 'min'));
   row('Satıcı', items.map((l) => sellers[l.sel]?.name ?? '–'));
@@ -49,17 +46,17 @@ export function CompareView() {
   row('Son doğrulama', items.map((l) => (l.conf === 0 ? 'Bugün' : `${formatNum(l.conf, language)} gün önce`)));
   return (
     <>
-      <p className="saha-results-label">{tr("Saha Defteri")}</p><h1>{tr("Künyeleri karşılaştır")}</h1>
-      <div className="saha-comparison" style={{ marginTop: 16 }}>
-        <table className="cmpt" aria-label={tr("Künyeleri karşılaştır")}>
+      <h1>{tr("İlan karşılaştırma")}</h1>
+      <div className="panel scroll" style={{ marginTop: 16 }}>
+        <table className="cmpt">
           <thead>
-            <tr><th scope="col">{tr("Özellik")}</th>{items.map((l) => (
-              <th scope="col" key={l.id}><a className="linkbtn" href={`/ilanlar/${l.id}`}>{l.photos?.[0] && <img className="saha-photo" src={l.photos[0]} alt="" loading="lazy" />}{cardTitle(l)}</a><br /><button type="button" className="btn ghost sm" onClick={() => removeCmp(String(l.id))}>{tr("Çıkar")}</button></th>
+            <tr><th></th>{items.map((l) => (
+              <th key={l.id}><a className="linkbtn" href={`/ilanlar/${l.id}`}>{cardTitle(l)}</a><br /><button type="button" className="btn ghost sm" onClick={() => removeCmp(String(l.id))}>{tr("Çıkar")}</button></th>
             ))}</tr>
           </thead>
           <tbody>
             {rows.map((r) => (
-              <tr key={r.label}><th scope="row">{tr(r.label)}</th>{r.cells.map((c, i) => <td key={i}>{c}{i === r.best ? <> <Pill cls="good">{tr("En iyi")}</Pill></> : null}</td>)}</tr>
+              <tr key={r.label}><th>{tr(r.label)}</th>{r.cells.map((c, i) => <td key={i}>{c}{i === r.best ? <> <Pill cls="good">{tr("En iyi")}</Pill></> : null}</td>)}</tr>
             ))}
           </tbody>
         </table>

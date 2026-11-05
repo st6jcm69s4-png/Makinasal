@@ -1,11 +1,11 @@
 /* Graphite, warm white and burgundy. Semantic status colors stay distinct. */
 :root{
   --navy:#2B3440; --navy-2:#3B4654;
-  --bg:#F2F5FA; --surface:#FFFFFF; --plate:#E6ECF5; --ink:#232A33; --muted:#56606F; --line:#D3DBE8;
-  --accent:#2563EB; --accent-ink:#FFFFFF; --accent-text:#1D55D6; --accent-soft:#E5EEFF;
-  --pop:#0B635C; --pop-ink:#FFFFFF; --pop-soft:#DDF3F0;
-  --teal:#0B635C; --teal-ink:#FFFFFF; --teal-soft:#DDF3F0;
-  --good:#1B6F40; --good-bg:#DCEFE3; --warn:#7F5200; --warn-bg:#FFF0C2; --bad:#9C2626; --bad-bg:#F5DADA; --neutral-bg:#E6ECF5;
+  --bg:#E3EAF4; --surface:#F7F9FD; --plate:#D6E0EE; --ink:#1E2530; --muted:#4F5B6C; --line:#BFCCE0;
+  --accent:#2563EB; --accent-ink:#FFFFFF; --accent-text:#1D55D6; --accent-soft:#D8E5FD;
+  --pop:#0B635C; --pop-ink:#FFFFFF; --pop-soft:#CFEDE8;
+  --teal:#0B635C; --teal-ink:#FFFFFF; --teal-soft:#CFEDE8;
+  --good:#1B6F40; --good-bg:#DCEFE3; --warn:#7F5200; --warn-bg:#FFF0C2; --bad:#9C2626; --bad-bg:#F5DADA; --neutral-bg:#D6E0EE;
   --f-display:'Inter','Segoe UI',system-ui,sans-serif;
   --f-body:'Inter','Segoe UI',system-ui,sans-serif;
   color-scheme:light;
@@ -338,53 +338,3 @@ a.btn{display:inline-block;text-align:center;text-decoration:none}
 .lang-welcome{position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;padding:16px}.lang-welcome-box{background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:24px;max-width:440px;width:100%;text-align:center}.lang-welcome-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:16px 0}
 
 .phone-field{display:flex;gap:8px}.phone-field select{flex:0 1 46%;min-width:0}.phone-field input{flex:1 1 54%;min-width:0}
-
-/* Saha Defteri: masthead, shift log and equipment nameplates. */
-.home-market .home-hero{background:var(--surface);color:var(--ink);border:1px solid var(--line);border-top:4px solid var(--accent);border-radius:4px;box-shadow:none}
-.home-market .home-hero::after{display:none}
-.home-market .home-hero-top,.home-market .home-hero-top>a,.home-market .home-kicker,.home-market .home-hero-copy p{color:var(--muted)}
-.home-market .home-hero-copy{display:flex;align-items:baseline;gap:12px 28px;flex-wrap:wrap;padding:18px 0}
-.home-market .home-hero-copy h1{font-size:clamp(32px,5vw,60px);line-height:1;letter-spacing:-.04em;color:var(--ink);margin:0}
-.home-market .home-hero-copy p{margin:0;font-size:1rem;line-height:1.4}
-.home-market .home-search-box{border:1px solid var(--line);border-radius:3px;box-shadow:none}
-.home-market .home-search-tabs{border-radius:2px 2px 0 0}
-.home-market .home-popular,.home-market .home-popular a{color:var(--accent-text)}
-.saha-links{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin:0 0 18px;border-block:1px solid var(--line)}
-.saha-links a{display:flex;align-items:center;gap:.55rem;padding:11px 8px;color:var(--accent-text);font-weight:700;font-size:.88rem}
-.saha-links a+a{border-inline-start:1px solid var(--line)}
-.saha-links a span,.saha-tag,.saha-plate-fields dt{font-variant-numeric:tabular-nums;font-size:.74rem;color:var(--muted)}
-.saha-log{border:1px solid var(--line);border-top:3px solid var(--accent);background:var(--surface)}
-.saha-log-list{list-style:none;margin:0;padding:0}
-.saha-log-head,.saha-log-row{display:grid;grid-template-columns:minmax(100px,.95fr) minmax(0,2fr) minmax(0,1.25fr) minmax(0,1fr);align-items:start;gap:12px;padding:12px 16px;overflow-wrap:anywhere}
-.saha-log-head{background:var(--plate);font-size:.78rem;font-weight:700;color:var(--muted)}
-.saha-log-row{color:var(--ink);border-top:1px solid var(--line)}
-.saha-log-row:is(:hover,:focus-visible){background:var(--accent-soft);text-decoration:none}
-.saha-log-row small{display:block;margin-top:4px;color:var(--muted)}
-.saha-log-row>b{font-variant-numeric:tabular-nums}
-.saha-tag{font-weight:750;color:var(--accent-text)}
-.saha-detail-heading{margin-bottom:14px}
-.saha-detail-grid{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(0,1fr);gap:16px;align-items:start}
-.saha-detail-grid .gal-main{border-radius:4px}
-.saha-plate{border:1px solid var(--line);border-top:4px solid var(--accent);background:var(--surface);min-width:0}
-.saha-plate-head,.saha-plate-price{padding:12px 16px;border-bottom:1px solid var(--line)}
-.saha-plate-head{background:var(--plate)}
-.saha-plate-head h2{margin:0 0 4px;font-size:1.3rem}
-.saha-plate-head span,.saha-plate-note{color:var(--muted);font-size:.85rem}
-.saha-plate-price .saha-amount{font-size:clamp(24px,3vw,34px);margin:2px 0;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
-.saha-plate-fields{margin:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
-.saha-plate-fields>div{padding:9px 12px;border-bottom:1px solid var(--line);min-width:0}
-.saha-plate-fields>div:nth-child(odd){border-inline-end:1px solid var(--line)}
-.saha-plate-fields dd{margin:4px 0 0;font-weight:650;overflow-wrap:anywhere}
-.saha-plate-note{display:block;margin:10px 12px}
-.saha-notes{border-radius:4px}
-.saha-results-label{font-size:.8rem;font-weight:750;color:var(--accent-text);margin:0 0 5px}
-.saha-comparison{border:1px solid var(--line);border-top:3px solid var(--accent);border-radius:3px;padding:0;overflow:auto}
-.saha-comparison .cmpt{margin:0;table-layout:fixed;min-width:420px}
-.saha-comparison th,.saha-comparison td{font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
-.saha-comparison thead th{background:var(--plate);vertical-align:top}
-.saha-comparison tbody th{position:sticky;left:0;background:var(--surface)}
-.saha-comparison .saha-photo{display:block;width:100%;aspect-ratio:16/9;object-fit:cover;margin-bottom:8px}
-.saha-comparison .saha-delta{display:block;margin-top:4px;color:var(--muted);font-size:.8rem}
-@media(max-width:700px){.saha-detail-grid{grid-template-columns:minmax(0,1fr)}.saha-log-head{display:none}.saha-log-row{grid-template-columns:repeat(2,minmax(0,1fr));padding:10px 12px;gap:5px 12px}.saha-log-row>span:nth-child(1),.saha-log-row>span:nth-child(2){grid-column:1/-1}.saha-log-row>b{align-self:end;text-align:end}.saha-links a{flex-wrap:wrap}}
-.saha-results>.card{border-radius:4px}
-.saha-results>.card .cbody{border-top:1px solid var(--line)}

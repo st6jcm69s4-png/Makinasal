@@ -102,7 +102,6 @@ function Browser() {
 
   return (
     <>
-      <p className="saha-results-label">{tr("Saha Defteri")} / {tr("Satılık ilanlar")}</p>
       <h1>{tr("İlanlarda ara")}</h1>
       <form className="searchbar" role="search" onSubmit={submit}>
         <label className="sr" htmlFor="q">
@@ -347,7 +346,7 @@ function Browser() {
               {tr("Bu filtrelerle ilan bulunamadı. Filtreleri gevşetmeyi dene.")}</div>
           ) : (
             <>
-              <div className="grid saha-results">
+              <div className="grid">
                 {visible.map((l) => (
                   <ListingCard key={String(l.id)} l={l} />
                 ))}

@@ -7,16 +7,16 @@ import { SearchBox } from '../../components/SearchBox';
 import { ListingCard } from '../../components/ListingCard';
 import { Btn, Band, Label } from '../../components/ui';
 import { AlertBox, CardSkeleton } from '../../components/kit';
-import { FirmCard } from '../../components/NetCards';
+import { FirmCard, PostCard } from '../../components/NetCards';
 import { Icon, type IconName } from '../../components/Icon';
 import { color, font, radius, shadow } from '../../lib/theme';
 import { useLang } from '../../lib/lang';
-import { localeOf, tr } from '../../lib/i18n';
+import { tr } from '../../lib/i18n';
 import { displayName, firstName } from '../../lib/person';
 import { useApp } from '../../lib/AppContext';
 import { CATEGORY_GROUPS } from '../../lib/machineryCatalog';
-import { money, POST_KINDS, RENTAL_MODES, type MarketPost, type Provider } from '../../lib/network';
-import { photoUrl, supabase, type Row } from '../../lib/supabase';
+import { money, type MarketPost, type Provider } from '../../lib/network';
+import { photoUrl, supabase, tl, type Row } from '../../lib/supabase';
 
 type Short = { label: string; sub: string; icon: IconName; tint: 'accent' | 'teal'; go: () => void; wide?: boolean };
 const SHORTS: Short[] = [
@@ -48,6 +48,23 @@ const STEPS: [string, string][] = [
   ['Ayrıntıları konuş', 'Özel mesajlarla işi netleştir. Seçim ödeme oluşturmaz.'],
 ];
 
+function Spot({ item }: { item: Row }) {
+  const ph = [...(item.listing_photos ?? [])].sort((a, b) => a.position - b.position)[0];
+  if (!ph) return null;
+  return (
+    <Pressable style={({ pressed }) => [s.spot, pressed && { opacity: 0.92 }]} onPress={() => router.push(`/ilan/${item.id}`)} accessibilityRole="button">
+      <View>
+        <Image source={{ uri: photoUrl(ph.path) }} style={s.spotPhoto} />
+        <View style={s.spotTag}><Label style={s.spotTagText}>Öne çıkan ilan</Label></View>
+      </View>
+      <View style={s.spotBar}>
+        <Text style={s.spotTitle} numberOfLines={2}>{item.title}</Text>
+        <View style={s.spotPrice}><PlainText style={s.spotPriceText}>{tl(item.price)}</PlainText></View>
+      </View>
+    </Pressable>
+  );
+}
+
 export default function Home() {
   const scroller = useRef<never>(null);
   const { lang } = useLang();
@@ -55,14 +72,14 @@ export default function Home() {
   const { session } = useApp();
   const [q, setQ] = useState('');
   const [latest, setLatest] = useState<Row[]>([]);
-  const [rentals, setRentals] = useState<MarketPost[]>([]);
-  const [parts, setParts] = useState<MarketPost[]>([]);
+  const [featured, setFeatured] = useState<Row[]>([]);
   const [page, setPage] = useState(1);
   const [more, setMore] = useState(true);
   const [moreBusy, setMoreBusy] = useState(false);
   const [counts, setCounts] = useState<{ offers: number; works: number } | null>(null);
   const [pname, setPname] = useState('');
   const [city, setCity] = useState('');
+  const [pool, setPool] = useState<{ category: string; url: string }[]>([]);
   const [cats, setCats] = useState<{ id: string; label: string; photo: string; n: number }[]>([]);
   const [local, setLocal] = useState<Row[]>([]);
   const [jobs, setJobs] = useState<MarketPost[]>([]);
@@ -74,32 +91,31 @@ export default function Home() {
   const load = useCallback(async () => {
     setBusy(true);
     const uid = session?.user.id;
-    const [l, r, j, f, o, w, pr, cp, p] = await Promise.all([
+    const [l, r, j, f, o, w, pr, cp] = await Promise.all([
       supabase.rpc('search_listings', { p: { ...base, page: 1, sort: 'new' }, count_only: false }),
-      supabase.from('market_posts').select('*').eq('kind', 'rental_machine').eq('status', 'open').order('created_at', { ascending: false }).limit(3),
+      supabase.rpc('search_listings', { p: { ...base, page: 1, sort: 'rec' }, count_only: false }),
       supabase.from('market_posts').select('*').eq('kind', 'job').eq('status', 'open').order('created_at', { ascending: false }).limit(3),
       supabase.from('service_providers').select('*').eq('published', true).order('created_at', { ascending: false }).limit(3),
       uid ? supabase.from('market_quotes').select('id', { count: 'exact', head: true }).eq('owner_id', uid).eq('status', 'pending') : Promise.resolve(null),
       uid ? supabase.from('market_posts').select('id', { count: 'exact', head: true }).eq('owner_id', uid).eq('status', 'open') : Promise.resolve(null),
       uid ? supabase.from('profiles').select('full_name,city').eq('id', uid).maybeSingle() : Promise.resolve(null),
       supabase.from('listings').select('category,listing_photos(path,position)').eq('status', 'active').eq('moderation_status', 'approved').order('created_at', { ascending: false }).limit(150),
-      supabase.from('market_posts').select('*').eq('kind', 'part_request').eq('status', 'open').order('created_at', { ascending: false }).limit(3),
     ]);
     // Kategori kutuları: her grubun en yeni ilanının gerçek fotoğrafı.
     const crow = (cp.data ?? []) as unknown as { category: string; listing_photos: { path: string; position: number }[] | null }[];
+    setPool(crow.filter((x) => x.listing_photos?.length).map((x) => ({ category: x.category, url: photoUrl([...(x.listing_photos ?? [])].sort((a, b) => a.position - b.position)[0].path) })));
     setCats(CATEGORY_GROUPS.map((g) => {
-      const mine = crow.filter((x) => g.categories.some((category) => category === x.category));
+      const mine = crow.filter((x) => g.categories.includes(x.category));
       const withPhoto = mine.find((x) => x.listing_photos?.length);
       const ph = withPhoto ? [...(withPhoto.listing_photos ?? [])].sort((a, b) => a.position - b.position)[0] : null;
       return { id: g.id, label: g.label, photo: ph ? photoUrl(ph.path) : '', n: mine.length };
     }).filter((c) => c.photo));
-    setError(!!(l.error || j.error || f.error || r.error || p.error));
+    setError(!!(l.error || j.error || f.error));
     const rows = ((l.data as { rows?: Row[] } | null)?.rows ?? []);
     setLatest(rows);
     setPage(1);
     setMore(rows.length >= 10);
-    setRentals((r.data ?? []) as MarketPost[]);
-    setParts((p.data ?? []) as MarketPost[]);
+    setFeatured(((r.data as { rows?: Row[] } | null)?.rows ?? []).slice(0, 6));
     setJobs((j.data ?? []) as MarketPost[]);
     setFirms((f.data ?? []) as Provider[]);
     setCounts(uid && o && w ? { offers: o.count ?? 0, works: w.count ?? 0 } : null);
@@ -127,46 +143,19 @@ export default function Home() {
   useFocusEffect(useCallback(() => { void load(); }, [load]));
 
   const search = () => router.navigate({ pathname: '/ilanlar', params: { q: q.trim() } });
-  const feed = [...jobs, ...rentals, ...parts].sort((a,b) => b.created_at.localeCompare(a.created_at));
-  const day = (value: string) => {
-    const date = new Date(value);
-    return Number.isNaN(date.getTime()) ? tr('Tarih görüşülecek') : new Intl.DateTimeFormat(localeOf(lang), { day: 'numeric', month: 'short', timeZone: 'UTC' }).format(date);
-  };
+  const spot = featured.find((r) => r.listing_photos?.length) ?? null;
   const name = firstName(displayName(session, pname));
   return (
     <ScrollView ref={scroller} style={s.screen} contentContainerStyle={{ paddingBottom: 32 }} refreshControl={<RefreshControl refreshing={busy} onRefresh={() => void load()} />} keyboardShouldPersistTaps="handled">
       <View style={s.hero}>
-        <Text style={s.kicker}>{city || 'Tüm Türkiye'}</Text>
-        <Text accessibilityRole="header" style={s.h1}>Saha Defteri</Text>
-        <Text style={s.lead}>Bugün sahada ne lazım?</Text>
-        {session ? <PlainText style={s.lead}>{`${tr('Merhaba,')} ${name}.`}</PlainText> : null}
+        {session ? <PlainText style={s.h1}>{`${tr('Merhaba,')} ${name}.`}</PlainText> : null}
+        <Text style={s.lead}>Makine, yedek parça ve işini yapacak hizmeti burada bul.</Text>
         <View style={s.searchRow}>
           <View style={{ flex: 1 }}><SearchBox value={q} onChangeText={setQ} onSubmit={search} placeholder="Marka, model veya parça numarası ara" /></View>
           <Pressable style={s.go} onPress={search} accessibilityRole="button"><Text style={s.goText}>Ara</Text></Pressable>
         </View>
       </View>
 
-      <View style={s.primaryLinks}>
-        {([['Makine bul', SHORTS[0].go],['İş bul',SHORTS[4].go],['Parça bul',SHORTS[2].go]] as const).map(([label,go],i) =>
-          <Pressable key={label} style={s.primaryLink} onPress={go} accessibilityRole="button">
-            <PlainText style={s.kicker}>0{i+1}</PlainText><Text style={s.link2}>{label}</Text>
-          </Pressable>)}
-      </View>
-      <Band title="Saha Akışı" action="Tümünü gör" onAction={() => router.navigate('/is-agi')} />
-      <View style={s.log}>
-        <Text style={[s.logRow, s.kicker]}>Tüm Türkiye</Text>
-        {feed.map(p => <Pressable key={p.id} style={({pressed}) => [s.logRow, pressed && {backgroundColor:color.accentSoft}]} accessibilityRole="button" onPress={() => router.push(`/ag/ilan/${p.id}`)}>
-          <Text style={s.kicker}>{POST_KINDS[p.kind]}</Text>
-          <PlainText style={s.cardTitle}>{p.title}</PlainText>
-          {p.kind === 'rental_machine' && p.rental_mode && p.rental_mode in RENTAL_MODES ? <Text style={s.meta}>{RENTAL_MODES[p.rental_mode as keyof typeof RENTAL_MODES]}</Text> : null}
-          {p.kind === 'part_request' && p.specs ? <PlainText style={s.meta}>{p.specs}</PlainText> : null}
-          <View style={s.logMeta}>
-            <PlainText style={s.logLocation}>{[p.city,p.district].filter(Boolean).join(' / ')} · {p.start_date ? day(p.start_date) : tr('Tarih görüşülecek')}{p.end_date ? ` – ${day(p.end_date)}` : ''}</PlainText>
-            <Text style={s.logPrice}>{money(p.price,p.price_unit)}</Text>
-          </View>
-        </Pressable>)}
-        {!feed.length ? <Text style={s.logRow}>{busy ? 'Yükleniyor…' : error ? 'Bazı bölümler yüklenemedi.' : 'Henüz açık talep veya kiralık ilan yok.'}</Text> : null}
-      </View>
       <Band title="Hızlı keşfet" style={{ marginTop: 22 }} />
       <View style={s.grid}>
         {SHORTS.map((t) => <ShortCard key={t.label} t={t} />)}
@@ -212,11 +201,18 @@ export default function Home() {
       {error ? <View style={{ marginHorizontal: 16, marginTop: 12 }}><AlertBox variant="destructive">Bazı bölümler yüklenemedi. Aşağı çekerek yenileyebilirsin.</AlertBox></View> : null}
       {local.length ? <Band title={`${city} ilanları`} action="Tümünü gör" onAction={() => router.navigate({ pathname: '/ilanlar', params: { city } })} /> : null}
       {local.map((r) => <ListingCard key={'c' + r.id} item={r} />)}
+      {spot ? <Spot item={spot} /> : null}
+      {featured.length ? <Band title="Öne çıkanlar" action="Tümünü gör" onAction={() => router.navigate('/ilanlar')} /> : null}
+      {featured.filter((r) => r.id !== spot?.id).map((r) => <ListingCard key={'f' + r.id} item={r} />)}
       <Band title="Yeni ilanlar" action="Tümünü gör" onAction={() => router.navigate('/ilanlar')} />
       {busy && !latest.length ? <CardSkeleton count={3} /> : null}
       {latest.map((r) => <ListingCard key={r.id} item={r} />)}
       {more && latest.length ? <View style={{ marginHorizontal: 16 }}><Btn ghost disabled={moreBusy} title={moreBusy ? 'Yükleniyor…' : 'Daha fazla ilan göster'} onPress={() => void loadMore()} /></View> : null}
       {!busy && !latest.length ? <Text style={s.empty}>Henüz ilan yok.</Text> : null}
+
+      <Band title="Yeni iş fırsatları" action="Tümünü gör" onAction={() => router.navigate({ pathname: '/is-agi', params: { kind: 'job' } })} />
+      {jobs.map((p) => <PostCard key={p.id} p={p} />)}
+      {!busy && !jobs.length ? <Text style={s.empty}>Bir sonraki işin burada olabilir.</Text> : null}
 
       <Band title="Bölgendeki şirketler" action="Şirketleri keşfet" onAction={() => router.navigate({ pathname: '/is-agi', params: { kind: 'firma' } })} />
       {firms.map((f) => <FirmCard key={f.user_id} p={f} />)}
@@ -249,17 +245,9 @@ export default function Home() {
 
 const s = StyleSheet.create({
   screen: { flex: 1, backgroundColor: color.bg },
-  hero: { backgroundColor: color.surface, paddingHorizontal: 16, paddingVertical: 14, gap: 6, borderTopWidth: 4, borderTopColor: color.accent, borderBottomWidth: 1, borderBottomColor: color.line },
-  h1: { color: color.ink, fontFamily: font.bold, fontSize: 30, lineHeight: 36 },
-  lead: { color: color.muted, fontSize: 16, lineHeight: 22 },
-  kicker: { color: color.accentText, fontFamily: font.semi, fontSize: 12 },
-  primaryLinks: { flexDirection:'row', borderBottomWidth:1, borderColor:color.line, backgroundColor:color.surface },
-  primaryLink: { flex:1, paddingHorizontal:10, paddingVertical:10, borderRightWidth:1, borderRightColor:color.line },
-  log: { marginHorizontal:16, backgroundColor:color.surface, borderTopWidth:3, borderTopColor:color.accent, borderWidth:1, borderColor:color.line },
-  logRow: { padding:12, gap:4, borderBottomWidth:1, borderBottomColor:color.line },
-  logMeta: { flexDirection:'row', flexWrap:'wrap', gap:6, alignItems:'baseline', justifyContent:'space-between' },
-  logLocation: { color:color.muted, fontSize:13, flexShrink:1 },
-  logPrice: { color:color.ink, fontWeight:'700', fontSize:14 },
+  hero: { backgroundColor: color.navy, paddingHorizontal: 16, paddingTop: 14, paddingBottom: 24, gap: 10, borderBottomLeftRadius: 28, borderBottomRightRadius: 28 },
+  h1: { color: color.onBar, fontFamily: font.bold, fontSize: 30, lineHeight: 36 },
+  lead: { color: color.onNavy, fontSize: 16, lineHeight: 22 },
   searchRow: { flexDirection: 'row', gap: 8, marginTop: 6, alignItems: 'flex-start' },
   go: { backgroundColor: color.pop, borderRadius: radius + 2, paddingHorizontal: 20, height: 50, justifyContent: 'center' },
   goText: { color: color.popInk, fontFamily: font.bold, fontSize: 16 },
@@ -276,6 +264,14 @@ const s = StyleSheet.create({
   hub: { flexDirection: 'row', marginHorizontal: 16, marginTop: 16, backgroundColor: color.surface, borderRadius: radius + 4, paddingVertical: 4, ...shadow },
   hubCell: { flex: 1, paddingVertical: 10, paddingHorizontal: 10, gap: 2 },
   hubNum: { fontFamily: font.bold, fontSize: 22, color: color.accentText },
+  spot: { marginHorizontal: 16, marginTop: 4, marginBottom: 16, backgroundColor: color.surface, borderRadius: radius + 8, overflow: 'hidden', ...shadow },
+  spotPhoto: { width: '100%', height: 220, backgroundColor: color.plate },
+  spotTag: { position: 'absolute', top: 12, left: 12, backgroundColor: 'rgba(0,0,0,0.55)', paddingHorizontal: 12, paddingVertical: 5, borderRadius: 14 },
+  spotTagText: { color: '#fff', fontSize: 12.5 },
+  spotBar: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14 },
+  spotTitle: { flex: 1, color: color.ink, fontFamily: font.semi, fontSize: 17, lineHeight: 22 },
+  spotPrice: { backgroundColor: color.pop, paddingHorizontal: 14, paddingVertical: 8, borderRadius: 18 },
+  spotPriceText: { color: color.popInk, fontFamily: font.bold, fontSize: 18 },
   catCard: { width: 156, backgroundColor: color.surface, borderRadius: radius + 4, overflow: 'hidden', ...shadow },
   catPhoto: { width: 156, height: 112, backgroundColor: color.plate },
   catPlate: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 12, paddingVertical: 10, minHeight: 56 },
