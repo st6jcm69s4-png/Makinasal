@@ -88,8 +88,8 @@ function Body({ l, seller: m, own, stats, favs, toggleFav, cmp, toggleCmp, myCit
   if (part) {
     rows.push([l.cat === 'Yedek parça' ? 'Parça numarası' : 'Ebat', l.spec ?? '–'], ['Durum', l.cond ?? '–'], ['Uyumlu', l.compat || '–'], ['Adet', l.qty ? formatNum(l.qty, language) : '–']);
   } else {
-    if (l.year) rows.push(['Model yılı', String(l.year)]);
-    if (usageLabel(l, language)) rows.push(['Kullanım', usageLabel(l, language)]);
+    rows.push(['Model yılı', l.year ? String(l.year) : '–']);
+    rows.push(['Kullanım', usageLabel(l, language) || '–']);
     rows.push(['Seri / şasi no', l.serial ? <Pill cls="good">{tr("Beyan edildi")}</Pill> : <Pill>{tr("Beyan yok")}</Pill>]);
   }
   rows.push(['Konum', l.city + (d ? ` (${d})` : '')], ['Takas', l.takas ? <Pill cls="good">{tr("Kabul edilir")}</Pill> : 'Belirtilmedi'],
@@ -98,12 +98,11 @@ function Body({ l, seller: m, own, stats, favs, toggleFav, cmp, toggleCmp, myCit
   return (
     <>
       <a href="/ilanlar" className="back">{tr("← İlanlara dön")}</a>
-      <div className="sh-head" style={{ marginBottom: 14 }}>
+      <div className="sh-head saha-detail-heading">
         <div>
           <span className="sub">{tr(l.cat)}{l.demo ? tr(" · Demo ilan") : ''}</span>
           <h1 style={{ fontSize: 34 }}>{cardTitle(l)}</h1>
-          <div className="price" style={{ fontSize: 34, marginTop: 6 }}>{formatTL(l.price, language)}{part ? <span className="sub" style={{ font: '400 15px var(--f-body)' }}> {tr(" / adet")}</span> : null}</div>
-          {dropPct(l) ? <div className="sub">{tr("Önceki fiyat ")}{formatTL(l.prev!, language)} · <b>−%{dropPct(l)}</b></div> : null}
+
         </div>
         <div className="acts-row">
           <button type="button" className="ibtn fav" aria-pressed={key in favs} aria-label={tr("Favorilere ekle veya çıkar")} onClick={() => void toggleFav(l)}><IconFav /></button>
@@ -115,6 +114,7 @@ function Body({ l, seller: m, own, stats, favs, toggleFav, cmp, toggleCmp, myCit
       {inactive ? <div className="note bad" style={{ marginBottom: 14 }}>{tr("Bu ilan ")}{l.status === 'sold' ? tr("satıldı") : tr("şu an yayında değil")}.</div> : null}
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <div className="saha-detail-grid">
         {photos.length > 0 ? (
           <div>
             <div className="gal-main">{/* eslint-disable-next-line @next/next/no-img-element */}<img src={photos[gi] ?? photos[0]} alt={listingTitle(l)} /></div>
@@ -127,6 +127,18 @@ function Body({ l, seller: m, own, stats, favs, toggleFav, cmp, toggleCmp, myCit
             ) : null}
           </div>
         ) : <div className="empty">{tr("Bu ilanda fotoğraf yok. Fotoğrafsız ilanlara dikkat et.")}</div>}
+          <section className="saha-plate" aria-labelledby="saha-plate-title">
+            <div className="saha-plate-head"><h2 id="saha-plate-title">{tr(part ? "Parça Künyesi" : "Makine Künyesi")}</h2><span>{tr(l.cat)}</span></div>
+            <div className="saha-plate-price"><span className="sub">{tr("Fiyat")}</span>
+          <div className="price saha-amount">{formatTL(l.price, language)}{part ? <span className="sub" style={{ font: '400 15px var(--f-body)' }}> {tr(" / adet")}</span> : null}</div>
+          {dropPct(l) ? <div className="sub">{tr("Önceki fiyat ")}{formatTL(l.prev!, language)} · <b>−%{dropPct(l)}</b></div> : null}
+            </div>
+            <dl className="saha-plate-fields">{rows.map(([k,v]) => <div key={k}><dt>{tr(k)}</dt><dd>{typeof v === "string" && ["İlan durumu","Takas","Durum"].includes(k) ? tr(v) : v}</dd></div>)}</dl>
+            {!part && <p className="saha-plate-note">{tr("Bakım kaydı bu ekranda doğrulanmıyor.")}</p>}
+            {cmp.includes(key) && <a className="saha-plate-note linkbtn" href="/karsilastir">{tr("Künyeleri karşılaştır")} ↗</a>}
+          </section>
+        </div>
+
 
         {flag === 'low' && med ? <div className="note bad"><b>{tr("Fiyat piyasanın çok altında.")}</b> {tr(" Bu kategorideki ilanların ortancası ")}{formatTL(r1000(med), language)}{tr(". Çok düşük fiyat ve acele ettirme, kapora dolandırıcılığında sık görülen işaretlerdir.")}</div> : null}
         {flag === 'high' && med ? <div className="note">{tr("Fiyat kategori ortancası olan ")}{formatTL(r1000(med), language)} {tr(" seviyesinin belirgin üstünde. Pazarlık payını sor.")}</div> : null}
@@ -136,10 +148,10 @@ function Body({ l, seller: m, own, stats, favs, toggleFav, cmp, toggleCmp, myCit
         <PriceBox ind={ind} l={l} />
 
         <div className="two">
-          <div className="panel">
-            <h3>{part ? tr("Ürün bilgisi") : tr("Makine bilgisi")}</h3>
-            <table><tbody>{rows.map(([k, v]) => <tr key={k}><th>{tr(k)}</th><td>{["İlan durumu", "Takas", "Durum"].includes(k) && typeof v === "string" ? tr(v) : v}</td></tr>)}</tbody></table>
-            {l.equipmentCategory && <p className="sub">{l.equipmentCategory} · {tr(partGroupLabel(l.partGroup))}</p>}{l.desc ? <p style={{ margin: '12px 0 0', whiteSpace: 'pre-wrap' }}>{l.desc}</p> : null}
+          <div className="panel saha-notes">
+            <h3>{tr("Satıcı açıklaması")}</h3>
+            {l.equipmentCategory && <p className="sub">{l.equipmentCategory} · {tr(partGroupLabel(l.partGroup))}</p>}
+            <p style={{ whiteSpace: 'pre-wrap' }}>{l.desc || tr("Açıklama paylaşılmamış.")}</p>
           </div>
           <div className="panel">
             <h3>{tr("Satıcı")}</h3>

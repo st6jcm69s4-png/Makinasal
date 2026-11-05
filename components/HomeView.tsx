@@ -94,6 +94,7 @@ function Icon({
   );
 }
 type Feed = {
+  parts: MarketPost[];
   jobs: MarketPost[];
   rentals: MarketPost[];
   firms: Provider[];
@@ -109,6 +110,7 @@ export function HomeView() {
     [cityReady, setCityReady] = useState(false);
   const selectedCity = useRef(false);
   const [feed, setFeed] = useState<Feed>({
+      parts: [],
       jobs: [],
       rentals: [],
       firms: [],
@@ -158,6 +160,7 @@ export function HomeView() {
     const db = getSupabase();
     if (!db) {
       setFeed({
+        parts: [],
         jobs: [],
         rentals: [],
         firms: [],
@@ -180,6 +183,7 @@ export function HomeView() {
       .eq("status", "open")
       .order("created_at", { ascending: false })
       .limit(4);
+    let parts = db.from("market_posts").select("*").eq("kind", "part_request").eq("status", "open").order("created_at", { ascending: false }).limit(4);
     let firms = db
       .from("service_providers")
       .select("*")
@@ -188,18 +192,21 @@ export function HomeView() {
       .order("created_at", { ascending: false })
       .limit(4);
     if (city) {
+      parts = parts.eq("city", city);
       jobs = jobs.eq("city", city);
       rentals = rentals.eq("city", city);
       firms = firms.contains("service_cities", [city]);
     }
-    void Promise.all([jobs, rentals, firms])
-      .then(([j, r, f]) => {
+    void Promise.all([jobs, rentals, firms, parts])
+      .then(([j, r, f, p]) => {
         if (!active) return;
         setFeed({
+          parts: (p.data ?? []) as MarketPost[],
           jobs: (j.data ?? []) as MarketPost[],
           rentals: (r.data ?? []) as MarketPost[],
           firms: (f.data ?? []) as Provider[],
           errors: [
+            ...(p.error ? ["Parça talepleri yüklenemedi."] : []),
             ...(j.error ? ["İş fırsatları yüklenemedi."] : []),
             ...(r.error ? ["Kiralık makineler yüklenemedi."] : []),
             ...(f.error ? ["Firmalar yüklenemedi."] : []),
@@ -210,6 +217,7 @@ export function HomeView() {
       .catch(() => {
         if (active) {
           setFeed({
+            parts: [],
             jobs: [],
             rentals: [],
             firms: [],
@@ -267,14 +275,14 @@ export function HomeView() {
           </a>
         </div>
         <div className="home-hero-copy">
-          <h1 id="home-title">
-            {tr("Doğru makine.")}<br />
-            <mark>{tr("Doğru ekip. Daha çok iş.")}</mark>
-          </h1>
-          <p>
-            {tr("Al, sat, kirala. İşini paylaş, fiyat al.")}<br />
-            {tr("Makine, yedek parça ve işini yapacak hizmeti burada bul.")}</p>
+          <h1 id="home-title">{tr("Saha Defteri")}</h1>
+          <p>{tr("Bugün sahada ne lazım?")}</p>
         </div>
+        <nav className="saha-links" aria-label={tr("Hızlı keşfet")}>
+          <a href={locationUrl("/ilanlar", city)}><span aria-hidden="true">01</span>{tr("Makine bul")} ↗</a>
+          <a href={locationUrl("/isler", city)}><span aria-hidden="true">02</span>{tr("İş bul")} ↗</a>
+          <a href={locationUrl("/yedek-parca", city)}><span aria-hidden="true">03</span>{tr("Parça bul")} ↗</a>
+        </nav>
         <div className="home-search-box">
           <div
             className="home-search-tabs"
@@ -469,51 +477,22 @@ export function HomeView() {
             {tr("Tekrar dene")}</button>
         </div>
       )}
-      <HomeSection
-        label={tr("YENİ İŞ FIRSATLARI")}
-        title={tr("Bir sonraki işin burada olabilir.")}
-        href={locationUrl("/isler", city)}
-      >
-        <FeedContent
-          loading={loading}
-          empty={feed.jobs.length === 0}
-          unavailable={feed.errors.some(
-            (e) => e.includes("İş fırsatları") || e.includes("İş ağı"),
-          )}
-          message={
-            city
-              ? tr("{0} için henüz açık iş talebi yok.", {0:city})
-              : "Henüz açık iş talebi yok."
-          }
-          action="İlk iş talebini oluştur"
-          href="/is-agi/yeni?kind=job"
-        >
-          <div className="home-feed-grid">
-            {feed.jobs.map((p) => (
-              <HomePost key={p.id} p={p} />
-            ))}
-          </div>
-        </FeedContent>
-      </HomeSection>
-      <HomeSection
-        label={tr("KİRALIK MAKİNELER")}
-        title={tr("İşin kadar kirala.")}
-        href={locationUrl("/kiralik", city)}
-      >
-        <FeedContent
-          loading={loading}
-          empty={feed.rentals.length === 0}
-          unavailable={feed.errors.some(
-            (e) => e.includes("Kiralık makineler") || e.includes("İş ağı"),
-          )}
-          message="Bu bölgede henüz kiralık makine ilanı yok."
-          action="Kiralık ilanı ver"
-          href="/is-agi/yeni?kind=rental_machine"
-        >
-          <div className="home-feed-grid">
-            {feed.rentals.map((p) => (
-              <HomePost key={p.id} p={p} />
-            ))}
+      <HomeSection label={city || tr("Tüm Türkiye")} title={tr("Saha Akışı")} href={locationUrl("/is-ve-hizmetler", city)}>
+        <FeedContent loading={loading} empty={!feed.jobs.length && !feed.rentals.length && !feed.parts.length}
+          unavailable={!feed.jobs.length && !feed.rentals.length && !feed.parts.length && feed.errors.some((e) => /İş|Kiralık|Parça/.test(e))} message="Bu bölgede henüz açık talep veya kiralık ilan yok."
+          action="İlk iş talebini oluştur" href="/is-agi/yeni?kind=job">
+          <div className="saha-log">
+            <div className="saha-log-head" aria-hidden="true"><span>{tr("Tür")}</span><span>{tr("Makine / ihtiyaç")}</span><span>{tr("Yer ve zaman")}</span><span>{tr("Fiyat")}</span></div>
+            <ul className="saha-log-list">
+              {[...feed.jobs, ...feed.rentals, ...feed.parts].sort((a,b) => b.created_at.localeCompare(a.created_at)).map(p => (
+                <li key={p.id}><a className="saha-log-row" href={`/is-agi/ilan/${p.id}`}>
+                  <span className="saha-tag">{tr(POST_KINDS[p.kind])}</span>
+                  <span><strong>{p.title}</strong><small>{p.kind === "rental_machine" ? tr(rentalModeLabel(p.rental_mode)) : p.kind === "part_request" && p.specs ? p.specs : tr(p.category)}</small></span>
+                  <span>{[p.city,p.district].filter(Boolean).join(" / ")}<small>{p.start_date ? dateLabel(p.start_date,language) : tr("Tarih görüşülecek")}{p.end_date ? ` – ${dateLabel(p.end_date,language)}` : ""}</small></span>
+                  <b>{money(p.price,p.price_unit,language)} <span aria-hidden="true">↗</span></b>
+                </a></li>
+              ))}
+            </ul>
           </div>
         </FeedContent>
       </HomeSection>
@@ -722,43 +701,5 @@ function FeedContent({
     </div>
   ) : (
     <>{children}</>
-  );
-}
-function HomePost({ p }: { p: MarketPost }) {
-  const { t: tr, language } = useLanguage();
-
-  return (
-    <a className="home-post-card" href={`/is-agi/ilan/${p.id}`}>
-      <span className={`home-post-type ${p.kind === "job" ? "job" : ""}`}>
-        {tr(POST_KINDS[p.kind])}
-      </span>
-      <h3>{p.title}</h3>
-      {p.kind === "rental_machine" && (
-        <span className="home-rental-scope">
-          {tr(rentalModeLabel(p.rental_mode))}
-        </span>
-      )}
-      <p className="home-card-location">
-        <Icon type="pin" />
-        {p.city}
-        {p.district ? ` / ${p.district}` : ""}
-      </p>
-      <p className="home-card-description">
-        {p.description.slice(0, 110)}
-        {p.description.length > 110 ? "…" : ""}
-      </p>
-      <div className="home-post-meta">
-        <span>{tr(p.category)}</span>
-        <span>
-          {p.start_date ? dateLabel(p.start_date, language) : tr("Tarih görüşülecek")}
-          {p.end_date ? ` – ${dateLabel(p.end_date, language)}` : ""}
-        </span>
-      </div>
-      <strong>{money(p.price, p.price_unit, language)}</strong>
-      <span className="home-card-footer">
-        {p.kind === "job" ? tr("İşi incele ve teklif ver") : tr("Kiralama ayrıntıları")}{" "}
-        <span>↗</span>
-      </span>
-    </a>
   );
 }

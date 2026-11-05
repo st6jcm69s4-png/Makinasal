@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, Dimensions, Image, Linking, Modal, Pressable, ScrollView, StyleSheet, Switch, View } from 'react-native';
+import { ActivityIndicator, Alert, useWindowDimensions, Image, Linking, Modal, Pressable, ScrollView, StyleSheet, Switch, View } from 'react-native';
 import { Text, TextInput } from '../../components/LText';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Heart, Icon } from '../../components/Icon';
@@ -15,6 +15,7 @@ import { color } from '../../lib/theme';
 
 type Detail = {
   id: string; seller_id: string; category: string; title: string; description: string | null; price: number | string; city: string; year: number | null;
+  spec: string | null; cond: string | null; compat: string | null;
   usage_value: number | null; usage_unit: string | null; brand: string | null; model: string | null;
   listing_photos: { path: string; position: number }[] | null;
 };
@@ -26,6 +27,7 @@ const SERVICES = [
 ];
 
 export default function ListingScreen() {
+  const { width } = useWindowDimensions();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { favs, toggleFav, session, cmp, toggleCmp } = useApp();
   const { askLogin, notify } = useLoginPrompt();
@@ -48,7 +50,7 @@ export default function ListingScreen() {
   useEffect(() => {
     let alive = true;
     supabase.from('listings')
-      .select('id,seller_id,category,title,description,price,city,year,usage_value,usage_unit,brand,model,listing_photos(path,position)')
+      .select('id,seller_id,category,title,description,price,city,year,usage_value,usage_unit,brand,model,spec,cond,compat,listing_photos(path,position)')
       .eq('id', id).eq('status', 'active').eq('moderation_status', 'approved').maybeSingle()
       .then(async ({ data, error }) => {
         if (!alive) return;
@@ -144,11 +146,21 @@ export default function ListingScreen() {
   return (
     <ScrollView style={{ backgroundColor: color.surface }}>
       <ScrollView horizontal pagingEnabled>
-        {photos.length ? photos.map((p) => <Image key={p.path} source={{ uri: photoUrl(p.path) }} style={s.photo} />) : <View style={[s.photo, { backgroundColor: color.plate }]} />}
+        {photos.length ? photos.map((p) => <Image key={p.path} source={{ uri: photoUrl(p.path) }} style={[s.photo,{width}]} />) : <View style={[s.photo, { width, backgroundColor: color.plate, justifyContent: 'center', alignItems:'center' }]}><Text style={s.meta}>Fotoğraf paylaşılmamış.</Text></View>}
       </ScrollView>
       <View style={s.body}>
         <Text style={s.title}>{item.title}</Text>
-        <Text style={s.price}>{tl(item.price)}</Text>
+
+        <View style={s.plate}>
+          <View style={s.plateHead}><Text accessibilityRole="header" style={s.section}>{part ? 'Parça Künyesi' : 'Makine Künyesi'}</Text><Text style={s.meta}>{item.category}</Text></View>
+          <View style={s.platePrice}><Text style={s.meta}>Fiyat</Text><Text style={s.price}>{tl(item.price)}</Text></View>
+          <FieldGrid>
+            {part ? <><FieldCell label={item.category === 'Lastik ve jant' ? 'Ebat' : 'Parça numarası'} value={item.spec} /><FieldCell label="Durum" value={item.cond} /><FieldCell label="Uyumlu" value={item.compat} /></>
+              : <><FieldCell label="Model yılı" value={item.year} /><FieldCell label="Kullanım" value={item.usage_value != null ? `${item.usage_value} ${item.usage_unit ?? ''}`.trim() : null} /></>}
+            <FieldCell label="Marka" value={item.brand} /><FieldCell label="Model" value={item.model} /><FieldCell label="İl" value={item.city} />
+          </FieldGrid>
+          {!part && <Text style={s.plateNote}>Bakım kaydı bu ekranda doğrulanmıyor.</Text>}
+        </View>
         <Pressable style={s.favBtn} accessibilityRole="button" onPress={async () => { const err = await toggleFav(item.id, item.price); if (err) notify('Favoriler', err, (a) => void a.toggleFav(item.id, item.price)); }}>
           <Heart on={favs.has(item.id)} size={18} color={color.accentText} /><Text style={s.favText}>{favs.has(item.id) ? 'Favorilerde' : 'Favorilere ekle'}</Text>
         </Pressable>
@@ -156,19 +168,12 @@ export default function ListingScreen() {
           <Icon name="repeat" size={17} color={color.accentText} /><Text style={s.favText}>{cmp.includes(item.id) ? `Karşılaştırmada (${cmp.length}/3)` : 'Karşılaştırmaya ekle'}</Text>
         </Pressable>
         {cmp.length >= 2 ? <Pressable onPress={() => router.push('/karsilastir')} accessibilityRole="button"><Text style={s.favText}>Karşılaştırmayı aç ({cmp.length})</Text></Pressable> : null}
-        <FieldGrid style={{ marginTop: 4 }}>
-          <FieldCell label="Marka" value={item.brand} />
-          <FieldCell label="Model" value={item.model} />
-          <FieldCell label="Yıl" value={item.year} />
-          <FieldCell label="Kullanım" value={item.usage_value ? `${item.usage_value} ${item.usage_unit ?? ''}`.trim() : null} />
-          <FieldCell label="İl" value={item.city} />
-          <FieldCell label="Kategori" value={item.category} />
-        </FieldGrid>
         {trust ? (
           <Text style={s.meta}>Satıcı: {seller || '—'} · <Text style={{ color: trust.color, fontWeight: '700' }}>{trust.label}</Text></Text>
         ) : null}
         <Pressable onPress={() => router.push(`/magaza/${item.seller_id}`)} accessibilityRole="button"><Text style={s.favText}>Satıcının profili ve ilanları</Text></Pressable>
-        {item.description ? <Text style={s.desc}>{item.description}</Text> : null}
+        <Text style={s.section}>Satıcı açıklaması</Text>
+        <Text style={s.desc}>{item.description || 'Açıklama paylaşılmamış.'}</Text>
         <AlertBox variant="warning">Ürünü görmeden kapora, ön ödeme, havale ya da EFT göndermeyin.</AlertBox>
 
         {!own ? (
@@ -229,7 +234,11 @@ export default function ListingScreen() {
 }
 
 const s = StyleSheet.create({
-  photo: { width: Dimensions.get('window').width, height: 260 },
+  photo: { height: 260, resizeMode:'contain', backgroundColor:color.plate },
+  plate: { borderWidth:1, borderColor:color.line, borderTopWidth:4, borderTopColor:color.accent, padding:10, gap:6 },
+  plateHead: { backgroundColor:color.plate, padding:8 },
+  platePrice: { paddingHorizontal:8, paddingVertical:4, borderBottomWidth:1, borderBottomColor:color.line },
+  plateNote: { fontSize:13, color:color.muted, marginTop:6 },
   body: { padding: 16, gap: 10 },
   title: { fontSize: 23, fontWeight: '700', color: color.ink, lineHeight: 27 },
   price: { fontSize: 24, fontWeight: '700', color: color.accentText },
