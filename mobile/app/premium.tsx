@@ -7,7 +7,7 @@ import { useApp } from '../lib/AppContext';
 import { useLang } from '../lib/lang';
 import { tr } from '../lib/i18n';
 import { supabase } from '../lib/supabase';
-import { FREE, PLANS, activePlan, money, yearlyPerMonth, yearlyTotal, type Period, type Plan, type PlanId } from '../lib/plans';
+import { FREE, PLANS, activePlan, money, yearlyTotal, type Period, type Plan, type PlanId } from '../lib/plans';
 import { color, font, radius, shadow } from '../lib/theme';
 
 type Prof = { is_premium?: boolean | null; premium_plan?: string | null; premium_until?: string | null };
@@ -58,6 +58,8 @@ export default function Premium() {
         ))}
       </View>
 
+      <Text style={s.yearNote}>Yıllık üyelikte 2 ay bedava: 10 aylık ücret öde, 12 ay kullan.</Text>
+
       {PLANS.map((p) => <PlanCard key={p.id} p={p} period={period} lang={lang} current={current} onBuy={() => buy(p)} />)}
 
       <View style={s.free}>
@@ -86,8 +88,8 @@ function PlanCard({ p, period, lang, current, onBuy }: { p: Plan; period: Period
         <PlainText style={s.per}>{` / ${tr(period === 'yearly' ? 'yıl' : 'ay')}`}</PlainText>
       </View>
       {period === 'yearly'
-        ? <PlainText style={s.perMonth}>{`${tr('Aylık')} ${money(yearlyPerMonth(p), lang)} · ${tr('aylık ödemeye göre')} ${money(p.monthly * 12 - yearlyTotal(p), lang)} ${tr('kazanç')}`}</PlainText>
-        : <PlainText style={s.perMonth}>{`${tr('Yıllık öderseniz')} ${money(yearlyPerMonth(p), lang)} / ${tr('ay')}`}</PlainText>}
+        ? <PlainText style={s.perMonth}>{`${tr('12 ay kullan, 10 ay öde')} · ${tr('2 ay bedava')} (${money(p.monthly * 2, lang)})`}</PlainText>
+        : <PlainText style={s.perMonth}>{`${tr('Yıllık üyelikte 2 ay bedava')}: ${money(yearlyTotal(p), lang)} / ${tr('yıl')}`}</PlainText>}
       <View style={{ gap: 9, marginTop: 14 }}>
         {p.features.map((f) => (
           <View key={f} style={s.feat}>
@@ -120,6 +122,7 @@ const s = StyleSheet.create({
   toggleT: { color: color.ink, fontFamily: font.semi, fontSize: 15 },
   save: { backgroundColor: color.tealSoft, borderRadius: 10, paddingHorizontal: 7, paddingVertical: 2 },
   saveT: { color: color.tealText, fontFamily: font.bold, fontSize: 11.5 },
+  yearNote: { color: color.tealText, fontFamily: font.semi, fontSize: 14, textAlign: 'center', marginHorizontal: 16, marginTop: 2 },
   card: { marginHorizontal: 16, marginTop: 12, padding: 18, backgroundColor: color.surface, borderRadius: radius + 8, borderWidth: 1, borderColor: color.line, ...shadow },
   cardBig: { borderWidth: 2, borderColor: color.teal },
   cardHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 },

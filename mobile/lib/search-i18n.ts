@@ -90,6 +90,9 @@ export const searchEn: Record<string, string> = {
   "Mevcut tarifen": "Your current plan",
   "Bitiş tarihi": "End date",
   "Gönder": "Send",
+  "Yıllık üyelikte 2 ay bedava: 10 aylık ücret öde, 12 ay kullan.": "2 months free with yearly membership: pay for 10 months, use 12.",
+  "Yıllık üyelikte 2 ay bedava": "2 months free with yearly membership",
+  "12 ay kullan, 10 ay öde": "Use 12 months, pay for 10",
   "Asistan bu ay çok yoğun. Kısa süre sonra tekrar dene.": "The assistant is very busy this month. Please try again later.",
   "Bu tarifeyi seç": "Choose this plan",
 };
@@ -184,6 +187,9 @@ export const searchDe: Record<string, string> = {
   "Mevcut tarifen": "Ihr aktueller Tarif",
   "Bitiş tarihi": "Enddatum",
   "Gönder": "Senden",
+  "Yıllık üyelikte 2 ay bedava: 10 aylık ücret öde, 12 ay kullan.": "2 Monate gratis bei Jahresmitgliedschaft: 10 Monate bezahlen, 12 nutzen.",
+  "Yıllık üyelikte 2 ay bedava": "2 Monate gratis bei Jahresmitgliedschaft",
+  "12 ay kullan, 10 ay öde": "12 Monate nutzen, 10 bezahlen",
   "Asistan bu ay çok yoğun. Kısa süre sonra tekrar dene.": "Der Assistent ist diesen Monat stark ausgelastet. Bitte versuchen Sie es später erneut.",
   "Bu tarifeyi seç": "Diesen Tarif wählen",
 };

@@ -1,4 +1,4 @@
-// Premium tarifeleri. Fiyatlar TL; yıllık ödeme 10 aylık ücrete denk gelir (2 ay bedava).
+// Premium tarifeleri. Fiyatlar TL; yıllık üyelikte 2 ay bedava: yıllık ücret tam olarak 10 aylık ücrettir.
 export type PlanId = 'pro' | 'business';
 export type Period = 'monthly' | 'yearly';
 export type Plan = { id: PlanId; name: string; tagline: string; monthly: number; yearly: number; aiLimit: number; listings: number; features: string[] };
@@ -8,7 +8,7 @@ export const FREE = { listings: 3, photos: 8 };
 
 export const PLANS: Plan[] = [
   {
-    id: 'pro', name: 'Pro', monthly: 69.99, yearly: 699.99, aiLimit: 40, listings: 30,
+    id: 'pro', name: 'Pro', monthly: 69.99, yearly: 699.90, aiLimit: 40, listings: 30,
     tagline: 'Bireysel satıcılar, operatörler ve ustalar için',
     features: [
       'Yapay zeka iş asistanı (ayda 40 soru)',
@@ -18,7 +18,7 @@ export const PLANS: Plan[] = [
     ],
   },
   {
-    id: 'business', name: 'Firma Pro', monthly: 179.99, yearly: 1799.99, aiLimit: 200, listings: 100,
+    id: 'business', name: 'Firma Pro', monthly: 179.99, yearly: 1799.90, aiLimit: 200, listings: 100,
     tagline: 'Şirketler, filolar ve bayiler için',
     features: [
       'Pro tarifesindeki her şey',
@@ -31,8 +31,8 @@ export const PLANS: Plan[] = [
 ];
 
 const round2 = (n: number) => Math.round(n * 100) / 100;
-/** Yıllık toplam (sabit, sonu 99 kuruş). */
-export const yearlyTotal = (p: Plan) => p.yearly;
+/** Yıllık toplam = 10 aylık ücret (12 ay kullan, 10 ay öde). */
+export const yearlyTotal = (p: Plan) => round2(p.monthly * 10);
 /** Yıllıkta aylık ödemeye göre indirim yüzdesi. */
 export const yearlyDiscountPct = (p: Plan) => Math.round((1 - p.yearly / (p.monthly * 12)) * 100);
 /** Yıllık ödemede aylığa düşen tutar. */

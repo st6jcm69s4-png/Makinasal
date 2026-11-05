@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { useLanguage } from "@/components/LanguageProvider";
 import { useMarket } from './MarketProvider';
-import { FREE, PLANS, activePlan, money, yearlyPerMonth, yearlyTotal, type Period } from '@/lib/plans';
+import { FREE, PLANS, activePlan, money, yearlyTotal, type Period } from '@/lib/plans';
 
 export function PremiumView() {
   const { t: tr, language } = useLanguage();
@@ -15,7 +15,7 @@ export function PremiumView() {
     <h1>Makinasal Premium</h1>
     <p className="lead">{tr("İlanların ve firman üstte görünsün, yapay zeka asistanı profilini ve ilanlarını güçlendirsin.")}</p>
     <div className="premium-toggle" role="tablist">
-      {(['monthly', 'yearly'] as Period[]).map(p => <button key={p} type="button" role="tab" aria-selected={period === p} onClick={() => setPeriod(p)}>{tr(p === 'monthly' ? 'Aylık' : 'Yıllık')}{p === 'yearly' ? <span>{tr('2 ay bedava')}</span> : null}</button>)}
+      {(['monthly', 'yearly'] as Period[]).map(p => <button key={p} type="button" role="tab" aria-selected={period === p} onClick={() => setPeriod(p)}>{tr(p === 'monthly' ? 'Aylık' : 'Yıllık')}{p === 'yearly' ? <span>{tr('Yıllık üyelikte 2 ay bedava')}</span> : null}</button>)}
     </div>
     <div className="premium-plans">
       {PLANS.map(p => {
@@ -24,7 +24,7 @@ export function PremiumView() {
           <header><h2>{tr(p.name)}</h2>{p.id === 'business' ? <span className="premium-tag">{tr('Şirketler için')}</span> : null}</header>
           <p className="sub">{tr(p.tagline)}</p>
           <p className="premium-price">{money(period === 'yearly' ? yearlyTotal(p) : p.monthly, lang)} <small>/ {tr(period === 'yearly' ? 'yıl' : 'ay')}</small></p>
-          <p className="premium-per">{period === 'yearly' ? `${tr('Aylık')} ${money(yearlyPerMonth(p), lang)}` : `${tr('Yıllık öderseniz')} ${money(yearlyPerMonth(p), lang)} / ${tr('ay')}`}</p>
+          <p className="premium-per">{period === 'yearly' ? `${tr('12 ay kullan, 10 ay öde')} · ${tr('2 ay bedava')} (${money(p.monthly * 2, lang)})` : `${tr('Yıllık üyelikte 2 ay bedava')}: ${money(yearlyTotal(p), lang)} / ${tr('yıl')}`}</p>
           <ul className="premium-features">{p.features.map(f => <li key={f}>{tr(f)}</li>)}</ul>
           <button type="button" className="btn" disabled={mine} onClick={() => setNotice(true)}>{tr(mine ? 'Mevcut tarifen' : 'Bu tarifeyi seç')}</button>
         </section>;
