@@ -22,7 +22,7 @@ export const PLANS: Plan[] = [
     tagline: 'Şirketler, filolar ve bayiler için',
     features: [
       'Pro tarifesindeki her şey',
-      'Gelişmiş yapay zeka asistanı (ayda 200 soru)',
+      'Yapay zeka iş asistanı (ayda 200 soru)',
       'Firma profilin, iş, kiralama ve eleman ilanların en üstte',
       'Satış ilanların aramalarda en üstte',
       '100 ilan hakkı, ilan başına 20 fotoğraf',

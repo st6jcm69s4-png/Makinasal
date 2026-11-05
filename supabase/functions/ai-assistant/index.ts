@@ -1,6 +1,6 @@
 // Makinasal premium yapay zeka iş asistanı.
 // Gerekli gizli anahtar (Supabase > Edge Functions > Secrets): ANTHROPIC_API_KEY
-// İsteğe bağlı: AI_MODEL_PRO (varsayılan claude-haiku-5-5), AI_MODEL_BUSINESS (varsayılan claude-sonnet-5-5)
+// İsteğe bağlı: AI_MODEL_PRO ve AI_MODEL_BUSINESS (ikisinin de varsayılanı claude-haiku-5-5; maliyet için)
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
 
@@ -31,7 +31,7 @@ Kurallar:
 - Hukuki, vergi ve finansal konularda kesin hüküm verme; bir uzmana danışmasını öner.
 - Makinasal dışındaki konulara kısa ve kibar bir cümleyle dön.
 - Kullanıcının yazdığı dilde yanıt ver (Türkçe, İngilizce veya Almanca; Almancada "Sie" kullan).
-- Kısa ve düzenli yaz: en fazla yaklaşık 220 kelime. Başlık (#) ve kalın yazı (**) kullanma; madde için "• " kullan.`;
+- Kısa ve düzenli yaz: en fazla yaklaşık 180 kelime. Başlık (#) ve kalın yazı (**) kullanma; madde için "• " kullan.`;
 
 const clip = (v: unknown, n: number) => String(v ?? "").replace(/\s+/g, " ").trim().slice(0, n);
 
@@ -53,8 +53,8 @@ Deno.serve(async (req) => {
   try { body = await req.json(); } catch { return json({ error: "bad_request" }, 400); }
   const messages = (Array.isArray(body.messages) ? body.messages : [])
     .filter((m) => (m?.role === "user" || m?.role === "assistant") && typeof m.content === "string" && m.content.trim())
-    .slice(-12)
-    .map((m) => ({ role: m.role, content: m.content.slice(0, 3000) }));
+    .slice(-8)
+    .map((m) => ({ role: m.role, content: m.content.slice(0, 2000) }));
   while (messages.length && messages[0].role !== "user") messages.shift();
   if (!messages.length || messages[messages.length - 1].role !== "user") return json({ error: "bad_request" }, 400);
 
@@ -66,7 +66,7 @@ Deno.serve(async (req) => {
     const [profile, provider, listings, posts, stats] = await Promise.all([
       admin.from("profiles").select("full_name,city,district,bio,company_bio,is_store,store_name,verified_phone,verified_id,verified_tax,premium_plan").eq("id", user.id).maybeSingle(),
       admin.from("service_providers").select("name,kind,company_category,description,city,district,service_cities,specialties,published").eq("user_id", user.id).maybeSingle(),
-      admin.from("listings").select("title,category,brand,model,price,city,year,usage_value,usage_unit,status,moderation_status,description,created_at,listing_photos(count)").eq("seller_id", user.id).order("created_at", { ascending: false }).limit(15),
+      admin.from("listings").select("title,category,brand,model,price,city,year,usage_value,usage_unit,status,moderation_status,description,created_at,listing_photos(count)").eq("seller_id", user.id).order("created_at", { ascending: false }).limit(10),
       admin.from("market_posts").select("kind,title,description,city,status,price,price_unit,created_at").eq("owner_id", user.id).order("created_at", { ascending: false }).limit(10),
       admin.from("user_stats").select("seller_score,seller_reviews,deals").eq("id", user.id).maybeSingle(),
     ]);
@@ -94,12 +94,12 @@ Deno.serve(async (req) => {
 
     const plan = String(quota.plan);
     const model = plan === "business"
-      ? (Deno.env.get("AI_MODEL_BUSINESS") ?? "claude-sonnet-5-5")
+      ? (Deno.env.get("AI_MODEL_BUSINESS") ?? "claude-haiku-5-5")
       : (Deno.env.get("AI_MODEL_PRO") ?? "claude-haiku-5-5");
     const res = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: { "x-api-key": apiKey, "anthropic-version": "2023-06-01", "content-type": "application/json" },
-      body: JSON.stringify({ model, max_tokens: 900, system: `${SYSTEM}\n\n${lines.join("\n").slice(0, 9000)}`, messages }),
+      body: JSON.stringify({ model, max_tokens: 700, system: `${SYSTEM}\n\n${lines.join("\n").slice(0, 6000)}`, messages }),
     });
     if (!res.ok) throw new Error(`ai ${res.status}`);
     const out = await res.json() as { content?: { type: string; text?: string }[] };
