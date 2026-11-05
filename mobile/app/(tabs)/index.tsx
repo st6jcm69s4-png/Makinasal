@@ -206,7 +206,7 @@ export default function Home() {
         </>
       ) : null}
 
-      {error ? <View style={{ marginHorizontal: 16, marginTop: 12 }}><AlertBox variant="destructive">Bazı bölümler yüklenemedi. Aşağı çekerek yenileyebilirsin.</AlertBox></View> : null}
+      {error ? <View style={{ marginHorizontal: 16, marginTop: 12 }}><AlertBox variant="destructive">Bazı bölümler yüklenemedi. Lütfen sayfayı yenileyin.</AlertBox></View> : null}
       {local.length ? <Band title={`${city} ilanları`} action="Tümünü gör" onAction={() => router.navigate({ pathname: '/ilanlar', params: { city } })} /> : null}
       {local.map((r) => <ListingCard key={'c' + r.id} item={r} />)}
       {spot ? <Spot item={spot} /> : null}

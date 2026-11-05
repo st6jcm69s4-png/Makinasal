@@ -76,7 +76,7 @@ export default function Listings() {
     const { data, error: e } = await supabase.rpc('search_listings', { p: { q: query, page: nextPage, categories: f.cat ? categoryValues(f.cat) : [], city: f.city, maxPrice: Number(f.maxPrice), sort: f.sort, part: f.cat === 'Yedek parça' || f.cat === 'Lastik ve jant' || f.cat === 'group:parts', brand: a.brand, yMin: a.yMin, yMax: a.yMax, useMin: a.useMin, useMax: a.useMax, unit: a.unit, minScore: a.minScore, incNew: true, ver: a.ver, hide: a.hide, takas: a.takas, near: a.near, distances: Object.fromEntries(Object.keys(COORDS).map((c) => [c, distanceKm(myCity, c) ?? 99999])) }, count_only: false });
     if (id !== seq.current) return;
     setLoading(false);
-    if (e || !data) { setError('İlanlar yüklenemedi. Bağlantını kontrol et.'); return; }
+    if (e || !data) { setError('İlanlar yüklenemedi. Lütfen sayfayı yenileyin.'); return; }
     const res = data as { total: number; rows: Row[] };
     setTotal(res.total);
     setRows((cur) => (nextPage === 1 ? res.rows : [...cur, ...res.rows]));
