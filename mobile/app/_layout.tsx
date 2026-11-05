@@ -16,11 +16,11 @@ function Screens() {
   const T = (x: string) => caps(tr(x), lang);
   return (
     <>
-      <StatusBar style="light" />
+      <StatusBar style="auto" />
       <Stack
         screenOptions={({ navigation }) => ({
           headerStyle: { backgroundColor: color.navy },
-          headerTintColor: '#fff',
+          headerTintColor: color.onBar,
           headerTitleStyle: { fontFamily: fontState.ok ? 'Inter_700Bold' : undefined, fontSize: 18, letterSpacing: 0.2 },
           headerShadowVisible: false,
           // Her uygulamadaki gibi: sistemin kendi geri oku. Geçmiş yoksa (bağlantıyla açılınca) ana sayfaya dönen düğme.

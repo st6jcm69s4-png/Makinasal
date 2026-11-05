@@ -18,26 +18,27 @@ import { CATEGORY_GROUPS } from '../../lib/machineryCatalog';
 import { money, type MarketPost, type Provider } from '../../lib/network';
 import { photoUrl, supabase, tl, type Row } from '../../lib/supabase';
 
-type Short = { label: string; icon: IconName; tint: 'accent' | 'teal' | 'pop'; go: () => void; primary?: boolean };
+type Short = { label: string; sub: string; icon: IconName; tint: 'accent' | 'teal'; go: () => void; wide?: boolean };
 const SHORTS: Short[] = [
-  { label: 'Satılık ilanlar', icon: 'truck', tint: 'accent', primary: true, go: () => router.navigate('/ilanlar') },
-  { label: 'Kiralık makineler', icon: 'key', tint: 'pop', go: () => router.navigate({ pathname: '/is-agi', params: { kind: 'rental_machine' } }) },
-  { label: 'Yedek parça', icon: 'settings', tint: 'teal', go: () => router.push('/yedek-parca') },
-  { label: 'Operatör ve ustalar', icon: 'user-check', tint: 'accent', go: () => router.navigate({ pathname: '/is-agi', params: { kind: 'rental_operator' } }) },
-  { label: 'İş talepleri', icon: 'clipboard', tint: 'pop', go: () => router.navigate({ pathname: '/is-agi', params: { kind: 'job' } }) },
-  { label: 'Parça talepleri', icon: 'search', tint: 'teal', go: () => router.navigate({ pathname: '/is-agi', params: { kind: 'part_request' } }) },
-  { label: 'Çekici bul', icon: 'life-buoy', tint: 'accent', go: () => router.push('/cekici' as never) },
-  { label: 'Şirketler ve filolar', icon: 'briefcase', tint: 'teal', go: () => router.navigate({ pathname: '/is-agi', params: { kind: 'firma' } }) },
+  { label: 'Satılık ilanlar', sub: 'Makine, kamyon ve parça', icon: 'truck', tint: 'accent', wide: true, go: () => router.navigate('/ilanlar') },
+  { label: 'Kiralık makineler', sub: 'Günlük, aylık', icon: 'key', tint: 'teal', go: () => router.navigate({ pathname: '/is-agi', params: { kind: 'rental_machine' } }) },
+  { label: 'Yedek parça', sub: 'Numaraya göre ara', icon: 'settings', tint: 'accent', go: () => router.push('/yedek-parca') },
+  { label: 'Operatör ve ustalar', sub: 'Şoför, usta, operatör', icon: 'user-check', tint: 'teal', go: () => router.navigate({ pathname: '/is-agi', params: { kind: 'rental_operator' } }) },
+  { label: 'İş talepleri', sub: 'Teklif ver, işi al', icon: 'clipboard', tint: 'accent', go: () => router.navigate({ pathname: '/is-agi', params: { kind: 'job' } }) },
+  { label: 'Parça talepleri', sub: 'Aradığın parçayı yaz', icon: 'search', tint: 'teal', go: () => router.navigate({ pathname: '/is-agi', params: { kind: 'part_request' } }) },
+  { label: 'Çekici bul', sub: 'En yakın, puanlı', icon: 'life-buoy', tint: 'accent', go: () => router.push('/cekici' as never) },
+  { label: 'Şirketler ve filolar', sub: 'Hizmet bölgesine göre', icon: 'briefcase', tint: 'teal', wide: true, go: () => router.navigate({ pathname: '/is-agi', params: { kind: 'firma' } }) },
 ];
-function ShortChip({ t }: { t: Short }) {
-  const fg = t.tint === 'accent' ? color.accentText : t.tint === 'teal' ? color.teal : color.pop;
-  const bg = t.tint === 'accent' ? color.accentSoft : t.tint === 'teal' ? color.tealSoft : color.popSoft;
+function ShortCard({ t }: { t: Short }) {
+  const fg = t.tint === 'accent' ? color.accentText : color.teal;
+  const bg = t.tint === 'accent' ? color.accentSoft : color.tealSoft;
   return (
-    <Pressable style={({ pressed }) => [s.short, t.primary && s.shortPrimary, pressed && { opacity: 0.85 }]} onPress={t.go} accessibilityRole="button">
-      <View style={[s.shortIcon, { backgroundColor: t.primary ? 'rgba(255,255,255,0.2)' : bg }]}>
-        <Icon name={t.icon} size={17} color={t.primary ? color.accentInk : fg} />
+    <Pressable style={({ pressed }) => [s.short, t.wide ? { width: '100%' } : { width: '48.5%' }, pressed && { opacity: 0.88 }]} onPress={t.go} accessibilityRole="button">
+      <View style={[s.shortIcon, { backgroundColor: bg }]}><Icon name={t.icon} size={20} color={fg} /></View>
+      <View style={{ flex: 1, gap: 1 }}>
+        <Text style={s.shortText} numberOfLines={2}>{t.label}</Text>
+        <Text style={s.shortSub} numberOfLines={1}>{t.sub}</Text>
       </View>
-      <Text style={[s.shortText, t.primary && { color: color.accentInk }]}>{t.label}</Text>
     </Pressable>
   );
 }
@@ -155,9 +156,10 @@ export default function Home() {
         </View>
       </View>
 
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 18 }} contentContainerStyle={s.shorts}>
-        {SHORTS.map((t) => <ShortChip key={t.label} t={t} />)}
-      </ScrollView>
+      <Band title="Hızlı keşfet" style={{ marginTop: 22 }} />
+      <View style={s.grid}>
+        {SHORTS.map((t) => <ShortCard key={t.label} t={t} />)}
+      </View>
 
       {!session ? (
         <View style={s.guest}>
@@ -244,16 +246,16 @@ export default function Home() {
 const s = StyleSheet.create({
   screen: { flex: 1, backgroundColor: color.bg },
   hero: { backgroundColor: color.navy, paddingHorizontal: 16, paddingTop: 14, paddingBottom: 24, gap: 10, borderBottomLeftRadius: 28, borderBottomRightRadius: 28 },
-  h1: { color: '#fff', fontFamily: font.bold, fontSize: 30, lineHeight: 36 },
+  h1: { color: color.onBar, fontFamily: font.bold, fontSize: 30, lineHeight: 36 },
   lead: { color: color.onNavy, fontSize: 16, lineHeight: 22 },
   searchRow: { flexDirection: 'row', gap: 8, marginTop: 6, alignItems: 'flex-start' },
   go: { backgroundColor: color.pop, borderRadius: radius + 2, paddingHorizontal: 20, height: 50, justifyContent: 'center' },
   goText: { color: color.popInk, fontFamily: font.bold, fontSize: 16 },
-  shorts: { paddingHorizontal: 16, gap: 8 },
-  short: { flexDirection: 'row', alignItems: 'center', gap: 8, height: 46, paddingLeft: 8, paddingRight: 16, borderRadius: 23, backgroundColor: color.surface, borderWidth: 1, borderColor: color.line },
-  shortPrimary: { backgroundColor: color.accent, borderColor: color.accent },
-  shortIcon: { width: 30, height: 30, borderRadius: 15, alignItems: 'center', justifyContent: 'center' },
-  shortText: { color: color.ink, fontFamily: font.semi, fontSize: 15 },
+  grid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', rowGap: 10, marginHorizontal: 16 },
+  short: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 72, paddingVertical: 12, paddingHorizontal: 12, borderRadius: radius + 4, backgroundColor: color.surface, borderWidth: 1, borderColor: color.line },
+  shortIcon: { width: 42, height: 42, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
+  shortText: { color: color.ink, fontFamily: font.semi, fontSize: 15.5, lineHeight: 19 },
+  shortSub: { color: color.muted, fontSize: 13 },
   guest: { flexDirection: 'row', alignItems: 'center', gap: 12, marginHorizontal: 16, marginTop: 16, padding: 14, backgroundColor: color.surface, borderRadius: radius + 4, ...shadow },
   guestT: { fontFamily: font.semi, color: color.ink, fontSize: 15 },
   guestS: { color: color.muted, fontSize: 14, marginTop: 2 },
@@ -286,7 +288,7 @@ const s = StyleSheet.create({
   trustText: { color: color.ink, fontSize: 15 },
   link2: { color: color.accentText, fontFamily: font.semi, marginTop: 2 },
   cta: { marginHorizontal: 16, marginTop: 24, padding: 20, gap: 8, backgroundColor: color.navy, borderRadius: radius + 8 },
-  ctaTitle: { color: '#fff', fontFamily: font.bold, fontSize: 22, lineHeight: 28 },
+  ctaTitle: { color: color.onBar, fontFamily: font.bold, fontSize: 22, lineHeight: 28 },
   ctaText: { color: color.onNavy, fontSize: 15.5, lineHeight: 22 },
   ctaBtn: { marginTop: 8, backgroundColor: color.pop, borderRadius: radius, minHeight: 50, alignItems: 'center', justifyContent: 'center' },
   ctaBtnText: { color: color.popInk, fontFamily: font.bold, fontSize: 16 },

@@ -22,7 +22,7 @@ function Logo() {
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
       <Icon name="settings" size={20} color={color.pop} />
-      <PlainText style={{ color: '#fff', fontSize: 21, fontFamily: font.bold, letterSpacing: 1.6 }}>MAKİNASAL</PlainText>
+      <PlainText style={{ color: color.onBar, fontSize: 21, fontFamily: font.bold, letterSpacing: 1.6 }}>MAKİNASAL</PlainText>
     </View>
   );
 }
@@ -48,12 +48,12 @@ export default function TabsLayout() {
       screenListeners={({ route }) => ({ tabPress: () => fireScrollTop(route.name) })}
       screenOptions={{
         headerStyle: { backgroundColor: color.navy, borderBottomWidth: 2, borderBottomColor: color.pop } as object,
-        headerTintColor: '#fff',
+        headerTintColor: color.onBar,
         headerShadowVisible: false,
         headerTitleAlign: 'left',
         headerTitle: () => <Logo />,
-        tabBarActiveTintColor: '#fff',
-        tabBarInactiveTintColor: color.onNavy,
+        tabBarActiveTintColor: color.accentText,
+        tabBarInactiveTintColor: color.muted,
         tabBarStyle: { backgroundColor: color.navy, borderTopWidth: 1, borderTopColor: color.navy2, paddingTop: 0 },
         tabBarItemStyle: { borderLeftWidth: 1, borderLeftColor: color.navy2, paddingTop: 6 },
         tabBarLabelStyle: { fontSize: 11.5, fontFamily: font.label, letterSpacing: 0.4 },

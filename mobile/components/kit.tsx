@@ -111,8 +111,8 @@ export function Tabs<T extends string>({ items, value, onChange, variant = 'fill
             style={[k.tab, filled ? { borderTopWidth: 3, borderTopColor: on ? color.pop : 'transparent', backgroundColor: on ? color.navy : 'transparent' } : { borderBottomWidth: 3, borderBottomColor: on ? color.accent : 'transparent' }, filled && i > 0 && { borderLeftWidth: 1, borderLeftColor: color.line }]}
             onPress={() => onChange(t.id)} accessibilityRole="tab" accessibilityState={{ selected: on }}
           >
-            {t.icon ? <Icon name={t.icon} size={16} color={on && filled ? '#fff' : on ? color.accentText : color.muted} /> : null}
-            <Text style={[k.tabText, { color: on ? (filled ? '#fff' : color.ink) : color.muted }]}>{t.label}</Text>
+            {t.icon ? <Icon name={t.icon} size={16} color={on && filled ? color.onBar : on ? color.accentText : color.muted} /> : null}
+            <Text style={[k.tabText, { color: on ? (filled ? color.onBar : color.ink) : color.muted }]}>{t.label}</Text>
             {t.count ? <Badge variant={on && filled ? 'outline' : 'default'}>{t.count}</Badge> : null}
           </Pressable>
         );
@@ -126,7 +126,7 @@ export function Avatar({ name, size = 44, uri, tone = 'navy' }: { name: string; 
   const ini = name.trim().split(/\s+/).slice(0, 2).map((w) => w.charAt(0).toLocaleUpperCase('tr-TR')).join('') || '?';
   return (
     <View style={{ width: size, height: size, borderRadius: radius, backgroundColor: tone === 'navy' ? color.navy : color.teal, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-      <PlainText style={{ color: '#fff', fontFamily: font.bold, fontSize: size * 0.42 }}>{ini}</PlainText>
+      <PlainText style={{ color: tone === 'navy' ? color.onBar : color.tealInk, fontFamily: font.bold, fontSize: size * 0.42 }}>{ini}</PlainText>
     </View>
   );
 }

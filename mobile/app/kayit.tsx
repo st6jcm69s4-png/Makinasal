@@ -135,7 +135,7 @@ const s = StyleSheet.create({
   title: { fontFamily: font.labelBold, fontSize: 28, color: color.ink, letterSpacing: 0.6 },
   p: { textAlign: 'center', color: color.ink, fontSize: 16, lineHeight: 22 },
   head: { backgroundColor: color.navy, padding: 16, gap: 2 },
-  headTitle: { color: '#fff', fontFamily: font.labelBold, fontSize: 28, letterSpacing: 0.6 },
+  headTitle: { color: color.onBar, fontFamily: font.labelBold, fontSize: 28, letterSpacing: 0.6 },
   headSub: { color: color.onNavy, fontSize: 14 },
   body: { padding: 12, gap: 12 },
   rule: { flexDirection: 'row', alignItems: 'center', gap: 6 },

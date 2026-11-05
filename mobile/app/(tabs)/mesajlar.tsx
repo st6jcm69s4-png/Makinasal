@@ -154,7 +154,7 @@ export default function Messages() {
         </Pressable>
       ) : (
         <Pressable style={({ pressed }) => [s.row, pressed && { backgroundColor: color.plate }]} onPress={() => router.push(`/ag/ilan/${item.post_id}` as never)} accessibilityRole="button">
-          <View style={[s.thumb, s.avatar]}><Icon name={item.incoming ? 'inbox' : 'send'} size={22} color="#fff" /></View>
+          <View style={[s.thumb, s.avatar]}><Icon name={item.incoming ? 'inbox' : 'send'} size={22} color={color.onBar} /></View>
           <View style={{ flex: 1, gap: 2 }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
               <PlainText style={s.other} numberOfLines={1}>{item.incoming ? `Gelen: ${item.other}` : 'Verdiğin teklif'}</PlainText>
@@ -186,7 +186,7 @@ const s = StyleSheet.create({
   row: { flexDirection: 'row', gap: 12, paddingVertical: 12, paddingHorizontal: 12, backgroundColor: color.surface, borderBottomWidth: 1, borderBottomColor: color.line },
   thumb: { width: 56, height: 56, borderRadius: radius, backgroundColor: color.plate },
   avatar: { backgroundColor: color.navy, alignItems: 'center', justifyContent: 'center' },
-  avatarText: { color: '#fff', fontFamily: font.bold, fontSize: 20 },
+  avatarText: { color: color.onBar, fontFamily: font.bold, fontSize: 20 },
   other: { flex: 1, fontSize: 16, fontFamily: font.semi, color: color.ink },
   time: { color: color.muted, fontSize: 12.5 },
   listing: { color: color.accentText, fontSize: 13.5, fontWeight: '500' },

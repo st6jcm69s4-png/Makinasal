@@ -103,7 +103,7 @@ export default function Cekici() {
         <PlainText style={s.h1}>{caps('En yakın çekiciyi bul', 'tr')}</PlainText>
         <Text style={s.lead}>Konumunu paylaş ya da il seç; çekiciler yakınlığa göre, puanlarıyla sıralanır.</Text>
         <Pressable style={({ pressed }) => [s.locBtn, pressed && { opacity: 0.85 }]} onPress={() => void useMyLocation()} disabled={locBusy} accessibilityRole="button">
-          {locBusy ? <ActivityIndicator color="#fff" /> : <Icon name="crosshair" size={20} color="#fff" />}
+          {locBusy ? <ActivityIndicator color={color.onBar} /> : <Icon name="crosshair" size={20} color={color.onBar} />}
           <Text style={s.locText}>{gps ? 'Konumum kullanılıyor · yenile' : 'Konumumu kullan'}</Text>
         </Pressable>
         <Pressable style={s.cityBtn} onPress={() => setSheet(true)} accessibilityRole="button">
@@ -171,12 +171,12 @@ export default function Cekici() {
 
 const s = StyleSheet.create({
   hero: { backgroundColor: color.navy, padding: 16, gap: 8 },
-  h1: { color: '#fff', fontFamily: font.labelBold, fontSize: 34, lineHeight: 36, letterSpacing: 0.5 },
+  h1: { color: color.onBar, fontFamily: font.labelBold, fontSize: 34, lineHeight: 36, letterSpacing: 0.5 },
   lead: { color: color.onNavy },
   locBtn: { backgroundColor: color.accent, borderRadius: radius, minHeight: 50, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 6 },
-  locText: { color: '#fff', fontSize: 16, fontWeight: '700' },
+  locText: { color: color.onBar, fontSize: 16, fontWeight: '700' },
   cityBtn: { borderWidth: 1, borderColor: color.navy2, backgroundColor: color.navy2, borderRadius: radius, minHeight: 46, flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 12 },
-  cityText: { flex: 1, color: '#fff', fontSize: 16 },
+  cityText: { flex: 1, color: color.onBar, fontSize: 16 },
   sos: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: color.warnBg, paddingVertical: 8, paddingHorizontal: 14 },
   sosText: { color: color.warn, fontSize: 14, fontWeight: '600' },
   err: { color: color.bad, margin: 12 },

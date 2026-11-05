@@ -57,7 +57,7 @@ function Member() {
           <PlainText style={s.name} numberOfLines={1}>{name}</PlainText>
           <Text style={s.sub}>{[profile?.is_store ? (profile.store_name || 'Mağaza') : 'Bireysel üye', profile?.city].filter(Boolean).join(' · ')}</Text>
         </View>
-        <Pressable onPress={go('/profil-duzenle')} hitSlop={10} accessibilityRole="button" accessibilityLabel="Profili düzenle"><Icon name="edit-2" size={19} color="#fff" /></Pressable>
+        <Pressable onPress={go('/profil-duzenle')} hitSlop={10} accessibilityRole="button" accessibilityLabel="Profili düzenle"><Icon name="edit-2" size={19} color={color.onBar} /></Pressable>
       </View>
       <View style={s.stats}>
         {stats.map(([l, v], i) => (
@@ -217,11 +217,11 @@ const s = StyleSheet.create({
   head: { backgroundColor: color.navy, flexDirection: 'row', alignItems: 'center', gap: 14, padding: 16 },
   avatar: { width: 56, height: 56, borderRadius: radius, backgroundColor: color.accent, alignItems: 'center', justifyContent: 'center' },
   avatarText: { color: '#fff', fontFamily: font.bold, fontSize: 24, letterSpacing: 1 },
-  name: { color: '#fff', fontFamily: font.labelBold, fontSize: 28, letterSpacing: 0.4 },
+  name: { color: color.onBar, fontFamily: font.labelBold, fontSize: 28, letterSpacing: 0.4 },
   sub: { color: color.onNavy, fontSize: 14 },
   stats: { flexDirection: 'row', backgroundColor: color.navy, borderTopWidth: 1, borderTopColor: color.navy2 },
   stat: { flex: 1, paddingVertical: 10, paddingHorizontal: 14, gap: 1 },
-  statNum: { color: '#fff', fontFamily: font.bold, fontSize: 24 },
+  statNum: { color: color.onBar, fontFamily: font.bold, fontSize: 24 },
   body: { padding: 12, gap: 18 },
   cta: { backgroundColor: color.accent, borderRadius: radius, minHeight: 52, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
   ctaText: { color: '#fff', fontSize: 17, fontWeight: '700' },

@@ -205,7 +205,7 @@ export default function Favorites() {
 const s = StyleSheet.create({
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12, padding: 24, backgroundColor: color.bg },
   top: { flexDirection: 'row', alignItems: 'center', gap: 14, backgroundColor: color.navy, padding: 14, borderBottomWidth: 3, borderBottomColor: color.accent },
-  count: { color: '#fff', fontFamily: font.labelBold, fontSize: 44, lineHeight: 46, minWidth: 50 },
+  count: { color: color.onBar, fontFamily: font.labelBold, fontSize: 44, lineHeight: 46, minWidth: 50 },
   small: { color: color.onNavy, fontSize: 14 },
   search: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: color.surface, borderWidth: 1, borderColor: color.line, borderRadius: radius, paddingHorizontal: 10 },
   searchInput: { flex: 1, paddingVertical: 11, fontSize: 16, color: color.ink },

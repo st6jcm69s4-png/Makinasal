@@ -144,11 +144,11 @@ function Empty({ text, cta, onPress }: { text: string; cta: string; onPress: () 
 const s = StyleSheet.create({
   head: { backgroundColor: color.navy, paddingTop: 6 },
   titleWrap: { paddingHorizontal: 16, gap: 2 },
-  h1: { color: '#fff', fontFamily: font.labelBold, fontSize: 38, letterSpacing: 0.8, lineHeight: 40 },
+  h1: { color: color.onBar, fontFamily: font.labelBold, fontSize: 38, letterSpacing: 0.8, lineHeight: 40 },
   stats: { flexDirection: 'row', marginTop: 10, borderTopWidth: 1, borderTopColor: color.navy2 },
   stat: { flex: 1, paddingVertical: 10, paddingHorizontal: 14, gap: 1, borderBottomWidth: 3, borderBottomColor: 'transparent' },
   statOn: { backgroundColor: color.navy2, borderBottomColor: color.accent },
-  statNum: { color: '#fff', fontFamily: font.bold, fontSize: 26 },
+  statNum: { color: color.onBar, fontFamily: font.bold, fontSize: 26 },
   quick: { flexDirection: 'row', backgroundColor: color.surface, borderBottomWidth: 1, borderBottomColor: color.line },
   q: { flex: 1, alignItems: 'center', gap: 4, paddingVertical: 12 },
   qText: { fontSize: 13.5, fontWeight: '600', color: color.ink },

@@ -85,8 +85,8 @@ export default function NetworkTab() {
           const on = x.id === section.id;
           return (
             <Pressable key={x.id} style={[s.seg, i > 0 && s.segL, on && s.segOn]} onPress={() => go(x.tabs[0][0])} accessibilityRole="button" accessibilityState={{ selected: on }}>
-              <Icon name={x.icon} size={19} color={on ? '#fff' : color.accent} />
-              <Text style={[s.segTitle, on && { color: '#fff' }]}>{x.title}</Text>
+              <Icon name={x.icon} size={19} color={on ? color.onBar : color.accent} />
+              <Text style={[s.segTitle, on && { color: color.onBar }]}>{x.title}</Text>
               <Text style={[s.segSub, on && { color: color.onNavy }]} numberOfLines={1}>{x.sub}</Text>
             </Pressable>
           );
@@ -137,7 +137,7 @@ export default function NetworkTab() {
       <Modal visible={acct} animationType="slide" presentationStyle="pageSheet" onRequestClose={() => setAcct(false)}>
         <View style={{ flex: 1, backgroundColor: color.navy }}>
           <View style={s.sheetBar}>
-            <Pressable onPress={() => setAcct(false)} hitSlop={12} accessibilityRole="button" accessibilityLabel="Geri" style={s.sheetBack}><Icon name="chevron-left" size={28} color="#fff" /></Pressable>
+            <Pressable onPress={() => setAcct(false)} hitSlop={12} accessibilityRole="button" accessibilityLabel="Geri" style={s.sheetBack}><Icon name="chevron-left" size={28} color={color.onBar} /></Pressable>
           </View>
           <NetAccountView embedded onNavigate={() => setAcct(false)} />
         </View>
@@ -150,7 +150,7 @@ export default function NetworkTab() {
 const s = StyleSheet.create({
   sheetBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', paddingHorizontal: 8, paddingVertical: 4 },
   sheetBack: { width: 40, height: 40, alignItems: 'flex-start', justifyContent: 'center', paddingLeft: 4 },
-  sheetTitle: { color: '#fff', fontFamily: font.labelBold, fontSize: 18, letterSpacing: 1 },
+  sheetTitle: { color: color.onBar, fontFamily: font.labelBold, fontSize: 18, letterSpacing: 1 },
   sheetClose: { width: 34, height: 34, borderRadius: 17, backgroundColor: 'rgba(255,255,255,0.14)', alignItems: 'center', justifyContent: 'center' },
   switch: { flexDirection: 'row', backgroundColor: color.surface, borderBottomWidth: 1, borderBottomColor: color.line },
   seg: { flex: 1, paddingVertical: 10, paddingHorizontal: 8, gap: 2, alignItems: 'flex-start', borderTopWidth: 3, borderTopColor: 'transparent' },

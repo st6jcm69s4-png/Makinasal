@@ -225,7 +225,7 @@ function Empty({ text }: { text: string }) {
 const s = StyleSheet.create({
   empty: { textAlign: 'center', color: color.muted, margin: 24 },
   head: { backgroundColor: color.navy, padding: 16, gap: 4 },
-  h1: { color: '#fff', fontFamily: font.labelBold, fontSize: 32, letterSpacing: 0.6, lineHeight: 34 },
+  h1: { color: color.onBar, fontFamily: font.labelBold, fontSize: 32, letterSpacing: 0.6, lineHeight: 34 },
   lead: { color: color.onNavy },
   grid: { flexDirection: 'row', flexWrap: 'wrap', backgroundColor: color.surface, borderBottomWidth: 1, borderBottomColor: color.line },
   stat: { width: '33.333%', padding: 12, gap: 2, borderRightWidth: 1, borderBottomWidth: 1, borderColor: color.line },

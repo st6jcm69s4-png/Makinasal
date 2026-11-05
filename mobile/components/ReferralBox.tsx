@@ -86,7 +86,7 @@ export function ReferralBox() {
               </View>
             ) : (
               <Pressable style={({ pressed }) => [s.show, pressed && { opacity: 0.88 }]} onPress={() => setShowCode(true)} accessibilityRole="button">
-                <Icon name="eye" size={18} color="#fff" /><Text style={s.shareText}>Davet kodumu göster</Text>
+                <Icon name="eye" size={18} color={color.onBar} /><Text style={s.showText}>Davet kodumu göster</Text>
               </Pressable>
             )}
           </View>
@@ -113,13 +113,14 @@ const s = StyleSheet.create({
   wrap: { borderWidth: 1, borderColor: color.line, backgroundColor: color.surface, borderRadius: radius, overflow: 'hidden' },
   top: { backgroundColor: color.navy, padding: 14, flexDirection: 'row', alignItems: 'center', gap: 12 },
   gift: { width: 42, height: 42, borderRadius: radius, backgroundColor: color.accent, alignItems: 'center', justifyContent: 'center' },
-  title: { color: '#fff', fontFamily: font.bold, fontSize: 18 },
+  title: { color: color.onBar, fontFamily: font.bold, fontSize: 18 },
   body: { padding: 14, gap: 12 },
   p: { color: color.ink, lineHeight: 21 },
   show: { backgroundColor: color.navy, minHeight: 48, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, borderRadius: radius },
-  lead: { color: color.accentSoft, fontSize: 14 },
+  lead: { color: color.onNavy, fontSize: 14 },
+  showText: { color: color.onBar, fontWeight: '700' },
   ticket: { flexDirection: 'row', alignItems: 'center', gap: 12, borderWidth: 1.5, borderStyle: 'dashed', borderColor: color.muted, padding: 12, backgroundColor: color.navy },
-  code: { color: '#fff', fontFamily: font.labelBold, fontSize: 30, letterSpacing: 4 },
+  code: { color: color.onBar, fontFamily: font.labelBold, fontSize: 30, letterSpacing: 4 },
   share: { backgroundColor: color.accent, flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 14, minHeight: 44, borderRadius: radius },
   shareText: { color: '#fff', fontWeight: '700' },
   progress: { flexDirection: 'row', alignItems: 'center', gap: 14 },
@@ -133,6 +134,6 @@ const s = StyleSheet.create({
   input: { padding: 11, backgroundColor: color.bg, borderWidth: 1, borderColor: color.line, borderRadius: radius, fontSize: 16 },
   err: { color: color.bad },
   use: { backgroundColor: color.navy, minHeight: 46, alignItems: 'center', justifyContent: 'center', borderRadius: radius },
-  useText: { color: '#fff', fontWeight: '700' },
+  useText: { color: color.onBar, fontWeight: '700' },
   link: { color: color.accentText, fontWeight: '600' },
 });
