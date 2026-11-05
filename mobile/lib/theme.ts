@@ -5,6 +5,7 @@ import { Appearance, DynamicColorIOS, Platform } from 'react-native';
 const light = {
   navy: '#2B3440', navy2: '#3B4654', accent: '#2563EB', accentText: '#1D55D6', accentInk: '#FFFFFF', accentSoft: '#E5EEFF',
   pop: '#F28500', popInk: '#232A33', popSoft: '#FFEFD9',
+  teal: '#0F766E', tealInk: '#FFFFFF', tealSoft: '#DDF3F0',
   bg: '#F2F5FA', surface: '#FFFFFF', plate: '#E6ECF5', ink: '#232A33', muted: '#56606F', line: '#D3DBE8',
   good: '#1B6F40', goodBg: '#DCEFE3', warn: '#7F5200', warnBg: '#FFF0C2', bad: '#9C2626', badBg: '#F5DADA',
   onNavy: '#D2DAE6',
@@ -13,6 +14,7 @@ const light = {
 const dark: Record<keyof typeof light, string> = {
   navy: '#1F2630', navy2: '#323C4A', accent: '#3B73F5', accentText: '#9DBBFF', accentInk: '#FFFFFF', accentSoft: '#273C66',
   pop: '#FF9A1F', popInk: '#232A33', popSoft: '#4D3718',
+  teal: '#1A9C91', tealInk: '#FFFFFF', tealSoft: '#1E4A4A',
   bg: '#252D38', surface: '#2F3946', plate: '#3A4655', ink: '#F3F6FA', muted: '#B7C1CF', line: '#4C596A',
   good: '#79D6A2', goodBg: '#173226', warn: '#F0C45E', warnBg: '#38300F', bad: '#F4A0A0', badBg: '#3B1C1C',
   onNavy: '#D2DAE6',

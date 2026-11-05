@@ -125,7 +125,7 @@ export function Tabs<T extends string>({ items, value, onChange, variant = 'fill
 export function Avatar({ name, size = 44, uri, tone = 'navy' }: { name: string; size?: number; uri?: string | null; tone?: 'navy' | 'accent' }) {
   const ini = name.trim().split(/\s+/).slice(0, 2).map((w) => w.charAt(0).toLocaleUpperCase('tr-TR')).join('') || '?';
   return (
-    <View style={{ width: size, height: size, borderRadius: radius, backgroundColor: tone === 'navy' ? color.navy : color.accent, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+    <View style={{ width: size, height: size, borderRadius: radius, backgroundColor: tone === 'navy' ? color.navy : color.teal, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
       <PlainText style={{ color: '#fff', fontFamily: font.bold, fontSize: size * 0.42 }}>{ini}</PlainText>
     </View>
   );
@@ -134,7 +134,7 @@ export function Progress({ value, max = 100 }: { value: number; max?: number }) 
   const pct = Math.max(0, Math.min(1, value / max));
   return (
     <View style={k.progress} accessibilityRole="progressbar" accessibilityValue={{ min: 0, max, now: value }}>
-      <View style={{ width: `${pct * 100}%`, height: '100%', backgroundColor: color.accent }} />
+      <View style={{ width: `${pct * 100}%`, height: '100%', backgroundColor: color.teal }} />
     </View>
   );
 }

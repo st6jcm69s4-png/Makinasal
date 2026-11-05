@@ -18,22 +18,22 @@ import { CATEGORY_GROUPS } from '../../lib/machineryCatalog';
 import { money, type MarketPost, type Provider } from '../../lib/network';
 import { photoUrl, supabase, tl, type Row } from '../../lib/supabase';
 
-type Tile = { label: string; tag: string; sub: string; icon: IconName; go: () => void; tone: 'navy' | 'accent' | 'paper'; wide?: boolean };
+type Tile = { label: string; tag: string; sub: string; icon: IconName; go: () => void; tone: 'navy' | 'accent' | 'teal' | 'paper'; wide?: boolean };
 const QUICK: Tile[] = [
   { label: 'Satılık ilanlar', tag: 'Satış', sub: 'Makine, kamyon ve parça', icon: 'truck', tone: 'navy', wide: true, go: () => router.navigate('/ilanlar') },
   { label: 'Kiralık makineler', tag: 'Kiralık', sub: 'Günlük, aylık', icon: 'key', tone: 'paper', go: () => router.navigate({ pathname: '/is-agi', params: { kind: 'rental_machine' } }) },
   { label: 'Operatör ve ustalar', tag: 'Eleman', sub: 'Şoför, usta, operatör', icon: 'user-check', tone: 'paper', go: () => router.navigate({ pathname: '/is-agi', params: { kind: 'rental_operator' } }) },
   { label: 'İş talepleri', tag: 'İş', sub: 'Teklif ver, işi al', icon: 'clipboard', tone: 'paper', go: () => router.navigate({ pathname: '/is-agi', params: { kind: 'job' } }) },
   { label: 'Parça talepleri', tag: 'Talep', sub: 'Aradığın parçayı yaz', icon: 'search', tone: 'paper', go: () => router.navigate({ pathname: '/is-agi', params: { kind: 'part_request' } }) },
-  { label: 'Yedek parça', tag: 'Parça', sub: 'Numaraya göre ara', icon: 'settings', tone: 'navy', go: () => router.push('/yedek-parca') },
+  { label: 'Yedek parça', tag: 'Parça', sub: 'Numaraya göre ara', icon: 'settings', tone: 'teal', go: () => router.push('/yedek-parca') },
   { label: 'Çekici bul', tag: 'Yol yardım', sub: 'En yakın, puanlı', icon: 'life-buoy', tone: 'accent', go: () => router.push('/cekici' as never) },
   { label: 'Şirketler ve filolar', tag: 'Firma', sub: 'Hizmet bölgesine göre', icon: 'briefcase', tone: 'paper', wide: true, go: () => router.navigate({ pathname: '/is-agi', params: { kind: 'firma' } }) },
 ];
 function TileCard({ t }: { t: Tile }) {
   const dark = t.tone !== 'paper';
-  const bg = t.tone === 'navy' ? color.navy : t.tone === 'accent' ? color.accent : color.surface;
+  const bg = t.tone === 'navy' ? color.navy : t.tone === 'accent' ? color.accent : t.tone === 'teal' ? color.teal : color.surface;
   const ink = dark ? '#fff' : color.ink;
-  const soft = t.tone === 'accent' ? color.accentSoft : dark ? color.onNavy : color.muted;
+  const soft = t.tone === 'accent' ? color.accentSoft : t.tone === 'teal' ? color.tealSoft : dark ? color.onNavy : color.muted;
   return (
     <Pressable style={({ pressed }) => [s.tile, t.wide ? { width: '100%' } : { width: '48.5%' }, { backgroundColor: bg, borderColor: dark ? bg : color.line }, pressed && { opacity: 0.88 }]} onPress={t.go} accessibilityRole="button">
       <View style={s.tileMark} pointerEvents="none"><Icon name={t.icon} size={t.wide ? 112 : 92} color={dark ? '#FFFFFF' : color.navy} /></View>
