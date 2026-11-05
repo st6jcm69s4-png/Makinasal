@@ -29,7 +29,9 @@ const pick = (k: ColorKey): string =>
 export const color = Object.fromEntries((Object.keys(light) as ColorKey[]).map((k) => [k, pick(k)])) as Record<ColorKey, string>;
 export const themeSupportsChoice = Platform.OS === 'ios';
 
-export const radius = 4;
+export const radius = 12;
+/** Yumuşak gölge: aşağı kayık, geniş blur. */
+export const shadow = { shadowColor: '#0B1220', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.1, shadowRadius: 14, elevation: 2 } as const;
 export const hair = 1;
 
 /** Yazı tipi aileleri (yüklenemezse sistem yazı tipine düşer). */

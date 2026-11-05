@@ -3,7 +3,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { router } from 'expo-router';
 import { PlainText, Text, TextInput } from './LText';
 import { loadPopularity, matchingRanges, recordSuggestion, searchSuggestions, type Scope, type Suggestion } from '../lib/suggest';
-import { color } from '../lib/theme';
+import { color, radius } from '../lib/theme';
 
 function Highlight({ label, query, style }: { label: string; query: string; style?: object }) {
   const parts: { t: string; hit: boolean }[] = [];
@@ -83,10 +83,10 @@ export function SearchBox({ value, onChangeText, onSubmit, scope = 'all', placeh
 }
 
 const s = StyleSheet.create({
-  input: { backgroundColor: color.surface, borderRadius: 4, padding: 12, borderWidth: 1, borderColor: color.line },
-  box: { backgroundColor: color.surface, borderRadius: 4, marginTop: 4, borderWidth: 1, borderColor: color.line, overflow: 'hidden' },
+  input: { backgroundColor: color.surface, borderRadius: radius + 2, paddingVertical: 14, paddingHorizontal: 16, fontSize: 16, borderWidth: 1, borderColor: color.line },
+  box: { backgroundColor: color.surface, borderRadius: radius, marginTop: 6, borderWidth: 1, borderColor: color.line, overflow: 'hidden' },
   boxDark: { borderColor: '#fff' },
-  title: { fontSize: 12, fontWeight: '700', color: color.muted, paddingHorizontal: 12, paddingTop: 8, paddingBottom: 4, textTransform: 'uppercase' },
+  title: { fontSize: 13, fontWeight: '600', color: color.muted, paddingHorizontal: 14, paddingTop: 10, paddingBottom: 4 },
   row: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8, paddingVertical: 11, paddingHorizontal: 12, borderTopWidth: 1, borderTopColor: color.accentSoft },
   label: { flex: 1, color: color.ink, fontSize: 15 },
   path: { color: color.muted, fontSize: 12, maxWidth: '45%' },
