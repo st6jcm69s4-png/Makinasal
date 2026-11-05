@@ -3,12 +3,12 @@ import { Appearance, DynamicColorIOS, Platform } from 'react-native';
 // Her bilgi etiketli bir alanda durur: küçük, sıkı büyük harfli etiket + büyük değer, ince ortak çizgiler.
 // Renkler web ile aynıdır: kömür gri zemin ve petrol yeşili ana renk.
 const light = {
-  navy: '#D3E4E0', navy2: '#B6CEC9', accent: '#0B635C', accentText: '#0B635C', accentInk: '#FFFFFF', accentSoft: '#CFEDE8',
-  pop: '#0B635C', popInk: '#FFFFFF', popSoft: '#CFEDE8',
-  teal: '#0B635C', tealInk: '#FFFFFF', tealSoft: '#CFEDE8', tealText: '#0B635C',
-  bg: '#E6EBEA', surface: '#F8FAFA', plate: '#D9E0DF', ink: '#1F2625', muted: '#505B59', line: '#C4CECC',
+  navy: '#C6E2DA', navy2: '#A2CBC0', accent: '#0D7468', accentText: '#0A6257', accentInk: '#FFFFFF', accentSoft: '#C2E6DD',
+  pop: '#0D7468', popInk: '#FFFFFF', popSoft: '#C2E6DD',
+  teal: '#0D7468', tealInk: '#FFFFFF', tealSoft: '#C2E6DD', tealText: '#0A6257',
+  bg: '#DFEBE7', surface: '#F7FBFA', plate: '#CFE1DB', ink: '#132420', muted: '#43574F', line: '#B4CCC4',
   good: '#1B6F40', goodBg: '#DCEFE3', warn: '#7F5200', warnBg: '#FFF0C2', bad: '#9C2626', badBg: '#F5DADA',
-  onNavy: '#46544F', onBar: '#16201D',
+  onNavy: '#355049', onBar: '#0E241F',
 } as const;
 // Koyu görünüm: web ile aynı koyu palet.
 const dark: Record<keyof typeof light, string> = {

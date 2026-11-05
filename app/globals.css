@@ -1,11 +1,11 @@
 /* Charcoal, soft grey and petrol green. Semantic status colors stay distinct. */
 :root{
   --navy:#2A2F31; --navy-2:#3B4245;
-  --bg:#E6EBEA; --surface:#F8FAFA; --plate:#D9E0DF; --ink:#1F2625; --muted:#505B59; --line:#C4CECC;
-  --accent:#0B635C; --accent-ink:#FFFFFF; --accent-text:#0B635C; --accent-soft:#CFEDE8;
-  --pop:#0B635C; --pop-ink:#FFFFFF; --pop-soft:#CFEDE8;
-  --teal:#0B635C; --teal-ink:#FFFFFF; --teal-soft:#CFEDE8;
-  --good:#1B6F40; --good-bg:#DCEFE3; --warn:#7F5200; --warn-bg:#FFF0C2; --bad:#9C2626; --bad-bg:#F5DADA; --neutral-bg:#D9E0DF;
+  --bg:#DFEBE7; --surface:#F7FBFA; --plate:#CFE1DB; --ink:#132420; --muted:#43574F; --line:#B4CCC4;
+  --accent:#0D7468; --accent-ink:#FFFFFF; --accent-text:#0A6257; --accent-soft:#C2E6DD;
+  --pop:#0D7468; --pop-ink:#FFFFFF; --pop-soft:#C2E6DD;
+  --teal:#0D7468; --teal-ink:#FFFFFF; --teal-soft:#C2E6DD;
+  --good:#1B6F40; --good-bg:#DCEFE3; --warn:#7F5200; --warn-bg:#FFF0C2; --bad:#9C2626; --bad-bg:#F5DADA; --neutral-bg:#CFE1DB;
   --f-display:'Inter','Segoe UI',system-ui,sans-serif;
   --f-body:'Inter','Segoe UI',system-ui,sans-serif;
   color-scheme:light;

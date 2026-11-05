@@ -2,11 +2,10 @@ import { Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } f
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { useColorScheme } from 'react-native';
-import { caps, fontState, palettes } from '../lib/theme';
+import { caps, color, fontState } from '../lib/theme';
+import { AppHeader } from '../components/AppHeader';
 import { loadTheme } from '../lib/themePref';
 import { StatusBar } from 'expo-status-bar';
-import { HeaderBack } from '../components/HeaderBack';
 import { AppProvider } from '../lib/AppContext';
 import { tr } from '../lib/i18n';
 import { LangProvider, LanguageGate, useLang } from '../lib/lang';
@@ -15,22 +14,17 @@ import { LoginPromptProvider } from '../components/LoginPrompt';
 function Screens() {
   const { lang } = useLang();
   const T = (x: string) => caps(tr(x), lang);
-  // Yerel başlık çubuğu dinamik rengi okuyamaz; gerçek renk değerini seçili temaya göre veriyoruz.
-  const p = useColorScheme() === 'dark' ? palettes.dark : palettes.light;
   return (
     <>
       <StatusBar style="auto" />
       <Stack
-        screenOptions={({ navigation }) => ({
-          headerStyle: { backgroundColor: p.navy },
-          headerTintColor: p.onBar,
-          headerTitleStyle: { fontFamily: fontState.ok ? 'Inter_700Bold' : undefined, fontSize: 18, letterSpacing: 0.2, color: p.onBar },
-          headerShadowVisible: false,
-          // Her uygulamadaki gibi: sistemin kendi geri oku. Geçmiş yoksa (bağlantıyla açılınca) ana sayfaya dönen düğme.
-          headerBackButtonDisplayMode: 'minimal',
-          headerLeft: navigation.canGoBack() ? undefined : () => <HeaderBack />,
-          contentStyle: { backgroundColor: p.bg },
-        })}
+        screenOptions={{
+          // Kendi başlığımız: renkleri sayfayla aynı anda değişir.
+          header: ({ navigation, options, back }) => (
+            <AppHeader title={typeof options.title === 'string' ? options.title : ''} canGoBack={!!back} onBack={() => navigation.goBack()} />
+          ),
+          contentStyle: { backgroundColor: color.bg },
+        }}
       >
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="ilan/[id]" options={{ title: T('İlan') }} />
