@@ -3,7 +3,7 @@ import { GuestGate } from './LoginPrompt';
 import { Pressable, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
 import { PlainText, Text } from './LText';
 import { Icon, type IconName } from './Icon';
-import { Btn, Hatch, Label } from './ui';
+import { Btn, Label } from './ui';
 import { AlertBox, Badge, RowSkeleton, StatusBadge } from './kit';
 import { router } from 'expo-router';
 import { useApp } from '../lib/AppContext';
@@ -61,7 +61,7 @@ export function NetAccountView({ onNavigate, embedded }: { onNavigate?: () => vo
       <View style={s.head}>
         <View style={s.titleWrap}>
           <Label style={{ color: color.onNavy }}>İş ağı</Label>
-          <PlainText style={s.h1}>HESABIM</PlainText>
+          <Text style={s.h1}>Hesabım</Text>
         </View>
         <View style={s.stats}>
           {stats.map(([l, n, k], i) => (
@@ -72,7 +72,6 @@ export function NetAccountView({ onNavigate, embedded }: { onNavigate?: () => vo
           ))}
         </View>
       </View>
-      <Hatch height={6} />
       <View style={s.quick}>
         {([['briefcase', 'Firma profilim', '/ag/firma-kaydi'], ['truck', 'Envanterim', '/ag/envanter'], ['plus', 'Yeni ilan', '/ag/yeni']] as [IconName, string, string][]).map(([ic, l, to], i) => (
           <Pressable key={l} style={[s.q, i > 0 && { borderLeftWidth: 1, borderLeftColor: color.line }]} onPress={() => go(to)} accessibilityRole="button">

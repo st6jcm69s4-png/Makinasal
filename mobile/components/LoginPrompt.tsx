@@ -5,7 +5,6 @@ import { useApp } from '../lib/AppContext';
 import { PlainText, Text } from './LText';
 import { Icon, type IconName } from './Icon';
 import { Btn } from './ui';
-import { Hatch } from './ui';
 import { color, font, radius } from '../lib/theme';
 
 type App = ReturnType<typeof useApp>;
@@ -56,10 +55,9 @@ export function LoginPromptProvider({ children }: { children: ReactNode }) {
         <View style={s.backdrop}>
           <Pressable style={StyleSheet.absoluteFill} onPress={close} accessibilityRole="button" accessibilityLabel="Kapat" />
           <View style={s.sheet}>
-            <Hatch height={6} />
             <View style={s.body}>
               <View style={s.icon}><Icon name="lock" size={24} color="#fff" /></View>
-              <PlainText style={s.title}>GİRİŞ YAP</PlainText>
+              <Text style={s.title}>Giriş yap</Text>
               <Text style={s.text}>{reason}</Text>
               <Btn title="Giriş yap" onPress={() => { close(); router.navigate('/hesap'); }} />
               <Btn ghost title="Kayıt ol" onPress={() => { close(); router.push('/kayit' as never); }} />
@@ -88,9 +86,9 @@ export function GuestGate({ text, icon = 'lock' }: { text: string; icon?: IconNa
 
 const s = StyleSheet.create({
   backdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.45)', justifyContent: 'flex-end' },
-  sheet: { backgroundColor: color.bg, borderTopLeftRadius: radius, borderTopRightRadius: radius, overflow: 'hidden' },
+  sheet: { backgroundColor: color.bg, borderTopLeftRadius: 22, borderTopRightRadius: 22, overflow: 'hidden' },
   body: { padding: 20, gap: 12, paddingBottom: 28 },
-  icon: { width: 48, height: 48, borderRadius: radius, backgroundColor: color.accent, alignItems: 'center', justifyContent: 'center' },
+  icon: { width: 52, height: 52, borderRadius: 16, backgroundColor: color.teal, alignItems: 'center', justifyContent: 'center' },
   title: { fontFamily: font.bold, fontSize: 28, color: color.ink },
   text: { color: color.muted, fontSize: 16, lineHeight: 22 },
   skip: { color: color.muted, fontWeight: '600' },

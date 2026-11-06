@@ -1,7 +1,6 @@
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { PlainText, Text } from '../../components/LText';
-import { Hatch } from '../../components/ui';
 import { LEGAL_TR, LEGAL_VERSION_LABEL, fillLegal, type LegalSlugTr } from '../../lib/legalTexts';
 import { legalIdentity } from '../../lib/legal';
 import { color, font } from '../../lib/theme';
@@ -17,7 +16,6 @@ export default function LegalDoc() {
         <PlainText style={s.title}>{doc.title}</PlainText>
         <Text style={s.ver}>{`Sürüm: ${LEGAL_VERSION_LABEL}`}</Text>
       </View>
-      <Hatch height={6} />
       <View style={s.body}>
         {doc.intro ? <Text style={s.p}>{fillLegal(doc.intro, legalIdentity)}</Text> : null}
         {doc.sections.map(([h, paras]) => (

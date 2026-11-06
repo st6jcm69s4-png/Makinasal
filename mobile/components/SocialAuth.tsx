@@ -82,7 +82,7 @@ export function SocialAuth() {
   if (!p.google && !showApple) return null;
   return (
     <View style={{ gap: 10 }}>
-      <View style={s.or}><View style={s.line} /><PlainText style={s.orText}>VEYA</PlainText><View style={s.line} /></View>
+      <View style={s.or}><View style={s.line} /><Text style={s.orText}>veya</Text><View style={s.line} /></View>
       {showApple ? (
         <AppleAuthentication.AppleAuthenticationButton
           buttonType={AppleAuthentication.AppleAuthenticationButtonType.CONTINUE}

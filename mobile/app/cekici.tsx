@@ -3,7 +3,7 @@ import { ActivityIndicator, Alert, Linking, Pressable, ScrollView, StyleSheet, V
 import { PlainText, Text } from '../components/LText';
 import { Icon } from '../components/Icon';
 import { PickerModal } from '../components/PickerModal';
-import { Btn, Hatch, Label } from '../components/ui';
+import { Btn, Label } from '../components/ui';
 import { AlertBox, RowSkeleton } from '../components/kit';
 import { router } from 'expo-router';
 import { useApp } from '../lib/AppContext';
@@ -112,7 +112,6 @@ export default function Cekici() {
           <Icon name="chevron-down" size={18} color={color.onNavy} />
         </Pressable>
       </View>
-      <Hatch height={7} />
       <View style={s.sos}><Icon name="alert-triangle" size={16} color={color.warn} /><Text style={s.sosText}>Can güvenliği tehlikesinde önce 112'yi ara.</Text></View>
 
       {rows === null ? <RowSkeleton count={4} /> : null}

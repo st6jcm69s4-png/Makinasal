@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, Image, Pressable, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
 import { PlainText, Text } from '../components/LText';
 import { Icon, type IconName } from '../components/Icon';
-import { Btn, Hatch, Label } from '../components/ui';
+import { Btn, Label } from '../components/ui';
 import { AlertBox, Badge, StatusBadge, Tabs } from '../components/kit';
 import { router } from 'expo-router';
 import { useApp } from '../lib/AppContext';
@@ -104,7 +104,6 @@ export default function Admin() {
         <PlainText style={s.h1}>{todo ? `${todo} İŞ BEKLİYOR` : 'HER ŞEY YOLUNDA'}</PlainText>
         <Text style={s.lead}>{todo ? 'Aşağıdaki sekmelerden inceleme bekleyenleri sonuçlandır.' : 'İnceleme bekleyen ilan, şikayet veya başvuru yok.'}</Text>
       </View>
-      <Hatch height={7} />
       <View style={s.grid}>
         {stats.map((x) => (
           <View key={x.label} style={s.stat}>
