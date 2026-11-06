@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Alert, DevSettings, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Alert, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { Text } from '../components/LText';
 import { router } from 'expo-router';
 import { Btn, Chip, common } from '../components/ui';
@@ -47,10 +47,9 @@ export default function Settings() {
     if (id === palette) return;
     if (!savePalette(id)) { Alert.alert(tr('Renk teması'), tr('Seçim kaydedilemedi. Tekrar dene.')); return; }
     setPalette(id);
-    Alert.alert(tr('Renk teması'), tr('Yeni renkler uygulama yeniden başlayınca uygulanır.'), [
-      { text: tr('Sonra'), style: 'cancel' },
-      { text: tr('Şimdi yeniden başlat'), onPress: () => { try { DevSettings.reload(); } catch { Alert.alert(tr('Renk teması'), tr('Uygulamayı kapatıp yeniden aç.')); } } },
-    ]);
+    // Not: DevSettings.reload() Expo Go'da yerel modülleri kaybettiriyor (ExpoAsset hatası),
+    // mağaza sürümünde ise hiç çalışmıyor. Bu yüzden kullanıcıdan uygulamayı yeniden açmasını istiyoruz.
+    Alert.alert(tr('Renk teması'), tr('Yeni renkler için uygulamayı tamamen kapatıp yeniden aç.'));
   };
   useEffect(() => {
     if (!session) { setAdmin(false); return; }
