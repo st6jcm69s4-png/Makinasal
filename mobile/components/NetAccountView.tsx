@@ -9,7 +9,7 @@ import { router } from 'expo-router';
 import { useApp } from '../lib/AppContext';
 import { dateLabel, money, POST_KINDS, QUOTE_STATUS, type MarketPost, type Quote } from '../lib/network';
 import { supabase } from '../lib/supabase';
-import { color, font, radius } from '../lib/theme';
+import { color, font, radius, shadow } from '../lib/theme';
 import { getLang, localeOf } from '../lib/i18n';
 
 type Q = Quote & { market_posts: { title: string; kind: string } | { title: string; kind: string }[] | null };
@@ -74,9 +74,9 @@ export function NetAccountView({ onNavigate, embedded }: { onNavigate?: () => vo
       </View>
       <View style={s.quick}>
         {([['briefcase', 'Firma profilim', '/ag/firma-kaydi'], ['package', 'Makinelerim ve araçlarım', '/ag/envanter'], ['plus', 'Yeni ilan', '/ag/yeni']] as [IconName, string, string][]).map(([ic, l, to], i) => (
-          <Pressable key={l} style={[s.q, i > 0 && { borderLeftWidth: 1, borderLeftColor: color.line }]} onPress={() => go(to)} accessibilityRole="button">
-            <Icon name={ic} size={20} color={color.accentText} />
-            <Text style={s.qText}>{l}</Text>
+          <Pressable key={l} style={({ pressed }) => [s.q, pressed && { opacity: 0.85 }]} onPress={() => go(to)} accessibilityRole="button">
+            <View style={[s.qIcon, i === 2 && { backgroundColor: color.teal }]}><Icon name={ic} size={20} color={i === 2 ? color.tealInk : color.tealText} /></View>
+            <Text style={s.qText} numberOfLines={2}>{l}</Text>
           </Pressable>
         ))}
       </View>
@@ -135,7 +135,7 @@ function Empty({ text, cta, onPress }: { text: string; cta: string; onPress: () 
   return (
     <View style={s.emptyBox}>
       <Text style={s.emptyT}>{text}</Text>
-      <Btn ghost title={cta} onPress={onPress} />
+      <Btn title={cta} onPress={onPress} />
     </View>
   );
 }
@@ -148,14 +148,15 @@ const s = StyleSheet.create({
   stat: { flex: 1, paddingVertical: 10, paddingHorizontal: 14, gap: 1, borderBottomWidth: 3, borderBottomColor: 'transparent' },
   statOn: { backgroundColor: color.navy2, borderBottomColor: color.teal },
   statNum: { color: color.onBar, fontFamily: font.bold, fontSize: 26 },
-  quick: { flexDirection: 'row', backgroundColor: color.surface, borderBottomWidth: 1, borderBottomColor: color.line },
-  q: { flex: 1, alignItems: 'center', gap: 4, paddingVertical: 12 },
-  qText: { fontSize: 13.5, fontWeight: '600', color: color.ink },
+  quick: { flexDirection: 'row', gap: 10, paddingHorizontal: 12, paddingTop: 14 },
+  q: { flex: 1, alignItems: 'center', justifyContent: 'flex-start', gap: 8, paddingVertical: 14, paddingHorizontal: 6, backgroundColor: color.surface, borderRadius: radius + 4, borderWidth: 1, borderColor: color.line, ...shadow },
+  qIcon: { width: 42, height: 42, borderRadius: 21, backgroundColor: color.tealSoft, alignItems: 'center', justifyContent: 'center' },
+  qText: { fontSize: 13.5, lineHeight: 18, fontFamily: font.semi, color: color.ink, textAlign: 'center', alignSelf: 'stretch' },
   noteLine: { paddingHorizontal: 12, paddingBottom: 10, color: color.muted, fontSize: 14 },
   sec: { marginHorizontal: 14, marginTop: 18, marginBottom: 8 },
   err: { color: color.bad, margin: 12 },
   empty: { textAlign: 'center', color: color.muted, margin: 24 },
-  emptyBox: { marginHorizontal: 12, padding: 16, gap: 10, backgroundColor: color.surface, borderWidth: 1, borderColor: color.line },
+  emptyBox: { marginHorizontal: 12, padding: 16, gap: 12, backgroundColor: color.surface, borderWidth: 1, borderColor: color.line, borderRadius: radius + 4 },
   emptyT: { color: color.muted },
   card: { marginHorizontal: 12, marginBottom: 10, backgroundColor: color.surface, borderWidth: 1, borderColor: color.line, borderRadius: radius, overflow: 'hidden' },
   cardTop: { flexDirection: 'row', gap: 10, padding: 12, alignItems: 'flex-start' },
