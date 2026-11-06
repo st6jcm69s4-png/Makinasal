@@ -10,11 +10,30 @@ import { useLang } from '../../lib/lang';
 import { supabase } from '../../lib/supabase';
 import { fireScrollTop } from '../../lib/scrollTop';
 
-const icon = (name: IconName) => ({ color: tint, focused }: { color: ColorValue | null; focused: boolean }) => (
-  <View style={{ alignItems: 'center' }}>
-    <View style={{ position: 'absolute', top: -9, width: 44, height: 3, backgroundColor: focused ? color.barActive : 'transparent' }} />
-    <Icon name={name} size={21} color={typeof tint === 'string' ? tint : focused ? color.barActive : color.onNavy} />
+/** Aktif sekme: ikonun arkasında dolu bir hap, ikon beyaz; pasifler sade. */
+const icon = (name: IconName) => ({ focused }: { color: ColorValue | null; focused: boolean }) => (
+  <View
+    style={{
+      width: 56, height: 30, borderRadius: 15, alignItems: 'center', justifyContent: 'center',
+      backgroundColor: focused ? color.accent : 'transparent',
+    }}
+  >
+    <Icon name={name} size={focused ? 20 : 21} color={focused ? color.accentInk : color.onNavy} />
   </View>
+);
+
+/** Sekme yazısı: aktifken kalın ve vurgu renginde. */
+const label = (text: string) => ({ focused }: { focused: boolean }) => (
+  <PlainText
+    numberOfLines={1}
+    style={{
+      fontSize: 11.5, marginTop: 2, letterSpacing: 0.2,
+      fontFamily: focused ? font.bold : font.label,
+      color: focused ? color.barActive : color.onNavy,
+    }}
+  >
+    {text}
+  </PlainText>
 );
 
 /** Üst başlık: lacivert zemin, Barlow yazılı marka. */
@@ -59,17 +78,16 @@ export default function TabsLayout() {
         ),
         tabBarActiveTintColor: color.barActive,
         tabBarInactiveTintColor: color.onNavy,
-        tabBarStyle: { backgroundColor: color.navy, borderTopWidth: 1, borderTopColor: color.navy2, paddingTop: 0 },
-        tabBarItemStyle: { borderLeftWidth: 1, borderLeftColor: color.navy2, paddingTop: 6 },
-        tabBarLabelStyle: { fontSize: 11.5, fontFamily: font.label, letterSpacing: 0.4 },
+        tabBarStyle: { backgroundColor: color.navy, borderTopWidth: 1, borderTopColor: color.navy2, paddingTop: 6 },
+        tabBarItemStyle: { paddingTop: 2 },
       }}
     >
-      <Tabs.Screen name="index" options={{ tabBarLabel: tr('Ana sayfa'), tabBarIcon: icon('home') }} />
-      <Tabs.Screen name="ilanlar" options={{ tabBarLabel: tr('İlanlar'), tabBarIcon: icon('search') }} />
-      <Tabs.Screen name="is-agi" options={{ tabBarLabel: tr('İş Ağı'), tabBarIcon: icon('briefcase') }} />
-      <Tabs.Screen name="favoriler" options={{ tabBarLabel: tr('Favoriler'), tabBarIcon: icon('heart'), tabBarBadge: favs.size > 0 ? favs.size : undefined, tabBarBadgeStyle: { backgroundColor: color.pop, color: color.popInk, fontSize: 10 } }} />
-      <Tabs.Screen name="mesajlar" options={{ tabBarLabel: tr('Mesajlar'), tabBarIcon: icon('message-square'), tabBarBadge: unread > 0 ? unread : undefined, tabBarBadgeStyle: { backgroundColor: color.pop, color: color.popInk, fontSize: 10 } }} />
-      <Tabs.Screen name="hesap" options={{ tabBarLabel: tr('Hesabım'), tabBarIcon: icon('user') }} />
+      <Tabs.Screen name="index" options={{ tabBarLabel: label(tr('Ana sayfa')), tabBarIcon: icon('home') }} />
+      <Tabs.Screen name="ilanlar" options={{ tabBarLabel: label(tr('İlanlar')), tabBarIcon: icon('search') }} />
+      <Tabs.Screen name="is-agi" options={{ tabBarLabel: label(tr('İş Ağı')), tabBarIcon: icon('briefcase') }} />
+      <Tabs.Screen name="favoriler" options={{ tabBarLabel: label(tr('Favoriler')), tabBarIcon: icon('heart'), tabBarBadge: favs.size > 0 ? favs.size : undefined, tabBarBadgeStyle: { backgroundColor: color.pop, color: color.popInk, fontSize: 10 } }} />
+      <Tabs.Screen name="mesajlar" options={{ tabBarLabel: label(tr('Mesajlar')), tabBarIcon: icon('message-square'), tabBarBadge: unread > 0 ? unread : undefined, tabBarBadgeStyle: { backgroundColor: color.pop, color: color.popInk, fontSize: 10 } }} />
+      <Tabs.Screen name="hesap" options={{ tabBarLabel: label(tr('Hesabım')), tabBarIcon: icon('user') }} />
     </Tabs>
   );
 }
