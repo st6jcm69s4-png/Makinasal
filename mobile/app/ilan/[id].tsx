@@ -84,7 +84,7 @@ export default function ListingScreen() {
     if (!tid) {
       const created = await supabase.from('threads').insert({ listing_id: listingId, buyer_id: me, seller_id: sellerId }).select('id').single();
       tid = (created.data as { id: string } | null)?.id;
-      if (created.error || !tid) { setMsgBusy(false); Alert.alert('Mesaj', 'Konuşma başlatılamadı. Bağlantını kontrol et.'); return; }
+      if (created.error || !tid) { setMsgBusy(false); Alert.alert('Mesaj', created.error?.message.includes('MESSAGE_BLOCKED') ? 'Bu kullanıcıyla mesajlaşma kapalı.' : 'Konuşma başlatılamadı. Bağlantını kontrol et.'); return; }
     }
     setMsgBusy(false);
     router.push(`/mesaj/${tid}`);

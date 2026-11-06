@@ -8,7 +8,7 @@ import { router } from 'expo-router';
 import { useApp } from '../lib/AppContext';
 import { photoUrl, supabase, tl } from '../lib/supabase';
 import { color, font, radius } from '../lib/theme';
-import { getLang, localeOf } from '../lib/i18n';
+import { getLang, localeOf, tr } from '../lib/i18n';
 
 type L = { id: string; title: string; city: string; price: number; created_at: string; seller_id: string; listing_photos: { path: string; position: number }[] | null };
 type R = { id: string; ticket: number; listing_id: string | null; reason: string; created_at: string };
@@ -16,7 +16,9 @@ type S = { id: string; kind: string; note: string | null; city: string | null; s
 type D = { id: string; kind: string; note: string; status: string; created_at: string; profiles: { full_name: string | null } | { full_name: string | null }[] | null };
 const KIND: Record<string, string> = { finans: 'Finansman', nakliye: 'Nakliye', ekspertiz: 'Ekspertiz' };
 const DKIND: Record<string, string> = { export: 'Verimin kopyası', correct: 'Düzeltme', delete: 'Hesap ve veri silme', object: 'İşlemeye itiraz' };
-type Tab = 'ilan' | 'sikayet' | 'talep' | 'veri';
+type Tab = 'ilan' | 'sikayet' | 'mesaj' | 'talep' | 'veri';
+type MR = { id: string; created_at: string; reason: string; note: string; body: string | null; status: string; reported_user: string; reported_name: string; reporter_name: string; report_count: number };
+const MR_REASON: Record<string, string> = { abuse: 'Küfür veya hakaret', harassment: 'Taciz veya tehdit', fraud: 'Dolandırıcılık şüphesi', spam: 'Spam veya reklam', other: 'Diğer' };
 type Stat = { label: string; icon: IconName; n: number | null };
 
 const ago = (iso: string) => {
@@ -33,6 +35,7 @@ export default function Admin() {
   const [rs, setRs] = useState<R[]>([]);
   const [ss, setSs] = useState<S[]>([]);
   const [ds, setDs] = useState<D[]>([]);
+  const [ms, setMs] = useState<MR[]>([]);
   const [stats, setStats] = useState<Stat[]>([]);
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
@@ -54,6 +57,8 @@ export default function Admin() {
     setError('');
     const lrows = (l.data ?? []) as unknown as L[];
     setLs(lrows); setRs((r.data ?? []) as R[]);
+    const mr = await supabase.rpc('admin_message_reports');
+    if (!mr.error && Array.isArray(mr.data)) setMs(mr.data as MR[]);
     const sr = await supabase.rpc('admin_service_requests');
     if (!sr.error && Array.isArray(sr.data)) setSs(sr.data as S[]);
     const dr = await supabase.from('data_requests').select('id,kind,note,status,created_at,profiles(full_name)').eq('status', 'open').order('created_at');
@@ -88,20 +93,28 @@ export default function Admin() {
     if (r.error || !r.data) { setError('İşlem kaydedilemedi. Yetkini ve bağlantını kontrol et.'); return; }
     void load();
   }
+  async function resolveMsg(id: string, status: 'actioned' | 'dismissed') {
+    if (busy) return;
+    setBusy(true); setError('');
+    const r = await supabase.rpc('admin_resolve_message_report', { p_id: id, p_status: status });
+    setBusy(false);
+    if (r.error) { setError('İşlem kaydedilemedi. Yetkini ve bağlantını kontrol et.'); return; }
+    void load();
+  }
   const ask = (msg: string, fn: () => void) => Alert.alert('Onay', msg, [{ text: 'Vazgeç', style: 'cancel' }, { text: 'Evet', onPress: fn }]);
 
   if (admin === null) return <ActivityIndicator style={{ margin: 24 }} />;
   if (!admin) return <Text style={s.empty}>Bu bölüm yalnızca yetkili moderatörler içindir.</Text>;
 
   const newReq = ss.filter((x) => x.status === 'new').length;
-  const tabs: [Tab, string, number][] = [['ilan', 'İlanlar', ls.length], ['sikayet', 'Şikayetler', rs.length], ['talep', 'Talepler', newReq], ['veri', 'KVKK', ds.length]];
-  const todo = ls.length + rs.length + newReq + ds.length;
+  const tabs: [Tab, string, number][] = [['ilan', 'İlanlar', ls.length], ['sikayet', 'Şikayetler', rs.length], ['mesaj', 'Mesajlar', ms.length], ['talep', 'Talepler', newReq], ['veri', 'KVKK', ds.length]];
+  const todo = ls.length + rs.length + ms.length + newReq + ds.length;
 
   return (
     <ScrollView style={{ flex: 1, backgroundColor: color.bg }} contentContainerStyle={{ paddingBottom: 32 }} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); void load().finally(() => setRefreshing(false)); }} />}>
       <View style={s.head}>
         <Label style={{ color: color.onNavy }}>Yönetim paneli</Label>
-        <PlainText style={s.h1}>{todo ? `${todo} İŞ BEKLİYOR` : 'HER ŞEY YOLUNDA'}</PlainText>
+        <PlainText style={s.h1}>{todo ? `${todo} ${tr('iş bekliyor')}` : tr('Her şey yolunda')}</PlainText>
         <Text style={s.lead}>{todo ? 'Aşağıdaki sekmelerden inceleme bekleyenleri sonuçlandır.' : 'İnceleme bekleyen ilan, şikayet veya başvuru yok.'}</Text>
       </View>
       <View style={s.grid}>
@@ -157,6 +170,25 @@ export default function Admin() {
             </View>
           </View>
         )) : <Empty text="Açık şikayet yok." />) : null}
+
+        {tab === 'mesaj' ? (ms.length ? ms.map((m) => (
+          <View key={m.id} style={s.card}>
+            <View style={s.cardTop}>
+              <View style={{ flex: 1, gap: 3 }}>
+                <Label style={{ color: color.bad }}>{MR_REASON[m.reason] ?? m.reason}</Label>
+                <PlainText style={s.title}>{m.reported_name}</PlainText>
+                <PlainText style={s.when}>{`${tr('Bu kişi hakkında toplam şikayet')}: ${m.report_count} · ${tr('Şikayet eden')}: ${m.reporter_name}`}</PlainText>
+              </View>
+              <Text style={s.when}>{ago(m.created_at)}</Text>
+            </View>
+            {m.body ? <View style={s.quote}><PlainText style={s.quoteT}>{`“${m.body}”`}</PlainText></View> : null}
+            {m.note ? <PlainText style={s.when}>{m.note}</PlainText> : null}
+            <View style={s.actions}>
+              <View style={{ flex: 1 }}><Btn title="İşlem yapıldı" disabled={busy} onPress={() => ask('Şikayet işlem yapıldı olarak kapatılsın mı?', () => void resolveMsg(m.id, 'actioned'))} /></View>
+              <View style={{ flex: 1 }}><Btn ghost title="Geçersiz" disabled={busy} onPress={() => void resolveMsg(m.id, 'dismissed')} /></View>
+            </View>
+          </View>
+        )) : <Empty text="Açık mesaj şikayeti yok." />) : null}
 
         {tab === 'talep' ? (ss.length ? ss.map((q) => (
           <View key={q.id} style={s.card}>
@@ -222,6 +254,8 @@ function Empty({ text }: { text: string }) {
 }
 
 const s = StyleSheet.create({
+  quote: { backgroundColor: color.bg, borderRadius: radius, padding: 10, borderWidth: 1, borderColor: color.line, marginTop: 8 },
+  quoteT: { color: color.ink, fontSize: 14.5, lineHeight: 20, fontStyle: 'italic' },
   empty: { textAlign: 'center', color: color.muted, margin: 24 },
   head: { backgroundColor: color.navy, paddingHorizontal: 16, paddingTop: 16, paddingBottom: 20, gap: 4, borderBottomLeftRadius: 28, borderBottomRightRadius: 28 },
   h1: { color: color.onBar, fontFamily: font.bold, fontSize: 26, lineHeight: 32 },

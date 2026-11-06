@@ -116,6 +116,7 @@ export function validCoordinates(lat: number | null, lng: number | null) {
 export function networkError(
   error: { code?: string; message?: string } | null,
 ) {
+  if (error?.message?.includes("MESSAGE_BLOCKED")) return "Bu kullanıcıyla mesajlaşma kapalı.";
   if (error?.message?.includes("MESSAGE_PROFANITY")) return "Küfür veya hakaret içeren mesaj gönderilemez. Lütfen mesajını düzenle.";
   if (error?.code === "23505")
     return "Bu ilana zaten teklif verdin veya bu iş için bir teklif seçilmiş. Sayfayı yenile.";

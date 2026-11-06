@@ -170,7 +170,7 @@ export function MessagesView({ activeId }: { activeId?: string }) {
     try {
       const { error: err } = await supabase.from('messages').insert({ id: messageId, thread_id: activeId, sender_id: me, body });
       if (currentScope.current !== scope) return;
-      if (err && err.code !== '23505') { setSendError(err.message.includes('MESSAGE_PROFANITY') ? 'Küfür veya hakaret içeren mesaj gönderilemez. Lütfen mesajını düzenle.' : 'Mesaj gönderilemedi. Yazdığın mesaj korunuyor; tekrar deneyebilirsin.'); return; }
+      if (err && err.code !== '23505') { setSendError(err.message.includes('MESSAGE_BLOCKED') ? 'Bu kullanıcıyla mesajlaşma kapalı.' : err.message.includes('MESSAGE_PROFANITY') ? 'Küfür veya hakaret içeren mesaj gönderilemez. Lütfen mesajını düzenle.' : 'Mesaj gönderilemedi. Yazdığın mesaj korunuyor; tekrar deneyebilirsin.'); return; }
       if (pendingSend.current?.id === messageId) pendingSend.current = null;
       setText(current => current.trim() === body ? '' : current);
       await loadMsgs();

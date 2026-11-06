@@ -6,12 +6,20 @@ import { tr } from '../../lib/i18n';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useApp } from '../../lib/AppContext';
 import { DealBox } from '../../components/DealBox';
+import { PickerModal } from '../../components/PickerModal';
 import { checkMessage } from '../../lib/messageFilter';
 import { supabase } from '../../lib/supabase';
 import { color, font, radius } from '../../lib/theme';
 
 type Msg = { id: string; sender_id: string; body: string; created_at: string; kind?: string | null; offer_amount?: number | null };
 type ThreadInfo = { buyer_id: string; seller_id: string; title: string; listing_id: string | null };
+const REASONS = [
+  { value: 'abuse', label: 'Küfür veya hakaret' },
+  { value: 'harassment', label: 'Taciz veya tehdit' },
+  { value: 'fraud', label: 'Dolandırıcılık şüphesi' },
+  { value: 'spam', label: 'Spam veya reklam' },
+  { value: 'other', label: 'Diğer' },
+];
 const hhmm = (iso: string) => { const d = new Date(iso); return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`; };
 const PAGE = 50;
 
@@ -25,6 +33,34 @@ export default function Thread() {
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   const alive = useRef(true);
+  const [blocked, setBlocked] = useState(false);
+  const [reportMsg, setReportMsg] = useState<string | null>(null);
+  const other = info && me ? (info.buyer_id === me ? info.seller_id : info.buyer_id) : null;
+  useEffect(() => {
+    if (!me || !other) return;
+    void supabase.from('user_blocks').select('blocked_id').eq('blocker_id', me).eq('blocked_id', other).maybeSingle().then((r) => setBlocked(!!r.data));
+  }, [me, other]);
+  function blockMenu() {
+    if (!me || !other) return;
+    if (blocked) {
+      Alert.alert(tr('Engeli kaldır'), tr('Bu kişinin engeli kaldırılsın mı? Tekrar mesajlaşabilirsiniz.'), [
+        { text: tr('Vazgeç'), style: 'cancel' },
+        { text: tr('Engeli kaldır'), onPress: async () => { const r = await supabase.from('user_blocks').delete().eq('blocker_id', me).eq('blocked_id', other); if (!r.error) setBlocked(false); } },
+      ]);
+      return;
+    }
+    Alert.alert(tr('Kişiyi engelle'), tr('Bu kişi engellensin mi? Birbirinize mesaj gönderemezsiniz. Rahatsız edici bir mesaj varsa mesaja basılı tutarak şikayet de edebilirsin.'), [
+      { text: tr('Vazgeç'), style: 'cancel' },
+      { text: tr('Engelle'), style: 'destructive', onPress: async () => { const r = await supabase.from('user_blocks').insert({ blocker_id: me, blocked_id: other }); if (!r.error || r.error.code === '23505') setBlocked(true); else Alert.alert(tr('Engelle'), tr('İşlem kaydedilemedi.')); } },
+    ]);
+  }
+  async function report(reason: string) {
+    const id2 = reportMsg; setReportMsg(null);
+    if (!id2) return;
+    const r = await supabase.from('message_reports').insert({ message_id: id2, reason });
+    if (!r.error) Alert.alert(tr('Şikayet'), tr('Şikayetin alındı. Ekibimiz inceleyecek. İstersen bu kişiyi engelleyebilirsin.'));
+    else Alert.alert(tr('Şikayet'), r.error.code === '23505' ? tr('Bu mesajı zaten şikayet ettin.') : tr('Şikayet gönderilemedi. Daha sonra tekrar dene.'));
+  }
 
   const load = useCallback(async () => {
     const detailed = await supabase.from('messages').select('id,sender_id,body,created_at,kind,offer_amount')
@@ -59,7 +95,7 @@ export default function Thread() {
     const { error: e } = await supabase.from('messages').insert({ thread_id: id, sender_id: me, body });
     setBusy(false);
     if (e) {
-      setError(e.message.includes('MESSAGE_PROFANITY') ? 'Küfür veya hakaret içeren mesaj gönderilemez. Lütfen mesajını düzenle.'
+      setError(e.message.includes('MESSAGE_BLOCKED') ? 'Bu kullanıcıyla mesajlaşma kapalı.' : e.message.includes('MESSAGE_PROFANITY') ? 'Küfür veya hakaret içeren mesaj gönderilemez. Lütfen mesajını düzenle.'
         : /RATE_LIMIT/.test(e.message) ? 'Çok fazla mesaj gönderdin. Bir dakika sonra tekrar dene.' : 'Mesaj gönderilemedi. Yazdığın mesaj korunuyor.');
       return;
     }
@@ -92,6 +128,9 @@ export default function Thread() {
             <PlainText style={s.listingT} numberOfLines={1}>{info.title}</PlainText>
           </View>
           {info.listing_id ? <Icon name="chevron-right" size={18} color={color.muted} /> : null}
+          <Pressable onPress={blockMenu} hitSlop={10} style={s.more} accessibilityRole="button" accessibilityLabel={tr(blocked ? 'Engeli kaldır' : 'Kişiyi engelle')}>
+            <Icon name={blocked ? 'unlock' : 'slash'} size={18} color={blocked ? color.tealText : color.bad} />
+          </Pressable>
         </Pressable>
       ) : null}
       {info && me ? <DealBox threadId={id} me={me} buyerId={info.buyer_id} sellerId={info.seller_id} /> : null}
@@ -104,29 +143,40 @@ export default function Thread() {
         renderItem={({ item }) => {
           const mine = item.sender_id === me;
           return (
-            <View style={[s.bubble, mine ? s.mine : s.theirs, item.kind === 'offer' && s.offer]}>
+            <Pressable onLongPress={() => (!mine ? setReportMsg(item.id) : undefined)} delayLongPress={350} style={[s.bubble, mine ? s.mine : s.theirs, item.kind === 'offer' && s.offer]} accessibilityHint={!mine ? tr('Şikayet etmek için basılı tut') : undefined}>
               {item.kind === 'offer' ? <View style={[s.offerTag, mine && { backgroundColor: 'rgba(255,255,255,0.2)' }]}><Icon name="tag" size={12} color={mine ? color.tealInk : color.warn} /><Text style={[s.offerTagT, { color: mine ? color.tealInk : color.warn }]}>Teklif</Text></View> : null}
               <PlainText selectable style={mine ? s.mineText : s.theirsText}>{item.body}</PlainText>
               <PlainText style={[s.time, mine && { color: 'rgba(255,255,255,0.75)' }]}>{hhmm(item.created_at)}</PlainText>
-            </View>
+            </Pressable>
           );
         }}
       />
       {error ? <Text style={s.err}>{error}</Text> : null}
-      <View style={s.bar}>
+      {blocked ? (
+        <View style={s.blockedBar}>
+          <Icon name="slash" size={18} color={color.bad} />
+          <Text style={s.blockedT}>Bu kişiyi engelledin. Mesaj gönderemezsiniz.</Text>
+          <Pressable onPress={blockMenu} accessibilityRole="button"><Text style={s.unblock}>Engeli kaldır</Text></Pressable>
+        </View>
+      ) : <View style={s.bar}>
         <View style={{ flex: 1, gap: 4 }}>
           <TextInput style={s.input} value={text} onChangeText={setText} placeholder="Mesajını yaz" multiline maxLength={2000} />
         </View>
         <Pressable style={[s.send, (busy || !text.trim()) && { opacity: 0.45 }]} onPress={send} disabled={busy || !text.trim()} accessibilityRole="button" accessibilityLabel={tr('Gönder')}>
           <Icon name="send" size={19} color={color.tealInk} />
         </Pressable>
-      </View>
-      <Text style={s.hint}>Mesajlarda IBAN ve harici link paylaşımı engellenir.</Text>
+      </View>}
+      <Text style={s.hint}>Mesajlarda IBAN ve harici link paylaşımı engellenir. Rahatsız edici bir mesajı basılı tutarak şikayet edebilirsin.</Text>
+      <PickerModal visible={!!reportMsg} title="Şikayet nedeni" selected="" options={REASONS} onPick={(v) => void report(v)} onClose={() => setReportMsg(null)} />
     </KeyboardAvoidingView>
   );
 }
 
 const s = StyleSheet.create({
+  more: { width: 34, height: 34, borderRadius: 10, alignItems: 'center', justifyContent: 'center', backgroundColor: color.bg },
+  blockedBar: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 14, paddingVertical: 12, backgroundColor: color.badBg, borderTopWidth: 1, borderTopColor: color.line },
+  blockedT: { flex: 1, color: color.ink, fontSize: 14 },
+  unblock: { color: color.tealText, fontFamily: font.semi, fontSize: 14 },
   listing: { flexDirection: 'row', alignItems: 'center', gap: 10, marginHorizontal: 12, marginTop: 10, padding: 10, backgroundColor: color.surface, borderRadius: radius + 2, borderWidth: 1, borderColor: color.line },
   listingIcon: { width: 36, height: 36, borderRadius: 12, backgroundColor: color.tealSoft, alignItems: 'center', justifyContent: 'center' },
   listingK: { color: color.muted, fontSize: 12 },
