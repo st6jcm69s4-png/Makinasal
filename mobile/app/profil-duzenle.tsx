@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Switch, View } from 'react-native';
+import { ActivityIndicator, KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, Switch, View } from 'react-native';
 import { PlainText, Text, TextInput } from '../components/LText';
 import { Icon, type IconName } from '../components/Icon';
 import { PickerModal } from '../components/PickerModal';
@@ -91,7 +91,7 @@ export default function EditProfile() {
     <View style={{ gap: 6 }}><Text style={s.label}>{label}</Text><TextInput style={s.input} value={value} onChangeText={set} {...extra} /></View>
   );
   return (
-    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+    <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding">
       <ScrollView style={{ backgroundColor: color.bg }} contentContainerStyle={{ padding: 16, gap: 12 }} keyboardShouldPersistTaps="handled">
         {input('Ad soyad', name, setName)}
         {input('Telefon', phone, setPhone, { keyboardType: 'phone-pad' })}

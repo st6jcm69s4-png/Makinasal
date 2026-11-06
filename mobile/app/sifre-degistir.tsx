@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
+import { KeyboardAvoidingView, ScrollView, StyleSheet, View } from 'react-native';
 import { router } from 'expo-router';
 import { Text } from '../components/LText';
 import { Icon } from '../components/Icon';
@@ -45,7 +45,7 @@ export default function ChangePassword() {
     );
   }
   return (
-    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+    <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding">
       <ScrollView style={{ backgroundColor: color.bg }} contentContainerStyle={s.body} keyboardShouldPersistTaps="handled">
         <Field label="Yeni şifre" value={password} onChangeText={setPassword} secureTextEntry autoCapitalize="none" autoCorrect={false} textContentType="newPassword" />
         <View style={{ gap: 4 }}>

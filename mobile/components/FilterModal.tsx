@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, Switch, View } from 'react-native';
+import { KeyboardAvoidingView, Modal, Pressable, ScrollView, StyleSheet, Switch, View } from 'react-native';
 import { Text, TextInput } from './LText';
 import { PickerModal } from './PickerModal';
 import { Btn, Chip } from './ui';
@@ -17,7 +17,7 @@ export function FilterModal({ visible, value, category, part, onApply, onClose }
   const num = (k: 'yMin' | 'yMax' | 'useMin' | 'useMax') => (v: string) => set(k, v.replace(/\D/g, ''));
   return (
     <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose} onShow={() => setA(value)}>
-      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding">
         <View style={s.backdrop}>
           <Pressable style={StyleSheet.absoluteFill} onPress={onClose} accessibilityRole="button" accessibilityLabel="Kapat" />
           <View style={s.sheet}>

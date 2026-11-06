@@ -1,5 +1,6 @@
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Alert, FlatList, KeyboardAvoidingView, Platform, Pressable, StyleSheet, View } from 'react-native';
+import { Alert, FlatList, KeyboardAvoidingView, Pressable, StyleSheet, View } from 'react-native';
 import { PlainText, Text, TextInput } from '../../components/LText';
 import { Icon } from '../../components/Icon';
 import { tr } from '../../lib/i18n';
@@ -24,6 +25,7 @@ const hhmm = (iso: string) => { const d = new Date(iso); return `${String(d.getH
 const PAGE = 50;
 
 export default function Thread() {
+  const insets = useSafeAreaInsets();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { session } = useApp();
   const me = session?.user.id;
@@ -119,7 +121,7 @@ export default function Thread() {
   }
 
   return (
-    <KeyboardAvoidingView style={{ flex: 1, backgroundColor: color.bg }} behavior={Platform.OS === 'ios' ? 'padding' : undefined} keyboardVerticalOffset={90}>
+    <KeyboardAvoidingView style={{ flex: 1, backgroundColor: color.bg }} behavior="padding" keyboardVerticalOffset={90}>
       {info ? (
         <Pressable style={({ pressed }) => [s.listing, pressed && { opacity: 0.85 }]} disabled={!info.listing_id} onPress={() => info.listing_id && router.push(`/ilan/${info.listing_id}`)} accessibilityRole="button">
           <View style={s.listingIcon}><Icon name="truck" size={18} color={color.tealText} /></View>
@@ -166,7 +168,7 @@ export default function Thread() {
           <Icon name="send" size={19} color={color.tealInk} />
         </Pressable>
       </View>}
-      <Text style={s.hint}>Mesajlarda IBAN ve harici link paylaşımı engellenir. Rahatsız edici bir mesajı basılı tutarak şikayet edebilirsin.</Text>
+      <Text style={[s.hint, { paddingBottom: Math.max(insets.bottom, 10) }]}>Mesajlarda IBAN ve harici link paylaşımı engellenir. Rahatsız edici bir mesajı basılı tutarak şikayet edebilirsin.</Text>
       <PickerModal visible={!!reportMsg} title="Şikayet nedeni" selected="" options={REASONS} onPick={(v) => void report(v)} onClose={() => setReportMsg(null)} />
     </KeyboardAvoidingView>
   );
@@ -192,7 +194,7 @@ const s = StyleSheet.create({
   time: { alignSelf: 'flex-end', fontSize: 11, color: color.muted },
   empty: { textAlign: 'center', color: color.muted, margin: 24, transform: [{ scaleY: -1 }] },
   err: { color: color.bad, marginHorizontal: 14, marginBottom: 4 },
-  hint: { color: color.muted, fontSize: 11.5, textAlign: 'center', paddingHorizontal: 14, paddingBottom: Platform.OS === 'ios' ? 26 : 10, paddingTop: 4, backgroundColor: color.bg },
+  hint: { color: color.muted, fontSize: 11.5, textAlign: 'center', paddingHorizontal: 14, paddingBottom: 10, paddingTop: 4, backgroundColor: color.bg },
   bar: { flexDirection: 'row', gap: 8, paddingHorizontal: 12, paddingTop: 8, backgroundColor: color.bg, alignItems: 'flex-end', borderTopWidth: 1, borderTopColor: color.line },
   input: { maxHeight: 120, minHeight: 46, paddingHorizontal: 14, paddingTop: 12, paddingBottom: 12, fontSize: 16, backgroundColor: color.surface, borderRadius: 23, borderWidth: 1, borderColor: color.line },
   send: { width: 46, height: 46, borderRadius: 23, backgroundColor: color.teal, alignItems: 'center', justifyContent: 'center' },

@@ -47,28 +47,28 @@ export const PALETTES = {
 } as const;
 export type PaletteId = keyof typeof PALETTES;
 
-// Renk teması uygulama açılırken eşzamanlı okunur (renkler bir kez hesaplanır).
+// Renk teması ve (Android'de) görünüm uygulama açılırken eşzamanlı okunur (renkler bir kez hesaplanır).
 const PALETTE_FILE = 'mk-palette.txt';
-function paletteFile() {
+export const THEME_FILE = 'mk-theme.txt';
+function prefFile(name: string) {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const fs = require('expo-file-system') as { File: new (...p: unknown[]) => { exists: boolean; textSync(): string; write(t: string): void; create(): void }; Paths: { document: unknown } };
-  return new fs.File(fs.Paths.document, PALETTE_FILE);
+  return new fs.File(fs.Paths.document, name);
+}
+export function readPref(name: string): string {
+  try { const f = prefFile(name); if (f.exists) return f.textSync().trim(); } catch { /* okunamazsa boş */ }
+  return '';
+}
+export function writePref(name: string, v: string): boolean {
+  try { const f = prefFile(name); if (!f.exists) f.create(); f.write(v); return true; } catch { return false; }
 }
 function readPalette(): PaletteId {
-  try {
-    const f = paletteFile();
-    if (f.exists) { const v = f.textSync().trim(); if (v in PALETTES) return v as PaletteId; }
-  } catch { /* okunamazsa varsayılan */ }
-  return 'petrol';
+  const v = readPref(PALETTE_FILE);
+  return v in PALETTES ? (v as PaletteId) : 'petrol';
 }
 /** Seçimi kaydeder; yeni renkler uygulama yeniden başlayınca geçerli olur. */
 export function savePalette(id: PaletteId): boolean {
-  try {
-    const f = paletteFile();
-    if (!f.exists) f.create();
-    f.write(id);
-    return true;
-  } catch { return false; }
+  return writePref(PALETTE_FILE, id);
 }
 export const activePalette: PaletteId = readPalette();
 const light = PALETTES[activePalette].light;
@@ -78,17 +78,23 @@ const dark = PALETTES[activePalette].dark;
 export const palettes = { light, dark } as const;
 type ColorKey = keyof Palette;
 // iOS: renkler sistem görünümüne (veya Ayarlar'daki seçime) göre anında değişir.
-// Android: uygulama açılırken sistem görünümü okunur.
+// Android: açılışta kayıtlı seçim (yoksa sistem) okunur; seçim değişince uygulama kendini yeniden başlatır.
+const savedTheme = readPref(THEME_FILE);
+const forced = savedTheme === 'light' || savedTheme === 'dark' ? savedTheme : null;
+if (Platform.OS === 'android' && forced) { try { Appearance.setColorScheme(forced); } catch { /* yok say */ } }
+/** Android'de renklerin hesaplandığı görünüm. */
+export const launchScheme: 'light' | 'dark' = forced ?? (Appearance.getColorScheme() === 'dark' ? 'dark' : 'light');
 const pick = (k: ColorKey): string =>
   Platform.OS === 'ios'
     ? (DynamicColorIOS({ light: light[k], dark: dark[k] }) as unknown as string)
-    : Appearance.getColorScheme() === 'dark' ? dark[k] : light[k];
+    : launchScheme === 'dark' ? dark[k] : light[k];
 export const color = Object.fromEntries((Object.keys(light) as ColorKey[]).map((k) => [k, pick(k)])) as Record<ColorKey, string>;
-export const themeSupportsChoice = Platform.OS === 'ios';
+/** Görünüm seçimi her iki platformda da var (Android'de yeniden başlatarak uygulanır). */
+export const themeSupportsChoice = true;
 
 export const radius = 12;
 /** Yumuşak gölge: aşağı kayık, geniş blur. */
-export const shadow = { shadowColor: '#0B1220', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.1, shadowRadius: 14, elevation: 2 } as const;
+export const shadow = { shadowColor: '#0B1220', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.1, shadowRadius: 14, elevation: 3 } as const;
 export const hair = 1;
 
 /** Yazı tipi aileleri (yüklenemezse sistem yazı tipine düşer). */

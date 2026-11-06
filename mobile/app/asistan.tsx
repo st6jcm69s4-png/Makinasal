@@ -1,5 +1,6 @@
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useEffect, useRef, useState, type ComponentRef } from 'react';
-import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { router } from 'expo-router';
 import { PlainText, Text, TextInput } from '../components/LText';
 import { Icon, type IconName } from '../components/Icon';
@@ -27,6 +28,7 @@ async function errorCode(err: unknown): Promise<string> {
 }
 
 export default function Assistant() {
+  const insets = useSafeAreaInsets();
   const { session } = useApp();
   const [plan, setPlan] = useState<PlanId | null | undefined>(undefined);
   const [usage, setUsage] = useState<{ used: number; limit: number } | null>(null);
@@ -94,7 +96,7 @@ export default function Assistant() {
   }
 
   return (
-    <KeyboardAvoidingView style={s.screen} behavior={Platform.OS === 'ios' ? 'padding' : undefined} keyboardVerticalOffset={Platform.OS === 'ios' ? 96 : 0}>
+    <KeyboardAvoidingView style={s.screen} behavior="padding" keyboardVerticalOffset={96}>
       <ScrollView ref={scroller} contentContainerStyle={{ padding: 16, gap: 12, paddingBottom: 24 }} keyboardShouldPersistTaps="handled">
         {usage ? <PlainText style={s.usage}>{`${tr('Bu ay')}: ${usage.used} / ${usage.limit} ${tr('soru')}`}</PlainText> : null}
         {!msgs.length ? (
@@ -125,7 +127,7 @@ export default function Assistant() {
           <Icon name="send" size={19} color={color.tealInk} />
         </Pressable>
       </View>
-      <Text style={s.disc}>Yapay zeka yanıtları öneri niteliğindedir; önemli kararları kontrol ederek ver.</Text>
+      <Text style={[s.disc, { paddingBottom: Math.max(insets.bottom, 10) }]}>Yapay zeka yanıtları öneri niteliğindedir; önemli kararları kontrol ederek ver.</Text>
     </KeyboardAvoidingView>
   );
 }
@@ -154,5 +156,5 @@ const s = StyleSheet.create({
   bar: { flexDirection: 'row', alignItems: 'flex-end', gap: 8, paddingHorizontal: 12, paddingTop: 8, borderTopWidth: 1, borderTopColor: color.line, backgroundColor: color.bg },
   input: { flex: 1, maxHeight: 120, minHeight: 46, paddingHorizontal: 14, paddingTop: 12, paddingBottom: 12, fontSize: 16, backgroundColor: color.surface, borderRadius: 23, borderWidth: 1, borderColor: color.line },
   send: { width: 46, height: 46, borderRadius: 23, backgroundColor: color.teal, alignItems: 'center', justifyContent: 'center' },
-  disc: { color: color.muted, fontSize: 11.5, textAlign: 'center', paddingHorizontal: 16, paddingTop: 6, paddingBottom: Platform.OS === 'ios' ? 28 : 12 },
+  disc: { color: color.muted, fontSize: 11.5, textAlign: 'center', paddingHorizontal: 16, paddingTop: 6, paddingBottom: 10 },
 });

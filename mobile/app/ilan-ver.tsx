@@ -1,6 +1,6 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { GuestGate } from '../components/LoginPrompt';
-import { ActivityIndicator, Alert, Image, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Switch, View } from 'react-native';
+import { ActivityIndicator, Alert, Image, KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, Switch, View } from 'react-native';
 import { Text, TextInput } from '../components/LText';
 import { Icon, type IconName } from '../components/Icon';
 import { tr } from '../lib/i18n';
@@ -182,7 +182,7 @@ export default function NewListing() {
   );
   const total = photos.length + existing.length;
   return (
-    <KeyboardAvoidingView style={{ flex: 1, backgroundColor: color.bg }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+    <KeyboardAvoidingView style={{ flex: 1, backgroundColor: color.bg }} behavior="padding">
       <ScrollView style={{ backgroundColor: color.bg }} contentContainerStyle={s.form} keyboardShouldPersistTaps="handled">
         {section('Ne satıyorsun?', 'tag', <>
           {select('Kategori', cat, 'cat')}

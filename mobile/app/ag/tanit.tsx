@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from 'react';
-import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Switch, View } from 'react-native';
+import { ActivityIndicator, KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, Switch, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { PlainText, Text, TextInput } from '../../components/LText';
 import { Icon, type IconName } from '../../components/Icon';
@@ -136,7 +136,7 @@ export default function Introduce() {
   );
 
   return (
-    <KeyboardAvoidingView style={s.screen} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+    <KeyboardAvoidingView style={s.screen} behavior="padding">
       <ScrollView contentContainerStyle={s.form} keyboardShouldPersistTaps="handled">
         <View style={s.intro}>
           <Text style={s.introT}>İşverenler seni burada tanısın</Text>

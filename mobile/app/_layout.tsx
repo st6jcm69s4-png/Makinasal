@@ -4,7 +4,7 @@ import { Stack } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { caps, color, fontState } from '../lib/theme';
 import { AppHeader } from '../components/AppHeader';
-import { loadTheme } from '../lib/themePref';
+import { loadTheme, watchSystemTheme } from '../lib/themePref';
 import { StatusBar } from 'expo-status-bar';
 import { AppProvider } from '../lib/AppContext';
 import { tr } from '../lib/i18n';
@@ -72,6 +72,7 @@ export default function RootLayout() {
   const [timedOut, setTimedOut] = useState(false);
   const [themeReady, setThemeReady] = useState(false);
   useEffect(() => { void loadTheme().finally(() => setThemeReady(true)); }, []);
+  useEffect(() => watchSystemTheme(), []);
   useEffect(() => { const t = setTimeout(() => setTimedOut(true), 4000); return () => clearTimeout(t); }, []);
   fontState.ok = !!loaded && !error;
   if ((!loaded && !error && !timedOut) || !themeReady) return null;

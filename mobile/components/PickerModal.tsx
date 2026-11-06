@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { FlatList, KeyboardAvoidingView, Modal, Platform, Pressable, StyleSheet, View } from 'react-native';
+import { FlatList, KeyboardAvoidingView, Modal, Pressable, StyleSheet, View } from 'react-native';
 import { Text, TextInput } from './LText';
 import { color } from '../lib/theme';
 
@@ -20,7 +20,7 @@ export function PickerModal({ visible, title, options, selected, onPick, onClose
   const custom = allowCustom && q.trim() && !options.some((o) => norm(o.label) === term) ? q.trim() : '';
   return (
     <Modal visible={visible} animationType="slide" onRequestClose={close} transparent>
-      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding">
         <View style={s.backdrop}>
           {/* Boş alana dokununca kapanır */}
           <Pressable style={StyleSheet.absoluteFill} onPress={close} accessibilityRole="button" accessibilityLabel="Kapat" />

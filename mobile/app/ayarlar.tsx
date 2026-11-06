@@ -11,6 +11,7 @@ import { openWeb } from '../lib/web';
 import { loadTheme, saveTheme, type ThemeChoice } from '../lib/themePref';
 import { PALETTES, activePalette, color, font, radius, savePalette, shadow, themeSupportsChoice, type PaletteId } from '../lib/theme';
 import { tr } from '../lib/i18n';
+import { restartApp } from '../lib/restart';
 
 /** Ayar satırı: yumuşak ikon, kalın yazı ve sağda küçük ayraç. */
 function Row({ icon, title, onPress, last }: { icon: IconName; title: string; onPress: () => void; last?: boolean }) {
@@ -69,9 +70,10 @@ export default function Settings() {
     if (id === palette) return;
     if (!savePalette(id)) { Alert.alert(tr('Renk teması'), tr('Seçim kaydedilemedi. Tekrar dene.')); return; }
     setPalette(id);
-    // Not: DevSettings.reload() Expo Go'da yerel modülleri kaybettiriyor (ExpoAsset hatası),
-    // mağaza sürümünde ise hiç çalışmıyor. Bu yüzden kullanıcıdan uygulamayı yeniden açmasını istiyoruz.
-    Alert.alert(tr('Renk teması'), tr('Yeni renkler için uygulamayı tamamen kapatıp yeniden aç.'));
+    Alert.alert(tr('Renk teması'), tr('Yeni renkler için uygulama yeniden başlatılacak.'), [
+      { text: tr('Sonra'), style: 'cancel' },
+      { text: tr('Yeniden başlat'), onPress: () => { void restartApp().then((ok) => { if (!ok) Alert.alert(tr('Renk teması'), tr('Yeni renkler için uygulamayı tamamen kapatıp yeniden aç.')); }); } },
+    ]);
   };
   useEffect(() => {
     if (!session) { setAdmin(false); return; }
