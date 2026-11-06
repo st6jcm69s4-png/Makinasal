@@ -127,7 +127,7 @@ export default function Messages() {
       keyExtractor={(t) => t.id}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); void load().finally(() => setRefreshing(false)); }} />}
       ListHeaderComponent={head}
-      contentContainerStyle={{ paddingBottom: 24 }}
+      contentContainerStyle={{ paddingBottom: 28 }}
       ListEmptyComponent={
         <View style={s.empty}>
           <Text style={s.emptyT}>{mode === 'ilan' ? (threads.length ? 'Aramana uygun konuşma yok' : 'Henüz mesajın yok') : 'Henüz teklif konuşman yok'}</Text>
@@ -136,7 +136,7 @@ export default function Messages() {
         </View>
       }
       renderItem={({ item }) => 'unread' in item ? (
-        <Pressable style={({ pressed }) => [s.row, pressed && { backgroundColor: color.plate }]} onPress={() => router.push(`/mesaj/${item.id}`)} accessibilityRole="button">
+        <Pressable style={({ pressed }) => [s.row, item.unread > 0 && s.rowUnread, pressed && { opacity: 0.88 }]} onPress={() => router.push(`/mesaj/${item.id}`)} accessibilityRole="button">
           {item.photo ? <Image source={{ uri: item.photo }} style={s.thumb} /> : <Avatar name={item.other} size={56} />}
           <View style={{ flex: 1, gap: 2 }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
@@ -153,8 +153,8 @@ export default function Messages() {
           </View>
         </Pressable>
       ) : (
-        <Pressable style={({ pressed }) => [s.row, pressed && { backgroundColor: color.plate }]} onPress={() => router.push(`/ag/ilan/${item.post_id}` as never)} accessibilityRole="button">
-          <View style={[s.thumb, s.avatar]}><Icon name={item.incoming ? 'inbox' : 'send'} size={22} color={color.onBar} /></View>
+        <Pressable style={({ pressed }) => [s.row, pressed && { opacity: 0.88 }]} onPress={() => router.push(`/ag/ilan/${item.post_id}` as never)} accessibilityRole="button">
+          <View style={[s.thumb, s.avatar]}><Icon name={item.incoming ? 'inbox' : 'send'} size={22} color={color.tealText} /></View>
           <View style={{ flex: 1, gap: 2 }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
               <PlainText style={s.other} numberOfLines={1}>{item.incoming ? `Gelen: ${item.other}` : 'Verdiğin teklif'}</PlainText>
@@ -177,19 +177,20 @@ const s = StyleSheet.create({
   modeText: { fontSize: 15, fontFamily: font.bold, color: color.ink },
   dot: { minWidth: 20, height: 20, borderRadius: 10, backgroundColor: color.accent, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 5 },
   dotText: { color: '#fff', fontSize: 11, fontWeight: '700' },
-  search: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: color.surface, borderWidth: 1, borderColor: color.line, borderRadius: radius, paddingHorizontal: 10 },
+  search: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: color.surface, borderWidth: 1, borderColor: color.line, borderRadius: radius + 2, paddingHorizontal: 14, minHeight: 50 },
   searchInput: { flex: 1, paddingVertical: 11, fontSize: 16, color: color.ink },
   err: { color: color.bad, marginHorizontal: 12 },
   empty: { alignItems: 'center', gap: 10, padding: 28 },
   emptyT: { fontSize: 17, fontWeight: '700', color: color.ink, textAlign: 'center' },
   emptyS: { color: color.muted, textAlign: 'center' },
-  row: { flexDirection: 'row', gap: 12, paddingVertical: 12, paddingHorizontal: 12, backgroundColor: color.surface, borderBottomWidth: 1, borderBottomColor: color.line },
-  thumb: { width: 56, height: 56, borderRadius: radius, backgroundColor: color.plate },
-  avatar: { backgroundColor: color.navy, alignItems: 'center', justifyContent: 'center' },
-  avatarText: { color: color.onBar, fontFamily: font.bold, fontSize: 20 },
+  row: { flexDirection: 'row', gap: 12, padding: 12, marginHorizontal: 12, marginBottom: 8, backgroundColor: color.surface, borderRadius: radius + 4, borderWidth: 1, borderColor: color.line },
+  rowUnread: { borderColor: color.teal, borderWidth: 1.5 },
+  thumb: { width: 58, height: 58, borderRadius: 16, backgroundColor: color.plate },
+  avatar: { backgroundColor: color.tealSoft, alignItems: 'center', justifyContent: 'center' },
+  avatarText: { color: color.tealText, fontFamily: font.bold, fontSize: 20 },
   other: { flex: 1, fontSize: 16, fontFamily: font.semi, color: color.ink },
   time: { color: color.muted, fontSize: 12.5 },
-  listing: { color: color.accentText, fontSize: 13.5, fontWeight: '500' },
+  listing: { color: color.tealText, fontSize: 13.5, fontWeight: '600' },
   last: { flex: 1, color: color.muted, fontSize: 14.5 },
   badge: { minWidth: 22, height: 22, borderRadius: 11, backgroundColor: color.accent, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 6 },
   badgeText: { color: '#fff', fontSize: 12, fontWeight: '700' },
