@@ -108,12 +108,14 @@ export function Tabs<T extends string>({ items, value, onChange, variant = 'fill
         return (
           <Pressable
             key={t.id}
-            style={[k.tab, filled ? { borderTopWidth: 3, borderTopColor: on ? color.teal : 'transparent', backgroundColor: on ? color.tealSoft : 'transparent' } : { borderBottomWidth: 3, borderBottomColor: on ? color.accent : 'transparent' }, filled && i > 0 && { borderLeftWidth: 1, borderLeftColor: color.line }]}
+            style={[k.tab, filled ? { borderTopWidth: 3, borderTopColor: on ? color.teal : 'transparent', backgroundColor: on ? color.teal : 'transparent' } : { borderBottomWidth: 3, borderBottomColor: on ? color.accent : 'transparent' }, filled && i > 0 && { borderLeftWidth: 1, borderLeftColor: color.line }]}
             onPress={() => onChange(t.id)} accessibilityRole="tab" accessibilityState={{ selected: on }}
           >
-            {t.icon ? <Icon name={t.icon} size={16} color={on && filled ? color.onBar : on ? color.accentText : color.muted} /> : null}
-            <Text style={[k.tabText, { color: on ? (filled ? color.onBar : color.ink) : color.muted }]}>{t.label}</Text>
-            {t.count ? <Badge variant={on && filled ? 'outline' : 'default'}>{t.count}</Badge> : null}
+            {t.icon ? <Icon name={t.icon} size={16} color={on && filled ? color.tealInk : on ? color.accentText : color.muted} /> : null}
+            <Text style={[k.tabText, { color: on ? (filled ? color.tealInk : color.ink) : color.muted }]}>{t.label}</Text>
+            {t.count ? (on && filled
+              ? <View style={[k.badge, { backgroundColor: color.tealInk, borderColor: color.tealInk }]}><Text style={[k.badgeText, { color: color.teal }]}>{String(t.count)}</Text></View>
+              : <Badge variant="default">{t.count}</Badge>) : null}
           </Pressable>
         );
       })}
