@@ -207,10 +207,10 @@ export default function Account() {
 const s = StyleSheet.create({
   screen: { padding: 20, gap: 12, flexGrow: 1, backgroundColor: color.bg },
   h: { fontSize: 22, fontWeight: '700' },
-  input: { padding: 12, backgroundColor: color.surface, borderRadius: 4, borderWidth: 1, borderColor: color.line },
-  btn: { backgroundColor: color.accent, padding: 14, borderRadius: 4, alignItems: 'center' },
+  input: { padding: 12, backgroundColor: color.surface, borderRadius: 12, borderWidth: 1, borderColor: color.line },
+  btn: { backgroundColor: color.accent, padding: 14, borderRadius: 12, alignItems: 'center' },
   btnText: { color: '#fff', fontWeight: '600' },
-  btnGhost: { borderWidth: 1, borderColor: color.accent, padding: 14, borderRadius: 4, alignItems: 'center' },
+  btnGhost: { borderWidth: 1, borderColor: color.accent, padding: 14, borderRadius: 12, alignItems: 'center' },
   btnGhostText: { color: color.accentText, fontWeight: '600' },
   err: { color: color.bad },
   note: { color: color.muted },

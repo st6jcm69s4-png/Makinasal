@@ -150,7 +150,7 @@ export default function NetworkTab() {
 const s = StyleSheet.create({
   sheetBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', paddingHorizontal: 8, paddingVertical: 4 },
   sheetBack: { width: 40, height: 40, alignItems: 'flex-start', justifyContent: 'center', paddingLeft: 4 },
-  sheetTitle: { color: color.onBar, fontFamily: font.labelBold, fontSize: 18, letterSpacing: 1 },
+  sheetTitle: { color: color.onBar, fontFamily: font.bold, fontSize: 18 },
   sheetClose: { width: 34, height: 34, borderRadius: 17, backgroundColor: 'rgba(255,255,255,0.14)', alignItems: 'center', justifyContent: 'center' },
   switch: { flexDirection: 'row', gap: 8, padding: 16, paddingBottom: 12 },
   seg: { flex: 1, paddingVertical: 12, paddingHorizontal: 10, gap: 2, alignItems: 'flex-start', backgroundColor: color.surface, borderRadius: radius + 4, borderWidth: 1, borderColor: color.line },

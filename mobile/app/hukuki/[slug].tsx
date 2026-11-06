@@ -32,8 +32,8 @@ export default function LegalDoc() {
 }
 const s = StyleSheet.create({
   none: { textAlign: 'center', color: color.muted, margin: 24 },
-  head: { backgroundColor: color.navy, padding: 16, gap: 4 },
-  title: { color: color.onBar, fontFamily: font.labelBold, fontSize: 26, letterSpacing: 0.4 },
+  head: { backgroundColor: color.navy, paddingHorizontal: 16, paddingTop: 16, paddingBottom: 20, gap: 4, borderBottomLeftRadius: 28, borderBottomRightRadius: 28 },
+  title: { color: color.onBar, fontFamily: font.bold, fontSize: 26 },
   ver: { color: color.onNavy, fontSize: 13 },
   body: { padding: 14, gap: 16 },
   sec: { gap: 6, borderTopWidth: 1, borderTopColor: color.line, paddingTop: 12 },

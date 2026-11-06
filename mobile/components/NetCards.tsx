@@ -85,7 +85,7 @@ const s = StyleSheet.create({
   roleIcon: { width: 44, height: 44, borderRadius: radius, backgroundColor: color.accentSoft, alignItems: 'center', justifyContent: 'center' },
   title: { fontSize: 17, fontWeight: '600', color: color.ink },
   desc: { color: color.muted, fontSize: 14 },
-  fresh: { backgroundColor: color.accent, paddingHorizontal: 6, paddingVertical: 1, borderRadius: 2 },
+  fresh: { backgroundColor: color.accent, paddingHorizontal: 6, paddingVertical: 1, borderRadius: 8 },
   freshText: { color: '#fff', fontSize: 10.5, fontWeight: '700', letterSpacing: 0.6 },
   strip: { flexDirection: 'row', borderTopWidth: 1, borderTopColor: color.line },
   cell: { paddingVertical: 7, paddingHorizontal: 12, gap: 1 },

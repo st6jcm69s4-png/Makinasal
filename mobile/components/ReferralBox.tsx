@@ -111,7 +111,7 @@ export function ReferralBox() {
 
 const s = StyleSheet.create({
   wrap: { borderWidth: 1, borderColor: color.line, backgroundColor: color.surface, borderRadius: radius, overflow: 'hidden' },
-  top: { backgroundColor: color.navy, padding: 14, flexDirection: 'row', alignItems: 'center', gap: 12 },
+  top: { backgroundColor: color.navy, padding: 16, flexDirection: 'row', alignItems: 'center', gap: 12 },
   gift: { width: 42, height: 42, borderRadius: radius, backgroundColor: color.accent, alignItems: 'center', justifyContent: 'center' },
   title: { color: color.onBar, fontFamily: font.bold, fontSize: 18 },
   body: { padding: 14, gap: 12 },
@@ -127,7 +127,7 @@ const s = StyleSheet.create({
   seg: { flex: 1, height: 10, backgroundColor: color.plate, borderWidth: 1, borderColor: color.line },
   segOn: { backgroundColor: color.accent, borderColor: color.accent },
   nums: { alignItems: 'flex-end' },
-  num: { fontFamily: font.labelBold, fontSize: 28, color: color.ink, lineHeight: 30 },
+  num: { fontFamily: font.bold, fontSize: 28, color: color.ink, lineHeight: 32 },
   of: { fontFamily: font.label, fontSize: 18, color: color.muted },
   small: { color: color.muted, fontSize: 12.5 },
   claim: { borderTopWidth: 1, borderTopColor: color.line, padding: 12, gap: 8 },

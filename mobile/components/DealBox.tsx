@@ -99,15 +99,15 @@ export function DealBox({ threadId, me, buyerId, sellerId }: { threadId: string;
 }
 
 const s = StyleSheet.create({
-  box: { backgroundColor: color.surface, margin: 10, padding: 12, borderRadius: 4, gap: 8 },
+  box: { backgroundColor: color.surface, margin: 10, padding: 12, borderRadius: 12, gap: 8 },
   b: { fontWeight: '700' },
   small: { color: color.muted, fontSize: 12 },
-  btn: { backgroundColor: color.accent, padding: 12, borderRadius: 4, alignItems: 'center' },
+  btn: { backgroundColor: color.accent, padding: 12, borderRadius: 12, alignItems: 'center' },
   btnText: { color: '#fff', fontWeight: '600' },
   star: { fontSize: 30, color: color.line },
   tags: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
-  tag: { borderWidth: 1, borderColor: color.line, borderRadius: 4, paddingVertical: 6, paddingHorizontal: 10 },
+  tag: { borderWidth: 1, borderColor: color.line, borderRadius: 12, paddingVertical: 6, paddingHorizontal: 10 },
   tagOn: { backgroundColor: color.accent, borderColor: color.accent },
-  input: { padding: 10, backgroundColor: color.bg, borderRadius: 4, minHeight: 50 },
+  input: { padding: 10, backgroundColor: color.bg, borderRadius: 12, minHeight: 50 },
   err: { color: color.bad },
 });

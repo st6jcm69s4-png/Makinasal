@@ -26,6 +26,6 @@ export default function Legal() {
   );
 }
 const s = StyleSheet.create({
-  note: { padding: 12, backgroundColor: color.surface, borderWidth: 1, borderColor: color.line, borderLeftWidth: 3, borderLeftColor: color.navy },
+  note: { padding: 12, backgroundColor: color.surface, borderWidth: 1, borderColor: color.line, borderRadius: 16 },
   p: { color: color.ink, lineHeight: 21 },
 });

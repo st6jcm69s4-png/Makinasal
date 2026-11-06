@@ -60,7 +60,7 @@ const s = StyleSheet.create({
   head: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, borderBottomWidth: 1, borderBottomColor: color.line },
   title: { fontWeight: '700', fontSize: 16 },
   close: { color: color.accentText, fontWeight: '600' },
-  search: { margin: 12, padding: 10, backgroundColor: color.bg, borderRadius: 4, borderWidth: 1, borderColor: color.line },
+  search: { margin: 12, padding: 10, backgroundColor: color.bg, borderRadius: 12, borderWidth: 1, borderColor: color.line },
   row: { paddingVertical: 14, paddingHorizontal: 16, borderBottomWidth: 1, borderBottomColor: color.line },
   label: { color: color.ink },
   sel: { color: color.accentText, fontWeight: '700' },

@@ -71,7 +71,7 @@ const s = StyleSheet.create({
   title: { fontWeight: '700', fontSize: 16 },
   close: { color: color.accentText, fontWeight: '600' },
   label: { fontWeight: '600', color: color.ink },
-  input: { padding: 12, backgroundColor: color.surface, borderRadius: 4, borderWidth: 1, borderColor: color.line },
+  input: { padding: 12, backgroundColor: color.surface, borderRadius: 12, borderWidth: 1, borderColor: color.line },
   row: { flexDirection: 'row', gap: 8 },
   sw: { flexDirection: 'row', alignItems: 'center' },
 });

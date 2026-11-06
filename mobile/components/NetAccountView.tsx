@@ -142,12 +142,12 @@ function Empty({ text, cta, onPress }: { text: string; cta: string; onPress: () 
 }
 
 const s = StyleSheet.create({
-  head: { backgroundColor: color.navy, paddingTop: 6 },
+  head: { backgroundColor: color.navy, paddingTop: 6, borderBottomLeftRadius: 28, borderBottomRightRadius: 28, overflow: 'hidden' },
   titleWrap: { paddingHorizontal: 16, gap: 2 },
-  h1: { color: color.onBar, fontFamily: font.labelBold, fontSize: 38, letterSpacing: 0.8, lineHeight: 40 },
+  h1: { color: color.onBar, fontFamily: font.bold, fontSize: 26, lineHeight: 32 },
   stats: { flexDirection: 'row', marginTop: 10, borderTopWidth: 1, borderTopColor: color.navy2 },
   stat: { flex: 1, paddingVertical: 10, paddingHorizontal: 14, gap: 1, borderBottomWidth: 3, borderBottomColor: 'transparent' },
-  statOn: { backgroundColor: color.navy2, borderBottomColor: color.accent },
+  statOn: { backgroundColor: color.navy2, borderBottomColor: color.teal },
   statNum: { color: color.onBar, fontFamily: font.bold, fontSize: 26 },
   quick: { flexDirection: 'row', backgroundColor: color.surface, borderBottomWidth: 1, borderBottomColor: color.line },
   q: { flex: 1, alignItems: 'center', gap: 4, paddingVertical: 12 },
@@ -161,7 +161,7 @@ const s = StyleSheet.create({
   card: { marginHorizontal: 12, marginBottom: 10, backgroundColor: color.surface, borderWidth: 1, borderColor: color.line, borderRadius: radius, overflow: 'hidden' },
   cardTop: { flexDirection: 'row', gap: 10, padding: 12, alignItems: 'flex-start' },
   title: { fontSize: 16, fontWeight: '600', color: color.ink },
-  pill: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 2 },
+  pill: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 8 },
   pillText: { fontSize: 12, fontWeight: '700' },
   strip: { flexDirection: 'row', borderTopWidth: 1, borderTopColor: color.line },
   cell: { paddingVertical: 7, paddingHorizontal: 12, gap: 1 },

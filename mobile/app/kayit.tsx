@@ -131,7 +131,7 @@ export default function Register() {
 const s = StyleSheet.create({
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 14, padding: 24, backgroundColor: color.bg },
   icon: { width: 48, height: 48, borderRadius: radius, backgroundColor: color.accent, alignItems: 'center', justifyContent: 'center' },
-  title: { fontFamily: font.labelBold, fontSize: 28, color: color.ink, letterSpacing: 0.6 },
+  title: { fontFamily: font.bold, fontSize: 28, color: color.ink },
   p: { textAlign: 'center', color: color.ink, fontSize: 16, lineHeight: 22 },
   head: { backgroundColor: color.navy, paddingHorizontal: 18, paddingTop: 18, paddingBottom: 22, gap: 4, borderBottomLeftRadius: 28, borderBottomRightRadius: 28 },
   headTitle: { color: color.onBar, fontFamily: font.bold, fontSize: 26 },

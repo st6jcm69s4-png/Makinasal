@@ -10,7 +10,7 @@ import { useApp } from '../lib/AppContext';
 import { useLoginPrompt } from '../components/LoginPrompt';
 import { CITIES } from '../lib/data';
 import { COORDS } from '../lib/geo';
-import { caps, color, font, radius } from '../lib/theme';
+import { color, font, radius } from '../lib/theme';
 import type { Provider } from '../lib/network';
 import { supabase } from '../lib/supabase';
 
@@ -100,7 +100,7 @@ export default function Cekici() {
     <ScrollView style={{ flex: 1, backgroundColor: color.bg }} contentContainerStyle={{ paddingBottom: 32 }}>
       <View style={s.hero}>
         <Label style={{ color: color.onNavy }}>Yol yardım</Label>
-        <PlainText style={s.h1}>{caps('En yakın çekiciyi bul', 'tr')}</PlainText>
+        <Text style={s.h1}>En yakın çekiciyi bul</Text>
         <Text style={s.lead}>Konumunu paylaş ya da il seç; çekiciler yakınlığa göre, puanlarıyla sıralanır.</Text>
         <Pressable style={({ pressed }) => [s.locBtn, pressed && { opacity: 0.85 }]} onPress={() => void useMyLocation()} disabled={locBusy} accessibilityRole="button">
           {locBusy ? <ActivityIndicator color={color.onBar} /> : <Icon name="crosshair" size={20} color={color.onBar} />}
@@ -170,8 +170,8 @@ export default function Cekici() {
 }
 
 const s = StyleSheet.create({
-  hero: { backgroundColor: color.navy, padding: 16, gap: 8 },
-  h1: { color: color.onBar, fontFamily: font.labelBold, fontSize: 34, lineHeight: 36, letterSpacing: 0.5 },
+  hero: { backgroundColor: color.navy, paddingHorizontal: 16, paddingTop: 16, paddingBottom: 20, gap: 8, borderBottomLeftRadius: 28, borderBottomRightRadius: 28 },
+  h1: { color: color.onBar, fontFamily: font.bold, fontSize: 26, lineHeight: 32 },
   lead: { color: color.onNavy },
   locBtn: { backgroundColor: color.accent, borderRadius: radius, minHeight: 50, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 6 },
   locText: { color: color.onBar, fontSize: 16, fontWeight: '700' },

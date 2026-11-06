@@ -71,7 +71,7 @@ export default function ChangePassword() {
 const s = StyleSheet.create({
   body: { padding: 12, gap: 12, paddingBottom: 40 },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 14, padding: 24, backgroundColor: color.bg },
-  icon: { width: 48, height: 48, borderRadius: 4, backgroundColor: color.good, alignItems: 'center', justifyContent: 'center' },
+  icon: { width: 48, height: 48, borderRadius: 12, backgroundColor: color.good, alignItems: 'center', justifyContent: 'center' },
   title: { fontSize: 22, fontWeight: '700', color: color.ink },
   p: { textAlign: 'center', color: color.ink, fontSize: 16, lineHeight: 22 },
   rule: { flexDirection: 'row', alignItems: 'center', gap: 6 },

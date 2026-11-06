@@ -40,7 +40,7 @@ export function AlertBox({ variant = 'default', title, children, style }: { vari
     : variant === 'success' ? { bg: color.goodBg, fg: color.good, icon: 'check-circle' as IconName }
     : { bg: color.plate, fg: color.ink, icon: 'info' as IconName };
   return (
-    <View style={[k.alert, { backgroundColor: tone.bg, borderLeftColor: tone.fg }, style]} accessibilityRole="alert">
+    <View style={[k.alert, { backgroundColor: tone.bg, borderColor: tone.fg }, style]} accessibilityRole="alert">
       <Icon name={tone.icon} size={18} color={tone.fg} />
       <View style={{ flex: 1, gap: 2 }}>
         {title ? <Text style={[k.alertTitle, { color: tone.fg }]}>{title}</Text> : null}
@@ -61,7 +61,7 @@ export function Skeleton({ width = '100%', height = 14, style }: { width?: numbe
     loop.start();
     return () => loop.stop();
   }, [o]);
-  return <Animated.View style={[{ width, height, backgroundColor: color.line, borderRadius: 2, opacity: o }, style]} />;
+  return <Animated.View style={[{ width, height, backgroundColor: color.line, borderRadius: 8, opacity: o }, style]} />;
 }
 /** İlan kartı iskeleti: yüklenirken dönen çember yerine. */
 export function CardSkeleton({ count = 3 }: { count?: number }) {
@@ -108,7 +108,7 @@ export function Tabs<T extends string>({ items, value, onChange, variant = 'fill
         return (
           <Pressable
             key={t.id}
-            style={[k.tab, filled ? { borderTopWidth: 3, borderTopColor: on ? color.pop : 'transparent', backgroundColor: on ? color.navy : 'transparent' } : { borderBottomWidth: 3, borderBottomColor: on ? color.accent : 'transparent' }, filled && i > 0 && { borderLeftWidth: 1, borderLeftColor: color.line }]}
+            style={[k.tab, filled ? { borderTopWidth: 3, borderTopColor: on ? color.teal : 'transparent', backgroundColor: on ? color.tealSoft : 'transparent' } : { borderBottomWidth: 3, borderBottomColor: on ? color.accent : 'transparent' }, filled && i > 0 && { borderLeftWidth: 1, borderLeftColor: color.line }]}
             onPress={() => onChange(t.id)} accessibilityRole="tab" accessibilityState={{ selected: on }}
           >
             {t.icon ? <Icon name={t.icon} size={16} color={on && filled ? color.onBar : on ? color.accentText : color.muted} /> : null}
@@ -143,9 +143,9 @@ export function Separator({ vertical }: { vertical?: boolean }) {
 }
 
 const k = StyleSheet.create({
-  badge: { flexDirection: 'row', alignItems: 'center', gap: 4, alignSelf: 'flex-start', paddingHorizontal: 7, paddingVertical: 2, borderRadius: 2, borderWidth: 1 },
+  badge: { flexDirection: 'row', alignItems: 'center', gap: 4, alignSelf: 'flex-start', paddingHorizontal: 7, paddingVertical: 2, borderRadius: 8, borderWidth: 1 },
   badgeText: { fontSize: 11.5, fontWeight: '700', letterSpacing: 0.2 },
-  alert: { flexDirection: 'row', gap: 10, padding: 12, borderLeftWidth: 3, borderRadius: radius, alignItems: 'flex-start' },
+  alert: { flexDirection: 'row', gap: 10, padding: 12, borderWidth: 1, borderRadius: radius + 2, alignItems: 'flex-start' },
   alertTitle: { fontWeight: '700', fontSize: 14.5 },
   skCard: { marginHorizontal: 12, marginBottom: 10, backgroundColor: color.surface, borderWidth: 1, borderColor: color.line, borderRadius: radius, overflow: 'hidden' },
   skRow: { flexDirection: 'row', gap: 12, padding: 12, backgroundColor: color.surface, borderBottomWidth: 1, borderBottomColor: color.line },

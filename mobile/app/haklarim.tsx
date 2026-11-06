@@ -94,7 +94,7 @@ export default function Rights() {
 const s = StyleSheet.create({
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12, padding: 24, backgroundColor: color.bg },
   p: { color: color.ink, lineHeight: 21 },
-  note: { gap: 10, padding: 12, backgroundColor: color.surface, borderWidth: 1, borderColor: color.line, borderLeftWidth: 3, borderLeftColor: color.navy },
+  note: { gap: 10, padding: 12, backgroundColor: color.surface, borderWidth: 1, borderColor: color.line, borderRadius: 16 },
   input: { minHeight: 80, padding: 12, backgroundColor: color.surface, borderWidth: 1, borderColor: color.line, borderRadius: radius, textAlignVertical: 'top', fontSize: 16 },
   card: { gap: 12, padding: 12, backgroundColor: color.surface, borderWidth: 1, borderColor: color.line, borderRadius: radius },
   title: { fontSize: 16, fontWeight: '700', color: color.ink },

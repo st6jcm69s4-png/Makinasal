@@ -66,8 +66,8 @@ const s = StyleSheet.create({
   msg: { textAlign: 'center', color: color.muted, margin: 24 },
   err: { color: color.bad, margin: 12 },
   link: { color: color.accentText, fontWeight: '600', margin: 12 },
-  card: { backgroundColor: color.surface, padding: 12, borderRadius: 4, gap: 4 },
-  unread: { borderLeftWidth: 4, borderLeftColor: color.accent },
+  card: { backgroundColor: color.surface, padding: 12, borderRadius: 12, gap: 4 },
+  unread: { borderWidth: 1.5, borderColor: color.teal },
   title: { fontWeight: '700' },
   date: { color: color.muted, fontSize: 12 },
 });

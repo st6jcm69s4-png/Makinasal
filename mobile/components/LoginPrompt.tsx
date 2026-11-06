@@ -91,7 +91,7 @@ const s = StyleSheet.create({
   sheet: { backgroundColor: color.bg, borderTopLeftRadius: radius, borderTopRightRadius: radius, overflow: 'hidden' },
   body: { padding: 20, gap: 12, paddingBottom: 28 },
   icon: { width: 48, height: 48, borderRadius: radius, backgroundColor: color.accent, alignItems: 'center', justifyContent: 'center' },
-  title: { fontFamily: font.labelBold, fontSize: 28, color: color.ink, letterSpacing: 0.6 },
+  title: { fontFamily: font.bold, fontSize: 28, color: color.ink },
   text: { color: color.muted, fontSize: 16, lineHeight: 22 },
   skip: { color: color.muted, fontWeight: '600' },
 });
