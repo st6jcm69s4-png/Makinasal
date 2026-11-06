@@ -108,9 +108,10 @@ export function Tabs<T extends string>({ items, value, onChange, variant = 'fill
         return (
           <Pressable
             key={t.id}
-            style={[k.tab, filled ? { borderTopWidth: 3, borderTopColor: on ? color.teal : 'transparent', backgroundColor: on ? color.teal : 'transparent' } : { borderBottomWidth: 3, borderBottomColor: on ? color.accent : 'transparent' }, filled && i > 0 && { borderLeftWidth: 1, borderLeftColor: color.line }]}
+            style={[k.tab, filled ? { backgroundColor: on ? color.teal : 'transparent' } : { borderBottomWidth: 3, borderBottomColor: on ? color.accent : 'transparent' }]}
             onPress={() => onChange(t.id)} accessibilityRole="tab" accessibilityState={{ selected: on }}
           >
+            {filled && i > 0 && !on && items[i - 1].id !== value ? <View style={k.tabDivider} /> : null}
             {t.icon ? <Icon name={t.icon} size={16} color={on && filled ? color.tealInk : on ? color.accentText : color.muted} /> : null}
             <Text style={[k.tabText, { color: on ? (filled ? color.tealInk : color.ink) : color.muted }]}>{t.label}</Text>
             {t.count ? (on && filled
@@ -152,6 +153,7 @@ const k = StyleSheet.create({
   skCard: { marginHorizontal: 12, marginBottom: 10, backgroundColor: color.surface, borderWidth: 1, borderColor: color.line, borderRadius: radius, overflow: 'hidden' },
   skRow: { flexDirection: 'row', gap: 12, padding: 12, backgroundColor: color.surface, borderBottomWidth: 1, borderBottomColor: color.line },
   tabs: { flexDirection: 'row', backgroundColor: color.surface, borderBottomWidth: 1, borderBottomColor: color.line },
+  tabDivider: { position: 'absolute', left: 0, top: 10, bottom: 10, width: StyleSheet.hairlineWidth, backgroundColor: color.line },
   tab: { flex: 1, minHeight: 48, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingHorizontal: 6 },
   tabText: { fontSize: 14.5, fontFamily: font.bold },
   progress: { height: 8, backgroundColor: color.plate, borderWidth: 1, borderColor: color.line, overflow: 'hidden' },
