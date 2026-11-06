@@ -73,7 +73,7 @@ export function NetAccountView({ onNavigate, embedded }: { onNavigate?: () => vo
         </View>
       </View>
       <View style={s.quick}>
-        {([['briefcase', 'Firma profilim', '/ag/firma-kaydi'], ['package', 'Makine parkım', '/ag/envanter'], ['plus', 'Yeni ilan', '/ag/yeni']] as [IconName, string, string][]).map(([ic, l, to], i) => (
+        {([['briefcase', 'Firma profilim', '/ag/firma-kaydi'], ['package', 'Makinelerim', '/ag/envanter'], ['plus', 'Yeni ilan', '/ag/yeni']] as [IconName, string, string][]).map(([ic, l, to], i) => (
           <Pressable key={l} style={[s.q, i > 0 && { borderLeftWidth: 1, borderLeftColor: color.line }]} onPress={() => go(to)} accessibilityRole="button">
             <Icon name={ic} size={20} color={color.accentText} />
             <Text style={s.qText}>{l}</Text>

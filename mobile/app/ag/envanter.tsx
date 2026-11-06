@@ -24,11 +24,11 @@ export default function Inventory() {
   const load = useCallback(async () => {
     if (!uid) { setLoading(false); return; }
     const r = await supabase.from('company_inventory').select('*').eq('owner_id', uid).order('created_at', { ascending: false }).limit(200);
-    if (r.error) setError('Makine parkı yüklenemedi.'); else setItems((r.data ?? []) as InventoryItem[]);
+    if (r.error) setError('Makineler yüklenemedi.'); else setItems((r.data ?? []) as InventoryItem[]);
     setLoading(false);
   }, [uid]);
   useEffect(() => { void load(); }, [load]);
-  if (!uid) return <GuestGate icon="truck" text="Makine parkını yönetmek için giriş yap." />;
+  if (!uid) return <GuestGate icon="truck" text="Makinelerini yönetmek için giriş yap." />;
   if (loading) return <ActivityIndicator style={{ margin: 24 }} />;
 
   async function save() {
@@ -66,7 +66,7 @@ export default function Inventory() {
           <Btn ghost title="Vazgeç" onPress={() => { setForm(null); setEditId(null); }} />
         </View>
       ) : <Btn title="Makine / araç ekle" onPress={() => { setForm(empty); setEditId(null); }} />}
-      {items.length === 0 ? <Text style={common.meta}>Makine parkında kayıt yok. Önce firma profilini kaydetmelisin.</Text> : null}
+      {items.length === 0 ? <Text style={common.meta}>Henüz makine eklenmedi. Önce firma profilini kaydetmelisin.</Text> : null}
       {items.map((i) => (
         <View key={String(i.id)} style={common.card}>
           <Text style={common.title}>{String(i.brand ?? '')} {String(i.model)}</Text>

@@ -176,7 +176,7 @@ export default function Home() {
             ['Gelen teklifler', counts?.offers, '/ag/hesabim', 'inbox'],
             ['Açık işlerim', counts?.works, '/ag/hesabim', 'clipboard'],
             ['İlanlarım', undefined, '/ilanlarim', 'list'],
-            ['Makine parkım', undefined, '/ag/envanter', 'package'],
+            ['Makinelerim', undefined, '/ag/envanter', 'package'],
           ] as [string, number | undefined, string, IconName][]).map(([l, n, to, ic]) => (
             <Pressable key={l} style={({ pressed }) => [s.hubCell, pressed && { opacity: 0.88 }]} onPress={() => router.push(to as never)} accessibilityRole="button">
               <View style={s.hubIcon}><Icon name={ic} size={20} color={color.tealText} /></View>

@@ -64,7 +64,7 @@ export default function ProviderForm() {
     <Pressable style={({ pressed }) => [s.park, pressed && { opacity: 0.88 }]} onPress={() => router.push('/ag/envanter' as never)} accessibilityRole="button">
       <View style={s.parkIcon}><Icon name="package" size={20} color={color.tealInk} /></View>
       <View style={{ flex: 1 }}>
-        <Text style={s.parkT}>Makine parkım</Text>
+        <Text style={s.parkT}>Makinelerim</Text>
         <Text style={s.parkS}>Firmana ait makine ve araçları ekle, müsaitliklerini göster.</Text>
       </View>
       <Icon name="chevron-right" size={20} color={color.tealText} />
