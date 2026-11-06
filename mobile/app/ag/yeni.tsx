@@ -37,7 +37,7 @@ export default function NewPost() {
     });
   }, [edit, session]);
 
-  if (kind === 'rental_operator') return <Redirect href={(edit ? `/ag/tanit?edit=${edit}` : '/ag/tanit') as never} />;
+  if ((kind as string) === 'rental_operator') return <Redirect href={(edit ? `/ag/tanit?edit=${edit}` : '/ag/tanit') as never} />;
   if (!session) return <GuestGate icon="plus-square" text="İş ağında ilan vermek için giriş yap." />;
   if (loading) return <ActivityIndicator style={{ margin: 24 }} />;
 
