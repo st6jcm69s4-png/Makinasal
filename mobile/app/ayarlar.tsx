@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Alert, DevSettings, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { Text } from '../components/LText';
 import { router } from 'expo-router';
 import { Btn, Chip, common } from '../components/ui';
@@ -9,7 +9,8 @@ import { useApp } from '../lib/AppContext';
 import { supabase } from '../lib/supabase';
 import { openWeb } from '../lib/web';
 import { loadTheme, saveTheme, type ThemeChoice } from '../lib/themePref';
-import { color, font, radius, shadow, themeSupportsChoice } from '../lib/theme';
+import { PALETTES, activePalette, color, font, radius, savePalette, shadow, themeSupportsChoice, type PaletteId } from '../lib/theme';
+import { tr } from '../lib/i18n';
 
 /** Ayar satırı: yumuşak ikon, kalın yazı ve sağda küçük ayraç. */
 function Row({ icon, title, onPress, last }: { icon: IconName; title: string; onPress: () => void; last?: boolean }) {
@@ -28,6 +29,10 @@ const r = StyleSheet.create({
   icon: { width: 38, height: 38, borderRadius: 12, backgroundColor: color.tealSoft, alignItems: 'center', justifyContent: 'center' },
   title: { flex: 1, color: color.ink, fontFamily: font.semi, fontSize: 16 },
   head: { fontFamily: font.bold, fontSize: 18, color: color.ink, marginTop: 8, marginBottom: 4, marginHorizontal: 4 },
+  pal: { flex: 1, gap: 10, padding: 12, borderRadius: radius, borderWidth: 1, borderColor: color.line, backgroundColor: color.bg },
+  swatches: { flexDirection: 'row', gap: 4 },
+  sw: { flex: 1, height: 28, borderRadius: 8, borderWidth: 1, borderColor: 'rgba(0,0,0,0.12)' },
+  palT: { color: color.ink, fontFamily: font.semi, fontSize: 15 },
 });
 
 export default function Settings() {
@@ -37,6 +42,16 @@ export default function Settings() {
   const [theme, setTheme] = useState<ThemeChoice>('system');
   useEffect(() => { void loadTheme().then(setTheme); }, []);
   const pickTheme = (c: ThemeChoice) => { setTheme(c); void saveTheme(c); };
+  const [palette, setPalette] = useState<PaletteId>(activePalette);
+  const pickPalette = (id: PaletteId) => {
+    if (id === palette) return;
+    if (!savePalette(id)) { Alert.alert(tr('Renk teması'), tr('Seçim kaydedilemedi. Tekrar dene.')); return; }
+    setPalette(id);
+    Alert.alert(tr('Renk teması'), tr('Yeni renkler uygulama yeniden başlayınca uygulanır.'), [
+      { text: tr('Sonra'), style: 'cancel' },
+      { text: tr('Şimdi yeniden başlat'), onPress: () => { try { DevSettings.reload(); } catch { Alert.alert(tr('Renk teması'), tr('Uygulamayı kapatıp yeniden aç.')); } } },
+    ]);
+  };
   useEffect(() => {
     if (!session) { setAdmin(false); return; }
     void supabase.auth.getUser().then(({ data }) => setAdmin(data.user?.app_metadata?.role === 'admin'));
@@ -62,6 +77,27 @@ export default function Settings() {
           </View>
         </View>
       ) : null}
+      <View style={common.card}>
+        <Text style={common.h2}>Renk teması</Text>
+        <View style={{ flexDirection: 'row', gap: 10 }}>
+          {(Object.keys(PALETTES) as PaletteId[]).map((id) => {
+            const p = PALETTES[id];
+            const on = palette === id;
+            return (
+              <Pressable key={id} style={[r.pal, on && { borderColor: color.teal, borderWidth: 2 }]} onPress={() => pickPalette(id)} accessibilityRole="button" accessibilityState={{ selected: on }}>
+                <View style={r.swatches}>
+                  {[p.light.navy, p.light.accent, p.light.bg, p.dark.bg].map((c, i) => <View key={i} style={[r.sw, { backgroundColor: c }]} />)}
+                </View>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                  <Text style={r.palT}>{p.name}</Text>
+                  {on ? <Icon name="check-circle" size={16} color={color.tealText} /> : null}
+                </View>
+              </Pressable>
+            );
+          })}
+        </View>
+        <Text style={common.meta}>Açık ve koyu görünüm her renk temasında ayrıca çalışır.</Text>
+      </View>
       <Text style={r.head}>Hesap</Text>
       {session ? (
         <View style={r.group}>

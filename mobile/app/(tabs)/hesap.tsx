@@ -88,7 +88,7 @@ function Member() {
         <Group title="İş ağı" items={[
           { icon: 'briefcase', label: 'İş ağı hesabım', sub: 'Taleplerim, tekliflerim', go: go('/ag/hesabim') },
           { icon: 'home', label: 'Firma profilim', go: go('/ag/firma-kaydi') },
-          { icon: 'truck', label: 'Envanterim', go: go('/ag/envanter') },
+          { icon: 'truck', label: 'Makine parkım', go: go('/ag/envanter') },
         ]} />
         <Group title="Hesap" items={[
           { icon: 'user', label: 'Profili düzenle', go: go('/profil-duzenle') },

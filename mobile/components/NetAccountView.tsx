@@ -54,7 +54,7 @@ export function NetAccountView({ onNavigate, embedded }: { onNavigate?: () => vo
   const waiting = inc.filter((x) => x.status === 'pending').length;
   const pendingBy = (id: string) => inc.filter((x) => x.post_id === id && x.status === 'pending').length;
   const title = (q: Q) => (Array.isArray(q.market_posts) ? q.market_posts[0]?.title : q.market_posts?.title) ?? 'İş ağı ilanı';
-  const stats: [string, number, Seg][] = [['Açık ilan', open, 'posts'], ['Bekleyen teklif', waiting, 'incoming'], ['Verdiğim', sent.length, 'sent']];
+  const stats: [string, number, Seg][] = [['Açık ilan', open, 'posts'], ['Bekleyen teklif', waiting, 'incoming'], ['Gönderilen teklif', sent.length, 'sent']];
 
   return (
     <ScrollView style={{ flex: 1, backgroundColor: color.bg }} contentContainerStyle={{ paddingBottom: 28 }} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); void load().finally(() => setRefreshing(false)); }} />}>
@@ -73,7 +73,7 @@ export function NetAccountView({ onNavigate, embedded }: { onNavigate?: () => vo
         </View>
       </View>
       <View style={s.quick}>
-        {([['briefcase', 'Firma profilim', '/ag/firma-kaydi'], ['truck', 'Envanterim', '/ag/envanter'], ['plus', 'Yeni ilan', '/ag/yeni']] as [IconName, string, string][]).map(([ic, l, to], i) => (
+        {([['briefcase', 'Firma profilim', '/ag/firma-kaydi'], ['package', 'Makine parkım', '/ag/envanter'], ['plus', 'Yeni ilan', '/ag/yeni']] as [IconName, string, string][]).map(([ic, l, to], i) => (
           <Pressable key={l} style={[s.q, i > 0 && { borderLeftWidth: 1, borderLeftColor: color.line }]} onPress={() => go(to)} accessibilityRole="button">
             <Icon name={ic} size={20} color={color.accentText} />
             <Text style={s.qText}>{l}</Text>
@@ -82,7 +82,7 @@ export function NetAccountView({ onNavigate, embedded }: { onNavigate?: () => vo
       </View>
       {error ? <View style={{ margin: 12 }}><AlertBox variant="destructive">{error}</AlertBox></View> : null}
 
-      <Label style={s.sec}>{seg === 'posts' ? 'İlanlarım' : seg === 'incoming' ? 'Gelen teklifler ve başvurular' : 'Verdiğim teklifler'}</Label>
+      <Label style={s.sec}>{seg === 'posts' ? 'İlanlarım' : seg === 'incoming' ? 'Gelen teklifler ve başvurular' : 'Gönderilen teklifler'}</Label>
       {seg === 'posts' ? (posts.length ? posts.map((p) => (
         <Pressable key={p.id} style={({ pressed }) => [s.card, pressed && { opacity: 0.85 }]} onPress={() => go(`/ag/ilan/${p.id}`)} accessibilityRole="button">
           <View style={s.cardTop}>
@@ -107,7 +107,7 @@ export function NetAccountView({ onNavigate, embedded }: { onNavigate?: () => vo
         <Pressable key={q.id} style={({ pressed }) => [s.card, pressed && { opacity: 0.85 }]} onPress={() => go(`/ag/ilan/${q.post_id}`)} accessibilityRole="button">
           <View style={s.cardTop}>
             <View style={{ flex: 1, gap: 3 }}>
-              <Label style={{ color: color.accentText }}>{seg === 'incoming' ? q.display_name : 'Verdiğim teklif'}</Label>
+              <Label style={{ color: color.accentText }}>{seg === 'incoming' ? q.display_name : 'Gönderilen teklif'}</Label>
               <Text style={s.title} numberOfLines={2}>{title(q)}</Text>
             </View>
             <StatusBadge status={q.status} text={QUOTE_STATUS[q.status] ?? q.status} />

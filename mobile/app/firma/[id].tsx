@@ -48,7 +48,7 @@ export default function ProviderDetail() {
       </View>
       <Btn title="Telefonla ara" onPress={() => void call()} />
       <Btn ghost title={netFavs.has(`firm:${id}`) ? 'Favorilerde · çıkar' : 'Favorilere ekle'} onPress={async () => { const err = await toggleNetFav('firm', String(id)); if (err) notify('Favoriler', err, (a) => void a.toggleNetFav('firm', String(id))); }} />
-      {inv.length ? <Text style={common.h2}>Envanter</Text> : null}
+      {inv.length ? <Text style={common.h2}>Makine parkı</Text> : null}
       {inv.map((i) => (
         <View key={String(i.id)} style={common.card}>
           <Text style={common.title}>{String(i.brand ?? '')} {String(i.model ?? '')}</Text>

@@ -12,8 +12,8 @@ import { fireScrollTop } from '../../lib/scrollTop';
 
 const icon = (name: IconName) => ({ color: tint, focused }: { color: ColorValue | null; focused: boolean }) => (
   <View style={{ alignItems: 'center' }}>
-    <View style={{ position: 'absolute', top: -9, width: 44, height: 3, backgroundColor: focused ? color.pop : 'transparent' }} />
-    <Icon name={name} size={21} color={typeof tint === 'string' ? tint : focused ? color.pop : color.muted} />
+    <View style={{ position: 'absolute', top: -9, width: 44, height: 3, backgroundColor: focused ? color.barActive : 'transparent' }} />
+    <Icon name={name} size={21} color={typeof tint === 'string' ? tint : focused ? color.barActive : color.onNavy} />
   </View>
 );
 
@@ -57,8 +57,8 @@ export default function TabsLayout() {
             <Icon name="search" size={22} color={color.onBar} />
           </Pressable>
         ),
-        tabBarActiveTintColor: color.tealText,
-        tabBarInactiveTintColor: color.muted,
+        tabBarActiveTintColor: color.barActive,
+        tabBarInactiveTintColor: color.onNavy,
         tabBarStyle: { backgroundColor: color.navy, borderTopWidth: 1, borderTopColor: color.navy2, paddingTop: 0 },
         tabBarItemStyle: { borderLeftWidth: 1, borderLeftColor: color.navy2, paddingTop: 6 },
         tabBarLabelStyle: { fontSize: 11.5, fontFamily: font.label, letterSpacing: 0.4 },

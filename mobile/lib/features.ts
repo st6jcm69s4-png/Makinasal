@@ -26,6 +26,7 @@ export const FEATURES: Feature[] = [
   { id: 'theme-dark', title: 'Koyu tema', sub: 'Uygulamayı koyu görünüme al', icon: 'moon', androidHidden: true, action: true, words: 'dark mod mode karanlık gece siyah koyu dunkel dunkler modus nachtmodus tema theme görünüm', run: async () => { await saveTheme('dark'); return 'Koyu tema açıldı.'; } },
   { id: 'theme-light', title: 'Açık tema', sub: 'Uygulamayı açık görünüme al', icon: 'sun', androidHidden: true, action: true, words: 'light mod mode aydınlık gündüz beyaz açık hell heller modus tagmodus tema theme görünüm', run: async () => { await saveTheme('light'); return 'Açık tema açıldı.'; } },
   { id: 'theme-system', title: 'Sistem görünümü', sub: 'Telefonun ayarını izle', icon: 'smartphone', androidHidden: true, action: true, words: 'sistem otomatik system automatic automatisch tema theme görünüm', run: async () => { await saveTheme('system'); return 'Görünüm telefonun ayarını izliyor.'; } },
+  { id: 'palette', title: 'Renk teması', sub: 'Petrol yeşili veya bordo', icon: 'droplet', words: 'renk tema bordo petrol yeşil kırmızı palet color theme farbe design', run: open('/ayarlar') },
   { id: 'lang-tr', title: 'Türkçe', sub: 'Uygulama dilini Türkçe yap', icon: 'globe', action: true, words: 'dil language sprache türkçe turkish turkce türkisch', run: (c) => { c.setLang('tr'); return 'Dil: Türkçe'; } },
   { id: 'lang-en', title: 'English', sub: 'Uygulama dilini İngilizce yap', icon: 'globe', action: true, words: 'dil language sprache ingilizce english englisch', run: (c) => { c.setLang('en'); return 'Dil: English'; } },
   { id: 'lang-de', title: 'Deutsch', sub: 'Uygulama dilini Almanca yap', icon: 'globe', action: true, words: 'dil language sprache almanca german deutsch', run: (c) => { c.setLang('de'); return 'Dil: Deutsch'; } },
@@ -62,7 +63,7 @@ export const FEATURES: Feature[] = [
   { id: 'firms', title: 'Şirketler ve filolar', sub: 'Hizmet bölgesine göre', icon: 'briefcase', words: 'şirket firma filo company firms firmen flotte', run: net('firma') },
   { id: 'tow', title: 'Çekici bul', sub: 'En yakın, puanlı', icon: 'life-buoy', words: 'çekici yol yardım kurtarma tow towing abschleppdienst pannenhilfe', run: open('/cekici') },
   { id: 'net-account', title: 'İş ağı hesabım', sub: 'Tekliflerin ve işlerin', icon: 'briefcase', needsLogin: true, words: 'iş ağı hesabım teklif tekliflerim work network angebote', run: open('/ag/hesabim') },
-  { id: 'inventory', title: 'Envanterim', sub: 'Makine ve araçların', icon: 'package', needsLogin: true, words: 'envanter makinelerim araçlarım inventory fuhrpark', run: open('/ag/envanter') },
+  { id: 'inventory', title: 'Makine parkım', sub: 'Makine ve araçların', icon: 'package', needsLogin: true, words: 'makine parkı envanter makinelerim araçlarım filo inventory fleet fuhrpark', run: open('/ag/envanter') },
   { id: 'firm-profile', title: 'Firma profilim', sub: 'Şirket vitrinin', icon: 'briefcase', needsLogin: true, words: 'firma şirket profil vitrin company profile firmenprofil', run: open('/ag/firma-kaydi') },
   // Bilgi
   { id: 'trust', title: 'Güvenli işlem rehberi', sub: 'Dolandırıcılığa karşı ipuçları', icon: 'shield', words: 'güven güvenli dolandırıcı kapora sahte scam fraud safe trading betrug sicher', run: open('/guven') },

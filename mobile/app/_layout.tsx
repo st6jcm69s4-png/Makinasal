@@ -40,7 +40,7 @@ function Screens() {
         <Stack.Screen name="ag/tanit" options={{ title: T('Kendini tanıt') }} />
         <Stack.Screen name="ag/hesabim" options={{ title: T('İş ağı hesabım') }} />
         <Stack.Screen name="ag/firma-kaydi" options={{ title: T('Firma profilim') }} />
-        <Stack.Screen name="ag/envanter" options={{ title: T('Envanterim') }} />
+        <Stack.Screen name="ag/envanter" options={{ title: T('Makine parkım') }} />
         <Stack.Screen name="firma/[id]" options={{ title: T('Firma') }} />
         <Stack.Screen name="cekici" options={{ title: T('Çekici') }} />
         <Stack.Screen name="haklarim" options={{ title: T('Veri haklarım') }} />
