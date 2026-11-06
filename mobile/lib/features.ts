@@ -63,7 +63,7 @@ export const FEATURES: Feature[] = [
   { id: 'firms', title: 'Şirketler ve filolar', sub: 'Hizmet bölgesine göre', icon: 'briefcase', words: 'şirket firma filo company firms firmen flotte', run: net('firma') },
   { id: 'tow', title: 'Çekici bul', sub: 'En yakın, puanlı', icon: 'life-buoy', words: 'çekici yol yardım kurtarma tow towing abschleppdienst pannenhilfe', run: open('/cekici') },
   { id: 'net-account', title: 'İş ağı hesabım', sub: 'Tekliflerin ve işlerin', icon: 'briefcase', needsLogin: true, words: 'iş ağı hesabım teklif tekliflerim work network angebote', run: open('/ag/hesabim') },
-  { id: 'inventory', title: 'Makinelerim', sub: 'Makine ve araçların', icon: 'package', needsLogin: true, words: 'makinelerim makine parkı envanter makinelerim araçlarım filo inventory fleet fuhrpark', run: open('/ag/envanter') },
+  { id: 'inventory', title: 'Makinelerim ve araçlarım', sub: 'Makine ve araçların', icon: 'package', needsLogin: true, words: 'makinelerim makine parkı envanter makinelerim araçlarım filo inventory fleet fuhrpark', run: open('/ag/envanter') },
   { id: 'firm-profile', title: 'Firma profilim', sub: 'Şirket vitrinin', icon: 'briefcase', needsLogin: true, words: 'firma şirket profil vitrin company profile firmenprofil', run: open('/ag/firma-kaydi') },
   // Bilgi
   { id: 'trust', title: 'Güvenli işlem rehberi', sub: 'Dolandırıcılığa karşı ipuçları', icon: 'shield', words: 'güven güvenli dolandırıcı kapora sahte scam fraud safe trading betrug sicher', run: open('/guven') },
