@@ -58,13 +58,13 @@ export default function Settings() {
   return (
     <ScrollView style={common.screen} contentContainerStyle={{ padding: 12, gap: 10 }}>
       <View style={common.card}>
-        <Text style={common.h2}>Dil / Language / Sprache</Text>
+        <Text style={common.h2}>Dil</Text>
         <View style={{ flexDirection: 'row', gap: 8 }}>
           <Chip title="Türkçe" on={lang === 'tr'} onPress={() => setLang('tr')} />
           <Chip title="English" on={lang === 'en'} onPress={() => setLang('en')} />
           <Chip title="Deutsch" on={lang === 'de'} onPress={() => setLang('de')} />
         </View>
-        <Text style={common.meta}>Dil tercihin bu telefonda saklanır. İlanlar ve mesajlar yazıldıkları dilde kalır.</Text>
+        <Text style={common.meta}>Uygulama seçtiğin dilde görünür. İlanlar ve mesajlar, yazıldıkları dilde gösterilir.</Text>
       </View>
       {themeSupportsChoice ? (
         <View style={common.card}>
