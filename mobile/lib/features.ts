@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
+import { confirmSignOut } from './signOut';
 import type { IconName } from '../components/Icon';
-import { supabase } from './supabase';
 import { saveTheme } from './themePref';
 import { themeSupportsChoice } from './theme';
 import { foldSearch } from './suggest';
@@ -41,7 +41,7 @@ export const FEATURES: Feature[] = [
   { id: 'rights', title: 'Veri haklarım', sub: 'Verilerini indir veya sil', icon: 'file-text', needsLogin: true, words: 'veri kişisel kvkk hesabı sil silme indir data privacy delete account löschen daten datenschutz haklarım', run: open('/haklarim') },
   { id: 'login', title: 'Giriş yap', sub: 'Hesabına gir', icon: 'log-in', needsGuest: true, words: 'giriş login sign in anmelden oturum aç', run: tab('/hesap') },
   { id: 'signup', title: 'Üye ol', sub: 'Ücretsiz hesap oluştur', icon: 'user-plus', needsGuest: true, words: 'üye kayıt ol hesap oluştur register sign up registrieren', run: open('/kayit') },
-  { id: 'logout', title: 'Çıkış yap', sub: 'Oturumu kapat', icon: 'log-out', needsLogin: true, action: true, words: 'çıkış oturumu kapat logout sign out abmelden', run: async () => { await supabase.auth.signOut(); return 'Çıkış yapıldı.'; } },
+  { id: 'logout', title: 'Çıkış yap', sub: 'Oturumu kapat', icon: 'log-out', needsLogin: true, action: true, words: 'çıkış oturumu kapat logout sign out abmelden', run: async () => ((await confirmSignOut()) ? 'Çıkış yapıldı.' : undefined) },
   { id: 'referral', title: 'Davet et, ilan hakkı kazan', sub: 'Davet kodunu paylaş', icon: 'gift', needsLogin: true, words: 'davet kod referans arkadaş invite referral einladen hak kazan', run: tab('/hesap') },
   // İlan ve alışveriş
   { id: 'sale', title: 'Satılık ilanlar', sub: 'Makine, kamyon ve parça', icon: 'truck', words: 'satılık ilan makine kamyon ara listings for sale inserate kaufen', run: tab('/ilanlar') },

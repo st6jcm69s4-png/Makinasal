@@ -16,6 +16,7 @@ import { ReferralBox } from '../../components/ReferralBox';
 import { useApp } from '../../lib/AppContext';
 import { configured, supabase } from '../../lib/supabase';
 import { SocialAuth } from '../../components/SocialAuth';
+import { confirmSignOut } from '../../lib/signOut';
 
 function Member() {
   const scroller = useRef<never>(null);
@@ -108,8 +109,8 @@ function Member() {
           <Label style={{ marginLeft: 2 }}>Davet et</Label>
           <ReferralBox />
         </View>
-        <Pressable style={s.out} onPress={() => void supabase.auth.signOut()} accessibilityRole="button">
-          <Icon name="log-out" size={18} color={color.bad} /><Text style={s.outText}>Çıkış yap</Text>
+        <Pressable style={s.out} onPress={() => void confirmSignOut()} accessibilityRole="button">
+          <Icon name="log-out" size={18} color={color.tealInk} /><Text style={s.outText}>Çıkış yap</Text>
         </Pressable>
       </View>
     </ScrollView>
@@ -238,6 +239,6 @@ const s = StyleSheet.create({
   rowSub: { fontSize: 13, color: color.muted },
   badge: { minWidth: 22, height: 22, borderRadius: 11, backgroundColor: color.accent, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 6 },
   badgeText: { color: '#fff', fontSize: 12, fontWeight: '700' },
-  out: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, borderWidth: 1.5, borderColor: color.bad, borderRadius: radius, minHeight: 50 },
-  outText: { color: color.bad, fontWeight: '600', fontSize: 16 },
+  out: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: color.teal, borderRadius: radius, minHeight: 50, ...shadow },
+  outText: { color: color.tealInk, fontFamily: font.bold, fontSize: 16 },
 });
