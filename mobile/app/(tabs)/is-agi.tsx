@@ -17,7 +17,7 @@ import { color, font, radius } from '../../lib/theme';
 type Tab = PostKind | 'firma';
 type Section = 'seek' | 'hire' | 'market';
 const SECTIONS: { id: Section; icon: IconName; title: string; sub: string; tabs: [Tab, string][]; cta: [string, string] }[] = [
-  { id: 'seek', icon: 'search', title: 'İş arıyorum', sub: 'Açık pozisyonlar', tabs: [['staff_wanted', 'Eleman ilanları']], cta: ['Kendimi tanıt: hizmet ilanı ver', 'rental_operator'] },
+  { id: 'seek', icon: 'search', title: 'İş arıyorum', sub: 'Açık pozisyonlar', tabs: [['staff_wanted', 'Eleman ilanları']], cta: ['Kendini tanıt', 'rental_operator'] },
   { id: 'hire', icon: 'users', title: 'Eleman arıyorum', sub: 'Operatör, şoför, usta', tabs: [['rental_operator', 'Hazır elemanlar']], cta: ['Eleman ilanı ver', 'staff_wanted'] },
   { id: 'market', icon: 'truck', title: 'Makine ve iş', sub: 'Kiralık, iş, parça', tabs: [['rental_machine', 'Kiralık'], ['job', 'İşler'], ['part_request', 'Parça talepleri'], ['firma', 'Firmalar']], cta: ['İlan ver', ''] },
 ];
@@ -113,8 +113,8 @@ export default function NetworkTab() {
           </Pressable>
         </View>
         <View style={{ flexDirection: 'row', gap: 8 }}>
-          <View style={{ flex: 3 }}><Btn title={tab === 'firma' ? 'Firma profilim' : section.cta[0]} onPress={create} /></View>
-          <View style={{ flex: 2 }}><Btn ghost title="Hesabım" onPress={() => setAcct(true)} /></View>
+          <View style={{ flex: 1 }}><Btn title={tab === 'firma' ? 'Firma profilim' : section.cta[0]} onPress={create} /></View>
+          <View style={{ flex: 1 }}><Btn ghost title="Hesabım" onPress={() => setAcct(true)} /></View>
         </View>
         {error ? <AlertBox variant="destructive">{error}</AlertBox> : null}
       </View>
