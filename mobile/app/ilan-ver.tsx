@@ -1,7 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { GuestGate } from '../components/LoginPrompt';
 import { ActivityIndicator, Alert, Image, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Switch, View } from 'react-native';
 import { Text, TextInput } from '../components/LText';
+import { Icon, type IconName } from '../components/Icon';
+import { tr } from '../lib/i18n';
 import * as ImagePicker from 'expo-image-picker';
 import { router, useLocalSearchParams } from 'expo-router';
 import { PickerModal } from '../components/PickerModal';
@@ -9,7 +11,7 @@ import { useApp } from '../lib/AppContext';
 import { CATEGORIES, CITIES, KM_CATEGORIES, LIMITS, MACHINE_CATEGORIES, PART_GROUPS } from '../lib/data';
 import { brandsForCategory, canonicalBrand } from '../lib/machineryCatalog';
 import { photoUrl, supabase } from '../lib/supabase';
-import { color } from '../lib/theme';
+import { color, font, radius, shadow } from '../lib/theme';
 
 const CONDITIONS = ['Sıfır', 'Çıkma', 'Revizyonlu'];
 const YEAR_MAX = new Date().getFullYear() + 1;
@@ -166,21 +168,35 @@ export default function NewListing() {
   );
   const select = (label: string, value: string, open: Sheet) => (
     <View style={s.field}><Text style={s.label}>{label}</Text>
-      <Pressable style={s.input} onPress={() => setSheet(open)} accessibilityRole="button"><Text style={{ color: value ? color.navy : color.muted }}>{value || 'Seç'}</Text></Pressable></View>
+      <Pressable style={[s.input, s.select]} onPress={() => setSheet(open)} accessibilityRole="button">
+        <Text style={{ flex: 1, fontSize: 16, color: value ? color.ink : color.muted }} numberOfLines={1}>{value || 'Seç'}</Text>
+        <Icon name="chevron-down" size={18} color={color.muted} />
+      </Pressable>
+    </View>
   );
+  const section = (title: string, icon: IconName, children: ReactNode) => (
+    <View style={s.card}>
+      <View style={s.cardHead}><View style={s.cardIcon}><Icon name={icon} size={17} color={color.tealText} /></View><Text style={s.cardT}>{title}</Text></View>
+      {children}
+    </View>
+  );
+  const total = photos.length + existing.length;
   return (
-    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+    <KeyboardAvoidingView style={{ flex: 1, backgroundColor: color.bg }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <ScrollView style={{ backgroundColor: color.bg }} contentContainerStyle={s.form} keyboardShouldPersistTaps="handled">
-        {select('Kategori', cat, 'cat')}
-        {part ? (
-          <>
-            {select('Hangi makine / araç için', equip, 'equip')}
-            {select('Parça grubu', PART_GROUPS.find((g) => g.id === group)?.label ?? '', 'group')}
-          </>
-        ) : null}
-        {select('Marka', brand, 'brand')}
-        {field(part ? 'Ürün adı' : 'Model', model, setModel)}
-        {part ? (
+        {section('Ne satıyorsun?', 'tag', <>
+          {select('Kategori', cat, 'cat')}
+          {part ? (
+            <>
+              {select('Hangi makine / araç için', equip, 'equip')}
+              {select('Parça grubu', PART_GROUPS.find((g) => g.id === group)?.label ?? '', 'group')}
+            </>
+          ) : null}
+          {select('Marka', brand, 'brand')}
+          {field(part ? 'Ürün adı' : 'Model', model, setModel)}
+        </>)}
+
+        {section('Ayrıntılar', 'sliders', part ? (
           <>
             {field(cat === 'Lastik ve jant' ? 'Lastik ebadı' : 'Parça numarası', spec, setSpec)}
             {select('Durum', cond, 'cond')}
@@ -188,42 +204,60 @@ export default function NewListing() {
             {field('Adet', qty, setQty, { keyboardType: 'number-pad' })}
           </>
         ) : (
-          <>
-            {field('Model yılı', year, setYear, { keyboardType: 'number-pad', maxLength: 4 })}
-            {field(unit === 'km' ? 'Kilometre' : 'Çalışma saati', usage, setUsage, { keyboardType: 'number-pad' })}
-          </>
+          <View style={{ flexDirection: 'row', gap: 10 }}>
+            <View style={{ flex: 1 }}>{field('Model yılı', year, setYear, { keyboardType: 'number-pad', maxLength: 4 })}</View>
+            <View style={{ flex: 1 }}>{field(unit === 'km' ? 'Kilometre' : 'Çalışma saati', usage, setUsage, { keyboardType: 'number-pad' })}</View>
+          </View>
+        ))}
+
+        {section('Fiyat ve konum', 'map-pin', <>
+          {field(part ? 'Birim fiyat (₺)' : 'Fiyat (₺)', price, setPrice, { keyboardType: 'decimal-pad' })}
+          {select('İl', city, 'city')}
+          <View style={s.rowSwitch}><Text style={s.switchT}>Takas olur</Text><Switch value={takas} onValueChange={setTakas} trackColor={{ true: color.teal, false: color.plate }} /></View>
+        </>)}
+
+        {section('Açıklama', 'file-text',
+          <TextInput style={[s.input, { minHeight: 120, textAlignVertical: 'top', paddingTop: 12 }]} value={desc} onChangeText={setDesc} multiline maxLength={4000} placeholder="Durumu, bakım geçmişi, ekipmanlar, hasar bilgisi…" />,
         )}
-        {select('İl', city, 'city')}
-        {field(part ? 'Birim fiyat (₺)' : 'Fiyat (₺)', price, setPrice, { keyboardType: 'decimal-pad' })}
-        <View style={s.field}><Text style={s.label}>Açıklama</Text>
-          <TextInput style={[s.input, { minHeight: 100, textAlignVertical: 'top' }]} value={desc} onChangeText={setDesc} multiline maxLength={4000} /></View>
-        <View style={s.rowSwitch}><Text style={{ flex: 1 }}>Takas olur</Text><Switch value={takas} onValueChange={setTakas} /></View>
 
-        <Text style={s.label}>Fotoğraflar ({photos.length + existing.length}/{maxPhotos})</Text>
-        <ScrollView horizontal contentContainerStyle={{ gap: 8 }}>
-          {existing.map((p) => (
-            <Pressable key={p.id} onPress={() => { setExisting((cur) => cur.filter((x) => x.id !== p.id)); setRemoved((cur) => [...cur, p]); }} accessibilityRole="button" accessibilityLabel="Fotoğrafı kaldır">
-              <Image source={{ uri: photoUrl(p.path) }} style={s.thumb} /><Text style={s.rm}>Kaldır</Text>
-            </Pressable>
-          ))}
-          {photos.map((u, i) => (
-            <Pressable key={u + i} onPress={() => setPhotos((cur) => cur.filter((_, j) => j !== i))} accessibilityRole="button" accessibilityLabel="Fotoğrafı kaldır">
-              <Image source={{ uri: u }} style={s.thumb} /><Text style={s.rm}>Kaldır</Text>
-            </Pressable>
-          ))}
-        </ScrollView>
-        <View style={{ flexDirection: 'row', gap: 8 }}>
-          <Pressable style={[s.btnGhost, { flex: 1 }]} onPress={() => void pick(true)} accessibilityRole="button"><Text style={s.btnGhostText}>Kamera</Text></Pressable>
-          <Pressable style={[s.btnGhost, { flex: 1 }]} onPress={() => void pick(false)} accessibilityRole="button"><Text style={s.btnGhostText}>Galeri</Text></Pressable>
-        </View>
+        {section(`${tr('Fotoğraflar')} (${total}/${maxPhotos})`, 'camera', <>
+          <View style={s.grid}>
+            {existing.map((p, i) => (
+              <View key={p.id} style={s.tile}>
+                <Image source={{ uri: photoUrl(p.path) }} style={s.thumb} />
+                {i === 0 ? <View style={s.cover}><Text style={s.coverT}>Kapak</Text></View> : null}
+                <Pressable style={s.x} onPress={() => { setExisting((cur) => cur.filter((x) => x.id !== p.id)); setRemoved((cur) => [...cur, p]); }} hitSlop={8} accessibilityRole="button" accessibilityLabel={tr('Fotoğrafı kaldır')}><Icon name="x" size={14} color="#fff" /></Pressable>
+              </View>
+            ))}
+            {photos.map((u, i) => (
+              <View key={u + i} style={s.tile}>
+                <Image source={{ uri: u }} style={s.thumb} />
+                {existing.length === 0 && i === 0 ? <View style={s.cover}><Text style={s.coverT}>Kapak</Text></View> : null}
+                <Pressable style={s.x} onPress={() => setPhotos((cur) => cur.filter((_, j) => j !== i))} hitSlop={8} accessibilityRole="button" accessibilityLabel={tr('Fotoğrafı kaldır')}><Icon name="x" size={14} color="#fff" /></Pressable>
+              </View>
+            ))}
+            {total < maxPhotos ? (
+              <>
+                <Pressable style={[s.tile, s.add]} onPress={() => void pick(true)} accessibilityRole="button"><Icon name="camera" size={22} color={color.tealText} /><Text style={s.addT}>Kamera</Text></Pressable>
+                <Pressable style={[s.tile, s.add]} onPress={() => void pick(false)} accessibilityRole="button"><Icon name="image" size={22} color={color.tealText} /><Text style={s.addT}>Galeri</Text></Pressable>
+              </>
+            ) : null}
+          </View>
+        </>)}
 
-        {!editId ? <View style={s.rowSwitch}><Text style={{ flex: 1 }}>Ürünü görmeden kapora, ön ödeme, havale veya EFT istemeyeceğimi taahhüt ederim.</Text><Switch value={pledge} onValueChange={setPledge} /></View> : null}
+        {!editId ? (
+          <View style={[s.card, s.rowSwitch]}>
+            <Icon name="shield" size={20} color={color.tealText} />
+            <Text style={[s.switchT, { fontSize: 14.5 }]}>Ürünü görmeden kapora, ön ödeme, havale veya EFT istemeyeceğimi taahhüt ederim.</Text>
+            <Switch value={pledge} onValueChange={setPledge} trackColor={{ true: color.teal, false: color.plate }} />
+          </View>
+        ) : null}
         {error ? <Text style={s.err} accessibilityRole="alert">{error}</Text> : null}
         {progress ? <Text style={s.small}>{progress}</Text> : null}
-        <Pressable style={[s.btn, busy && { opacity: 0.5 }]} disabled={busy} onPress={() => void submit()} accessibilityRole="button">
-          {busy ? <ActivityIndicator color="#fff" /> : <Text style={s.btnText}>{editId ? 'Değişiklikleri gönder' : 'İlanı gönder'}</Text>}
+        <Pressable style={[s.btn, busy && { opacity: 0.6 }]} disabled={busy} onPress={() => void submit()} accessibilityRole="button">
+          {busy ? <ActivityIndicator color={color.tealInk} /> : <><Icon name="send" size={18} color={color.tealInk} /><Text style={s.btnText}>{editId ? 'Değişiklikleri gönder' : 'İlanı gönder'}</Text></>}
         </Pressable>
-        <Text style={s.small}>Yeni ilanlar yayına girmeden önce incelenir.</Text>
+        <Text style={[s.small, { textAlign: 'center' }]}>Yeni ilanlar yayına girmeden önce incelenir.</Text>
       </ScrollView>
 
       <PickerModal visible={sheet === 'brand'} title="Marka" searchable allowCustom selected={brand} options={brandsForCategory(part ? equip : cat).map((b) => ({ value: b, label: b }))} onPick={setBrand} onClose={() => setSheet(null)} />
@@ -237,18 +271,28 @@ export default function NewListing() {
 }
 
 const s = StyleSheet.create({
-  form: { padding: 16, gap: 12 },
-  field: { gap: 4 },
-  label: { fontWeight: '600', color: color.ink },
-  input: { padding: 12, backgroundColor: color.surface, borderRadius: 4, borderWidth: 1, borderColor: color.line },
+  form: { padding: 16, gap: 14, paddingBottom: 40 },
+  card: { backgroundColor: color.surface, borderRadius: radius + 4, padding: 14, gap: 12, ...shadow },
+  cardHead: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  cardIcon: { width: 32, height: 32, borderRadius: 10, backgroundColor: color.tealSoft, alignItems: 'center', justifyContent: 'center' },
+  cardT: { fontFamily: font.bold, fontSize: 17, color: color.ink },
+  field: { gap: 6 },
+  label: { fontFamily: font.semi, fontSize: 14, color: color.muted },
+  input: { minHeight: 50, paddingHorizontal: 14, paddingVertical: 12, fontSize: 16, backgroundColor: color.bg, borderRadius: radius, borderWidth: 1, borderColor: color.line, color: color.ink },
+  select: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   rowSwitch: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  thumb: { width: 90, height: 70, borderRadius: 4 },
-  rm: { textAlign: 'center', color: color.bad, fontSize: 12 },
-  btn: { backgroundColor: color.accent, padding: 14, borderRadius: 4, alignItems: 'center' },
-  btnText: { color: '#fff', fontWeight: '600' },
-  btnGhost: { borderWidth: 1, borderColor: color.accent, padding: 12, borderRadius: 4, alignItems: 'center' },
-  btnGhostText: { color: color.accentText, fontWeight: '600' },
-  err: { color: color.bad },
-  small: { color: color.muted, fontSize: 12 },
+  switchT: { flex: 1, color: color.ink, fontSize: 15.5 },
+  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
+  tile: { width: 96, height: 96, borderRadius: radius, overflow: 'hidden' },
+  thumb: { width: 96, height: 96, backgroundColor: color.plate },
+  cover: { position: 'absolute', left: 6, bottom: 6, backgroundColor: 'rgba(0,0,0,0.6)', borderRadius: 8, paddingHorizontal: 6, paddingVertical: 2 },
+  coverT: { color: '#fff', fontSize: 11, fontWeight: '700' },
+  x: { position: 'absolute', top: 6, right: 6, width: 24, height: 24, borderRadius: 12, backgroundColor: 'rgba(0,0,0,0.6)', alignItems: 'center', justifyContent: 'center' },
+  add: { borderWidth: 1.5, borderStyle: 'dashed', borderColor: color.teal, backgroundColor: color.tealSoft, alignItems: 'center', justifyContent: 'center', gap: 4 },
+  addT: { color: color.tealText, fontFamily: font.semi, fontSize: 13 },
+  btn: { flexDirection: 'row', gap: 8, backgroundColor: color.teal, minHeight: 54, borderRadius: radius + 2, alignItems: 'center', justifyContent: 'center', ...shadow },
+  btnText: { color: color.tealInk, fontFamily: font.bold, fontSize: 17 },
+  err: { color: color.bad, textAlign: 'center' },
+  small: { color: color.muted, fontSize: 12.5 },
   msg: { textAlign: 'center', color: color.muted, margin: 24 },
 });
