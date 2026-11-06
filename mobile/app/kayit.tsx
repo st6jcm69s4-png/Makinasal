@@ -3,7 +3,7 @@ import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, View
 import { router } from 'expo-router';
 import { PlainText, Text } from '../components/LText';
 import { Icon } from '../components/Icon';
-import { Btn, Field, Hatch, Select } from '../components/ui';
+import { Btn, Field, Select } from '../components/ui';
 import { AlertBox } from '../components/kit';
 import { PickerModal } from '../components/PickerModal';
 import { Captcha } from '../components/Captcha';
@@ -64,7 +64,7 @@ export default function Register() {
     return (
       <View style={s.center}>
         <View style={s.icon}><Icon name="user-plus" size={24} color="#fff" /></View>
-        <PlainText style={s.title}>KAYIT YAKINDA</PlainText>
+        <Text style={s.title}>Kayıt yakında</Text>
         <Text style={s.p}>Yeni üyelik kısa süre içinde açılacak. Hesabın varsa giriş yapabilir, uygulamayı misafir olarak gezebilirsin.</Text>
         <View style={{ alignSelf: 'stretch' }}><Btn title="Giriş yap" onPress={() => router.navigate('/hesap')} /></View>
       </View>
@@ -74,7 +74,7 @@ export default function Register() {
     return (
       <View style={s.center}>
         <View style={[s.icon, { backgroundColor: color.good }]}><Icon name="mail" size={24} color="#fff" /></View>
-        <PlainText style={s.title}>E-POSTANI KONTROL ET</PlainText>
+        <Text style={s.title}>E-postanı kontrol et</Text>
         <Text style={s.p}>{`${email.trim()} adresine bir doğrulama bağlantısı gönderdik. Bağlantıya dokununca hesabın etkinleşir. Gelmediyse spam klasörüne bak.`}</Text>
         <View style={{ alignSelf: 'stretch' }}><Btn title="Giriş ekranına dön" onPress={() => router.navigate('/hesap')} /></View>
       </View>
@@ -84,10 +84,9 @@ export default function Register() {
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <ScrollView style={{ backgroundColor: color.bg }} contentContainerStyle={{ paddingBottom: 40 }} keyboardShouldPersistTaps="handled">
         <View style={s.head}>
-          <PlainText style={s.headTitle}>ÜYE OL</PlainText>
+          <Text style={s.headTitle}>Üye ol</Text>
           <Text style={s.headSub}>İlan ver, mesajlaş, teklif al. Ücretsiz.</Text>
         </View>
-        <Hatch height={7} />
         <View style={s.body}>
           <Field label="Ad soyad" value={name} onChangeText={setName} autoCapitalize="words" textContentType="name" />
           <Field label="E-posta" value={email} onChangeText={setEmail} autoCapitalize="none" keyboardType="email-address" textContentType="emailAddress" />
@@ -134,10 +133,10 @@ const s = StyleSheet.create({
   icon: { width: 48, height: 48, borderRadius: radius, backgroundColor: color.accent, alignItems: 'center', justifyContent: 'center' },
   title: { fontFamily: font.labelBold, fontSize: 28, color: color.ink, letterSpacing: 0.6 },
   p: { textAlign: 'center', color: color.ink, fontSize: 16, lineHeight: 22 },
-  head: { backgroundColor: color.navy, padding: 16, gap: 2 },
-  headTitle: { color: color.onBar, fontFamily: font.labelBold, fontSize: 28, letterSpacing: 0.6 },
+  head: { backgroundColor: color.navy, paddingHorizontal: 18, paddingTop: 18, paddingBottom: 22, gap: 4, borderBottomLeftRadius: 28, borderBottomRightRadius: 28 },
+  headTitle: { color: color.onBar, fontFamily: font.bold, fontSize: 26 },
   headSub: { color: color.onNavy, fontSize: 14 },
-  body: { padding: 12, gap: 12 },
+  body: { padding: 16, gap: 14 },
   rule: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   ruleText: { color: color.muted, fontSize: 13 },
   check: { flexDirection: 'row', gap: 10, alignItems: 'flex-start' },

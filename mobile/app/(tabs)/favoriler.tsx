@@ -176,7 +176,7 @@ export default function Favorites() {
       ListHeaderComponent={head}
       renderSectionHeader={({ section }) => (
         <View style={s.sec}>
-          <Label style={{ color: color.ink, fontSize: 14, letterSpacing: 0.9 }}>{section.title}</Label>
+          <Text style={s.secT}>{section.title}</Text>
           <Text style={s.secN}>{section.data.length}</Text>
         </View>
       )}
@@ -204,14 +204,15 @@ export default function Favorites() {
 
 const s = StyleSheet.create({
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12, padding: 24, backgroundColor: color.bg },
-  top: { flexDirection: 'row', alignItems: 'center', gap: 14, backgroundColor: color.navy, padding: 14, borderBottomWidth: 3, borderBottomColor: color.accent },
-  count: { color: color.onBar, fontFamily: font.labelBold, fontSize: 44, lineHeight: 46, minWidth: 50 },
+  top: { flexDirection: 'row', alignItems: 'center', gap: 14, backgroundColor: color.navy, paddingHorizontal: 18, paddingVertical: 16, borderBottomLeftRadius: 28, borderBottomRightRadius: 28 },
+  count: { color: color.onBar, fontFamily: font.bold, fontSize: 40, lineHeight: 44, minWidth: 50 },
   small: { color: color.onNavy, fontSize: 14 },
-  search: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: color.surface, borderWidth: 1, borderColor: color.line, borderRadius: radius, paddingHorizontal: 10 },
+  search: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: color.surface, borderWidth: 1, borderColor: color.line, borderRadius: radius + 2, paddingHorizontal: 14, minHeight: 50 },
   searchInput: { flex: 1, paddingVertical: 11, fontSize: 16, color: color.ink },
-  sec: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderTopWidth: 2, borderTopColor: color.navy, paddingTop: 8, marginTop: 14, marginBottom: 10, marginHorizontal: 12 },
-  secN: { color: color.muted, fontFamily: font.label, fontSize: 15 },
-  dropTag: { flexDirection: 'row', alignItems: 'center', gap: 4, marginHorizontal: 12, marginBottom: 4 },
+  sec: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 22, marginBottom: 12, marginHorizontal: 16 },
+  secT: { color: color.ink, fontFamily: font.bold, fontSize: 18 },
+  secN: { color: color.tealText, fontFamily: font.bold, fontSize: 15, backgroundColor: color.tealSoft, borderRadius: 11, paddingHorizontal: 9, paddingVertical: 2, overflow: 'hidden' },
+  dropTag: { flexDirection: 'row', alignItems: 'center', gap: 4, marginHorizontal: 16, marginBottom: 6 },
   dropText: { color: color.good, fontSize: 13, fontWeight: '700' },
   empty: { alignItems: 'center', gap: 10, padding: 28 },
   emptyT: { fontSize: 17, fontWeight: '700', color: color.ink, textAlign: 'center' },

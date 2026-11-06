@@ -3,7 +3,8 @@ import { useLoginPrompt } from '../../components/LoginPrompt';
 import { CardSkeleton } from '../../components/kit';
 import { useTabScrollTop } from '../../lib/scrollTop';
 import { ActivityIndicator, FlatList, Pressable, ScrollView, StyleSheet, View } from 'react-native';
-import { Text, TextInput } from '../../components/LText';
+import { PlainText, Text, TextInput } from '../../components/LText';
+import { Icon, type IconName } from '../../components/Icon';
 import { SearchBox } from '../../components/SearchBox';
 import { PickerModal } from '../../components/PickerModal';
 import { advCount, FilterModal, NO_ADV, type Adv } from '../../components/FilterModal';
@@ -15,7 +16,18 @@ import { Alert } from 'react-native';
 import { useApp } from '../../lib/AppContext';
 import { ListingCard } from '../../components/ListingCard';
 import { configured, supabase, type Row } from '../../lib/supabase';
-import { color } from '../../lib/theme';
+import { color, font } from '../../lib/theme';
+import { tr } from '../../lib/i18n';
+
+function FChip({ icon, label, on, drop, onPress }: { icon: IconName; label: string; on?: boolean; drop?: boolean; onPress: () => void }) {
+  return (
+    <Pressable style={({ pressed }) => [s.chip, on && s.chipOn, pressed && { opacity: 0.85 }]} onPress={onPress} accessibilityRole="button" accessibilityState={{ selected: !!on }}>
+      <Icon name={icon} size={15} color={on ? color.tealInk : color.tealText} />
+      <Text style={[s.chipText, on && s.chipTextOn]} numberOfLines={1}>{label}</Text>
+      {drop ? <Icon name="chevron-down" size={14} color={on ? color.tealInk : color.muted} /> : null}
+    </Pressable>
+  );
+}
 
 const SORTS = [
   { value: 'rec', label: 'Öne çıkanlar önce' }, { value: 'new', label: 'En yeni ilan' }, { value: 'pa', label: 'Fiyat: artan' },
@@ -90,16 +102,16 @@ export default function Listings() {
 
   return (
     <View style={s.screen}>
-      <View style={{ marginHorizontal: 12, marginTop: 12, marginBottom: 8 }}><SearchBox value={q} onChangeText={setQ} placeholder="Marka, model veya parça numarası ara" /></View>
+      <View style={{ marginHorizontal: 16, marginTop: 12, marginBottom: 10 }}><SearchBox value={q} onChangeText={setQ} placeholder="Marka, model veya parça numarası ara" /></View>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flexGrow: 0 }} contentContainerStyle={s.chips}>
-        <Pressable style={[s.chip, !!cat && s.chipOn]} onPress={() => setSheet('cat')}><Text style={[s.chipText, !!cat && s.chipTextOn]}>{cat ? categoryLabel(cat) : 'Kategori'}</Text></Pressable>
-        <Pressable style={[s.chip, city !== 'Tümü' && s.chipOn]} onPress={() => setSheet('city')}><Text style={[s.chipText, city !== 'Tümü' && s.chipTextOn]}>{city === 'Tümü' ? 'İl' : city}</Text></Pressable>
-        <Pressable style={[s.chip, maxPrice !== '6000000' && s.chipOn]} onPress={() => setSheet('price')}><Text style={[s.chipText, maxPrice !== '6000000' && s.chipTextOn]}>{maxPrice === '6000000' ? 'Fiyat' : PRICES.find((p) => p.value === maxPrice)?.label}</Text></Pressable>
-        <Pressable style={[s.chip, advCount(adv) > 0 && s.chipOn]} onPress={() => setAdvOpen(true)}><Text style={[s.chipText, advCount(adv) > 0 && s.chipTextOn]}>Filtreler{advCount(adv) ? ` (${advCount(adv)})` : ''}</Text></Pressable>
-        <Pressable style={s.chip} onPress={() => void saveSearch()}><Text style={s.chipText}>♡ Aramayı kaydet</Text></Pressable>
-        <Pressable style={s.chip} onPress={() => router.push('/yedek-parca')}><Text style={s.chipText}>Yedek parça</Text></Pressable>
-        <Pressable style={s.chip} onPress={() => router.push('/harita')}><Text style={s.chipText}>İl haritası</Text></Pressable>
-        <Pressable style={s.chip} onPress={() => setSheet('sort')}><Text style={s.chipText}>Sırala: {SORTS.find((o) => o.value === sort)?.label}</Text></Pressable>
+        <FChip icon="grid" label={cat ? categoryLabel(cat) : 'Kategori'} on={!!cat} drop onPress={() => setSheet('cat')} />
+        <FChip icon="map-pin" label={city === 'Tümü' ? 'İl' : city} on={city !== 'Tümü'} drop onPress={() => setSheet('city')} />
+        <FChip icon="tag" label={maxPrice === '6000000' ? 'Fiyat' : PRICES.find((p) => p.value === maxPrice)?.label ?? 'Fiyat'} on={maxPrice !== '6000000'} drop onPress={() => setSheet('price')} />
+        <FChip icon="sliders" label={advCount(adv) ? `${tr('Filtreler')} (${advCount(adv)})` : 'Filtreler'} on={advCount(adv) > 0} onPress={() => setAdvOpen(true)} />
+        <FChip icon="list" label={SORTS.find((o) => o.value === sort)?.label ?? 'Sırala'} drop onPress={() => setSheet('sort')} />
+        <FChip icon="bookmark" label="Aramayı kaydet" onPress={() => void saveSearch()} />
+        <FChip icon="settings" label="Yedek parça" onPress={() => router.push('/yedek-parca')} />
+        <FChip icon="map" label="İl haritası" onPress={() => router.push('/harita')} />
       </ScrollView>
       <PickerModal visible={sheet === 'cat'} title="Kategori" selected={cat} options={[{ value: '', label: 'Tümü' }, ...CATEGORY_GROUPS.map((g) => ({ value: 'group:' + g.id, label: g.label + ' (tümü)' })), ...CATEGORY_GROUPS.flatMap((g) => g.categories).map((c) => ({ value: c, label: c }))]} onPick={setCat} onClose={() => setSheet(null)} />
       <PickerModal visible={sheet === 'city'} title="İl" selected={city} options={['Tümü', ...CITIES].map((c) => ({ value: c, label: c }))} onPick={setCity} onClose={() => setSheet(null)} />
@@ -107,6 +119,7 @@ export default function Listings() {
       <PickerModal visible={sheet === 'sort'} title="Sırala" selected={sort} options={SORTS} onPick={setSort} onClose={() => setSheet(null)} />
       <FilterModal visible={advOpen} value={adv} category={cat} part={isPart} onApply={setAdv} onClose={() => setAdvOpen(false)} />
       {error ? <Text style={s.err}>{error}</Text> : null}
+      {!loading || rows.length ? <View style={s.countRow}><PlainText style={s.countN}>{String(total)}</PlainText><Text style={s.countT}>ilan bulundu</Text></View> : null}
       <FlatList
         ref={scroller}
         data={rows}
@@ -123,12 +136,14 @@ export default function Listings() {
 
 const s = StyleSheet.create({
   screen: { flex: 1, backgroundColor: color.bg },
-  input: { margin: 12, padding: 12, backgroundColor: color.surface, borderRadius: 4, borderWidth: 1, borderColor: color.line },
-  chips: { paddingHorizontal: 12, gap: 8, paddingBottom: 8 },
-  chip: { paddingVertical: 8, paddingHorizontal: 14, backgroundColor: color.surface, borderRadius: 4, borderWidth: 1, borderColor: color.line },
-  chipOn: { backgroundColor: color.accent, borderColor: color.accent },
-  chipText: { color: color.ink },
-  chipTextOn: { color: '#fff' },
-  err: { color: color.bad, marginHorizontal: 12 },
+  chips: { paddingHorizontal: 16, gap: 8, paddingBottom: 6 },
+  chip: { flexDirection: 'row', alignItems: 'center', gap: 6, height: 40, paddingHorizontal: 14, backgroundColor: color.surface, borderRadius: 20, borderWidth: 1, borderColor: color.line },
+  chipOn: { backgroundColor: color.teal, borderColor: color.teal },
+  chipText: { color: color.ink, fontFamily: font.semi, fontSize: 14, maxWidth: 180 },
+  chipTextOn: { color: color.tealInk },
+  countRow: { flexDirection: 'row', alignItems: 'baseline', gap: 5, marginHorizontal: 20, marginTop: 6, marginBottom: 10 },
+  countN: { color: color.ink, fontFamily: font.bold, fontSize: 15 },
+  countT: { color: color.muted, fontSize: 14 },
+  err: { color: color.bad, marginHorizontal: 16 },
   empty: { textAlign: 'center', margin: 24, color: color.muted },
 });

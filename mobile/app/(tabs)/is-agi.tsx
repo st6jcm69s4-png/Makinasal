@@ -84,15 +84,15 @@ export default function NetworkTab() {
         {SECTIONS.map((x, i) => {
           const on = x.id === section.id;
           return (
-            <Pressable key={x.id} style={[s.seg, i > 0 && s.segL, on && s.segOn]} onPress={() => go(x.tabs[0][0])} accessibilityRole="button" accessibilityState={{ selected: on }}>
-              <Icon name={x.icon} size={19} color={on ? color.onBar : color.accent} />
-              <Text style={[s.segTitle, on && { color: color.onBar }]}>{x.title}</Text>
-              <Text style={[s.segSub, on && { color: color.onNavy }]} numberOfLines={1}>{x.sub}</Text>
+            <Pressable key={x.id} style={[s.seg, on && s.segOn]} onPress={() => go(x.tabs[0][0])} accessibilityRole="button" accessibilityState={{ selected: on }}>
+              <Icon name={x.icon} size={19} color={on ? color.tealInk : color.tealText} />
+              <Text style={[s.segTitle, on && { color: color.tealInk }]}>{x.title}</Text>
+              <Text style={[s.segSub, on && { color: 'rgba(255,255,255,0.85)' }]} numberOfLines={1}>{x.sub}</Text>
             </Pressable>
           );
         })}
       </View>
-      <View style={{ gap: 10, padding: 12 }}>
+      <View style={{ gap: 12, paddingHorizontal: 16, paddingBottom: 12 }}>
         {section.tabs.length > 1 ? (
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
             {section.tabs.map(([k, l]) => <Chip key={k} title={l} on={tab === k} onPress={() => go(k)} />)}
@@ -108,8 +108,8 @@ export default function NetworkTab() {
           <Icon name="search" size={18} color={color.muted} />
           <TextInput style={s.input} placeholder={tab === 'firma' ? 'Firma ara' : tab === 'staff_wanted' ? 'Pozisyon ara' : 'İlan ara'} placeholderTextColor={color.muted} value={q} onChangeText={setQ} />
           <Pressable style={s.cityBtn} onPress={() => setSheet(true)} accessibilityRole="button">
-            <Icon name="map-pin" size={15} color={city ? color.accent : color.muted} />
-            <Text style={[s.cityText, city && { color: color.accentText, fontWeight: '700' }]} numberOfLines={1}>{city || 'Tüm iller'}</Text>
+            <Icon name="map-pin" size={15} color={city ? color.tealText : color.muted} />
+            <Text style={[s.cityText, city && { color: color.tealText, fontWeight: '700' }]} numberOfLines={1}>{city || 'Tüm iller'}</Text>
           </Pressable>
         </View>
         <View style={{ flexDirection: 'row', gap: 8 }}>
@@ -152,25 +152,24 @@ const s = StyleSheet.create({
   sheetBack: { width: 40, height: 40, alignItems: 'flex-start', justifyContent: 'center', paddingLeft: 4 },
   sheetTitle: { color: color.onBar, fontFamily: font.labelBold, fontSize: 18, letterSpacing: 1 },
   sheetClose: { width: 34, height: 34, borderRadius: 17, backgroundColor: 'rgba(255,255,255,0.14)', alignItems: 'center', justifyContent: 'center' },
-  switch: { flexDirection: 'row', backgroundColor: color.surface, borderBottomWidth: 1, borderBottomColor: color.line },
-  seg: { flex: 1, paddingVertical: 10, paddingHorizontal: 8, gap: 2, alignItems: 'flex-start', borderTopWidth: 3, borderTopColor: 'transparent' },
-  segL: { borderLeftWidth: 1, borderLeftColor: color.line },
-  segOn: { backgroundColor: color.navy, borderTopColor: color.accent },
+  switch: { flexDirection: 'row', gap: 8, padding: 16, paddingBottom: 12 },
+  seg: { flex: 1, paddingVertical: 12, paddingHorizontal: 10, gap: 2, alignItems: 'flex-start', backgroundColor: color.surface, borderRadius: radius + 4, borderWidth: 1, borderColor: color.line },
+  segOn: { backgroundColor: color.teal, borderColor: color.teal },
   segTitle: { fontSize: 15, fontFamily: font.bold, color: color.ink, marginTop: 2 },
   segSub: { fontSize: 12, color: color.muted },
-  searchRow: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: color.surface, borderWidth: 1, borderColor: color.line, borderRadius: radius, paddingLeft: 10 },
+  searchRow: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: color.surface, borderWidth: 1, borderColor: color.line, borderRadius: radius + 2, paddingLeft: 14, minHeight: 50 },
   input: { flex: 1, paddingVertical: 11, fontSize: 16, color: color.ink },
   cityBtn: { flexDirection: 'row', alignItems: 'center', gap: 4, maxWidth: 120, minHeight: 44, paddingHorizontal: 10, borderLeftWidth: 1, borderLeftColor: color.line },
   cityText: { color: color.muted, fontSize: 14, flexShrink: 1 },
   err: { color: color.bad },
   empty: { textAlign: 'center', color: color.muted, margin: 24 },
-  card: { marginHorizontal: 12, marginBottom: 10, backgroundColor: color.surface, borderWidth: 1, borderColor: color.line, borderRadius: radius, overflow: 'hidden' },
+  card: { marginHorizontal: 16, marginBottom: 12, backgroundColor: color.surface, borderWidth: 1, borderColor: color.line, borderRadius: radius + 4, overflow: 'hidden' },
   cardTop: { flexDirection: 'row', gap: 12, padding: 12, alignItems: 'flex-start' },
-  roleIcon: { width: 44, height: 44, borderRadius: radius, backgroundColor: color.accentSoft, alignItems: 'center', justifyContent: 'center' },
+  roleIcon: { width: 44, height: 44, borderRadius: 14, backgroundColor: color.tealSoft, alignItems: 'center', justifyContent: 'center' },
   title: { fontSize: 17, fontWeight: '600', color: color.ink },
   desc: { color: color.muted, fontSize: 14 },
-  fresh: { backgroundColor: color.accent, paddingHorizontal: 6, paddingVertical: 1, borderRadius: 2 },
-  freshText: { color: '#fff', fontSize: 10.5, fontWeight: '700', letterSpacing: 0.6 },
+  fresh: { backgroundColor: color.teal, paddingHorizontal: 8, paddingVertical: 2, borderRadius: 8 },
+  freshText: { color: color.tealInk, fontSize: 11, fontWeight: '700' },
   strip: { flexDirection: 'row', borderTopWidth: 1, borderTopColor: color.line },
   cell: { paddingVertical: 7, paddingHorizontal: 12, gap: 1 },
   cellL: { borderLeftWidth: 1, borderLeftColor: color.line },
