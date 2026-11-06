@@ -76,7 +76,7 @@ export default function NetworkTab() {
   useEffect(() => { const t = setTimeout(() => void load(0), 300); return () => clearTimeout(t); }, [load]);
 
   const go = (t: Tab) => { setPosts([]); setProviders([]); setRole(''); setTab(t); };
-  const create = () => router.push(tab === 'firma' ? '/ag/firma-kaydi' : (`/ag/yeni?kind=${section.cta[1] || tab}` as never));
+  const create = () => router.push(tab === 'firma' ? '/ag/firma-kaydi' : section.cta[1] === 'rental_operator' ? ('/ag/tanit' as never) : (`/ag/yeni?kind=${section.cta[1] || tab}` as never));
 
   const header = (
     <View>

@@ -8,6 +8,8 @@ import { Badge } from './kit';
 import { router } from 'expo-router';
 import { dateLabel, money, PERSONNEL_ROLES, PROVIDER_KINDS, RENTAL_MODES, type MarketPost, type Provider } from '../lib/network';
 import { color, radius } from '../lib/theme';
+import { isPersonDetails } from '../lib/personProfile';
+import { tr } from '../lib/i18n';
 import { getLang, localeOf } from '../lib/i18n';
 
 const ROLE_ICON: Record<string, IconName> = { operator: 'settings', driver: 'truck', mechanic: 'tool' };
@@ -39,20 +41,21 @@ export function PostCard({ p }: { p: MarketPost }) {
   return (
     <Pressable style={({ pressed }) => [s.card, pressed && { opacity: 0.85 }]} onPress={() => router.push(`/ag/ilan/${p.id}` as never)} accessibilityRole="button">
       <View style={s.cardTop}>
-        {p.personnel_role ? <View style={s.roleIcon}><Icon name={ROLE_ICON[p.personnel_role] ?? 'user'} size={22} color={color.accentText} /></View> : null}
+        {p.personnel_role ? <View style={s.roleIcon}><Icon name={ROLE_ICON[p.personnel_role] ?? 'user'} size={22} color={color.tealText} /></View> : null}
         <View style={{ flex: 1, gap: 4 }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-            <Label style={{ color: color.accentText }}>{who}</Label>
-            {fresh ? <Badge variant="default">YENİ</Badge> : null}
+            <Label style={{ color: color.tealText }}>{who}</Label>
+            {fresh ? <Badge variant="default">Yeni</Badge> : null}
           </View>
           <Text style={s.title} numberOfLines={2}>{p.title}</Text>
+          {isPersonDetails(p.details) ? <Text style={s.person} numberOfLines={1}>{`${p.details.years} ${tr('yıl deneyim')} · ${p.details.machines.slice(0, 3).map((m) => tr(m)).join(', ')}`}</Text> : null}
         </View>
         <NetHeart kind="post" id={p.id} />
       </View>
       <View style={s.strip}>
         <Cell label="İl" value={p.city} />
         <Cell label={p.start_date ? 'Başlangıç' : 'Yayın'} value={p.start_date ? dateLabel(p.start_date) : new Date(p.created_at).toLocaleDateString(localeOf(getLang()))} left />
-        <Cell label={isStaff ? 'Ücret' : 'Bütçe'} value={p.price == null ? 'Belirtilmedi' : money(p.price, p.price_unit).replace(' toplam', '')} flex={1.4} left />
+        <Cell label={isStaff || p.kind === 'rental_operator' ? 'Ücret' : 'Bütçe'} value={p.price == null ? (p.kind === 'rental_operator' ? 'Görüşülür' : 'Belirtilmedi') : money(p.price, p.price_unit).replace(' toplam', '')} flex={1.4} left />
       </View>
     </Pressable>
   );
@@ -80,6 +83,7 @@ export function FirmCard({ p }: { p: Provider }) {
 
 
 const s = StyleSheet.create({
+  person: { color: color.muted, fontSize: 13.5 },
   card: { marginHorizontal: 12, marginBottom: 10, backgroundColor: color.surface, borderWidth: 1, borderColor: color.line, borderRadius: radius, overflow: 'hidden' },
   cardTop: { flexDirection: 'row', gap: 12, padding: 12, alignItems: 'flex-start' },
   roleIcon: { width: 44, height: 44, borderRadius: radius, backgroundColor: color.accentSoft, alignItems: 'center', justifyContent: 'center' },

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { PersonDetailsView } from '../../../components/PersonDetails';
 import { Alert, ActivityIndicator, ScrollView, View } from 'react-native';
 import { Text } from '../../../components/LText';
 import { router, useLocalSearchParams } from 'expo-router';
@@ -78,7 +79,7 @@ export default function PostDetail() {
     ['Konum', [post.city, post.district].filter(Boolean).join(' / ')],
     ['Çalışma türü', post.rental_mode ? RENTAL_MODES[post.rental_mode as keyof typeof RENTAL_MODES] : post.personnel_role ? PERSONNEL_ROLES[post.personnel_role as keyof typeof PERSONNEL_ROLES] : ''],
     ['Tarih', post.start_date ? `${dateLabel(post.start_date)}${post.end_date ? ' – ' + dateLabel(post.end_date) : ''}` : ''],
-    ['Adet', String(post.quantity)], ['Özellikler', post.specs],
+    ...(post.kind === 'rental_operator' ? [] : [['Adet', String(post.quantity)], ['Özellikler', post.specs]] as [string, string][]),
   ];
   return (
     <ScrollView contentContainerStyle={{ padding: 12, gap: 12 }} style={common.screen}>
@@ -89,12 +90,13 @@ export default function PostDetail() {
         {rows.filter(([, v]) => v).map(([k, v]) => <Text key={k}><Text style={{ fontWeight: '600' }}>{k}: </Text>{v}</Text>)}
         <Text style={{ marginTop: 6 }}>{post.description}</Text>
       </View>
+      {post.kind === 'rental_operator' ? <PersonDetailsView details={post.details} /> : null}
       {error ? <Text style={common.err}>{error}</Text> : null}
       {!isOwner ? <Btn ghost title={netFavs.has(`post:${post.id}`) ? 'Favorilerde · çıkar' : 'Favorilere ekle'} onPress={async () => { const err = await toggleNetFav('post', post.id); if (err) notify('Favoriler', err, (a) => void a.toggleNetFav('post', post.id)); }} /> : null}
 
       {isOwner ? (
         <View style={{ gap: 8 }}>
-          <Btn title="İlanı düzenle" onPress={() => router.push(`/ag/yeni?edit=${post.id}` as never)} />
+          <Btn title="İlanı düzenle" onPress={() => router.push((post.kind === 'rental_operator' ? `/ag/tanit?edit=${post.id}` : `/ag/yeni?edit=${post.id}`) as never)} />
           {post.status === 'open' ? <Btn ghost title="İlanı kapat" disabled={busy} onPress={() => confirm('Yeni teklif alınmayacak. Kapatılsın mı?', () => void setStatus('closed'))} /> : null}
           {post.status === 'closed' ? <Btn ghost title="Tekrar aç" disabled={busy} onPress={() => void setStatus('open')} /> : null}
           {post.status !== 'removed' ? <Btn danger title="Yayından kaldır" disabled={busy} onPress={() => confirm('İlan yayından kaldırılsın mı? Teklif geçmişi korunur.', () => void setStatus('removed'))} /> : null}

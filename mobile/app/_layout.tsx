@@ -37,6 +37,7 @@ function Screens() {
         <Stack.Screen name="kayitli-aramalar" options={{ title: T('Kayıtlı aramalar') }} />
         <Stack.Screen name="ag/ilan/[id]" options={{ title: T('İş ağı ilanı') }} />
         <Stack.Screen name="ag/yeni" options={{ title: T('İş ağı ilanı') }} />
+        <Stack.Screen name="ag/tanit" options={{ title: T('Kendini tanıt') }} />
         <Stack.Screen name="ag/hesabim" options={{ title: T('İş ağı hesabım') }} />
         <Stack.Screen name="ag/firma-kaydi" options={{ title: T('Firma profilim') }} />
         <Stack.Screen name="ag/envanter" options={{ title: T('Envanterim') }} />

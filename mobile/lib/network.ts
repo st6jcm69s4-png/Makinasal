@@ -15,7 +15,7 @@ export type MarketPost = {
   id: string; owner_id: string; preferred_provider: string | null; kind: PostKind; rental_mode: string | null; personnel_role: string | null;
   brand: string; model: string; title: string; description: string; category: string; city: string; district: string;
   start_date: string | null; end_date: string | null; price: number | null; price_unit: string; quantity: number; specs: string;
-  status: 'open' | 'closed' | 'removed'; created_at: string;
+  status: 'open' | 'closed' | 'removed'; created_at: string; details?: unknown;
 };
 export type Provider = {
   user_id: string; name: string; kind: keyof typeof PROVIDER_KINDS; company_category: string | null; description: string; city: string; district: string;

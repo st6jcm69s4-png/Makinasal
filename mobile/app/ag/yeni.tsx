@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { GuestGate } from '../../components/LoginPrompt';
 import { ActivityIndicator, ScrollView } from 'react-native';
 import { Text } from '../../components/LText';
-import { router, useLocalSearchParams } from 'expo-router';
+import { Redirect, router, useLocalSearchParams } from 'expo-router';
 import { PickerModal } from '../../components/PickerModal';
 import { Btn, common, Field, Select } from '../../components/ui';
 import { useApp } from '../../lib/AppContext';
@@ -37,11 +37,12 @@ export default function NewPost() {
     });
   }, [edit, session]);
 
+  if (kind === 'rental_operator') return <Redirect href={(edit ? `/ag/tanit?edit=${edit}` : '/ag/tanit') as never} />;
   if (!session) return <GuestGate icon="plus-square" text="İş ağında ilan vermek için giriş yap." />;
   if (loading) return <ActivityIndicator style={{ margin: 24 }} />;
 
   async function save() {
-    if (f.title.trim().length < 5 || f.description.trim().length < 10) { setError('Başlık en az 5, açıklama en az 10 karakter olmalı.'); return; }
+    if (f.title.trim().length < 5 || f.description.trim().length < 20) { setError('Başlık en az 5, açıklama en az 20 karakter olmalı.'); return; }
     if (!f.category || !f.city) { setError('Kategori ve il seçmelisin.'); return; }
     if (kind === 'rental_machine' && !f.mode) { setError('Operatörlü / sadece makine seçeneğini belirt.'); return; }
     if ((kind === 'rental_operator' || kind === 'staff_wanted') && !f.role) { setError(kind === 'staff_wanted' ? 'Aradığın pozisyonu seç.' : 'Hizmet türünü seç.'); return; }
