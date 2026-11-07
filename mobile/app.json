@@ -29,7 +29,7 @@
       "package": "tr.com.makinasal.app",
       "adaptiveIcon": {
         "foregroundImage": "./assets/brand/adaptive-icon.png",
-        "backgroundColor": "#F5B700"
+        "backgroundColor": "#1F201C"
       }
     },
     "icon": "./assets/brand/icon.png",

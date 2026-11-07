@@ -6,17 +6,16 @@ import { color, font } from '../lib/theme';
 import { tr } from '../lib/i18n';
 
 /**
- * Açılış animasyonu (yaklaşık 1,8 sn): logo kutusu belirir, ekskavatör yükselir,
- * kamyon sağdan gelir, kol kamyonun üstüne iner ve yük dökülür; yazı belirir, ekran yumuşakça açılır.
+ * Açılış animasyonu (yaklaşık 1,7 sn): logo kutusu belirir, palet soldan gelir, M yükselir,
+ * kepçe kolu yukarıdan inip yerine oturur; yazı belirir, ekran yumuşakça açılır.
  * Hareketi azalt açıksa animasyon atlanır.
  */
 export function AnimatedSplash() {
   const [done, setDone] = useState(false);
   const tile = useRef(new Animated.Value(0)).current;
-  const dig = useRef(new Animated.Value(0)).current;
-  const truck = useRef(new Animated.Value(0)).current;
+  const track = useRef(new Animated.Value(0)).current;
+  const m = useRef(new Animated.Value(0)).current;
   const arm = useRef(new Animated.Value(0)).current;
-  const load = useRef(new Animated.Value(0)).current;
   const word = useRef(new Animated.Value(0)).current;
   const out = useRef(new Animated.Value(0)).current;
 
@@ -30,10 +29,9 @@ export function AnimatedSplash() {
       Animated.sequence([
         Animated.parallel([
           Animated.spring(tile, { toValue: 1, friction: 7, tension: 80, useNativeDriver: true }),
-          t(dig, 320, 120),
-          t(truck, 520, 220),
-          Animated.timing(arm, { toValue: 1, duration: 480, delay: 560, easing: Easing.out(Easing.back(1.4)), useNativeDriver: true }),
-          t(load, 260, 1020),
+          t(track, 360, 120),
+          t(m, 380, 260),
+          Animated.timing(arm, { toValue: 1, duration: 560, delay: 560, easing: Easing.out(Easing.back(1.6)), useNativeDriver: true }),
           t(word, 360, 900),
         ]),
         Animated.delay(280),
@@ -41,7 +39,7 @@ export function AnimatedSplash() {
       ]).start(() => { if (alive) setDone(true); });
     });
     return () => { alive = false; };
-  }, [tile, dig, truck, arm, load, word, out]);
+  }, [tile, track, m, arm, word, out]);
 
   if (done) return null;
   return (
@@ -58,7 +56,7 @@ export function AnimatedSplash() {
           ],
         }}
       >
-        <AnimatedBrandMark size={120} dig={dig} truck={truck} arm={arm} load={load} />
+        <AnimatedBrandMark size={120} track={track} m={m} arm={arm} />
       </Animated.View>
       <Animated.View style={{ alignItems: 'center', marginTop: 22, opacity: word, transform: [{ translateY: word.interpolate({ inputRange: [0, 1], outputRange: [10, 0] }) }] }}>
         <PlainText style={s.word}>MAKİNASAL</PlainText>
