@@ -10,6 +10,7 @@ import { AppProvider } from '../lib/AppContext';
 import { tr } from '../lib/i18n';
 import { LangProvider, LanguageGate, useLang } from '../lib/lang';
 import { LoginPromptProvider } from '../components/LoginPrompt';
+import { AnimatedSplash } from '../components/AnimatedSplash';
 
 function Screens() {
   const { lang } = useLang();
@@ -82,6 +83,7 @@ export default function RootLayout() {
         <LoginPromptProvider>
           <Screens />
           <LanguageGate />
+          <AnimatedSplash />
         </LoginPromptProvider>
       </AppProvider>
     </LangProvider>
