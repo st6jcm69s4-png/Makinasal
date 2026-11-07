@@ -60,7 +60,7 @@ export function AnimatedSplash() {
       </Animated.View>
       <Animated.View style={{ alignItems: 'center', marginTop: 22, opacity: word, transform: [{ translateY: word.interpolate({ inputRange: [0, 1], outputRange: [10, 0] }) }] }}>
         <PlainText style={s.word}>MAKİNASAL</PlainText>
-        <PlainText style={s.tag}>{tr('İş makinesi, araç ve parça pazarı')}</PlainText>
+        <PlainText style={s.tag}>{tr('İş makinesi, parça ve iş pazarı')}</PlainText>
       </Animated.View>
     </Animated.View>
   );
