@@ -41,7 +41,7 @@ const label = (text: string) => ({ focused }: { focused: boolean }) => (
 function Logo() {
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-      <BrandMark size={26} radius={7} />
+      <BrandMark size={28} />
       <PlainText style={{ color: color.onBar, fontSize: 21, fontFamily: font.bold, letterSpacing: 1.6 }}>MAKİNASAL</PlainText>
     </View>
   );

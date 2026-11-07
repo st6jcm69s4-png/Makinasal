@@ -1,63 +1,56 @@
-import { Animated, View, type ViewStyle } from 'react-native';
-import { color } from '../lib/theme';
+import { Animated, Image, View, type ImageSourcePropType, type ImageStyle } from 'react-native';
 
-/** Paletten bağımsız marka kumu (palet zemininde de kullanılan ton). */
-export const BRAND_SAND = '#E5D7BC';
+/** Marka renkleri (uygulama paletinden bağımsız): iş makinesi sarısı ve kömür. */
+export const BRAND_YELLOW = '#F5B700';
+export const BRAND_INK = '#1F1F1C';
 
-type Val = Animated.Value | Animated.AnimatedInterpolation<number> | number;
-type Parts = { posts?: Val; arms?: Val; track?: Val };
+/* eslint-disable @typescript-eslint/no-require-imports */
+const FULL = require('../assets/brand/splash-icon.png') as ImageSourcePropType;
+const LAYERS = {
+  excavator: require('../assets/brand/l-excavator.png') as ImageSourcePropType,
+  arm: require('../assets/brand/l-arm.png') as ImageSourcePropType,
+  load: require('../assets/brand/l-load.png') as ImageSourcePropType,
+  truck: require('../assets/brand/l-truck.png') as ImageSourcePropType,
+};
+/* eslint-enable @typescript-eslint/no-require-imports */
 
-// Geometri 100 birimlik kare üzerinde (assets/brand/icon.png ile aynı).
-const STROKE = 11;
-const ARM_LEN = Math.hypot(22, 26) + STROKE - 3; // yuvarlak uçlar dahil, bacakların dışına taşmasın
-const ARM_DEG = (Math.atan2(26, 22) * 180) / Math.PI;
-const WHEELS: [number, number][] = [[26, 2.6], [38, 1.7], [50, 1.7], [62, 1.7], [74, 2.6]];
+/** Makinasal logosu: kamyona yük boşaltan ekskavatör (sarı zemin, kömür çizim). */
+export function BrandMark({ size = 32, style }: { size?: number; style?: ImageStyle }) {
+  return <Image source={FULL} style={[{ width: size, height: size }, style]} accessibilityLabel="Makinasal" />;
+}
 
+type V = Animated.Value;
 /**
- * Makinasal logosu: palet (tırtıl) üzerinde duran kalın bir "M".
- * Parçalar isteğe bağlı Animated değerleriyle (0→1) tek tek canlandırılabilir.
+ * Katmanlı logo (açılış animasyonu için). Değerler 0→1:
+ * dig: ekskavatör belirir, truck: kamyon sağdan gelir, arm: kol iner, load: yük dökülür.
  */
-export function BrandMark({ size = 32, radius, parts, style }: { size?: number; radius?: number; parts?: Parts; style?: ViewStyle }) {
+export function AnimatedBrandMark({ size, dig, truck, arm, load }: { size: number; dig: V; truck: V; arm: V; load: V }) {
   const u = size / 100;
-  const posts = parts?.posts ?? 1;
-  const arms = parts?.arms ?? 1;
-  const track = parts?.track ?? 1;
-  const ink = color.accentInk;
-  const post = (x: number) => (
-    <Animated.View
-      style={{
-        position: 'absolute', left: (x - STROKE / 2) * u, top: (24 - STROKE / 2) * u, width: STROKE * u, height: (42 + STROKE) * u,
-        borderRadius: (STROKE / 2) * u, backgroundColor: ink, transformOrigin: 'bottom',
-        transform: [{ scaleY: posts as number }],
-      }}
-    />
-  );
-  const arm = (mx: number, deg: number) => (
-    <Animated.View
-      style={{
-        position: 'absolute', left: (mx - ARM_LEN / 2) * u, top: (37 - STROKE / 2) * u, width: ARM_LEN * u, height: STROKE * u,
-        borderRadius: (STROKE / 2) * u, backgroundColor: ink, opacity: arms as number,
-        transform: [{ rotate: `${deg}deg` }, { scale: typeof arms === 'number' ? 1 : (arms as Animated.Value).interpolate({ inputRange: [0, 1], outputRange: [0.5, 1] }) as unknown as number }],
-      }}
-    />
-  );
+  const layer = { position: 'absolute' as const, left: 0, top: 0, width: size, height: size };
+  const rise = dig.interpolate({ inputRange: [0, 1], outputRange: [8 * u, 0] });
   return (
-    <View style={[{ width: size, height: size, borderRadius: radius ?? size * 0.22, backgroundColor: color.accent, overflow: 'hidden' }, style]} accessibilityLabel="Makinasal">
-      <Animated.View
-        style={{
-          position: 'absolute', left: 16.8 * u, top: 70.8 * u, width: 66.4 * u, height: 16.4 * u,
-          borderRadius: 8.2 * u, borderWidth: 3.4 * u, borderColor: BRAND_SAND, opacity: track as number,
-          transform: [{ translateX: typeof track === 'number' ? 0 : (track as Animated.Value).interpolate({ inputRange: [0, 1], outputRange: [-24 * u, 0] }) as unknown as number }],
-        }}
-      >
-        {WHEELS.map(([cx, r]) => (
-          <View key={cx} style={{ position: 'absolute', left: (cx - 16.8 - 3.4 - r) * u, top: (79 - 70.8 - 3.4 - r) * u, width: r * 2 * u, height: r * 2 * u, borderRadius: r * u, backgroundColor: BRAND_SAND }} />
-        ))}
-      </Animated.View>
-      {arm(39, ARM_DEG)}
-      {arm(61, -ARM_DEG)}
-      {post(28)}
-      {post(72)}
+    <View style={{ width: size, height: size, borderRadius: size * 0.22, backgroundColor: BRAND_YELLOW, overflow: 'hidden' }} accessibilityLabel="Makinasal">
+      <Animated.Image
+        source={LAYERS.truck}
+        style={[layer, { transform: [{ translateX: truck.interpolate({ inputRange: [0, 1], outputRange: [62 * u, 0] }) }] }]}
+      />
+      <Animated.Image
+        source={LAYERS.load}
+        style={[layer, { opacity: load, transform: [{ translateY: load.interpolate({ inputRange: [0, 1], outputRange: [-5 * u, 0] }) }] }]}
+      />
+      <Animated.Image source={LAYERS.excavator} style={[layer, { opacity: dig, transform: [{ translateY: rise }] }]} />
+      {/* Kol omuz pimi (30,62) etrafında döner: önce yukarıda, sonra kamyonun üstüne iner. */}
+      <Animated.Image
+        source={LAYERS.arm}
+        style={[layer, {
+          opacity: dig,
+          transformOrigin: '30% 62%',
+          transform: [
+            { translateY: rise },
+            { rotate: arm.interpolate({ inputRange: [0, 1], outputRange: ['-38deg', '0deg'] }) },
+          ],
+        }]}
+      />
     </View>
   );
 }

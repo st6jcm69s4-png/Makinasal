@@ -1,21 +1,22 @@
 import { useEffect, useRef, useState } from 'react';
 import { AccessibilityInfo, Animated, Easing, StyleSheet } from 'react-native';
 import { PlainText } from './LText';
-import { BrandMark } from './BrandMark';
+import { AnimatedBrandMark } from './BrandMark';
 import { color, font } from '../lib/theme';
 import { tr } from '../lib/i18n';
 
 /**
- * Açılış animasyonu (yaklaşık 1,6 sn): logo kutusu belirir, palet kayarak gelir,
- * M'nin bacakları yükselir, kolları birleşir; yazı belirir ve ekran yumuşakça açılır.
+ * Açılış animasyonu (yaklaşık 1,8 sn): logo kutusu belirir, ekskavatör yükselir,
+ * kamyon sağdan gelir, kol kamyonun üstüne iner ve yük dökülür; yazı belirir, ekran yumuşakça açılır.
  * Hareketi azalt açıksa animasyon atlanır.
  */
 export function AnimatedSplash() {
   const [done, setDone] = useState(false);
   const tile = useRef(new Animated.Value(0)).current;
-  const track = useRef(new Animated.Value(0)).current;
-  const posts = useRef(new Animated.Value(0)).current;
-  const arms = useRef(new Animated.Value(0)).current;
+  const dig = useRef(new Animated.Value(0)).current;
+  const truck = useRef(new Animated.Value(0)).current;
+  const arm = useRef(new Animated.Value(0)).current;
+  const load = useRef(new Animated.Value(0)).current;
   const word = useRef(new Animated.Value(0)).current;
   const out = useRef(new Animated.Value(0)).current;
 
@@ -29,17 +30,18 @@ export function AnimatedSplash() {
       Animated.sequence([
         Animated.parallel([
           Animated.spring(tile, { toValue: 1, friction: 7, tension: 80, useNativeDriver: true }),
-          t(track, 380, 120),
-          t(posts, 340, 260),
-          t(arms, 300, 480),
-          t(word, 360, 560),
+          t(dig, 320, 120),
+          t(truck, 520, 220),
+          Animated.timing(arm, { toValue: 1, duration: 480, delay: 560, easing: Easing.out(Easing.back(1.4)), useNativeDriver: true }),
+          t(load, 260, 1020),
+          t(word, 360, 900),
         ]),
-        Animated.delay(320),
+        Animated.delay(280),
         Animated.timing(out, { toValue: 1, duration: 320, easing: Easing.in(Easing.quad), useNativeDriver: true }),
       ]).start(() => { if (alive) setDone(true); });
     });
     return () => { alive = false; };
-  }, [tile, track, posts, arms, word, out]);
+  }, [tile, dig, truck, arm, load, word, out]);
 
   if (done) return null;
   return (
@@ -56,7 +58,7 @@ export function AnimatedSplash() {
           ],
         }}
       >
-        <BrandMark size={112} radius={26} parts={{ track, posts, arms }} />
+        <AnimatedBrandMark size={120} dig={dig} truck={truck} arm={arm} load={load} />
       </Animated.View>
       <Animated.View style={{ alignItems: 'center', marginTop: 22, opacity: word, transform: [{ translateY: word.interpolate({ inputRange: [0, 1], outputRange: [10, 0] }) }] }}>
         <PlainText style={s.word}>MAKİNASAL</PlainText>
