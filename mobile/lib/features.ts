@@ -61,6 +61,7 @@ export const FEATURES: Feature[] = [
   { id: 'jobs', title: 'İş talepleri', sub: 'Teklif ver, işi al', icon: 'clipboard', words: 'iş talep teklif hafriyat job jobs auftrag aufträge angebot', run: net('job') },
   { id: 'part-req', title: 'Parça talepleri', sub: 'Aradığın parçayı yaz', icon: 'search', words: 'parça talep arıyorum aranıyor part request teileanfrage', run: net('part_request') },
   { id: 'firms', title: 'Şirketler ve filolar', sub: 'Hizmet bölgesine göre', icon: 'briefcase', words: 'şirket firma filo company firms firmen flotte', run: net('firma') },
+  { id: 'auctions', title: 'Açık artırmalar', sub: 'Teklif ver, kazan', icon: 'award', words: 'açık artırma mezat ihale auction auctions bid auktion versteigerung', run: open('/acik-artirmalar') },
   { id: 'tow', title: 'Çekici bul', sub: 'En yakın, puanlı', icon: 'life-buoy', words: 'çekici yol yardım kurtarma tow towing abschleppdienst pannenhilfe', run: open('/cekici') },
   { id: 'net-account', title: 'İş ağı hesabım', sub: 'Tekliflerin ve işlerin', icon: 'briefcase', needsLogin: true, words: 'iş ağı hesabım teklif tekliflerim work network angebote', run: open('/ag/hesabim') },
   { id: 'inventory', title: 'Makinelerim ve araçlarım', sub: 'Makine ve araçların', icon: 'package', needsLogin: true, words: 'makinelerim makine parkı envanter makinelerim araçlarım filo inventory fleet fuhrpark', run: open('/ag/envanter') },

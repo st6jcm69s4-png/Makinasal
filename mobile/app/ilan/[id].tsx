@@ -9,16 +9,18 @@ import { checkMessage } from '../../lib/messageFilter';
 import { PickerModal } from '../../components/PickerModal';
 import { useApp } from '../../lib/AppContext';
 import { useLoginPrompt } from '../../components/LoginPrompt';
-import { SITE_URL, photoUrl, supabase, tl } from '../../lib/supabase';
+import { SITE_URL, photoUrl, supabase, tl, videoFileUrl } from '../../lib/supabase';
 import { trustLevel, type TrustLevel } from '../../lib/trust';
 import { LoanCalculator } from '../../components/LoanCalculator';
+import { AuctionBox, type Auction } from '../../components/AuctionBox';
+import { VideoPlayer } from '../../components/VideoPlayer';
 import { videoHost, videoThumb } from '../../lib/video';
 import { color, font, radius, shadow } from '../../lib/theme';
 
 type Detail = {
   id: string; seller_id: string; category: string; title: string; description: string | null; price: number | string; city: string; year: number | null;
   usage_value: number | null; usage_unit: string | null; brand: string | null; model: string | null;
-  video_url?: string | null; boosted_until?: string | null;
+  video_url?: string | null; video_path?: string | null; boosted_until?: string | null;
   listing_photos: { path: string; position: number }[] | null;
 };
 const REPORT_REASONS = ['Sahte veya yanıltıcı ilan', 'Kapora / ön ödeme istiyor', 'Fiyat gerçek dışı', 'Hakaret veya taciz', 'Diğer'];
@@ -51,6 +53,16 @@ export default function ListingScreen() {
   const [slide, setSlide] = useState(0);
   const [rating, setRating] = useState<{ score: number; count: number } | null>(null);
   const [boostBusy, setBoostBusy] = useState(false);
+  const [auction, setAuction] = useState<Auction | null>(null);
+  useEffect(() => {
+    void supabase.from('auctions').select('id,listing_id,seller_id,start_price,min_increment,ends_at,status,current_price,bid_count')
+      .eq('listing_id', id).neq('status', 'cancelled').order('created_at', { ascending: false }).limit(1).maybeSingle()
+      .then(({ data }) => {
+        const a = data as Auction | null;
+        // Biten açık artırma bir hafta daha görünür
+        setAuction(a && (a.status === 'active' || Date.parse(a.ends_at) > Date.now() - 7 * 86400000) ? a : null);
+      });
+  }, [id]);
   const isAdmin = (session?.user.app_metadata as { role?: string } | undefined)?.role === 'admin';
   const insets = useSafeAreaInsets();
 
@@ -59,7 +71,7 @@ export default function ListingScreen() {
     const base = 'id,seller_id,category,title,description,price,city,year,usage_value,usage_unit,brand,model,listing_photos(path,position)';
     const q = (cols: string) => supabase.from('listings').select(cols).eq('id', id).eq('status', 'active').eq('moderation_status', 'approved').maybeSingle();
     // video_url yeni sütun: eski veritabanında yoksa onsuz tekrar dene
-    void q(base + ',video_url,boosted_until').then((r) => (r.error ? q(base) : r))
+    void q(base + ',video_url,video_path,boosted_until').then((r) => (r.error ? q(base) : r))
       .then(async ({ data, error }) => {
         if (!alive) return;
         if (error) { setState('error'); return; }
@@ -205,7 +217,18 @@ export default function ListingScreen() {
           ) : null}
         </View>
 
-        {item.video_url ? (
+        {auction ? (
+          <View style={{ marginTop: 16 }}>
+            <AuctionBox auction={auction} own={own} signedIn={!!session} askLogin={() => needLogin('Teklif')} />
+          </View>
+        ) : null}
+
+        {item.video_path ? (
+          <>
+            <Text style={s.h2}>Video</Text>
+            <VideoPlayer uri={videoFileUrl(item.video_path)} poster={photos[0] ? photoUrl(photos[0].path) : null} />
+          </>
+        ) : item.video_url ? (
           <>
             <Text style={s.h2}>Video</Text>
             <Pressable style={({ pressed }) => [s.video, pressed && { opacity: 0.9 }]} onPress={() => void Linking.openURL(item.video_url!)} accessibilityRole="button" accessibilityLabel={`Videoyu ${videoHost(item.video_url)} uygulamasında aç`}>

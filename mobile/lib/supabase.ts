@@ -12,6 +12,7 @@ export const supabase = createClient(SUPABASE_URL || 'http://localhost', KEY || 
 });
 
 export const photoUrl = (path: string) => `${SUPABASE_URL}/storage/v1/object/public/listing-photos/${path}`;
+export const videoFileUrl = (path: string) => `${SUPABASE_URL}/storage/v1/object/public/listing-videos/${path}`;
 export const tl = (n: number | string) => `${Number(n).toLocaleString(localeOf(getLang()))} ₺`;
 
 export type Row = {

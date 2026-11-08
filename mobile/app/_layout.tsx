@@ -36,6 +36,7 @@ function Screens() {
         <Stack.Screen name="bildirimler" options={{ title: T('Bildirimler') }} />
         <Stack.Screen name="profil-duzenle" options={{ title: T('Profili düzenle') }} />
         <Stack.Screen name="kayitli-aramalar" options={{ title: T('Kayıtlı aramalar') }} />
+        <Stack.Screen name="acik-artirmalar" options={{ title: T('Açık artırmalar') }} />
         <Stack.Screen name="ag/ilan/[id]" options={{ title: T('İş ağı ilanı') }} />
         <Stack.Screen name="ag/yeni" options={{ title: T('İş ağı ilanı') }} />
         <Stack.Screen name="ag/tanit" options={{ title: T('Kendini tanıt') }} />

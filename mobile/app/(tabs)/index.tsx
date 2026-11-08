@@ -27,6 +27,7 @@ const SHORTS: Short[] = [
   { label: 'İş talepleri', sub: 'Teklif ver, işi al', icon: 'clipboard', tint: 'accent', go: () => router.navigate({ pathname: '/is-agi', params: { kind: 'job' } }) },
   { label: 'Parça talepleri', sub: 'Aradığın parçayı yaz', icon: 'search', tint: 'teal', go: () => router.navigate({ pathname: '/is-agi', params: { kind: 'part_request' } }) },
   { label: 'Çekici bul', sub: 'En yakın, puanlı', icon: 'life-buoy', tint: 'accent', go: () => router.push('/cekici' as never) },
+  { label: 'Açık artırmalar', sub: 'Teklif ver, kazan', icon: 'award', tint: 'teal', go: () => router.push('/acik-artirmalar' as never) },
   { label: 'Şirketler ve filolar', sub: 'Hizmet bölgesine göre', icon: 'briefcase', tint: 'teal', wide: true, go: () => router.navigate({ pathname: '/is-agi', params: { kind: 'firma' } }) },
 ];
 function ShortCard({ t }: { t: Short }) {

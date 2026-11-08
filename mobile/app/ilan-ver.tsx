@@ -2,7 +2,7 @@ import { normalizeVideoUrl } from '../lib/video';
 import { useEffect, useState, type ReactNode } from 'react';
 import { GuestGate } from '../components/LoginPrompt';
 import { ActivityIndicator, Alert, Image, KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, Switch, View } from 'react-native';
-import { Text, TextInput } from '../components/LText';
+import { PlainText, Text, TextInput } from '../components/LText';
 import { Icon, type IconName } from '../components/Icon';
 import { tr } from '../lib/i18n';
 import * as ImagePicker from 'expo-image-picker';
@@ -38,6 +38,10 @@ export default function NewListing() {
   const [desc, setDesc] = useState('');
   const [takas, setTakas] = useState(false);
   const [video, setVideo] = useState('');
+  type PickedVideo = { uri: string; ext: 'mp4' | 'mov'; mime: string; size: number | null; duration: number | null };
+  const [videoFile, setVideoFile] = useState<PickedVideo | null>(null);
+  const [oldVideo, setOldVideo] = useState<string | null>(null);
+  const [dropOldVideo, setDropOldVideo] = useState(false);
   const [spec, setSpec] = useState('');
   const [cond, setCond] = useState('Sıfır');
   const [compat, setCompat] = useState('');
@@ -58,13 +62,13 @@ export default function NewListing() {
   useEffect(() => {
     if (!uid || !editId) return;
     void supabase.from('listings')
-      .select('category,brand,model,year,usage_value,price,city,description,takas,spec,cond,compat,qty,equipment_category,part_group,video_url,listing_photos(id,path,position)')
+      .select('category,brand,model,year,usage_value,price,city,description,takas,spec,cond,compat,qty,equipment_category,part_group,video_url,video_path,listing_photos(id,path,position)')
       .eq('id', editId).eq('seller_id', uid).maybeSingle().then(({ data }) => {
         const r = data as unknown as Record<string, unknown> | null;
         if (!r) { Alert.alert('İlan', 'İlan bulunamadı.'); router.back(); return; }
         setCat(String(r.category ?? '')); setBrand(String(r.brand ?? '')); setModel(String(r.model ?? ''));
         setYear(r.year ? String(r.year) : ''); setUsage(r.usage_value != null ? String(r.usage_value) : ''); setPrice(String(r.price ?? ''));
-        setCity(String(r.city ?? '')); setDesc(String(r.description ?? '')); setVideo(String(r.video_url ?? '')); setTakas(!!r.takas); setSpec(String(r.spec ?? ''));
+        setCity(String(r.city ?? '')); setDesc(String(r.description ?? '')); setVideo(String(r.video_url ?? '')); setOldVideo(r.video_path ? String(r.video_path) : null); setTakas(!!r.takas); setSpec(String(r.spec ?? ''));
         setCond(String(r.cond ?? 'Sıfır')); setCompat(String(r.compat ?? '')); setQty(r.qty ? String(r.qty) : '1');
         setEquip(String(r.equipment_category ?? '')); setGroup(String(r.part_group ?? ''));
         const ph = ((r.listing_photos ?? []) as { id: string; path: string; position: number }[]).sort((a, b) => a.position - b.position);
@@ -88,6 +92,42 @@ export default function NewListing() {
       : await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], allowsMultipleSelection: true, selectionLimit: room, quality: 0.6 });
     if (res.canceled) return;
     setPhotos((cur) => [...cur, ...res.assets.map((a) => a.uri)].slice(0, maxPhotos - existing.length));
+  }
+
+  const MAX_VIDEO_MB = 50;
+  async function pickVideo(camera: boolean) {
+    const perm = camera ? await ImagePicker.requestCameraPermissionsAsync() : await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!perm.granted) { Alert.alert(tr('İzin gerekli'), tr('Video eklemek için izin vermelisin. Telefon ayarlarından değiştirebilirsin.')); return; }
+    const opts = { mediaTypes: ['videos'] as ImagePicker.MediaType[], videoMaxDuration: 60, allowsEditing: true, videoQuality: ImagePicker.UIImagePickerControllerQualityType.Medium };
+    const res = camera ? await ImagePicker.launchCameraAsync(opts) : await ImagePicker.launchImageLibraryAsync(opts);
+    if (res.canceled || !res.assets[0]) return;
+    const a = res.assets[0];
+    if (a.duration && a.duration > 61000) { Alert.alert(tr('Video'), tr('Video en fazla 60 saniye olabilir. Kırpıp tekrar seç.')); return; }
+    if (a.fileSize && a.fileSize > MAX_VIDEO_MB * 1024 * 1024) { Alert.alert(tr('Video'), tr('Video 50 MB\'tan büyük. Daha kısa bir video seç.')); return; }
+    const mov = (a.mimeType ?? '').includes('quicktime') || /\.mov$/i.test(a.uri);
+    setVideoFile({ uri: a.uri, ext: mov ? 'mov' : 'mp4', mime: mov ? 'video/quicktime' : 'video/mp4', size: a.fileSize ?? null, duration: a.duration ?? null });
+  }
+
+  /** Videoyu yükler ve ilana bağlar. Başarısızsa false (ilan yine de yayına alınır). */
+  async function uploadVideo(listingId: string): Promise<boolean> {
+    if (!uid) return false;
+    const old = oldVideo && (videoFile || dropOldVideo) ? oldVideo : null;
+    if (videoFile) {
+      setProgress(tr('Video yükleniyor…'));
+      try {
+        const buf = await (await fetch(videoFile.uri)).arrayBuffer();
+        if (buf.byteLength > MAX_VIDEO_MB * 1024 * 1024) return false;
+        const path = `${uid}/${listingId}/${Date.now()}-${Math.random().toString(36).slice(2, 10)}.${videoFile.ext}`;
+        const up = await supabase.storage.from('listing-videos').upload(path, buf, { contentType: videoFile.mime });
+        if (up.error) return false;
+        const link = await supabase.from('listings').update({ video_path: path }).eq('id', listingId).eq('seller_id', uid);
+        if (link.error) { await supabase.storage.from('listing-videos').remove([path]); return false; }
+      } catch { return false; }
+    } else if (dropOldVideo) {
+      await supabase.from('listings').update({ video_path: null }).eq('id', listingId).eq('seller_id', uid);
+    }
+    if (old) await supabase.storage.from('listing-videos').remove([old]);
+    return true;
   }
 
   async function submit() {
@@ -156,9 +196,10 @@ export default function NewListing() {
         router.replace('/ilanlarim');
         return;
       }
+      const videoOk = await uploadVideo(id);
       const published = await supabase.from('listings').update({ status: 'active' }).eq('id', id).eq('seller_id', uid);
       if (published.error) throw new Error('İlan kaydedildi ancak yayına alınamadı. İlanlarım ekranından "Yayına al" ile tekrar dene.');
-      Alert.alert('İlan', 'İlan incelemeye gönderildi. Onaylandığında yayımlanacak.');
+      Alert.alert('İlan', videoOk ? 'İlan incelemeye gönderildi. Onaylandığında yayımlanacak.' : 'İlan incelemeye gönderildi ancak video yüklenemedi. İlanı düzenleyip videoyu tekrar ekleyebilirsin.');
       router.replace('/ilanlarim');
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Bir hata oluştu.');
@@ -226,8 +267,25 @@ export default function NewListing() {
         )}
 
         {section('Video (isteğe bağlı)', 'video', <>
-          {field('YouTube veya Vimeo bağlantısı', video, setVideo, { keyboardType: 'url', autoCapitalize: 'none', autoCorrect: false, placeholder: 'https://youtu.be/…', maxLength: 300 })}
-          <Text style={s.hint}>Makinenin çalışırken çekilmiş videosu alıcıların güvenini artırır. Videoyu YouTube'a "Liste dışı" olarak yükleyip bağlantısını yapıştırabilirsin.</Text>
+          <Text style={s.hint}>Makinenin çalışırken çekilmiş kısa bir videosu alıcıların güvenini artırır. En fazla 60 saniye.</Text>
+          {videoFile || (oldVideo && !dropOldVideo) ? (
+            <View style={s.videoRow}>
+              <View style={s.videoIcon}><Icon name="film" size={20} color={color.tealInk} /></View>
+              <View style={{ flex: 1 }}>
+                <Text style={s.videoT}>{videoFile ? 'Video seçildi' : 'İlanda video var'}</Text>
+                {videoFile ? <PlainText style={s.hint}>{[videoFile.duration ? `${Math.round(videoFile.duration / 1000)} sn` : '', videoFile.size ? `${(videoFile.size / 1048576).toFixed(1).replace('.', ',')} MB` : ''].filter(Boolean).join(' · ')}</PlainText> : null}
+              </View>
+              <Pressable hitSlop={8} onPress={() => { if (videoFile) setVideoFile(null); else setDropOldVideo(true); }} accessibilityRole="button" accessibilityLabel={tr('Videoyu kaldır')}>
+                <Icon name="trash-2" size={19} color={color.bad} />
+              </Pressable>
+            </View>
+          ) : (
+            <View style={{ flexDirection: 'row', gap: 10 }}>
+              <Pressable style={s.videoBtn} onPress={() => void pickVideo(true)} accessibilityRole="button"><Icon name="video" size={20} color={color.tealText} /><Text style={s.addT}>Video çek</Text></Pressable>
+              <Pressable style={s.videoBtn} onPress={() => void pickVideo(false)} accessibilityRole="button"><Icon name="film" size={20} color={color.tealText} /><Text style={s.addT}>Galeriden seç</Text></Pressable>
+            </View>
+          )}
+          {field('veya YouTube / Vimeo bağlantısı', video, setVideo, { keyboardType: 'url', autoCapitalize: 'none', autoCorrect: false, placeholder: 'https://youtu.be/…', maxLength: 300 })}
         </>)}
 
         {section(`${tr('Fotoğraflar')} (${total}/${maxPhotos})`, 'camera', <>
@@ -282,6 +340,10 @@ export default function NewListing() {
 
 const s = StyleSheet.create({
   hint: { color: color.muted, fontSize: 12.5, lineHeight: 18 },
+  videoRow: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 12, borderRadius: radius, backgroundColor: color.tealSoft },
+  videoIcon: { width: 40, height: 40, borderRadius: 12, backgroundColor: color.teal, alignItems: 'center', justifyContent: 'center' },
+  videoT: { color: color.ink, fontFamily: font.semi, fontSize: 15 },
+  videoBtn: { flex: 1, minHeight: 56, borderRadius: radius, borderWidth: 1.5, borderStyle: 'dashed', borderColor: color.teal, alignItems: 'center', justifyContent: 'center', gap: 4 },
   form: { padding: 16, gap: 14, paddingBottom: 40 },
   card: { backgroundColor: color.surface, borderRadius: radius + 4, padding: 14, gap: 12, ...shadow },
   cardHead: { flexDirection: 'row', alignItems: 'center', gap: 10 },

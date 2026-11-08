@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 import { GuestGate } from '../components/LoginPrompt';
 import { ActivityIndicator, Alert, FlatList, Image, Modal, Pressable, StyleSheet, View } from 'react-native';
-import { PlainText, Text } from '../components/LText';
+import { PlainText, Text, TextInput } from '../components/LText';
 import { Icon, type IconName } from '../components/Icon';
 import { tr } from '../lib/i18n';
 import { router, useFocusEffect } from 'expo-router';
@@ -42,12 +42,21 @@ export default function MyListings() {
   const [error, setError] = useState('');
   const [menu, setMenu] = useState<Row | null>(null);
   const [stats, setStats] = useState<Map<string, Stat>>(new Map());
+  const [auctions, setAuctions] = useState<Map<string, { current_price: number | null; bid_count: number }>>(new Map());
+  const [auc, setAuc] = useState<Row | null>(null);
+  const [aStart, setAStart] = useState('');
+  const [aInc, setAInc] = useState('');
+  const [aDays, setADays] = useState(7);
+  const [aBusy, setABusy] = useState(false);
+  const [aErr, setAErr] = useState('');
 
   const load = useCallback(async () => {
     if (!uid) { setRows([]); return; }
     const { data, error: e } = await supabase.from('listings').select(COLS).eq('seller_id', uid).neq('status', 'removed').order('created_at', { ascending: false });
     if (e) { setError('İlanların yüklenemedi. Bağlantını kontrol et.'); setRows([]); return; }
     setError(''); setRows((data ?? []) as unknown as Row[]);
+    const au = await supabase.from('auctions').select('listing_id,current_price,bid_count').eq('seller_id', uid).eq('status', 'active');
+    if (!au.error) setAuctions(new Map(((au.data ?? []) as { listing_id: string; current_price: number | null; bid_count: number }[]).map((x) => [x.listing_id, x])));
     const st = await supabase.rpc('my_listing_stats');
     if (!st.error) setStats(new Map(((st.data ?? []) as (Stat & { listing_id: string })[]).map((x) => [x.listing_id, { views: x.views, phones: x.phones, favorites: x.favorites, threads: x.threads }])));
   }, [uid]);
@@ -68,6 +77,10 @@ export default function MyListings() {
       list.push({ icon: 'pause-circle', label: 'Duraklat', run: () => void patch(r.id, 'paused') });
     }
     if (r.status === 'active' && !isBoosted(r)) list.push({ icon: 'trending-up', label: 'Öne çıkar', run: () => Alert.alert(tr('Öne çıkar'), tr('İlanın 7 gün boyunca aramalarda üst sıralarda ve "Öne çıkan" etiketiyle görünür. Ödeme sistemi açılınca buradan satın alabileceksin. Premium üyelikte ilanların zaten öne çıkar.'), [{ text: tr('Tamam'), style: 'cancel' }, { text: tr("Premium'a bak"), onPress: () => router.push('/premium') }]) });
+    if (r.status === 'active' && r.moderation_status === 'approved' && !auctions.has(r.id)) list.push({ icon: 'award', label: 'Açık artırmaya çıkar', run: () => {
+      const p = Number(r.price) || 0;
+      setAStart(p ? String(Math.round(p * 0.7)) : ''); setAInc(p ? String(Math.max(100, Math.round(p * 0.01 / 100) * 100)) : ''); setADays(7); setAErr(''); setAuc(r);
+    } });
     if (r.status === 'paused') list.push({ icon: 'play-circle', label: 'Yayına al', run: () => void patch(r.id, 'active') });
     list.push({ icon: 'trash-2', label: 'Kaldır', danger: true, run: () => confirm(r, 'removed', 'İlan kaldırılsın mı? İşlem ve değerlendirme geçmişi korunur.', 'Kaldır', true) });
     return list;
@@ -107,6 +120,7 @@ export default function MyListings() {
                   <PlainText style={s.price}>{`${tl(r.price)} · ${r.city}`}</PlainText>
                   <View style={{ flexDirection: 'row', gap: 6, flexWrap: 'wrap' }}>
                     <View style={[s.pill, { backgroundColor: statusTone(r).bg }]}><Text style={[s.pillT, { color: statusTone(r).fg }]}>{statusText(r)}</Text></View>
+                    {auctions.has(r.id) ? <View style={[s.pill, { backgroundColor: color.teal }]}><Text style={[s.pillT, { color: color.tealInk }]}>{auctions.get(r.id)!.bid_count ? `${tr('Açık artırmada')} · ${auctions.get(r.id)!.bid_count} ${tr('teklif')}` : tr('Açık artırmada')}</Text></View> : null}
                     {isBoosted(r) ? <View style={[s.pill, { backgroundColor: color.teal }]}><Text style={[s.pillT, { color: color.tealInk }]}>Öne çıkan</Text></View> : null}
                   </View>
                 </View>
@@ -139,11 +153,55 @@ export default function MyListings() {
           </Pressable>
         </Pressable>
       </Modal>
+      <Modal visible={!!auc} transparent animationType="slide" onRequestClose={() => setAuc(null)}>
+        <Pressable style={s.backdrop} onPress={() => setAuc(null)} accessibilityLabel={tr('Kapat')}>
+          <Pressable style={[s.sheet, { gap: 10 }]} onPress={() => undefined}>
+            <Text style={s.aTitle}>Açık artırmaya çıkar</Text>
+            {auc ? <PlainText style={s.sheetTitle} numberOfLines={1}>{auc.title}</PlainText> : null}
+            <Text style={s.aK}>Başlangıç fiyatı (₺)</Text>
+            <TextInput style={s.aIn} value={aStart} onChangeText={setAStart} keyboardType="number-pad" />
+            <Text style={s.aK}>En az artış (₺)</Text>
+            <TextInput style={s.aIn} value={aInc} onChangeText={setAInc} keyboardType="number-pad" />
+            <Text style={s.aK}>Süre</Text>
+            <View style={s.aSeg}>
+              {[1, 3, 5, 7, 10].map((d) => (
+                <Pressable key={d} style={[s.aSegI, aDays === d && { backgroundColor: color.teal }]} onPress={() => setADays(d)} accessibilityRole="radio" accessibilityState={{ selected: aDays === d }}>
+                  <PlainText style={[s.aSegT, aDays === d && { color: color.tealInk }]}>{`${d} ${tr('gün')}`}</PlainText>
+                </Pressable>
+              ))}
+            </View>
+            <Text style={s.aNote}>Süre bitince en yüksek teklifi verenle mesajlaşma otomatik açılır. Teklif gelen açık artırma iptal edilemez; ilanı yayından kaldırırsan açık artırma da iptal olur.</Text>
+            {aErr ? <Text style={{ color: color.bad }}>{aErr}</Text> : null}
+            <Pressable style={[s.aBtn, aBusy && { opacity: 0.6 }]} disabled={aBusy} onPress={async () => {
+              if (!auc) return;
+              const st = Number(aStart.replace(/\./g, '')); const inc = Number(aInc.replace(/\./g, ''));
+              if (!st || st <= 0) { setAErr(tr('Başlangıç fiyatını gir.')); return; }
+              if (!inc || inc <= 0 || inc > st) { setAErr(tr('Artış tutarı 0\'dan büyük ve başlangıç fiyatından küçük olmalı.')); return; }
+              setABusy(true); setAErr('');
+              const { error: e } = await supabase.rpc('create_auction', { p_listing: auc.id, p_start: st, p_increment: inc, p_days: aDays });
+              setABusy(false);
+              if (e) { setAErr(tr(e.message.includes('LISTING_NOT_LIVE') ? 'İlan onaylanıp yayına girince açık artırma başlatabilirsin.' : e.message.includes('AUCTION_EXISTS') ? 'Bu ilan zaten açık artırmada.' : e.message.includes('AUCTION_LIMIT') ? 'Aynı anda en fazla 10 açık artırma olabilir.' : 'Açık artırma başlatılamadı.')); return; }
+              setAuc(null); void load();
+              Alert.alert(tr('Açık artırma'), tr('Açık artırma başladı. Gelen teklifleri bildirimlerden takip edebilirsin.'));
+            }} accessibilityRole="button"><Text style={s.aBtnT}>Başlat</Text></Pressable>
+            <Pressable style={s.cancel} onPress={() => setAuc(null)} accessibilityRole="button"><Text style={s.cancelT}>Vazgeç</Text></Pressable>
+          </Pressable>
+        </Pressable>
+      </Modal>
     </View>
   );
 }
 
 const s = StyleSheet.create({
+  aTitle: { color: color.ink, fontFamily: font.bold, fontSize: 19 },
+  aK: { color: color.muted, fontFamily: font.semi, fontSize: 13.5 },
+  aIn: { minHeight: 48, paddingHorizontal: 14, fontSize: 16, color: color.ink, backgroundColor: color.bg, borderRadius: radius, borderWidth: 1, borderColor: color.line },
+  aSeg: { flexDirection: 'row', gap: 4, padding: 4, borderRadius: radius, backgroundColor: color.bg, borderWidth: 1, borderColor: color.line },
+  aSegI: { flex: 1, minHeight: 38, borderRadius: radius - 3, alignItems: 'center', justifyContent: 'center' },
+  aSegT: { color: color.ink, fontFamily: font.semi, fontSize: 13.5 },
+  aNote: { color: color.muted, fontSize: 12.5, lineHeight: 18 },
+  aBtn: { minHeight: 50, borderRadius: radius, backgroundColor: color.teal, alignItems: 'center', justifyContent: 'center' },
+  aBtnT: { color: color.tealInk, fontFamily: font.bold, fontSize: 16 },
   msg: { textAlign: 'center', color: color.muted, margin: 24 },
   err: { color: color.bad, margin: 12 },
   card: { backgroundColor: color.surface, borderRadius: radius + 4, ...shadow },
