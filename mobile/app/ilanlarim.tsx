@@ -64,13 +64,20 @@ export default function MyListings() {
 
   async function patch(id: string, status: string) {
     const { error: e } = await supabase.from('listings').update({ status }).eq('id', id);
-    if (e) Alert.alert('İlan', e.message.includes('limit') || e.message.includes('limitine') ? 'İlan limitine ulaştın.' : 'İşlem kaydedilemedi.');
+    if (e) Alert.alert('İlan', e.message.includes('AUCTION_HAS_BIDS') ? 'Teklif almış açık artırma sürerken ilan değiştirilemez, duraklatılamaz veya kaldırılamaz.' : e.message.includes('limit') || e.message.includes('limitine') ? 'İlan limitine ulaştın.' : 'İşlem kaydedilemedi.');
     void load();
   }
   function confirm(r: Row, status: string, text: string, yes: string, danger = false) {
     Alert.alert(r.title, tr(text), [{ text: tr('Vazgeç'), style: 'cancel' }, { text: tr(yes), style: danger ? 'destructive' : 'default', onPress: () => void patch(r.id, status) }]);
   }
   function actions(r: Row): Action[] {
+    const au = auctions.get(r.id);
+    if (au && au.bid_count > 0) {
+      return [
+        { icon: 'award', label: 'Açık artırmayı gör', run: () => router.push(`/ilan/${r.id}`) },
+        { icon: 'lock', label: 'Neden değiştiremiyorum?', run: () => Alert.alert(tr('Açık artırma sürüyor'), tr('Bu ilan teklif almış bir açık artırmada. Süre bitene kadar ilan düzenlenemez, duraklatılamaz, satıldı yapılamaz veya kaldırılamaz. Süre bitince en yüksek teklifi verenle mesajlaşma otomatik açılır.')) },
+      ];
+    }
     const list: Action[] = [{ icon: 'edit-2', label: 'Düzenle', run: () => router.push(`/ilan-ver?duzenle=${r.id}`) }];
     if (r.status === 'active') {
       list.push({ icon: 'check-circle', label: 'Satıldı', run: () => confirm(r, 'sold', 'Bu ilan satıldı olarak işaretlensin mi? İlan yayından kalkar.', 'Evet, satıldı') });
@@ -170,7 +177,7 @@ export default function MyListings() {
                 </Pressable>
               ))}
             </View>
-            <Text style={s.aNote}>Süre bitince en yüksek teklifi verenle mesajlaşma otomatik açılır. Teklif gelen açık artırma iptal edilemez; ilanı yayından kaldırırsan açık artırma da iptal olur.</Text>
+            <Text style={s.aNote}>Teklif geldikten sonra açık artırma iptal edilemez; ilan da süre bitene kadar düzenlenemez, duraklatılamaz veya kaldırılamaz. Süre bitince en yüksek teklifi verenle mesajlaşma otomatik açılır.</Text>
             {aErr ? <Text style={{ color: color.bad }}>{aErr}</Text> : null}
             <Pressable style={[s.aBtn, aBusy && { opacity: 0.6 }]} disabled={aBusy} onPress={async () => {
               if (!auc) return;

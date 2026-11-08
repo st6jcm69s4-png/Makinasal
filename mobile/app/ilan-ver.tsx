@@ -171,7 +171,7 @@ export default function NewListing() {
       const created = editId
         ? await supabase.from('listings').update({ ...changes, status: 'paused' }).eq('id', editId).eq('seller_id', uid).select('id').single()
         : await supabase.from('listings').insert(base).select('id').single();
-      if (created.error || !created.data) throw new Error(created.error?.message.includes('RATE_LIMIT') ? 'Çok fazla işlem. Bir dakika sonra tekrar dene.' : 'İlan kaydedilemedi. Bilgileri kontrol edip tekrar dene.');
+      if (created.error || !created.data) throw new Error(created.error?.message.includes('AUCTION_HAS_BIDS') ? 'Teklif almış açık artırma sürerken ilan düzenlenemez.' : created.error?.message.includes('RATE_LIMIT') ? 'Çok fazla işlem. Bir dakika sonra tekrar dene.' : 'İlan kaydedilemedi. Bilgileri kontrol edip tekrar dene.');
       id = (created.data as { id: string }).id;
       if (editId && removed.length) {
         const unlink = await supabase.from('listing_photos').delete().in('id', removed.map((p) => p.id));
