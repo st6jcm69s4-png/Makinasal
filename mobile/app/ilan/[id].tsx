@@ -391,7 +391,7 @@ const s = StyleSheet.create({
   starsT: { color: color.ink, fontFamily: font.bold, fontSize: 13.5 },
   starsN: { color: color.muted, fontSize: 13 },
   video: { marginHorizontal: 16, height: 190, borderRadius: radius + 4, overflow: 'hidden', backgroundColor: '#141412', alignItems: 'center', justifyContent: 'center', ...shadow },
-  videoShade: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.28)' },
+  videoShade: { position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.28)' },
   play: { width: 60, height: 60, borderRadius: 30, backgroundColor: 'rgba(0,0,0,0.55)', alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: '#FFFFFF' },
   videoT: { position: 'absolute', left: 14, bottom: 12, color: '#FFFFFF', fontFamily: font.semi, fontSize: 14 },
   backdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.45)', justifyContent: 'flex-end' },

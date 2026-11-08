@@ -23,9 +23,9 @@ export default function SavedSearches() {
   const [rows, setRows] = useState<Saved[] | null>(null);
   const load = useCallback(async () => {
     if (!uid) { setRows([]); return; }
-    let r = await supabase.from('saved_searches').select('id,query,notify,params').eq('user_id', uid).order('created_at', { ascending: false });
+    let r: { data: unknown; error: unknown } = await supabase.from('saved_searches').select('id,query,notify,params').eq('user_id', uid).order('created_at', { ascending: false });
     if (r.error) r = await supabase.from('saved_searches').select('id,query').eq('user_id', uid).order('created_at', { ascending: false });
-    setRows((r.data ?? []) as unknown as Saved[]);
+    setRows(((r.data as Saved[] | null) ?? []));
   }, [uid]);
   useFocusEffect(useCallback(() => { void load(); }, [load]));
 
@@ -43,7 +43,7 @@ export default function SavedSearches() {
       data={rows}
       keyExtractor={(r) => r.id}
       contentContainerStyle={{ padding: 16, gap: 12 }}
-      ListHeaderComponent={rows.length ? <Text style={s.head}>Bildirim açık aramalara uyan yeni ilan gelince sana haber veririz.</Text> : null}
+      ListHeaderComponent={rows.length ? <Text style={s.head}>Bildirim açık aramalara uyan yeni ilan gelince sana haber veririz.</Text> : undefined}
       ListEmptyComponent={<Text style={s.msg}>Kayıtlı aramanın yok. İlanlar sekmesinde "Aramayı kaydet"e dokun.</Text>}
       renderItem={({ item }) => {
         const f = item.query?.f ?? {};

@@ -95,7 +95,7 @@ export default function MyListings() {
               </View>
             </View>
           );
-        })() : null}
+        })() : undefined}
         renderItem={({ item: r }) => {
           const photo = [...(r.listing_photos ?? [])].sort((a, b) => a.position - b.position)[0];
           return (
