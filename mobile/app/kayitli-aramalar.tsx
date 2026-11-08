@@ -1,19 +1,20 @@
 import { useCallback, useState } from 'react';
 import { GuestGate } from '../components/LoginPrompt';
-import { ActivityIndicator, Alert, FlatList, Pressable, StyleSheet, View } from 'react-native';
-import { Text } from '../components/LText';
+import { ActivityIndicator, Alert, FlatList, Pressable, StyleSheet, Switch, View } from 'react-native';
+import { PlainText, Text } from '../components/LText';
+import { Icon } from '../components/Icon';
 import { router, useFocusEffect } from 'expo-router';
 import { useApp } from '../lib/AppContext';
 import { supabase } from '../lib/supabase';
-import { getLang, localeOf } from '../lib/i18n';
-import { color } from '../lib/theme';
+import { getLang, localeOf, tr } from '../lib/i18n';
+import { color, font, radius, shadow } from '../lib/theme';
 
 type F = { cat?: string; city?: string; maxPrice?: number; q?: string; brand?: string };
-type Saved = { id: string; query: { f?: F } };
+type Saved = { id: string; query: { f?: F }; notify?: boolean | null; params?: unknown };
 
 function label(f: F) {
-  const parts = [f.q, f.cat && f.cat !== 'Tümü' ? f.cat : '', f.brand, f.city && f.city !== 'Tümü' ? f.city : '', f.maxPrice && f.maxPrice < 6000000 ? `≤ ${f.maxPrice.toLocaleString(localeOf(getLang()))} ₺` : ''].filter(Boolean);
-  return parts.length ? parts.join(' · ') : 'Tüm ilanlar';
+  const parts = [f.q, f.cat && f.cat !== 'Tümü' ? tr(f.cat) : '', f.brand, f.city && f.city !== 'Tümü' ? f.city : '', f.maxPrice && f.maxPrice < 6000000 ? `≤ ${f.maxPrice.toLocaleString(localeOf(getLang()))} ₺` : ''].filter(Boolean);
+  return parts.length ? parts.join(' · ') : tr('Tüm ilanlar');
 }
 
 export default function SavedSearches() {
@@ -22,10 +23,17 @@ export default function SavedSearches() {
   const [rows, setRows] = useState<Saved[] | null>(null);
   const load = useCallback(async () => {
     if (!uid) { setRows([]); return; }
-    const { data } = await supabase.from('saved_searches').select('id,query').eq('user_id', uid).order('created_at', { ascending: false });
-    setRows((data ?? []) as unknown as Saved[]);
+    let r = await supabase.from('saved_searches').select('id,query,notify,params').eq('user_id', uid).order('created_at', { ascending: false });
+    if (r.error) r = await supabase.from('saved_searches').select('id,query').eq('user_id', uid).order('created_at', { ascending: false });
+    setRows((r.data ?? []) as unknown as Saved[]);
   }, [uid]);
   useFocusEffect(useCallback(() => { void load(); }, [load]));
+
+  async function toggle(item: Saved, on: boolean) {
+    setRows((cur) => cur?.map((x) => (x.id === item.id ? { ...x, notify: on } : x)) ?? cur);
+    const { error } = await supabase.from('saved_searches').update({ notify: on }).eq('id', item.id).eq('user_id', uid!);
+    if (error) { Alert.alert(tr('Kayıtlı arama'), tr('Ayar kaydedilemedi.')); void load(); }
+  }
 
   if (!session) return <GuestGate icon="bookmark" text="Kayıtlı aramalarını görmek için giriş yap." />;
   if (rows === null) return <ActivityIndicator style={{ margin: 32 }} />;
@@ -34,18 +42,27 @@ export default function SavedSearches() {
       style={{ backgroundColor: color.bg }}
       data={rows}
       keyExtractor={(r) => r.id}
-      contentContainerStyle={{ padding: 12, gap: 8 }}
+      contentContainerStyle={{ padding: 16, gap: 12 }}
+      ListHeaderComponent={rows.length ? <Text style={s.head}>Bildirim açık aramalara uyan yeni ilan gelince sana haber veririz.</Text> : null}
       ListEmptyComponent={<Text style={s.msg}>Kayıtlı aramanın yok. İlanlar sekmesinde "Aramayı kaydet"e dokun.</Text>}
       renderItem={({ item }) => {
         const f = item.query?.f ?? {};
+        const canNotify = !!item.params;
         return (
           <View style={s.card}>
-            <Pressable style={{ flex: 1 }} accessibilityRole="button" onPress={() => router.navigate({ pathname: '/ilanlar', params: { q: f.q ?? '', cat: f.cat && f.cat !== 'Tümü' ? f.cat : '', city: f.city ?? 'Tümü', maxPrice: String(f.maxPrice ?? 6000000) } })}>
-              <Text style={s.title}>{label(f)}</Text>
+            <Pressable style={({ pressed }) => [s.top, pressed && { opacity: 0.8 }]} accessibilityRole="button" onPress={() => router.navigate({ pathname: '/ilanlar', params: { q: f.q ?? '', cat: f.cat && f.cat !== 'Tümü' ? f.cat : '', city: f.city ?? 'Tümü', maxPrice: String(f.maxPrice ?? 6000000) } })}>
+              <View style={s.icon}><Icon name="search" size={17} color={color.tealText} /></View>
+              <PlainText style={s.title} numberOfLines={2}>{label(f)}</PlainText>
+              <Icon name="chevron-right" size={18} color={color.muted} />
             </Pressable>
-            <Pressable accessibilityRole="button" onPress={() => Alert.alert('Kayıtlı arama', 'Silinsin mi?', [{ text: 'Vazgeç', style: 'cancel' }, { text: 'Sil', style: 'destructive', onPress: async () => { await supabase.from('saved_searches').delete().eq('id', item.id).eq('user_id', uid!); void load(); } }])}>
-              <Text style={s.del}>Sil</Text>
-            </Pressable>
+            <View style={s.bottom}>
+              <Icon name="bell" size={15} color={color.muted} />
+              <Text style={s.notifyT}>{canNotify ? 'Yeni ilanlarda bildir' : 'Bildirim için aramayı yeniden kaydet'}</Text>
+              {canNotify ? <Switch value={item.notify !== false} onValueChange={(v) => void toggle(item, v)} trackColor={{ true: color.teal, false: color.plate }} /> : null}
+              <Pressable hitSlop={8} accessibilityRole="button" accessibilityLabel={tr('Sil')} onPress={() => Alert.alert(tr('Kayıtlı arama'), tr('Silinsin mi?'), [{ text: tr('Vazgeç'), style: 'cancel' }, { text: tr('Sil'), style: 'destructive', onPress: async () => { await supabase.from('saved_searches').delete().eq('id', item.id).eq('user_id', uid!); void load(); } }])}>
+                <Icon name="trash-2" size={18} color={color.bad} />
+              </Pressable>
+            </View>
           </View>
         );
       }}
@@ -54,7 +71,11 @@ export default function SavedSearches() {
 }
 const s = StyleSheet.create({
   msg: { textAlign: 'center', color: color.muted, margin: 24 },
-  card: { backgroundColor: color.surface, padding: 14, borderRadius: 12, flexDirection: 'row', alignItems: 'center', gap: 10 },
-  title: { fontWeight: '600', color: color.ink },
-  del: { color: color.bad },
+  head: { color: color.muted, fontSize: 13.5, lineHeight: 19, marginHorizontal: 4 },
+  card: { backgroundColor: color.surface, borderRadius: radius + 4, ...shadow },
+  top: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14 },
+  icon: { width: 36, height: 36, borderRadius: 12, backgroundColor: color.tealSoft, alignItems: 'center', justifyContent: 'center' },
+  title: { flex: 1, fontFamily: font.semi, color: color.ink, fontSize: 15 },
+  bottom: { flexDirection: 'row', alignItems: 'center', gap: 8, borderTopWidth: 1, borderTopColor: color.line, paddingHorizontal: 14, paddingVertical: 8, minHeight: 48 },
+  notifyT: { flex: 1, color: color.ink, fontSize: 14 },
 });

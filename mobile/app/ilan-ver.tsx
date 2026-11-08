@@ -1,3 +1,4 @@
+import { normalizeVideoUrl } from '../lib/video';
 import { useEffect, useState, type ReactNode } from 'react';
 import { GuestGate } from '../components/LoginPrompt';
 import { ActivityIndicator, Alert, Image, KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, Switch, View } from 'react-native';
@@ -36,6 +37,7 @@ export default function NewListing() {
   const [city, setCity] = useState('');
   const [desc, setDesc] = useState('');
   const [takas, setTakas] = useState(false);
+  const [video, setVideo] = useState('');
   const [spec, setSpec] = useState('');
   const [cond, setCond] = useState('Sıfır');
   const [compat, setCompat] = useState('');
@@ -56,13 +58,13 @@ export default function NewListing() {
   useEffect(() => {
     if (!uid || !editId) return;
     void supabase.from('listings')
-      .select('category,brand,model,year,usage_value,price,city,description,takas,spec,cond,compat,qty,equipment_category,part_group,listing_photos(id,path,position)')
+      .select('category,brand,model,year,usage_value,price,city,description,takas,spec,cond,compat,qty,equipment_category,part_group,video_url,listing_photos(id,path,position)')
       .eq('id', editId).eq('seller_id', uid).maybeSingle().then(({ data }) => {
         const r = data as unknown as Record<string, unknown> | null;
         if (!r) { Alert.alert('İlan', 'İlan bulunamadı.'); router.back(); return; }
         setCat(String(r.category ?? '')); setBrand(String(r.brand ?? '')); setModel(String(r.model ?? ''));
         setYear(r.year ? String(r.year) : ''); setUsage(r.usage_value != null ? String(r.usage_value) : ''); setPrice(String(r.price ?? ''));
-        setCity(String(r.city ?? '')); setDesc(String(r.description ?? '')); setTakas(!!r.takas); setSpec(String(r.spec ?? ''));
+        setCity(String(r.city ?? '')); setDesc(String(r.description ?? '')); setVideo(String(r.video_url ?? '')); setTakas(!!r.takas); setSpec(String(r.spec ?? ''));
         setCond(String(r.cond ?? 'Sıfır')); setCompat(String(r.compat ?? '')); setQty(r.qty ? String(r.qty) : '1');
         setEquip(String(r.equipment_category ?? '')); setGroup(String(r.part_group ?? ''));
         const ph = ((r.listing_photos ?? []) as { id: string; path: string; position: number }[]).sort((a, b) => a.position - b.position);
@@ -106,6 +108,8 @@ export default function NewListing() {
     if (!city) return setError('İl seç.');
     if (desc.trim().length < 10) return setError('Açıklamayı en az 10 karakterle yaz.');
     if (!Number.isFinite(priceNum) || priceNum <= 0 || priceNum > 999999999999.99) return setError('Fiyatı gir.');
+    const videoUrl = normalizeVideoUrl(video);
+    if (videoUrl === null) return setError('Video bağlantısı YouTube veya Vimeo bağlantısı olmalı.');
     if (photos.length + existing.length === 0) return setError('En az 1 fotoğraf ekle. Alıcılar fotoğrafsız ilanlara güvenmez.');
     if (!pledge && !editId) return setError('Kapora taahhüdünü onaylaman gerekiyor.');
 
@@ -121,6 +125,7 @@ export default function NewListing() {
         spec: part ? spec.trim() : null, cond: part ? cond : null, compat: part && compat.trim() ? compat.trim() : null, qty: part ? Number(qty) : null,
         equipment_category: part ? equip : null, part_group: part ? group : null,
         brand: canonicalBrand(brand), model: model.trim(), takas, serial_declared: false,
+        video_url: videoUrl || null,
       };
       const { seller_id: _s, ...changes } = base;
       const created = editId
@@ -220,6 +225,11 @@ export default function NewListing() {
           <TextInput style={[s.input, { minHeight: 120, textAlignVertical: 'top', paddingTop: 12 }]} value={desc} onChangeText={setDesc} multiline maxLength={4000} placeholder="Durumu, bakım geçmişi, ekipmanlar, hasar bilgisi…" />,
         )}
 
+        {section('Video (isteğe bağlı)', 'video', <>
+          {field('YouTube veya Vimeo bağlantısı', video, setVideo, { keyboardType: 'url', autoCapitalize: 'none', autoCorrect: false, placeholder: 'https://youtu.be/…', maxLength: 300 })}
+          <Text style={s.hint}>Makinenin çalışırken çekilmiş videosu alıcıların güvenini artırır. Videoyu YouTube'a "Liste dışı" olarak yükleyip bağlantısını yapıştırabilirsin.</Text>
+        </>)}
+
         {section(`${tr('Fotoğraflar')} (${total}/${maxPhotos})`, 'camera', <>
           <View style={s.grid}>
             {existing.map((p, i) => (
@@ -271,6 +281,7 @@ export default function NewListing() {
 }
 
 const s = StyleSheet.create({
+  hint: { color: color.muted, fontSize: 12.5, lineHeight: 18 },
   form: { padding: 16, gap: 14, paddingBottom: 40 },
   card: { backgroundColor: color.surface, borderRadius: radius + 4, padding: 14, gap: 12, ...shadow },
   cardHead: { flexDirection: 'row', alignItems: 'center', gap: 10 },

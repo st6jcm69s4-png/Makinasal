@@ -11,11 +11,14 @@ import { useApp } from '../../lib/AppContext';
 import { useLoginPrompt } from '../../components/LoginPrompt';
 import { SITE_URL, photoUrl, supabase, tl } from '../../lib/supabase';
 import { trustLevel, type TrustLevel } from '../../lib/trust';
+import { LoanCalculator } from '../../components/LoanCalculator';
+import { videoHost, videoThumb } from '../../lib/video';
 import { color, font, radius, shadow } from '../../lib/theme';
 
 type Detail = {
   id: string; seller_id: string; category: string; title: string; description: string | null; price: number | string; city: string; year: number | null;
   usage_value: number | null; usage_unit: string | null; brand: string | null; model: string | null;
+  video_url?: string | null; boosted_until?: string | null;
   listing_photos: { path: string; position: number }[] | null;
 };
 const REPORT_REASONS = ['Sahte veya yanıltıcı ilan', 'Kapora / ön ödeme istiyor', 'Fiyat gerçek dışı', 'Hakaret veya taciz', 'Diğer'];
@@ -46,20 +49,24 @@ export default function ListingScreen() {
   const [note, setNote] = useState('');
   const [svcBusy, setSvcBusy] = useState(false);
   const [slide, setSlide] = useState(0);
+  const [rating, setRating] = useState<{ score: number; count: number } | null>(null);
+  const [boostBusy, setBoostBusy] = useState(false);
+  const isAdmin = (session?.user.app_metadata as { role?: string } | undefined)?.role === 'admin';
   const insets = useSafeAreaInsets();
 
   useEffect(() => {
     let alive = true;
-    supabase.from('listings')
-      .select('id,seller_id,category,title,description,price,city,year,usage_value,usage_unit,brand,model,listing_photos(path,position)')
-      .eq('id', id).eq('status', 'active').eq('moderation_status', 'approved').maybeSingle()
+    const base = 'id,seller_id,category,title,description,price,city,year,usage_value,usage_unit,brand,model,listing_photos(path,position)';
+    const q = (cols: string) => supabase.from('listings').select(cols).eq('id', id).eq('status', 'active').eq('moderation_status', 'approved').maybeSingle();
+    // video_url yeni sütun: eski veritabanında yoksa onsuz tekrar dene
+    void q(base + ',video_url,boosted_until').then((r) => (r.error ? q(base) : r))
       .then(async ({ data, error }) => {
         if (!alive) return;
         if (error) { setState('error'); return; }
         if (!data) { setState('missing'); return; }
-        setItem(data as Detail); setState('ok');
+        setItem(data as unknown as Detail); setState('ok');
         void supabase.rpc('track_view', { p_listing: id });
-        const sid = (data as Detail).seller_id;
+        const sid = (data as unknown as Detail).seller_id;
         const [st, pr] = await Promise.all([
           supabase.from('user_stats').select('score,review_count,deals,reports').eq('id', sid).maybeSingle(),
           supabase.from('profiles').select('full_name,store_name,is_store').eq('id', sid).maybeSingle(),
@@ -67,6 +74,7 @@ export default function ListingScreen() {
         if (!alive) return;
         const r = st.data as { score: number; review_count: number; deals: number; reports: number } | null;
         setTrust(trustLevel({ rep: Number(r?.reports ?? 0), deals: Number(r?.deals ?? 0), s: r && Number(r.review_count) > 0 ? Number(r.score) : null }));
+        setRating(r && Number(r.review_count) > 0 ? { score: Number(r.score), count: Number(r.review_count) } : null);
         const p = pr.data as { full_name: string | null; store_name: string | null; is_store: boolean | null } | null;
         setSeller((p?.is_store && p.store_name) || p?.full_name || '');
       });
@@ -139,12 +147,23 @@ export default function ListingScreen() {
     Alert.alert('Talep', 'Talebin alındı. Makinasal ekibi seninle iletişime geçecek.');
   }
 
+  async function setBoost(days: number) {
+    if (!item) return;
+    setBoostBusy(true);
+    const { data, error } = await supabase.rpc('admin_set_boost', { p_listing: item.id, p_days: days });
+    setBoostBusy(false);
+    if (error) { Alert.alert('Öne çıkar', 'İşlem yapılamadı.'); return; }
+    setItem({ ...item, boosted_until: (data as string | null) ?? null });
+  }
+
   if (state === 'loading') return <View style={[s.screen, { justifyContent: 'center' }]}><ActivityIndicator color={color.teal} /></View>;
   if (state !== 'ok' || !item) return <View style={s.screen}><Text style={s.msg}>{state === 'missing' ? 'İlan bulunamadı veya yayından kalktı.' : 'İlan yüklenemedi.'}</Text></View>;
   const photos = [...(item.listing_photos ?? [])].sort((a, b) => a.position - b.position);
   const own = session?.user.id === item.seller_id;
   const part = item.category === 'Yedek parça' || item.category === 'Lastik ve jant';
   const fav = favs.has(item.id);
+  const boosted = !!item.boosted_until && Date.parse(item.boosted_until) > Date.now();
+  const thumb = item.video_url ? videoThumb(item.video_url) : null;
   const inCmp = cmp.includes(item.id);
   const specs: [string, string | number | null][] = [
     ['Marka', item.brand], ['Model', item.model], ['Yıl', item.year],
@@ -171,6 +190,7 @@ export default function ListingScreen() {
         </View>
 
         <View style={s.head}>
+          {boosted ? <View style={s.boost}><Icon name="trending-up" size={13} color={color.tealInk} /><Text style={s.boostT}>Öne çıkan</Text></View> : null}
           <Text style={s.title}>{item.title}</Text>
           <PlainText style={s.price}>{tl(item.price)}{part ? <Text style={s.unit}> (birim fiyat)</Text> : null}</PlainText>
           {chips.length ? (
@@ -184,6 +204,18 @@ export default function ListingScreen() {
             </Pressable>
           ) : null}
         </View>
+
+        {item.video_url ? (
+          <>
+            <Text style={s.h2}>Video</Text>
+            <Pressable style={({ pressed }) => [s.video, pressed && { opacity: 0.9 }]} onPress={() => void Linking.openURL(item.video_url!)} accessibilityRole="button" accessibilityLabel={`Videoyu ${videoHost(item.video_url)} uygulamasında aç`}>
+              {thumb ? <Image source={{ uri: thumb }} style={StyleSheet.absoluteFill} resizeMode="cover" /> : null}
+              <View style={s.videoShade} />
+              <View style={s.play}><Icon name="play" size={26} color="#FFFFFF" /></View>
+              <PlainText style={s.videoT}>{`${videoHost(item.video_url)} · `}<Text style={s.videoT}>Videoyu izle</Text></PlainText>
+            </Pressable>
+          </>
+        ) : null}
 
         <Text style={s.h2}>Teknik bilgiler</Text>
         <View style={s.card}>
@@ -200,7 +232,10 @@ export default function ListingScreen() {
           <View style={s.avatar}><PlainText style={s.avatarT}>{(seller || '?').trim().charAt(0).toLocaleUpperCase('tr-TR')}</PlainText></View>
           <View style={{ flex: 1, gap: 3 }}>
             <PlainText style={s.sellerName} numberOfLines={1}>{seller || '—'}</PlainText>
-            {trust ? <View style={[s.trust, { borderColor: trust.color }]}><Text style={[s.trustT, { color: trust.color }]}>{trust.label}</Text></View> : null}
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+              {trust ? <View style={[s.trust, { borderColor: trust.color }]}><Text style={[s.trustT, { color: trust.color }]}>{trust.label}</Text></View> : null}
+              {rating ? <View style={s.stars}><Icon name="star" size={13} color={color.tealText} /><PlainText style={s.starsT}>{rating.score.toFixed(1).replace('.', ',')}</PlainText><PlainText style={s.starsN}>{`(${rating.count})`}</PlainText></View> : null}
+            </View>
             <Text style={s.linkT}>Satıcının profili ve ilanları</Text>
           </View>
           <Icon name="chevron-right" size={20} color={color.muted} />
@@ -210,6 +245,26 @@ export default function ListingScreen() {
           <>
             <Text style={s.h2}>Açıklama</Text>
             <View style={s.card}><Text style={s.desc}>{item.description}</Text></View>
+          </>
+        ) : null}
+
+        {!part && Number(item.price) > 0 ? (
+          <>
+            <Text style={s.h2}>Kredi / leasing hesapla</Text>
+            <LoanCalculator price={Number(item.price)} />
+          </>
+        ) : null}
+
+        {isAdmin ? (
+          <>
+            <Text style={s.h2}>Yönetici</Text>
+            <View style={[s.card, { paddingVertical: 12, gap: 10 }]}>
+              <Text style={s.specK}>{boosted ? `Öne çıkarma bitişi: ${new Date(item.boosted_until!).toLocaleDateString('tr-TR')}` : 'Bu ilan öne çıkarılmamış.'}</Text>
+              <View style={{ flexDirection: 'row', gap: 8 }}>
+                <Pressable style={[s.ghost, { flex: 1 }, boostBusy && { opacity: 0.6 }]} disabled={boostBusy} onPress={() => void setBoost(7)} accessibilityRole="button"><Text style={s.ghostT}>+7 gün öne çıkar</Text></Pressable>
+                {boosted ? <Pressable style={[s.ghost, { flex: 1 }, boostBusy && { opacity: 0.6 }]} disabled={boostBusy} onPress={() => void setBoost(0)} accessibilityRole="button"><Text style={s.ghostT}>Kaldır</Text></Pressable> : null}
+              </View>
+            </View>
           </>
         ) : null}
 
@@ -330,6 +385,15 @@ const s = StyleSheet.create({
   ghost: { minHeight: 50, borderRadius: radius, borderWidth: 1.5, borderColor: color.teal, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 12 },
   ghostT: { color: color.tealText, fontFamily: font.bold, fontSize: 15.5 },
   msg: { margin: 24, textAlign: 'center', color: color.muted },
+  boost: { flexDirection: 'row', alignItems: 'center', gap: 5, alignSelf: 'flex-start', backgroundColor: color.teal, borderRadius: 10, paddingHorizontal: 9, paddingVertical: 3 },
+  boostT: { color: color.tealInk, fontFamily: font.bold, fontSize: 12 },
+  stars: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  starsT: { color: color.ink, fontFamily: font.bold, fontSize: 13.5 },
+  starsN: { color: color.muted, fontSize: 13 },
+  video: { marginHorizontal: 16, height: 190, borderRadius: radius + 4, overflow: 'hidden', backgroundColor: '#141412', alignItems: 'center', justifyContent: 'center', ...shadow },
+  videoShade: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.28)' },
+  play: { width: 60, height: 60, borderRadius: 30, backgroundColor: 'rgba(0,0,0,0.55)', alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: '#FFFFFF' },
+  videoT: { position: 'absolute', left: 14, bottom: 12, color: '#FFFFFF', fontFamily: font.semi, fontSize: 14 },
   backdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.45)', justifyContent: 'flex-end' },
   sheet: { backgroundColor: color.surface, paddingHorizontal: 16, paddingTop: 10, paddingBottom: 34, gap: 12, borderTopLeftRadius: 22, borderTopRightRadius: 22 },
   grab: { alignSelf: 'center', width: 40, height: 5, borderRadius: 3, backgroundColor: color.line, marginBottom: 4 },

@@ -3,19 +3,13 @@ import { GuestGate } from '../components/LoginPrompt';
 import { ActivityIndicator, FlatList, Pressable, StyleSheet, View } from 'react-native';
 import { Text } from '../components/LText';
 import { router, useFocusEffect } from 'expo-router';
+import { notificationTarget as target } from '../lib/notifyTarget';
 import { useApp } from '../lib/AppContext';
 import { supabase } from '../lib/supabase';
 import { getLang, localeOf } from '../lib/i18n';
 import { color } from '../lib/theme';
 
 type Note = { id: string; title: string; body: string; url: string; read_at: string | null; created_at: string };
-const UUID = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}';
-
-function target(url: string): string | null {
-  const m = new RegExp(`^/(mesajlar|ilanlar)/(${UUID})$`, 'i').exec(url);
-  if (!m) return null;
-  return m[1].toLowerCase() === 'mesajlar' ? `/mesaj/${m[2]}` : `/ilan/${m[2]}`;
-}
 
 export default function Notifications() {
   const { session } = useApp();

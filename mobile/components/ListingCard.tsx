@@ -25,6 +25,9 @@ export function ListingCard({ item }: { item: Row }) {
         >
           <Heart on={fav} size={22} color={fav ? '#E5484D' : '#44505F'} />
         </Pressable>
+        {item.boosted_until && Date.parse(item.boosted_until) > Date.now() ? (
+          <View style={s.boost}><Icon name="trending-up" size={12} color={color.tealInk} /><Text style={s.boostT}>Öne çıkan</Text></View>
+        ) : null}
       </View>
       <View style={s.body}>
         <Text style={s.title} numberOfLines={2}>{item.title}</Text>
@@ -43,6 +46,8 @@ export function ListingCard({ item }: { item: Row }) {
 }
 
 const s = StyleSheet.create({
+  boost: { position: 'absolute', left: 10, top: 10, flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: color.teal, borderRadius: 10, paddingHorizontal: 8, paddingVertical: 3 },
+  boostT: { color: color.tealInk, fontFamily: font.bold, fontSize: 11.5 },
   card: { marginHorizontal: 16, marginBottom: 16, backgroundColor: color.surface, borderRadius: radius + 6, overflow: 'hidden', ...shadow },
   img: { width: '100%', aspectRatio: 1.6, backgroundColor: color.plate },
   noimg: { alignItems: 'center', justifyContent: 'center' },

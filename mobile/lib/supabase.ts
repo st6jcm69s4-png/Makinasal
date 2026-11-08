@@ -17,4 +17,5 @@ export const tl = (n: number | string) => `${Number(n).toLocaleString(localeOf(g
 export type Row = {
   id: string; title: string; price: number | string; city: string; year?: number | null;
   listing_photos?: { path: string; position: number }[] | null;
+  boosted_until?: string | null;
 };

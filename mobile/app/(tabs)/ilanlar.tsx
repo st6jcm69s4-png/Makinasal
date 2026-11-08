@@ -70,8 +70,11 @@ export default function Listings() {
   async function saveSearch() {
     if (!session) { askLogin('Aramayı kaydedip yeni ilanlardan haberdar olmak için giriş yapman gerekir.'); return; }
     const f = { cat: cat && !cat.startsWith('group:') ? cat : 'Tümü', city, maxPrice: Number(maxPrice), q: q.trim(), brand: adv.brand, unit: adv.unit, useMin: adv.useMin, useMax: adv.useMax, yMin: adv.yMin, yMax: adv.yMax, minScore: adv.minScore, incNew: true, ver: adv.ver, hide: adv.hide, takas: adv.takas, near: adv.near };
-    const { error: e } = await supabase.from('saved_searches').insert({ user_id: session.user.id, query: { f } });
-    Alert.alert('Aramayı kaydet', e ? 'Arama kaydedilemedi. Tekrar dene.' : 'Arama kaydedildi. Hesabım → Kayıtlı aramalar bölümünden görebilirsin.');
+    // Sunucu yarım saatte bir bu parametrelerle yeni ilan arar ve bildirim gönderir.
+    const params = { q: q.trim(), categories: cat ? categoryValues(cat) : [], city, maxPrice: Number(maxPrice), part: cat === 'Yedek parça' || cat === 'Lastik ve jant' || cat === 'group:parts', brand: adv.brand, yMin: adv.yMin, yMax: adv.yMax, useMin: adv.useMin, useMax: adv.useMax, unit: adv.unit, minScore: adv.minScore, incNew: true, ver: adv.ver, hide: adv.hide, takas: adv.takas };
+    let { error: e } = await supabase.from('saved_searches').insert({ user_id: session.user.id, query: { f }, params, notify: true });
+    if (e && /params|notify/.test(e.message)) ({ error: e } = await supabase.from('saved_searches').insert({ user_id: session.user.id, query: { f } }));
+    Alert.alert('Aramayı kaydet', e ? (/limit/i.test(e.message) ? 'Kayıtlı arama sınırına ulaştın. Eskilerden birini sil.' : 'Arama kaydedilemedi. Tekrar dene.') : 'Arama kaydedildi. Bu aramaya uyan yeni ilan gelince sana bildirim göndereceğiz.');
   }
   const [q, setQ] = useState('');
   const [rows, setRows] = useState<Row[]>([]);
