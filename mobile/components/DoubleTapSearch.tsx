@@ -4,7 +4,10 @@ import { router, usePathname } from 'expo-router';
 
 /**
  * Hangi sayfada olunursa olsun ekrana art arda iki kez dokununca arama ekranı açılır.
- * Dokunuşları yalnızca izler, hiçbir düğmenin dokunuşunu engellemez.
+ * Yalnızca boş alanlarda çalışır: düğme, kart, yazı alanı gibi dokunuşu kendisi karşılayan bir öğeye
+ * dokunulduysa sayılmaz. (React Native dokunuşu önce en içteki öğeye sorar; hiçbiri sahiplenmezse
+ * bu sarmalayıcıya ulaşır. Sarmalayıcı yalnızca "boş alan" diye not alır, dokunuşu hiç sahiplenmez;
+ * böylece kaydırma ve sekme kaydırması etkilenmez.)
  * Açılmadığı durumlar: zaten arama ekranındayken, klavye açıkken (yazı seçimi),
  * parmak kaydırıldıysa, ilk dokunuş başka sayfaya geçirdiyse, iki dokunuş birbirinden uzaksa.
  */
@@ -19,6 +22,8 @@ export function DoubleTapSearch({ children }: { children: ReactNode }) {
   pathRef.current = path;
   const start = useRef<{ x: number; y: number; t: number } | null>(null);
   const last = useRef<{ x: number; y: number; t: number; path: string } | null>(null);
+  // Bu dokunuşu hiçbir öğe sahiplenmediyse zamanı (boş alana dokunuldu)
+  const emptyAt = useRef<number | null>(null);
 
   const onStart = (e: GestureResponderEvent) => {
     const n = e.nativeEvent;
@@ -26,8 +31,11 @@ export function DoubleTapSearch({ children }: { children: ReactNode }) {
   };
   const onEnd = (e: GestureResponderEvent) => {
     const s = start.current;
+    const empty = emptyAt.current;
     start.current = null;
+    emptyAt.current = null;
     if (!s) return;
+    if (empty === null || Math.abs(empty - s.t) > 150) { last.current = null; return; }
     const n = e.nativeEvent;
     const now = Date.now();
     if (now - s.t > TAP_MS || Math.abs(n.pageX - s.x) > MOVE || Math.abs(n.pageY - s.y) > MOVE) { last.current = null; return; }
@@ -41,7 +49,10 @@ export function DoubleTapSearch({ children }: { children: ReactNode }) {
   };
 
   return (
-    <View style={{ flex: 1 }} onTouchStart={onStart} onTouchEnd={onEnd} onTouchCancel={() => { start.current = null; }}>
+    <View
+      style={{ flex: 1 }}
+      onStartShouldSetResponder={() => { emptyAt.current = Date.now(); return false; }}
+      onTouchStart={onStart} onTouchEnd={onEnd} onTouchCancel={() => { start.current = null; }}>
       {children}
     </View>
   );
