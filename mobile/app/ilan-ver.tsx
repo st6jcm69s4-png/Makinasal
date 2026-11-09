@@ -1,4 +1,5 @@
 import { normalizeVideoUrl } from '../lib/video';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CONDITION_FIELDS, cleanTech, techFieldsFor, type TechField } from '../lib/techSpecs';
 import { useEffect, useState, type ReactNode } from 'react';
 import { GuestGate } from '../components/LoginPrompt';
@@ -78,6 +79,43 @@ export default function NewListing() {
         setLoadedEdit(true);
       });
   }, [uid, editId]);
+
+  // Otomatik taslak (yalnızca yeni ilanda): bağlantı kopsa veya uygulama kapansa da emek kaybolmasın.
+  const draftKey = uid && !editId ? `mk-listing-draft:${uid}` : null;
+  const [draftReady, setDraftReady] = useState(false);
+  useEffect(() => {
+    if (!draftKey) { setDraftReady(true); return; }
+    let alive = true;
+    void AsyncStorage.getItem(draftKey).then((raw) => {
+      if (!alive) return;
+      let d: Record<string, unknown> | null = null;
+      try { d = raw ? JSON.parse(raw) as Record<string, unknown> : null; } catch { d = null; }
+      if (!d || !d.cat) { setDraftReady(true); return; }
+      const apply = () => {
+        const str = (k: string) => (typeof d![k] === 'string' ? d![k] as string : '');
+        setCat(str('cat')); setBrand(str('brand')); setModel(str('model')); setYear(str('year')); setUsage(str('usage')); setPrice(str('price'));
+        setCity(str('city')); setDesc(str('desc')); setTakas(!!d!.takas); setVideo(str('video')); setSpec(str('spec')); setCond(str('cond') || 'Sıfır');
+        setCompat(str('compat')); setQty(str('qty') || '1'); setEquip(str('equip')); setGroup(str('group'));
+        if (d!.tech && typeof d!.tech === 'object') setTech(d!.tech as Record<string, string>);
+        if (Array.isArray(d!.photos)) setPhotos((d!.photos as unknown[]).filter((x): x is string => typeof x === 'string').slice(0, 30));
+      };
+      Alert.alert(tr('Kaydedilmemiş ilan'), tr('Yarım kalmış bir ilan taslağın var. Kaldığın yerden devam etmek ister misin?'), [
+        { text: tr('Sil'), style: 'destructive', onPress: () => { void AsyncStorage.removeItem(draftKey).catch(() => {}); setDraftReady(true); } },
+        { text: tr('Devam et'), onPress: () => { apply(); setDraftReady(true); } },
+      ]);
+    }).catch(() => setDraftReady(true));
+    return () => { alive = false; };
+  }, [draftKey]);
+  useEffect(() => {
+    if (!draftKey || !draftReady || busy) return;
+    const t = setTimeout(() => {
+      const d = { cat, brand, model, year, usage, price, city, desc, takas, video, spec, cond, compat, qty, equip, group, tech, photos, at: Date.now() };
+      if (!cat && !brand && !model && !desc && !photos.length) void AsyncStorage.removeItem(draftKey).catch(() => {});
+      else void AsyncStorage.setItem(draftKey, JSON.stringify(d)).catch(() => {});
+    }, 800);
+    return () => clearTimeout(t);
+  }, [draftKey, draftReady, busy, cat, brand, model, year, usage, price, city, desc, takas, video, spec, cond, compat, qty, equip, group, tech, photos]);
+  const clearDraft = () => { if (draftKey) void AsyncStorage.removeItem(draftKey).catch(() => {}); };
 
   const part = cat === 'Yedek parça' || cat === 'Lastik ve jant';
   const kind = !cat ? '' : cat === 'Yedek parça' ? 'part' : cat === 'Lastik ve jant' ? 'tire' : 'machine';
@@ -176,6 +214,7 @@ export default function NewListing() {
         : await supabase.from('listings').insert(base).select('id').single();
       if (created.error || !created.data) throw new Error(created.error?.message.includes('AUCTION_HAS_BIDS') ? 'Teklif almış açık artırma sürerken ilan düzenlenemez.' : created.error?.message.includes('RATE_LIMIT') ? 'Çok fazla işlem. Bir dakika sonra tekrar dene.' : 'İlan kaydedilemedi. Bilgileri kontrol edip tekrar dene.');
       id = (created.data as { id: string }).id;
+      clearDraft(); // ilan oluştu (duraklatılmış da olsa); aynı taslaktan ikinci ilan açılmasın
       if (editId && removed.length) {
         const unlink = await supabase.from('listing_photos').delete().in('id', removed.map((p) => p.id));
         if (unlink.error) throw new Error('Eski fotoğraflar kaldırılamadı. İlan yayına alınmadı.');
@@ -330,17 +369,22 @@ export default function NewListing() {
         </>)}
 
         {section(`${tr('Fotoğraflar')} (${total}/${maxPhotos})`, 'camera', <>
+          {total > 1 ? <Text style={s.hint}>Kapak yapmak istediğin fotoğrafa dokun.</Text> : null}
           <View style={s.grid}>
             {existing.map((p, i) => (
               <View key={p.id} style={s.tile}>
-                <Image source={{ uri: photoUrl(p.path) }} style={s.thumb} />
+                <Pressable onPress={() => setExisting((cur) => [p, ...cur.filter((x) => x.id !== p.id)])} accessibilityRole="button" accessibilityLabel={tr('Kapak yap')}>
+                  <Image source={{ uri: photoUrl(p.path) }} style={s.thumb} />
+                </Pressable>
                 {i === 0 ? <View style={s.cover}><Text style={s.coverT}>Kapak</Text></View> : null}
                 <Pressable style={s.x} onPress={() => { setExisting((cur) => cur.filter((x) => x.id !== p.id)); setRemoved((cur) => [...cur, p]); }} hitSlop={8} accessibilityRole="button" accessibilityLabel={tr('Fotoğrafı kaldır')}><Icon name="x" size={14} color="#fff" /></Pressable>
               </View>
             ))}
             {photos.map((u, i) => (
               <View key={u + i} style={s.tile}>
-                <Image source={{ uri: u }} style={s.thumb} />
+                <Pressable disabled={existing.length > 0} onPress={() => setPhotos((cur) => [u, ...cur.filter((_, j) => j !== i)])} accessibilityRole="button" accessibilityLabel={tr('Kapak yap')}>
+                  <Image source={{ uri: u }} style={s.thumb} />
+                </Pressable>
                 {existing.length === 0 && i === 0 ? <View style={s.cover}><Text style={s.coverT}>Kapak</Text></View> : null}
                 <Pressable style={s.x} onPress={() => setPhotos((cur) => cur.filter((_, j) => j !== i))} hitSlop={8} accessibilityRole="button" accessibilityLabel={tr('Fotoğrafı kaldır')}><Icon name="x" size={14} color="#fff" /></Pressable>
               </View>
