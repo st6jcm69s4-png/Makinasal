@@ -11,17 +11,32 @@ const walk = (c: ReactNode): ReactNode => (typeof c === 'string' ? tr(c) : Array
 
 /** Ağırlığa göre yazı ailesini seçer (kalın: Barlow, diğerleri: Inter); ekranda başka yazı tipi istenmişse dokunmaz. */
 const Nested = createContext(false);
+/**
+ * Genel boyut: ekranlardaki puntolar bir tık büyütülür. Barlow dar bir yazı olduğu için biraz daha fazla.
+ * Satır yüksekliği de aynı oranda büyür (yazının üstü/altı kesilmesin).
+ */
+const SCALE_TEXT = 1.05;
+const SCALE_DISPLAY = 1.08;
+const scaled = (flat: { fontSize?: number; lineHeight?: number } | undefined, k: number, fallback?: number) => {
+  const size = flat?.fontSize ?? fallback;
+  return {
+    ...(size ? { fontSize: Math.round(size * k * 2) / 2 } : {}),
+    ...(flat?.lineHeight ? { lineHeight: Math.round(flat.lineHeight * k) } : {}),
+  };
+};
 function typeStyle(style: unknown, nested = false) {
   if (!fontState.ok) return style;
-  const flat = StyleSheet.flatten(style as object) as { fontFamily?: string; fontWeight?: string | number; fontSize?: number } | undefined;
-  if (flat?.fontFamily) return style;
+  const flat = StyleSheet.flatten(style as object) as { fontFamily?: string; fontWeight?: string | number; fontSize?: number; lineHeight?: number } | undefined;
+  if (flat?.fontFamily) {
+    const k = flat.fontFamily.startsWith('Barlow') ? SCALE_DISPLAY : flat.fontFamily.startsWith('Inter') ? SCALE_TEXT : 1;
+    return k === 1 ? style : [style, scaled(flat, k, nested ? undefined : 16)];
+  }
   const w = String(flat?.fontWeight ?? '400');
   const heavy = w === '700' || w === '800' || w === '900' || w === 'bold';
   // Tek başına kalın yazı (başlık, düğme, rozet) Barlow; cümle içindeki kalın kelime Inter kalır.
   const family = heavy ? (nested ? font.textBold : font.bold) : w === '600' ? font.semi : w === '500' ? font.medium : font.regular;
-  // Inter ile ekrandaki puntolar olduğu gibi kullanılır.
-  const size = flat?.fontSize ? flat.fontSize : nested ? undefined : 16;
-  return [style, { fontFamily: family, fontWeight: 'normal' as const, ...(size ? { fontSize: size } : {}), fontVariant: ['tabular-nums' as const] }];
+  const k = family === font.bold ? SCALE_DISPLAY : SCALE_TEXT;
+  return [style, { fontFamily: family, fontWeight: 'normal' as const, ...scaled(flat, k, nested ? undefined : 16), fontVariant: ['tabular-nums' as const] }];
 }
 
 /** react-native Text ile aynı; metinleri seçili dile çevirir ve Inter ile yazar. */

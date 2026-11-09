@@ -81,7 +81,7 @@ export default function RootLayout() {
   const [themeReady, setThemeReady] = useState(false);
   useEffect(() => { void loadTheme().finally(() => setThemeReady(true)); }, []);
   useEffect(() => watchSystemTheme(), []);
-  useEffect(() => { const t = setTimeout(() => setTimedOut(true), 4000); return () => clearTimeout(t); }, []);
+  useEffect(() => { const t = setTimeout(() => setTimedOut(true), 2500); return () => clearTimeout(t); }, []);
   fontState.ok = !!loaded && !error;
   if ((!loaded && !error && !timedOut) || !themeReady) return null;
   return (
