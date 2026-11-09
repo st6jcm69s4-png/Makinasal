@@ -4,6 +4,7 @@ import { Pressable, View, type ColorValue } from 'react-native';
 import { Icon, type IconName } from '../../components/Icon';
 import { PlainText } from '../../components/LText';
 import { BrandMark } from '../../components/BrandMark';
+import { SwipeTabs } from '../../components/SwipeTabs';
 import { color, font } from '../../lib/theme';
 import { useApp } from '../../lib/AppContext';
 import { tr } from '../../lib/i18n';
@@ -66,6 +67,7 @@ export default function TabsLayout() {
   return (
     <Tabs
       screenListeners={({ route }) => ({ tabPress: () => fireScrollTop(route.name) })}
+      screenLayout={({ children, route }) => <SwipeTabs route={route.name}>{children}</SwipeTabs>}
       screenOptions={{
         headerStyle: { backgroundColor: color.navy, borderBottomWidth: 2, borderBottomColor: color.pop } as object,
         headerTintColor: color.onBar,

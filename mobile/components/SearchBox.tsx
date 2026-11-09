@@ -3,7 +3,8 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { router } from 'expo-router';
 import { PlainText, Text, TextInput } from './LText';
 import { loadPopularity, matchingRanges, recordSuggestion, searchSuggestions, type Scope, type Suggestion } from '../lib/suggest';
-import { color, radius } from '../lib/theme';
+import { color, font, radius, shadow } from '../lib/theme';
+import { Icon } from './Icon';
 
 function Highlight({ label, query, style }: { label: string; query: string; style?: object }) {
   const parts: { t: string; hit: boolean }[] = [];
@@ -68,11 +69,18 @@ export function SearchBox({ value, onChangeText, onSubmit, scope = 'all', placeh
       />
       {show ? (
         <View style={[s.box, dark && s.boxDark]}>
-          <Text style={s.title}>Önerilen filtreler</Text>
+          <View style={s.head}>
+            <Icon name="zap" size={15} color={color.tealText} />
+            <Text style={s.title}>Önerilen filtreler</Text>
+          </View>
           {items.map((it) => (
-            <Pressable key={it.id} style={s.row} accessibilityRole="button" onPress={() => { clearTimeout(blur.current); setOpen(false); if (onPick) { recordSuggestion(it.id); onPick(it); } else openSuggestion(it); }}>
-              <Highlight label={it.label} query={value} style={s.label} />
-              <Text style={s.path}>{it.parent} →</Text>
+            <Pressable key={it.id} style={({ pressed }) => [s.row, pressed && { backgroundColor: color.tealSoft }]} accessibilityRole="button" onPress={() => { clearTimeout(blur.current); setOpen(false); if (onPick) { recordSuggestion(it.id); onPick(it); } else openSuggestion(it); }}>
+              <View style={s.icon}><Icon name="search" size={15} color={color.tealText} /></View>
+              <View style={{ flex: 1, gap: 3 }}>
+                <Highlight label={it.label} query={value} style={s.label} />
+                {it.parent ? <View style={s.path}><Text style={s.pathT} numberOfLines={1}>{it.parent}</Text></View> : null}
+              </View>
+              <Icon name="chevron-right" size={18} color={color.muted} />
             </Pressable>
           ))}
           {items.length === 0 ? <Text style={s.none}>Uygun filtre bulunamadı. Yazdığın kelimeyle aramak için Ara'ya dokun.</Text> : null}
@@ -84,12 +92,15 @@ export function SearchBox({ value, onChangeText, onSubmit, scope = 'all', placeh
 
 const s = StyleSheet.create({
   input: { backgroundColor: color.surface, borderRadius: radius + 2, paddingVertical: 14, paddingHorizontal: 16, fontSize: 16, borderWidth: 1, borderColor: color.line },
-  box: { backgroundColor: color.surface, borderRadius: radius, marginTop: 6, borderWidth: 1, borderColor: color.line, overflow: 'hidden' },
-  boxDark: { borderColor: '#fff' },
-  title: { fontSize: 13, fontWeight: '600', color: color.muted, paddingHorizontal: 14, paddingTop: 10, paddingBottom: 4 },
-  row: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8, paddingVertical: 11, paddingHorizontal: 12, borderTopWidth: 1, borderTopColor: color.accentSoft },
-  label: { flex: 1, color: color.ink, fontSize: 15 },
-  path: { color: color.muted, fontSize: 12, maxWidth: '45%' },
-  mark: { backgroundColor: '#FFE066', color: color.ink, fontWeight: '700' },
-  none: { padding: 12, color: color.muted },
+  box: { backgroundColor: color.surface, borderRadius: radius + 4, marginTop: 8, borderWidth: 1, borderColor: color.line, overflow: 'hidden', ...shadow },
+  boxDark: { borderColor: color.line },
+  head: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 14, paddingTop: 12, paddingBottom: 8 },
+  title: { fontFamily: font.bold, fontSize: 15, color: color.ink },
+  row: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 11, paddingHorizontal: 14, borderTopWidth: 1, borderTopColor: color.line },
+  icon: { width: 34, height: 34, borderRadius: 17, backgroundColor: color.tealSoft, alignItems: 'center', justifyContent: 'center' },
+  label: { color: color.ink, fontFamily: font.semi, fontSize: 15.5 },
+  path: { alignSelf: 'flex-start', backgroundColor: color.tealSoft, borderRadius: 8, paddingHorizontal: 7, paddingVertical: 2, maxWidth: '100%' },
+  pathT: { color: color.tealText, fontFamily: font.semi, fontSize: 12 },
+  mark: { color: color.tealText, fontFamily: font.bold },
+  none: { padding: 14, color: color.muted, fontSize: 14, lineHeight: 20 },
 });
