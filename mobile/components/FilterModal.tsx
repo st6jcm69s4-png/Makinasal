@@ -4,11 +4,12 @@ import { Text, TextInput } from './LText';
 import { PickerModal } from './PickerModal';
 import { Btn, Chip } from './ui';
 import { brandsForCategory } from '../lib/machineryCatalog';
+import { filterFieldsFor, techFilterCount, type TechFilter } from '../lib/techSpecs';
 import { color } from '../lib/theme';
 
-export type Adv = { brand: string; yMin: string; yMax: string; useMin: string; useMax: string; unit: 'sa' | 'km'; minScore: number; near: number; ver: boolean; hide: boolean; takas: boolean };
-export const NO_ADV: Adv = { brand: '', yMin: '', yMax: '', useMin: '', useMax: '', unit: 'sa', minScore: 0, near: 0, ver: false, hide: false, takas: false };
-export const advCount = (a: Adv) => [a.brand, a.yMin, a.yMax, a.useMin, a.useMax].filter(Boolean).length + (a.minScore ? 1 : 0) + (a.near ? 1 : 0) + [a.ver, a.hide, a.takas].filter(Boolean).length;
+export type Adv = { brand: string; yMin: string; yMax: string; useMin: string; useMax: string; unit: 'sa' | 'km'; minScore: number; near: number; ver: boolean; hide: boolean; takas: boolean; tech: TechFilter };
+export const NO_ADV: Adv = { brand: '', yMin: '', yMax: '', useMin: '', useMax: '', unit: 'sa', minScore: 0, near: 0, ver: false, hide: false, takas: false, tech: {} };
+export const advCount = (a: Adv, category?: string) => [a.brand, a.yMin, a.yMax, a.useMin, a.useMax].filter(Boolean).length + (a.minScore ? 1 : 0) + (a.near ? 1 : 0) + [a.ver, a.hide, a.takas].filter(Boolean).length + techFilterCount(a.tech, category ?? '');
 
 export function FilterModal({ visible, value, category, part, onApply, onClose }: { visible: boolean; value: Adv; category: string; part: boolean; onApply: (a: Adv) => void; onClose: () => void }) {
   const [a, setA] = useState<Adv>(value);
@@ -41,6 +42,26 @@ export function FilterModal({ visible, value, category, part, onApply, onClose }
                     <TextInput style={[s.input, { flex: 1 }]} placeholder="En az" keyboardType="number-pad" value={a.useMin} onChangeText={num('useMin')} />
                     <TextInput style={[s.input, { flex: 1 }]} placeholder="En çok" keyboardType="number-pad" value={a.useMax} onChangeText={num('useMax')} />
                   </View>
+                  {filterFieldsFor(category).map((f) => {
+                    const cur = a.tech?.[f.key];
+                    const setT = (v: TechFilter[string] | undefined) => setA((c) => { const t = { ...(c.tech ?? {}) }; if (v === undefined) delete t[f.key]; else t[f.key] = v; return { ...c, tech: t }; });
+                    return (
+                      <View key={f.key} style={{ gap: 8 }}>
+                        <Text style={s.label}>{f.unit ? `${f.label} (${f.unit})` : f.label}</Text>
+                        {f.type === 'select' ? (
+                          <View style={[s.row, { flexWrap: 'wrap' }]}>
+                            <Chip title="Hepsi" on={!cur} onPress={() => setT(undefined)} />
+                            {(f.options ?? []).map((o) => <Chip key={o} title={o} on={cur === o} onPress={() => setT(o)} />)}
+                          </View>
+                        ) : (
+                          <View style={s.row}>
+                            <TextInput style={[s.input, { flex: 1 }]} placeholder="En az" keyboardType="decimal-pad" maxLength={8} value={typeof cur === 'object' ? cur.min ?? '' : ''} onChangeText={(v) => setT({ ...(typeof cur === 'object' ? cur : {}), min: v.replace(/[^0-9.,]/g, '') })} />
+                            <TextInput style={[s.input, { flex: 1 }]} placeholder="En çok" keyboardType="decimal-pad" maxLength={8} value={typeof cur === 'object' ? cur.max ?? '' : ''} onChangeText={(v) => setT({ ...(typeof cur === 'object' ? cur : {}), max: v.replace(/[^0-9.,]/g, '') })} />
+                          </View>
+                        )}
+                      </View>
+                    );
+                  })}
                 </>
               ) : null}
               <Text style={s.label}>En düşük satıcı puanı</Text>

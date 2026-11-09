@@ -1,4 +1,5 @@
 import { normalizeVideoUrl } from '../lib/video';
+import { CONDITION_FIELDS, cleanTech, techFieldsFor, type TechField } from '../lib/techSpecs';
 import { useEffect, useState, type ReactNode } from 'react';
 import { GuestGate } from '../components/LoginPrompt';
 import { ActivityIndicator, Alert, Image, KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, Switch, View } from 'react-native';
@@ -38,6 +39,7 @@ export default function NewListing() {
   const [desc, setDesc] = useState('');
   const [takas, setTakas] = useState(false);
   const [video, setVideo] = useState('');
+  const [tech, setTech] = useState<Record<string, string>>({});
   type PickedVideo = { uri: string; ext: 'mp4' | 'mov'; mime: string; size: number | null; duration: number | null };
   const [videoFile, setVideoFile] = useState<PickedVideo | null>(null);
   const [oldVideo, setOldVideo] = useState<string | null>(null);
@@ -62,13 +64,13 @@ export default function NewListing() {
   useEffect(() => {
     if (!uid || !editId) return;
     void supabase.from('listings')
-      .select('category,brand,model,year,usage_value,price,city,description,takas,spec,cond,compat,qty,equipment_category,part_group,video_url,video_path,listing_photos(id,path,position)')
+      .select('category,brand,model,year,usage_value,price,city,description,takas,spec,cond,compat,qty,equipment_category,part_group,video_url,video_path,tech,listing_photos(id,path,position)')
       .eq('id', editId).eq('seller_id', uid).maybeSingle().then(({ data }) => {
         const r = data as unknown as Record<string, unknown> | null;
         if (!r) { Alert.alert('İlan', 'İlan bulunamadı.'); router.back(); return; }
         setCat(String(r.category ?? '')); setBrand(String(r.brand ?? '')); setModel(String(r.model ?? ''));
         setYear(r.year ? String(r.year) : ''); setUsage(r.usage_value != null ? String(r.usage_value) : ''); setPrice(String(r.price ?? ''));
-        setCity(String(r.city ?? '')); setDesc(String(r.description ?? '')); setVideo(String(r.video_url ?? '')); setOldVideo(r.video_path ? String(r.video_path) : null); setTakas(!!r.takas); setSpec(String(r.spec ?? ''));
+        setCity(String(r.city ?? '')); setDesc(String(r.description ?? '')); setVideo(String(r.video_url ?? '')); setTech(Object.fromEntries(Object.entries((r.tech ?? {}) as Record<string, unknown>).map(([k, v]) => [k, String(v)]))); setOldVideo(r.video_path ? String(r.video_path) : null); setTakas(!!r.takas); setSpec(String(r.spec ?? ''));
         setCond(String(r.cond ?? 'Sıfır')); setCompat(String(r.compat ?? '')); setQty(r.qty ? String(r.qty) : '1');
         setEquip(String(r.equipment_category ?? '')); setGroup(String(r.part_group ?? ''));
         const ph = ((r.listing_photos ?? []) as { id: string; path: string; position: number }[]).sort((a, b) => a.position - b.position);
@@ -166,6 +168,7 @@ export default function NewListing() {
         equipment_category: part ? equip : null, part_group: part ? group : null,
         brand: canonicalBrand(brand), model: model.trim(), takas, serial_declared: false,
         video_url: videoUrl || null,
+        tech: (() => { const t = cleanTech(cat, tech); return Object.keys(t).length ? t : null; })(),
       };
       const { seller_id: _s, ...changes } = base;
       const created = editId
@@ -220,6 +223,25 @@ export default function NewListing() {
       </Pressable>
     </View>
   );
+  const techInput = (f: TechField) => (
+    <View key={f.key} style={s.field}>
+      <Text style={s.label}>{f.unit ? `${tr(f.label)} (${f.unit})` : f.label}</Text>
+      {f.type === 'select' ? (
+        <View style={s.chips}>
+          {(f.options ?? []).map((o) => {
+            const on = tech[f.key] === o;
+            return (
+              <Pressable key={o} style={[s.chip, on && s.chipOn]} onPress={() => setTech((t) => ({ ...t, [f.key]: on ? '' : o }))} accessibilityRole="radio" accessibilityState={{ selected: on }}>
+                <Text style={[s.chipT, on && { color: color.tealInk }]}>{o}</Text>
+              </Pressable>
+            );
+          })}
+        </View>
+      ) : (
+        <TextInput style={s.input} value={tech[f.key] ?? ''} onChangeText={(v) => setTech((t) => ({ ...t, [f.key]: v }))} keyboardType={f.type === 'number' ? 'decimal-pad' : 'default'} maxLength={f.type === 'number' ? 10 : 60} />
+      )}
+    </View>
+  );
   const section = (title: string, icon: IconName, children: ReactNode) => (
     <View style={s.card}>
       <View style={s.cardHead}><View style={s.cardIcon}><Icon name={icon} size={17} color={color.tealText} /></View><Text style={s.cardT}>{title}</Text></View>
@@ -255,6 +277,16 @@ export default function NewListing() {
             <View style={{ flex: 1 }}>{field(unit === 'km' ? 'Kilometre' : 'Çalışma saati', usage, setUsage, { keyboardType: 'number-pad' })}</View>
           </View>
         ))}
+
+        {!part && techFieldsFor(cat).length ? section('Teknik özellikler', 'sliders', <>
+          <Text style={s.hint}>Alıcılar makineyi bu bilgilere göre filtreler. Bildiklerini doldur; boş bırakılan alanlar ilanda görünmez.</Text>
+          {techFieldsFor(cat).map(techInput)}
+        </>) : null}
+
+        {!part && cat ? section('Bakım ve durum (satıcı beyanı)', 'clipboard', <>
+          <Text style={s.hint}>Bu bilgiler ilanda "Satıcı beyanı" olarak gösterilir. Doğru beyan güven oluşturur.</Text>
+          {CONDITION_FIELDS.map(techInput)}
+        </>) : null}
 
         {section('Fiyat ve konum', 'map-pin', <>
           {field(part ? 'Birim fiyat (₺)' : 'Fiyat (₺)', price, setPrice, { keyboardType: 'decimal-pad' })}
@@ -349,6 +381,10 @@ export default function NewListing() {
 
 const s = StyleSheet.create({
   hint: { color: color.muted, fontSize: 12.5, lineHeight: 18 },
+  chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  chip: { minHeight: 38, paddingHorizontal: 14, borderRadius: 19, borderWidth: 1, borderColor: color.line, backgroundColor: color.bg, alignItems: 'center', justifyContent: 'center' },
+  chipOn: { backgroundColor: color.teal, borderColor: color.teal },
+  chipT: { color: color.ink, fontFamily: font.semi, fontSize: 14 },
   videoRow: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 12, borderRadius: radius, backgroundColor: color.tealSoft },
   videoIcon: { width: 40, height: 40, borderRadius: 12, backgroundColor: color.teal, alignItems: 'center', justifyContent: 'center' },
   videoT: { color: color.ink, fontFamily: font.semi, fontSize: 15 },

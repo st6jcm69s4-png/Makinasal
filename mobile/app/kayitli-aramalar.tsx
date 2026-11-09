@@ -9,7 +9,7 @@ import { supabase } from '../lib/supabase';
 import { getLang, localeOf, tr } from '../lib/i18n';
 import { color, font, radius, shadow } from '../lib/theme';
 
-type F = { cat?: string; catRaw?: string; city?: string; maxPrice?: number; q?: string; brand?: string; unit?: string; useMin?: string; useMax?: string; yMin?: string; yMax?: string; minScore?: number; ver?: boolean; hide?: boolean; takas?: boolean; near?: number };
+type F = { cat?: string; catRaw?: string; city?: string; maxPrice?: number; q?: string; brand?: string; unit?: string; useMin?: string; useMax?: string; yMin?: string; yMax?: string; minScore?: number; ver?: boolean; hide?: boolean; takas?: boolean; near?: number; tech?: Record<string, unknown> };
 type Saved = { id: string; query: { f?: F }; notify?: boolean | null; params?: unknown };
 
 function label(f: F) {
@@ -50,7 +50,7 @@ export default function SavedSearches() {
         const canNotify = !!item.params;
         return (
           <View style={s.card}>
-            <Pressable style={({ pressed }) => [s.top, pressed && { opacity: 0.8 }]} accessibilityRole="button" onPress={() => router.navigate({ pathname: '/ilanlar', params: { q: f.q ?? '', cat: f.catRaw ?? (f.cat && f.cat !== 'Tümü' ? f.cat : ''), city: f.city ?? 'Tümü', maxPrice: String(f.maxPrice ?? 6000000), n: String(Date.now()), adv: JSON.stringify({ brand: f.brand ?? '', unit: f.unit === 'km' ? 'km' : 'sa', useMin: f.useMin ?? '', useMax: f.useMax ?? '', yMin: f.yMin ?? '', yMax: f.yMax ?? '', minScore: Number(f.minScore) || 0, ver: !!f.ver, hide: !!f.hide, takas: !!f.takas, near: Number(f.near) || 0 }) } })}>
+            <Pressable style={({ pressed }) => [s.top, pressed && { opacity: 0.8 }]} accessibilityRole="button" onPress={() => router.navigate({ pathname: '/ilanlar', params: { q: f.q ?? '', cat: f.catRaw ?? (f.cat && f.cat !== 'Tümü' ? f.cat : ''), city: f.city ?? 'Tümü', maxPrice: String(f.maxPrice ?? 6000000), n: String(Date.now()), adv: JSON.stringify({ brand: f.brand ?? '', unit: f.unit === 'km' ? 'km' : 'sa', useMin: f.useMin ?? '', useMax: f.useMax ?? '', yMin: f.yMin ?? '', yMax: f.yMax ?? '', minScore: Number(f.minScore) || 0, ver: !!f.ver, hide: !!f.hide, takas: !!f.takas, near: Number(f.near) || 0, tech: f.tech ?? {} }) } })}>
               <View style={s.icon}><Icon name="search" size={17} color={color.tealText} /></View>
               <PlainText style={s.title} numberOfLines={2}>{label(f)}</PlainText>
               <Icon name="chevron-right" size={18} color={color.muted} />

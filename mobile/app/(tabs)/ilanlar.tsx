@@ -8,6 +8,7 @@ import { Icon, type IconName } from '../../components/Icon';
 import { SearchBox } from '../../components/SearchBox';
 import { PickerModal } from '../../components/PickerModal';
 import { advCount, FilterModal, NO_ADV, type Adv } from '../../components/FilterModal';
+import { techFilterParams } from '../../lib/techSpecs';
 import { CITIES } from '../../lib/data';
 import { COORDS, distanceKm } from '../../lib/geo';
 import { CATEGORY_GROUPS, categoryLabel, categoryValues } from '../../lib/machineryCatalog';
@@ -76,9 +77,10 @@ export default function Listings() {
 
   async function saveSearch() {
     if (!session) { askLogin('Aramayı kaydedip yeni ilanlardan haberdar olmak için giriş yapman gerekir.'); return; }
-    const f = { catRaw: cat, cat: cat && !cat.startsWith('group:') ? cat : 'Tümü', city, maxPrice: Number(maxPrice), q: q.trim(), brand: adv.brand, unit: adv.unit, useMin: adv.useMin, useMax: adv.useMax, yMin: adv.yMin, yMax: adv.yMax, minScore: adv.minScore, incNew: true, ver: adv.ver, hide: adv.hide, takas: adv.takas, near: adv.near };
+    const f = { catRaw: cat, cat: cat && !cat.startsWith('group:') ? cat : 'Tümü', city, maxPrice: Number(maxPrice), q: q.trim(), brand: adv.brand, unit: adv.unit, useMin: adv.useMin, useMax: adv.useMax, yMin: adv.yMin, yMax: adv.yMax, minScore: adv.minScore, incNew: true, ver: adv.ver, hide: adv.hide, takas: adv.takas, near: adv.near, tech: adv.tech };
     // Sunucu yarım saatte bir bu parametrelerle yeni ilan arar ve bildirim gönderir.
     const params = { q: q.trim(), categories: cat ? categoryValues(cat) : [], city, maxPrice: Number(maxPrice), part: cat === 'Yedek parça' || cat === 'Lastik ve jant' || cat === 'group:parts', brand: adv.brand, yMin: adv.yMin, yMax: adv.yMax, useMin: adv.useMin, useMax: adv.useMax, unit: adv.unit, minScore: adv.minScore, incNew: true, ver: adv.ver, hide: adv.hide, takas: adv.takas,
+      ...(techFilterParams(adv.tech, cat) ? { tech: techFilterParams(adv.tech, cat) } : {}),
       // Yakınlık filtresi bildirimde de korunsun (yalnızca açıksa, boyutu küçük tutmak için)
       ...(adv.near ? { near: adv.near, distances: Object.fromEntries(Object.keys(COORDS).map((c) => [c, distanceKm(myCity, c) ?? 99999])) } : {}) };
     let { error: e } = await supabase.from('saved_searches').insert({ user_id: session.user.id, query: { f }, params, notify: true });
@@ -97,7 +99,7 @@ export default function Listings() {
     if (!configured) { setError('Uygulama ayarları eksik (.env dosyası).'); return; }
     const id = ++seq.current;
     setLoading(true); setError('');
-    const { data, error: e } = await supabase.rpc('search_listings', { p: { q: query, page: nextPage, categories: f.cat ? categoryValues(f.cat) : [], city: f.city, maxPrice: Number(f.maxPrice), sort: f.sort, part: f.cat === 'Yedek parça' || f.cat === 'Lastik ve jant' || f.cat === 'group:parts', brand: a.brand, yMin: a.yMin, yMax: a.yMax, useMin: a.useMin, useMax: a.useMax, unit: a.unit, minScore: a.minScore, incNew: true, ver: a.ver, hide: a.hide, takas: a.takas, near: a.near, distances: Object.fromEntries(Object.keys(COORDS).map((c) => [c, distanceKm(myCity, c) ?? 99999])) }, count_only: false });
+    const { data, error: e } = await supabase.rpc('search_listings', { p: { q: query, page: nextPage, categories: f.cat ? categoryValues(f.cat) : [], city: f.city, maxPrice: Number(f.maxPrice), sort: f.sort, part: f.cat === 'Yedek parça' || f.cat === 'Lastik ve jant' || f.cat === 'group:parts', brand: a.brand, yMin: a.yMin, yMax: a.yMax, useMin: a.useMin, useMax: a.useMax, unit: a.unit, minScore: a.minScore, incNew: true, ver: a.ver, hide: a.hide, takas: a.takas, near: a.near, tech: techFilterParams(a.tech, f.cat), distances: Object.fromEntries(Object.keys(COORDS).map((c) => [c, distanceKm(myCity, c) ?? 99999])) }, count_only: false });
     if (id !== seq.current) return;
     setLoading(false);
     if (e || !data) { setError('İlanlar yüklenemedi. Lütfen sayfayı yenileyin.'); return; }
@@ -119,7 +121,7 @@ export default function Listings() {
         <FChip icon="grid" label={cat ? categoryLabel(cat) : 'Kategori'} on={!!cat} drop onPress={() => setSheet('cat')} />
         <FChip icon="map-pin" label={city === 'Tümü' ? 'İl' : city} on={city !== 'Tümü'} drop onPress={() => setSheet('city')} />
         <FChip icon="tag" label={maxPrice === '6000000' ? 'Fiyat' : PRICES.find((p) => p.value === maxPrice)?.label ?? 'Fiyat'} on={maxPrice !== '6000000'} drop onPress={() => setSheet('price')} />
-        <FChip icon="sliders" label={advCount(adv) ? `${tr('Filtreler')} (${advCount(adv)})` : 'Filtreler'} on={advCount(adv) > 0} onPress={() => setAdvOpen(true)} />
+        <FChip icon="sliders" label={advCount(adv, cat) ? `${tr('Filtreler')} (${advCount(adv, cat)})` : 'Filtreler'} on={advCount(adv, cat) > 0} onPress={() => setAdvOpen(true)} />
         <FChip icon="list" label={SORTS.find((o) => o.value === sort)?.label ?? 'Sırala'} drop onPress={() => setSheet('sort')} />
         <FChip icon="bookmark" label="Aramayı kaydet" onPress={() => void saveSearch()} />
         <FChip icon="settings" label="Yedek parça" onPress={() => router.push('/yedek-parca')} />

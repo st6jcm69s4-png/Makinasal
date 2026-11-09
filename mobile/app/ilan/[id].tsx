@@ -15,12 +15,13 @@ import { LoanCalculator } from '../../components/LoanCalculator';
 import { AuctionBox, type Auction } from '../../components/AuctionBox';
 import { VideoPlayer } from '../../components/VideoPlayer';
 import { videoHost, videoThumb } from '../../lib/video';
+import { CONDITION_FIELDS, formatTech, techFieldsFor } from '../../lib/techSpecs';
 import { color, font, radius, shadow } from '../../lib/theme';
 
 type Detail = {
   id: string; seller_id: string; category: string; title: string; description: string | null; price: number | string; city: string; year: number | null;
   usage_value: number | null; usage_unit: string | null; brand: string | null; model: string | null;
-  video_url?: string | null; video_path?: string | null; boosted_until?: string | null;
+  video_url?: string | null; video_path?: string | null; boosted_until?: string | null; tech?: Record<string, string | number> | null;
   listing_photos: { path: string; position: number }[] | null;
 };
 const REPORT_REASONS = ['Sahte veya yanıltıcı ilan', 'Kapora / ön ödeme istiyor', 'Fiyat gerçek dışı', 'Hakaret veya taciz', 'Diğer'];
@@ -71,7 +72,7 @@ export default function ListingScreen() {
     const base = 'id,seller_id,category,title,description,price,city,year,usage_value,usage_unit,brand,model,listing_photos(path,position)';
     const q = (cols: string) => supabase.from('listings').select(cols).eq('id', id).eq('status', 'active').eq('moderation_status', 'approved').maybeSingle();
     // video_url yeni sütun: eski veritabanında yoksa onsuz tekrar dene
-    void q(base + ',video_url,video_path,boosted_until').then((r) => (r.error ? q(base) : r))
+    void q(base + ',video_url,video_path,boosted_until,tech').then((r) => (r.error ? q(base) : r))
       .then(async ({ data, error }) => {
         if (!alive) return;
         if (error) { setState('error'); return; }
@@ -181,7 +182,9 @@ export default function ListingScreen() {
     ['Marka', item.brand], ['Model', item.model], ['Yıl', item.year],
     ['Kullanım', item.usage_value ? `${item.usage_value} ${item.usage_unit ?? ''}`.trim() : null],
     ['İl', item.city], ['Kategori', item.category],
+    ...techFieldsFor(item.category).map((f) => [f.label, formatTech(f, item.tech?.[f.key])] as [string, string | null]).filter(([, v]) => v !== null),
   ];
+  const condition = CONDITION_FIELDS.map((f) => [f.label, formatTech(f, item.tech?.[f.key])] as [string, string | null]).filter(([, v]) => v !== null);
   const chips: [IconName, string][] = ([['map-pin', item.city], ['calendar', item.year ? String(item.year) : ''], ['activity', item.usage_value ? `${item.usage_value} ${item.usage_unit ?? ''}`.trim() : '']] as [IconName, string][]).filter(([, v]) => !!v);
   return (
     <View style={s.screen}>
@@ -263,6 +266,23 @@ export default function ListingScreen() {
           </View>
           <Icon name="chevron-right" size={20} color={color.muted} />
         </Pressable>
+
+        {condition.length ? (
+          <>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginHorizontal: 16, marginTop: 22, marginBottom: 10 }}>
+              <Text style={[s.h2, { margin: 0 }]}>Bakım ve durum</Text>
+              <View style={s.declared}><Icon name="user" size={12} color={color.muted} /><Text style={s.declaredT}>Satıcı beyanı</Text></View>
+            </View>
+            <View style={s.card}>
+              {condition.map(([k, v], i) => (
+                <View key={k} style={[s.specRow, i > 0 && s.sep]}>
+                  <Text style={s.specK}>{k}</Text>
+                  <PlainText style={s.specV} numberOfLines={3}>{String(v)}</PlainText>
+                </View>
+              ))}
+            </View>
+          </>
+        ) : null}
 
         {item.description ? (
           <>
@@ -408,6 +428,8 @@ const s = StyleSheet.create({
   ghost: { minHeight: 50, borderRadius: radius, borderWidth: 1.5, borderColor: color.teal, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 12 },
   ghostT: { color: color.tealText, fontFamily: font.bold, fontSize: 15.5 },
   msg: { margin: 24, textAlign: 'center', color: color.muted },
+  declared: { flexDirection: 'row', alignItems: 'center', gap: 4, borderWidth: 1, borderColor: color.line, borderRadius: 10, paddingHorizontal: 8, paddingVertical: 3 },
+  declaredT: { color: color.muted, fontSize: 12, fontFamily: font.semi },
   boost: { flexDirection: 'row', alignItems: 'center', gap: 5, alignSelf: 'flex-start', backgroundColor: color.teal, borderRadius: 10, paddingHorizontal: 9, paddingVertical: 3 },
   boostT: { color: color.tealInk, fontFamily: font.bold, fontSize: 12 },
   stars: { flexDirection: 'row', alignItems: 'center', gap: 4 },
