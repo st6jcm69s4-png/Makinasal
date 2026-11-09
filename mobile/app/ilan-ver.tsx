@@ -279,6 +279,15 @@ export default function NewListing() {
                 <Icon name="trash-2" size={19} color={color.bad} />
               </Pressable>
             </View>
+          ) : !premium ? (
+            <Pressable style={({ pressed }) => [s.videoRow, pressed && { opacity: 0.85 }]} onPress={() => router.push('/premium')} accessibilityRole="button">
+              <View style={s.videoIcon}><Icon name="lock" size={18} color={color.tealInk} /></View>
+              <View style={{ flex: 1 }}>
+                <Text style={s.videoT}>Telefondan video yükleme Pro ve Firma Pro'ya özel</Text>
+                <Text style={s.hint}>Ücretsiz üyelikte YouTube bağlantısı ekleyebilirsin.</Text>
+              </View>
+              <Icon name="chevron-right" size={18} color={color.muted} />
+            </Pressable>
           ) : (
             <View style={{ flexDirection: 'row', gap: 10 }}>
               <Pressable style={s.videoBtn} onPress={() => void pickVideo(true)} accessibilityRole="button"><Icon name="video" size={20} color={color.tealText} /><Text style={s.addT}>Video çek</Text></Pressable>

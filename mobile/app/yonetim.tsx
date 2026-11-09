@@ -16,7 +16,8 @@ type S = { id: string; kind: string; note: string | null; city: string | null; s
 type D = { id: string; kind: string; note: string; status: string; created_at: string; profiles: { full_name: string | null } | { full_name: string | null }[] | null };
 const KIND: Record<string, string> = { finans: 'Finansman', nakliye: 'Nakliye', ekspertiz: 'Ekspertiz' };
 const DKIND: Record<string, string> = { export: 'Verimin kopyası', correct: 'Düzeltme', delete: 'Hesap ve veri silme', object: 'İşlemeye itiraz' };
-type Tab = 'ilan' | 'sikayet' | 'mesaj' | 'talep' | 'veri';
+type Tab = 'ilan' | 'sikayet' | 'mesaj' | 'artirma' | 'talep' | 'veri';
+type UP = { id: string; auction_id: string; listing_id: string; title: string; amount: number | string | null; buyer: string; seller: string; created_at: string };
 type MR = { id: string; created_at: string; reason: string; note: string; body: string | null; status: string; reported_user: string; reported_name: string; reporter_name: string; report_count: number };
 const MR_REASON: Record<string, string> = { abuse: 'Küfür veya hakaret', harassment: 'Taciz veya tehdit', fraud: 'Dolandırıcılık şüphesi', spam: 'Spam veya reklam', other: 'Diğer' };
 type Stat = { label: string; icon: IconName; n: number | null };
@@ -36,6 +37,7 @@ export default function Admin() {
   const [ss, setSs] = useState<S[]>([]);
   const [ds, setDs] = useState<D[]>([]);
   const [ms, setMs] = useState<MR[]>([]);
+  const [ups, setUps] = useState<UP[]>([]);
   const [stats, setStats] = useState<Stat[]>([]);
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
@@ -59,6 +61,8 @@ export default function Admin() {
     setLs(lrows); setRs((r.data ?? []) as R[]);
     const mr = await supabase.rpc('admin_message_reports');
     if (!mr.error && Array.isArray(mr.data)) setMs(mr.data as MR[]);
+    const up = await supabase.rpc('admin_unpaid_reports');
+    if (!up.error && Array.isArray(up.data)) setUps(up.data as UP[]);
     const sr = await supabase.rpc('admin_service_requests');
     if (!sr.error && Array.isArray(sr.data)) setSs(sr.data as S[]);
     const dr = await supabase.from('data_requests').select('id,kind,note,status,created_at,profiles(full_name)').eq('status', 'open').order('created_at');
@@ -101,14 +105,22 @@ export default function Admin() {
     if (r.error) { setError('İşlem kaydedilemedi. Yetkini ve bağlantını kontrol et.'); return; }
     void load();
   }
+  async function resolveUnpaid(id: string, confirm: boolean) {
+    if (busy) return;
+    setBusy(true); setError('');
+    const r = await supabase.rpc('admin_resolve_unpaid', { p_id: id, p_confirm: confirm });
+    setBusy(false);
+    if (r.error) { setError('İşlem kaydedilemedi. Yetkini ve bağlantını kontrol et.'); return; }
+    void load();
+  }
   const ask = (msg: string, fn: () => void) => Alert.alert('Onay', msg, [{ text: 'Vazgeç', style: 'cancel' }, { text: 'Evet', onPress: fn }]);
 
   if (admin === null) return <ActivityIndicator style={{ margin: 24 }} />;
   if (!admin) return <Text style={s.empty}>Bu bölüm yalnızca yetkili moderatörler içindir.</Text>;
 
   const newReq = ss.filter((x) => x.status === 'new').length;
-  const tabs: [Tab, string, number][] = [['ilan', 'İlanlar', ls.length], ['sikayet', 'Şikayetler', rs.length], ['mesaj', 'Mesajlar', ms.length], ['talep', 'Talepler', newReq], ['veri', 'KVKK', ds.length]];
-  const todo = ls.length + rs.length + ms.length + newReq + ds.length;
+  const tabs: [Tab, string, number][] = [['ilan', 'İlanlar', ls.length], ['sikayet', 'Şikayetler', rs.length], ['mesaj', 'Mesajlar', ms.length], ['artirma', 'Açık artırma', ups.length], ['talep', 'Talepler', newReq], ['veri', 'KVKK', ds.length]];
+  const todo = ls.length + rs.length + ms.length + ups.length + newReq + ds.length;
 
   return (
     <ScrollView style={{ flex: 1, backgroundColor: color.bg }} contentContainerStyle={{ paddingBottom: 32 }} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); void load().finally(() => setRefreshing(false)); }} />}>
@@ -189,6 +201,25 @@ export default function Admin() {
             </View>
           </View>
         )) : <Empty text="Açık mesaj şikayeti yok." />) : null}
+
+        {tab === 'artirma' ? (ups.length ? ups.map((u) => (
+          <View key={u.id} style={s.card}>
+            <View style={s.cardTop}>
+              <View style={{ flex: 1, gap: 3 }}>
+                <Label style={{ color: color.bad }}>Alıcı ödeme yapmadı</Label>
+                <PlainText style={s.title}>{u.title}</PlainText>
+                <PlainText style={s.when}>{`${tr('Alıcı')}: ${u.buyer} · ${tr('Satıcı')}: ${u.seller}${u.amount != null ? ` · ${Number(u.amount).toLocaleString('tr-TR')} TL` : ''}`}</PlainText>
+              </View>
+              <Text style={s.when}>{ago(u.created_at)}</Text>
+            </View>
+            <Text style={s.when}>Onaylarsan alıcının premium üyeliği iadesiz iptal edilir, hesabı ve IP adresi açık artırmalardan men edilir, makine sıradaki teklif verene 48 saatliğine teklif edilir. Alıcı Destek'ten ödeme belgesi gönderdiyse "Geçersiz" de.</Text>
+            <View style={s.actions}>
+              <View style={{ flex: 1 }}><Btn title="Onayla" disabled={busy} onPress={() => ask('Alıcının ödeme yapmadığı onaylansın mı? Bu işlem geri alınamaz.', () => void resolveUnpaid(u.id, true))} /></View>
+              <View style={{ flex: 1 }}><Btn ghost title="Geçersiz" disabled={busy} onPress={() => void resolveUnpaid(u.id, false)} /></View>
+              <View style={{ flex: 1 }}><Btn ghost title="İlan" onPress={() => router.push(`/ilan/${u.listing_id}`)} /></View>
+            </View>
+          </View>
+        )) : <Empty text="İncelenecek açık artırma bildirimi yok." />) : null}
 
         {tab === 'talep' ? (ss.length ? ss.map((q) => (
           <View key={q.id} style={s.card}>

@@ -14,6 +14,8 @@ export const PLANS: Plan[] = [
       'Yapay zeka iş asistanı (ayda 40 soru)',
       'İlanların ve iş ağı ilanların üst sıralarda',
       '30 ilan hakkı, ilan başına 20 fotoğraf',
+      'Açık artırmalara katılma (teklif verme)',
+      'Telefondan ilan videosu yükleme',
       'Reklamsız kullanım',
     ],
   },
