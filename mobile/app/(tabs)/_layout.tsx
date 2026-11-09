@@ -38,18 +38,39 @@ const label = (text: string) => ({ focused }: { focused: boolean }) => (
   </PlainText>
 );
 
+/** Ortadaki "İlan ver": menüden yükselen koyu daire. */
+const postIcon = () => (
+  <View style={{ width: 50, height: 50, marginTop: -14, borderRadius: 25, backgroundColor: color.navyDeep, borderWidth: 3, borderColor: color.navy, alignItems: 'center', justifyContent: 'center' }}>
+    <Icon name="plus" size={24} color={color.tealBright} />
+  </View>
+);
+
+/** Başlıktaki yuvarlak simge düğmesi (isteğe bağlı sayı rozeti). */
+function HeadBtn({ icon, label, badge, onPress }: { icon: IconName; label: string; badge?: number; onPress: () => void }) {
+  return (
+    <Pressable onPress={onPress} hitSlop={6} accessibilityRole="button" accessibilityLabel={badge ? `${label}, ${badge}` : label} style={({ pressed }) => [{ width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' }, pressed && { opacity: 0.6 }]}>
+      <Icon name={icon} size={21} color={color.onBar} />
+      {badge ? (
+        <View style={{ position: 'absolute', top: 2, right: 0, minWidth: 18, height: 18, paddingHorizontal: 4, borderRadius: 9, backgroundColor: color.pop, borderWidth: 2, borderColor: color.navy, alignItems: 'center', justifyContent: 'center' }}>
+          <PlainText style={{ color: color.popInk, fontSize: 10, fontFamily: font.textBold }}>{badge > 99 ? '99+' : String(badge)}</PlainText>
+        </View>
+      ) : null}
+    </Pressable>
+  );
+}
+
 /** Üst başlık: lacivert zemin, Barlow yazılı marka. */
 function Logo() {
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
       <BrandMark size={28} />
-      <PlainText style={{ color: color.onBar, fontSize: 21, fontFamily: font.bold, letterSpacing: 1.6 }}>MAKİNASAL</PlainText>
+      <PlainText style={{ color: color.onBar, fontSize: 21, fontFamily: font.bold, letterSpacing: 1.6 }}>MAKİNA<PlainText style={{ color: color.tealText, fontSize: 21, fontFamily: font.bold, letterSpacing: 1.6 }}>SAL</PlainText></PlainText>
     </View>
   );
 }
 
 export default function TabsLayout() {
-  const { favs, session } = useApp();
+  const { session } = useApp();
   useLang();
   // Okunmamış mesaj sayısı (30 sn'de bir yenilenir).
   const [unread, setUnread] = useState(0);
@@ -67,7 +88,13 @@ export default function TabsLayout() {
   return (
     <Tabs
       // Açık sekmeye tekrar dokununca en üste çıkar; başka sekmeye dokununca anında geçer.
-      screenListeners={({ route }) => ({ tabPress: () => { if (route.name === currentTab()) fireScrollTop(route.name); } })}
+      screenListeners={({ route }) => ({
+        tabPress: (e) => {
+          // Ortadaki düğme: ilan formunu açar (sekme değişmez)
+          if (route.name === 'yeni') { e.preventDefault(); router.push('/ilan-ver' as never); return; }
+          if (route.name === currentTab()) fireScrollTop(route.name);
+        },
+      })}
       screenLayout={({ children, route }) => <SwipeTabs route={route.name}>{children}</SwipeTabs>}
       screenOptions={{
         // Dokunmada geçiş anında; kaydırmada animasyonu SwipeTabs yürütür
@@ -78,10 +105,13 @@ export default function TabsLayout() {
         headerShadowVisible: false,
         headerTitleAlign: 'left',
         headerTitle: () => <Logo />,
+        // Mesajlar üstte, okunmamış sayısıyla (alt menüde yer açmak için)
         headerRight: () => (
-          <Pressable onPress={() => router.push('/ara' as never)} hitSlop={10} accessibilityRole="button" accessibilityLabel={tr('Uygulamada ara')} style={{ paddingHorizontal: 16 }}>
-            <Icon name="search" size={22} color={color.onBar} />
-          </Pressable>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 2, paddingRight: 10 }}>
+            <HeadBtn icon="search" label={tr('Uygulamada ara')} onPress={() => router.push('/ara' as never)} />
+            <HeadBtn icon="bell" label={tr('Bildirimler')} onPress={() => router.push(session ? '/bildirimler' as never : '/hesap' as never)} />
+            <HeadBtn icon="message-square" label={tr('Mesajlar')} badge={unread} onPress={() => router.navigate('/mesajlar' as never)} />
+          </View>
         ),
         tabBarActiveTintColor: color.barActive,
         tabBarInactiveTintColor: color.onNavy,
@@ -91,10 +121,12 @@ export default function TabsLayout() {
     >
       <Tabs.Screen name="index" options={{ tabBarLabel: label(tr('Ana sayfa')), tabBarIcon: icon('home') }} />
       <Tabs.Screen name="ilanlar" options={{ tabBarLabel: label(tr('İlanlar')), tabBarIcon: icon('search') }} />
+      <Tabs.Screen name="yeni" options={{ tabBarLabel: label(tr('İlan ver')), tabBarIcon: postIcon, tabBarAccessibilityLabel: tr('İlan ver') }} />
       <Tabs.Screen name="is-agi" options={{ tabBarLabel: label(tr('İş Ağı')), tabBarIcon: icon('briefcase') }} />
-      <Tabs.Screen name="favoriler" options={{ tabBarLabel: label(tr('Favoriler')), tabBarIcon: icon('heart'), tabBarBadge: favs.size > 0 ? favs.size : undefined, tabBarBadgeStyle: { backgroundColor: color.pop, color: color.popInk, fontSize: 10 } }} />
-      <Tabs.Screen name="mesajlar" options={{ tabBarLabel: label(tr('Mesajlar')), tabBarIcon: icon('message-square'), tabBarBadge: unread > 0 ? unread : undefined, tabBarBadgeStyle: { backgroundColor: color.pop, color: color.popInk, fontSize: 10 } }} />
       <Tabs.Screen name="hesap" options={{ tabBarLabel: label(tr('Hesabım')), tabBarIcon: icon('user') }} />
+      {/* Menüde görünmeyen sekmeler: Mesajlar başlıkta, Favoriler Hesabım'da */}
+      <Tabs.Screen name="mesajlar" options={{ href: null }} />
+      <Tabs.Screen name="favoriler" options={{ href: null }} />
     </Tabs>
   );
 }

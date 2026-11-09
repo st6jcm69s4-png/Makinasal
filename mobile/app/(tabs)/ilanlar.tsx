@@ -16,7 +16,8 @@ import { CATEGORY_GROUPS, categoryLabel, categoryValues } from '../../lib/machin
 import { router, useLocalSearchParams } from 'expo-router';
 import { Alert } from 'react-native';
 import { useApp } from '../../lib/AppContext';
-import { ListingCard } from '../../components/ListingCard';
+import { ListingCard, type CardVariant } from '../../components/ListingCard';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { configured, supabase, type Row } from '../../lib/supabase';
 import { color, font } from '../../lib/theme';
 import { tr } from '../../lib/i18n';
@@ -90,6 +91,10 @@ export default function Listings() {
     else toast('Arama kaydedildi. Bu aramaya uyan yeni ilan gelince sana bildirim göndereceğiz.');
   }
   const [q, setQ] = useState('');
+  const [view, setViewState] = useState<CardVariant>('row');
+  // Seçilen görünüm hatırlanır
+  useEffect(() => { void AsyncStorage.getItem('mk-list-view').then((v) => { if (v === 'grid' || v === 'row') setViewState(v); }).catch(() => undefined); }, []);
+  const setView = (v: CardVariant) => { setViewState(v); void AsyncStorage.setItem('mk-list-view', v).catch(() => undefined); };
   const [rows, setRows] = useState<Row[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
@@ -135,16 +140,31 @@ export default function Listings() {
       <PickerModal visible={sheet === 'sort'} title="Sırala" selected={sort} options={SORTS} onPick={setSort} onClose={() => setSheet(null)} />
       <FilterModal visible={advOpen} value={adv} category={cat} part={isPart} onApply={setAdv} onClose={() => setAdvOpen(false)} />
       {error ? <Text style={s.err}>{error}</Text> : null}
-      {!loading || rows.length ? <View style={s.countRow}><PlainText style={s.countN}>{String(total)}</PlainText><Text style={s.countT}>ilan bulundu</Text></View> : null}
+      <View style={s.countRow}>
+        <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 5, flex: 1 }}>
+          {!loading || rows.length ? <><PlainText style={s.countN}>{String(total)}</PlainText><Text style={s.countT}>ilan</Text></> : null}
+        </View>
+        {/* Görünüm: liste (fotoğraf solda) veya iki sütunlu ızgara */}
+        <View style={s.seg} accessibilityRole="radiogroup">
+          {(['row', 'grid'] as const).map((v) => (
+            <Pressable key={v} onPress={() => setView(v)} style={[s.segBtn, view === v && s.segOn]} accessibilityRole="radio" accessibilityState={{ selected: view === v }} accessibilityLabel={tr(v === 'row' ? 'Liste görünümü' : 'Izgara görünümü')}>
+              <Icon name={v === 'row' ? 'list' : 'grid'} size={16} color={view === v ? color.ink : color.muted} />
+            </Pressable>
+          ))}
+        </View>
+      </View>
       <FlatList
         ref={scroller}
+        key={view}
+        numColumns={view === 'grid' ? 2 : 1}
+        columnWrapperStyle={view === 'grid' ? { gap: 12, paddingHorizontal: 12, marginBottom: 12 } : undefined}
         data={rows}
         keyExtractor={(r) => r.id}
         onEndReachedThreshold={0.5}
         onEndReached={() => { if (!loading && rows.length < total) void load(page + 1, q.trim(), { cat, city, maxPrice, sort }, adv); }}
         ListEmptyComponent={loading ? undefined : <Text style={s.empty}>İlan bulunamadı.</Text>}
         ListFooterComponent={loading ? <CardSkeleton count={rows.length ? 1 : 4} /> : undefined}
-        renderItem={({ item }) => <ListingCard item={item} />}
+        renderItem={({ item }) => <ListingCard item={item} variant={view} />}
       />
     </View>
   );
@@ -157,8 +177,11 @@ const s = StyleSheet.create({
   chipOn: { backgroundColor: color.teal, borderColor: color.teal },
   chipText: { color: color.ink, fontFamily: font.semi, fontSize: 14, maxWidth: 180 },
   chipTextOn: { color: color.tealInk },
-  countRow: { flexDirection: 'row', alignItems: 'baseline', gap: 5, marginHorizontal: 20, marginTop: 6, marginBottom: 10 },
-  countN: { color: color.ink, fontFamily: font.bold, fontSize: 15 },
+  countRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginHorizontal: 16, marginTop: 6, marginBottom: 10 },
+  countN: { color: color.ink, fontFamily: font.bold, fontSize: 19 },
+  seg: { flexDirection: 'row', backgroundColor: color.plate, borderRadius: 10, padding: 3 },
+  segBtn: { width: 38, height: 32, borderRadius: 8, alignItems: 'center', justifyContent: 'center' },
+  segOn: { backgroundColor: color.surface },
   countT: { color: color.muted, fontSize: 14 },
   err: { color: color.bad, marginHorizontal: 16 },
   empty: { textAlign: 'center', margin: 24, color: color.muted },

@@ -4,7 +4,7 @@ import { Appearance, DynamicColorIOS, Platform } from 'react-native';
 // Renk temaları: Petrol yeşili (varsayılan) ve Bordo. Açık/koyu görünüm her temada ayrıca seçilir.
 type Palette = Record<
   'navy' | 'navy2' | 'accent' | 'accentText' | 'accentInk' | 'accentSoft' | 'pop' | 'popInk' | 'popSoft' | 'teal' | 'tealInk' | 'tealSoft' | 'tealText' |
-  'bg' | 'surface' | 'plate' | 'ink' | 'muted' | 'line' | 'good' | 'goodBg' | 'warn' | 'warnBg' | 'bad' | 'badBg' | 'onNavy' | 'onBar' | 'barActive', string>;
+  'bg' | 'surface' | 'plate' | 'ink' | 'muted' | 'line' | 'good' | 'goodBg' | 'warn' | 'warnBg' | 'bad' | 'badBg' | 'onNavy' | 'onBar' | 'barActive' | 'navyDeep' | 'tealBright' | 'onDeepMuted' | 'tile', string>;
 
 // Petrol yeşili (varsayılan): sıcak kum tonları ve petrol yeşili.
 const petrolLight: Palette = {
@@ -14,6 +14,7 @@ const petrolLight: Palette = {
   bg: '#EDE5D6', surface: '#F7F1E6', plate: '#E2D7C2', ink: '#1E211C', muted: '#544F3C', line: '#D2C4A9',
   good: '#1B6F40', goodBg: '#DCEFE3', warn: '#7F5200', warnBg: '#FFF0C2', bad: '#9C2626', badBg: '#F5DADA',
   onNavy: '#4D4734', barActive: '#0A6257', onBar: '#1E211C',
+  navyDeep: '#1A1B18', tealBright: '#5FD3C4', onDeepMuted: '#D4CAB7', tile: '#F7F1E6',
 };
 const petrolDark: Palette = {
   navy: '#100F0D', navy2: '#25221D', accent: '#117A70', accentText: '#5FD3C4', accentInk: '#FFFFFF', accentSoft: '#173B35',
@@ -22,6 +23,7 @@ const petrolDark: Palette = {
   bg: '#151412', surface: '#201E1A', plate: '#2C2924', ink: '#F5F0E6', muted: '#BDB4A3', line: '#3A362F',
   good: '#79D6A2', goodBg: '#173226', warn: '#F0C45E', warnBg: '#38300F', bad: '#F4A0A0', badBg: '#3B1C1C',
   onNavy: '#D4CAB7', barActive: '#5FD3C4', onBar: '#FFFFFF',
+  navyDeep: '#2C2A25', tealBright: '#5FD3C4', onDeepMuted: '#D4CAB7', tile: '#E9E1D2',
 };
 // Bordo: uygulamanın ilk tasarımı (grafit üst alan, sıcak beyaz zemin, bordo vurgu).
 const bordoLight: Palette = {
@@ -31,6 +33,7 @@ const bordoLight: Palette = {
   bg: '#F6F5F3', surface: '#FFFFFF', plate: '#EEECEA', ink: '#25272D', muted: '#5F5A63', line: '#DDD9DC',
   good: '#1B6F40', goodBg: '#DCEFE3', warn: '#7F5200', warnBg: '#FFF0C2', bad: '#9C2626', badBg: '#F5DADA',
   onNavy: '#D5CDD2', barActive: '#F2C6D0', onBar: '#FFFFFF',
+  navyDeep: '#25272D', tealBright: '#E7B3BF', onDeepMuted: '#D5CDD2', tile: '#FFFFFF',
 };
 const bordoDark: Palette = {
   navy: '#202024', navy2: '#303036', accent: '#9E1B3A', accentText: '#E7B3BF', accentInk: '#FFFFFF', accentSoft: '#3A2329',
@@ -39,6 +42,7 @@ const bordoDark: Palette = {
   bg: '#181719', surface: '#242225', plate: '#302C30', ink: '#F4F1F2', muted: '#C0B8BE', line: '#484047',
   good: '#79D6A2', goodBg: '#173226', warn: '#F0C45E', warnBg: '#38300F', bad: '#F4A0A0', badBg: '#3B1C1C',
   onNavy: '#D5CDD2', barActive: '#E7B3BF', onBar: '#FFFFFF',
+  navyDeep: '#303036', tealBright: '#E7B3BF', onDeepMuted: '#D5CDD2', tile: '#EEE9EA',
 };
 
 export const PALETTES = {

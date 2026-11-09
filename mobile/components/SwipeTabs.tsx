@@ -4,7 +4,7 @@ import { router, useFocusEffect } from 'expo-router';
 import { color } from '../lib/theme';
 
 /** Alt menü sırası; sağa/sola kaydırınca bir önceki/sonraki sekmeye geçilir. */
-export const TAB_ORDER = ['index', 'ilanlar', 'is-agi', 'favoriler', 'mesajlar', 'hesap'] as const;
+export const TAB_ORDER = ['index', 'ilanlar', 'is-agi', 'hesap'] as const;
 type Tab = (typeof TAB_ORDER)[number];
 const PATH: Record<string, string> = { index: '/', ilanlar: '/ilanlar', 'is-agi': '/is-agi', favoriler: '/favoriler', mesajlar: '/mesajlar', hesap: '/hesap' };
 
