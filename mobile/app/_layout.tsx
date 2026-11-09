@@ -12,6 +12,7 @@ import { LangProvider, LanguageGate, useLang } from '../lib/lang';
 import { LoginPromptProvider } from '../components/LoginPrompt';
 import { AnimatedSplash } from '../components/AnimatedSplash';
 import { ToastHost } from '../components/Toast';
+import { DoubleTapSearch } from '../components/DoubleTapSearch';
 
 function Screens() {
   const { lang } = useLang();
@@ -19,6 +20,8 @@ function Screens() {
   return (
     <>
       <StatusBar style="auto" />
+      {/* Her sayfada çift dokunuş: arama ekranı */}
+      <DoubleTapSearch>
       <Stack
         screenOptions={{
           // Kendi başlığımız: renkleri sayfayla aynı anda değişir.
@@ -65,6 +68,7 @@ function Screens() {
         <Stack.Screen name="ayarlar" options={{ title: T('Ayarlar') }} />
         <Stack.Screen name="ara" options={{ title: T('Uygulamada ara') }} />
       </Stack>
+      </DoubleTapSearch>
     </>
   );
 }

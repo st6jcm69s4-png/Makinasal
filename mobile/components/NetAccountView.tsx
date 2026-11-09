@@ -65,9 +65,9 @@ export function NetAccountView({ onNavigate, embedded }: { onNavigate?: () => vo
         </View>
         <View style={s.stats}>
           {stats.map(([l, n, k], i) => (
-            <Pressable key={l} style={[s.stat, i > 0 && { borderLeftWidth: 1, borderLeftColor: color.navy2 }, seg === k && s.statOn]} onPress={() => setSeg(k)} accessibilityRole="button">
-              <PlainText style={s.statNum}>{String(n)}</PlainText>
-              <Label style={{ color: color.onNavy }}>{l}</Label>
+            <Pressable key={l} style={[s.stat, i > 0 && { borderLeftWidth: 1, borderLeftColor: color.navy2 }, seg === k && s.statOn]} onPress={() => setSeg(k)} accessibilityRole="button" accessibilityState={{ selected: seg === k }}>
+              <PlainText style={[s.statNum, seg === k && { color: color.accentInk }]}>{String(n)}</PlainText>
+              <Label style={{ color: seg === k ? color.accentInk : color.onNavy }}>{l}</Label>
             </Pressable>
           ))}
         </View>
@@ -146,7 +146,8 @@ const s = StyleSheet.create({
   h1: { color: color.onBar, fontFamily: font.bold, fontSize: 26, lineHeight: 32 },
   stats: { flexDirection: 'row', marginTop: 10, borderTopWidth: 1, borderTopColor: color.navy2 },
   stat: { flex: 1, paddingVertical: 10, paddingHorizontal: 14, gap: 1, borderBottomWidth: 3, borderBottomColor: 'transparent' },
-  statOn: { backgroundColor: color.navy2, borderBottomColor: color.teal },
+  // Seçili kutu: sekmelerdeki gibi tam dolu tema rengi, yazı beyaz
+  statOn: { backgroundColor: color.accent, borderBottomColor: color.accent },
   statNum: { color: color.onBar, fontFamily: font.bold, fontSize: 26 },
   quick: { flexDirection: 'row', gap: 10, paddingHorizontal: 12, paddingTop: 14 },
   q: { flex: 1, alignItems: 'center', justifyContent: 'flex-start', gap: 8, paddingVertical: 14, paddingHorizontal: 6, backgroundColor: color.surface, borderRadius: radius + 4, borderWidth: 1, borderColor: color.line, ...shadow },

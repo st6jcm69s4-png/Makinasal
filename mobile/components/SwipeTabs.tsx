@@ -9,15 +9,15 @@ type Tab = (typeof TAB_ORDER)[number];
 const PATH: Record<string, string> = { index: '/', ilanlar: '/ilanlar', 'is-agi': '/is-agi', favoriler: '/favoriler', mesajlar: '/mesajlar', hesap: '/hesap' };
 
 /*
- * Sekme geçişi (hem alt menüye dokununca hem kaydırınca aynı):
+ * Sekme geçişi yalnızca kaydırınca canlandırılır (alt menüdeki simgeye dokununca anında geçer):
  *   1) açık olan ekran yavaşça solar ve gidilen yöne doğru hafifçe kayar,
  *   2) yeni ekran karşı yönden hafifçe kayarak belirir.
  * Kaydırırken ekran parmağı izler; yeterince çekilmezse yerine geri döner.
  * Telefonun "Hareketi azalt" ayarı açıksa geçiş anında yapılır.
  */
-const OUT_MS = 280;
-const IN_MS = 420;
-const SHIFT = 28;
+const OUT_MS = 170;
+const IN_MS = 250;
+const SHIFT = 22;
 
 type Screen = { x: Animated.Value; o: Animated.Value };
 const screens = new Map<string, Screen>();
@@ -31,8 +31,8 @@ AccessibilityInfo.addEventListener('reduceMotionChanged', (v) => { reduceMotion 
 export const currentTab = () => current;
 const idx = (t: string) => TAB_ORDER.indexOf(t as Tab);
 
-/** Sekmeye geçer: önce açık ekran solar, sonra yenisi belirir. */
-export function goTab(next: string) {
+/** Kaydırma ile sekmeye geçer: önce açık ekran solar, sonra yenisi belirir. */
+function goTab(next: string) {
   if (busy || next === current || idx(next) < 0) return;
   const dir = idx(next) > idx(current) ? 1 : -1;
   const from = screens.get(current);
@@ -59,8 +59,9 @@ export function SwipeTabs({ route, children }: { route: string; children: ReactN
 
   useFocusEffect(
     useCallback(() => {
-      const changed = current !== route;
-      const dir = pendingDir || (idx(route) > idx(current) ? 1 : -1);
+      // Yalnızca kaydırmayla gelindiyse belirme animasyonu oynar (dokunmada pendingDir = 0)
+      const changed = current !== route && pendingDir !== 0;
+      const dir = pendingDir;
       current = route;
       pendingDir = 0;
       if (changed && !reduceMotion) {

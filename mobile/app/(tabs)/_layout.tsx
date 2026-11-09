@@ -4,7 +4,7 @@ import { Pressable, View, type ColorValue } from 'react-native';
 import { Icon, type IconName } from '../../components/Icon';
 import { PlainText } from '../../components/LText';
 import { BrandMark } from '../../components/BrandMark';
-import { SwipeTabs, currentTab, goTab } from '../../components/SwipeTabs';
+import { SwipeTabs, currentTab } from '../../components/SwipeTabs';
 import { color, font } from '../../lib/theme';
 import { useApp } from '../../lib/AppContext';
 import { tr } from '../../lib/i18n';
@@ -66,17 +66,11 @@ export default function TabsLayout() {
   }, [session]);
   return (
     <Tabs
-      screenListeners={({ route }) => ({
-        // Açık sekmeye tekrar dokununca en üste çıkar; başka sekmeye geçerken önce açık ekran solar.
-        tabPress: (e) => {
-          if (route.name === currentTab()) { fireScrollTop(route.name); return; }
-          e.preventDefault();
-          goTab(route.name);
-        },
-      })}
+      // Açık sekmeye tekrar dokununca en üste çıkar; başka sekmeye dokununca anında geçer.
+      screenListeners={({ route }) => ({ tabPress: () => { if (route.name === currentTab()) fireScrollTop(route.name); } })}
       screenLayout={({ children, route }) => <SwipeTabs route={route.name}>{children}</SwipeTabs>}
       screenOptions={{
-        // Geçiş animasyonunu SwipeTabs yürütür (önce açık ekran solar, sonra yenisi belirir)
+        // Dokunmada geçiş anında; kaydırmada animasyonu SwipeTabs yürütür
         animation: 'none',
         sceneStyle: { backgroundColor: color.bg },
         headerStyle: { backgroundColor: color.navy, borderBottomWidth: 2, borderBottomColor: color.pop } as object,
