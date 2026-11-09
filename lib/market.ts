@@ -269,10 +269,10 @@ export type PriceIndicator =
 export function priceIndicator(l: Listing, stats: PriceStats): PriceIndicator {
   if (isPartCategory(l.cat)) return { kind: "part" };
   const count = stats.count(l.cat);
-  if (count < 3) return { kind: "few", count };
+  if (count < 5) return { kind: "few", count };
   const min = stats.min(l.cat),
     max = stats.max(l.cat),
-    median = stats.median(l.cat, 3) ?? 0;
+    median = stats.median(l.cat, 5) ?? 0;
   const span = Math.max(1, max - min);
   const pct = (v: number) =>
     Math.max(0, Math.min(100, ((v - min) / span) * 100));

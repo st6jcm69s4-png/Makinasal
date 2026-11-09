@@ -19,7 +19,14 @@ assert.equal(checkMessage('TR33 0006 1005 1978 6457 8413 26').block !== null, tr
 assert.equal(checkMessage('www.ornek.com').block !== null, true);
 assert.equal(checkMessage('kapora göndereyim mi').warn, true);
 assert.equal(checkMessage('yarın görelim').warn, false);
-assert.equal(priceFlag(LISTINGS, 1150000, 'Ekskavatör'), 'low');
+{
+  // En az 5 benzer ilan yoksa fiyat yorumu yapılmaz; 5 ve üzerinde düşük/yüksek bayrağı çalışır.
+  const base = { ...LISTINGS[0], demo: false, cat: 'Ekskavatör' };
+  const five = [3, 3.2, 3.4, 3.6, 3.8].map((m, i) => ({ ...base, id: 900 + i, price: m * 1000000 }));
+  assert.equal(priceFlag(five, 1150000, 'Ekskavatör'), 'low');
+  assert.equal(priceFlag(five, 9000000, 'Ekskavatör'), 'high');
+  assert.equal(priceFlag(five.slice(0, 4), 1150000, 'Ekskavatör'), null);
+}
 assert.equal(priceFlag(LISTINGS, 1, 'Yedek parça'), null);
 assert.ok(distanceKm('Ankara', 'İstanbul') > 330 && distanceKm('Ankara', 'İstanbul') < 360);
 for (const l of LISTINGS) assert.ok(SELLERS[l.sel], `satıcı yok: ${l.sel}`);
@@ -34,8 +41,9 @@ assert.equal(safeAuthNext('/sifre-yenile'), '/sifre-yenile');
 // Synthetic prices must never affect the benchmark for real listings.
 const real = { ...LISTINGS[0], demo: false, price: 100000 };
 const mixed = [real, { ...real, price: 200000 }, { ...real, demo: true, price: 9000000 }];
-assert.equal(categoryMedian(mixed, real.cat), 150000);
-assert.equal(buildPriceStats(mixed).median(real.cat), 150000);
+assert.equal(categoryMedian(mixed, real.cat, 2), 150000);
+assert.equal(buildPriceStats(mixed).median(real.cat, 2), 150000);
+assert.equal(categoryMedian(mixed, real.cat), null);
 console.log('Auth yönlendirmeleri ve gerçek ilan fiyatı kontrolleri geçti ✔');
 
 // Saved searches preserve every filter when opened again.

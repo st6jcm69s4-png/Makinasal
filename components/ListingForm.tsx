@@ -206,7 +206,7 @@ function Form() {
     setPhotos([photos[i], ...photos.filter((_, k) => k !== i)]);
 
   const priceNum = Number(price);
-  const med = cat && !part ? stats.median(cat, 2) : null;
+  const med = cat && !part ? stats.median(cat, 5) : null;
   let priceNote: { cls: string; text: string } | null = null;
   if (priceNum > 0 && cat && !part) {
     if (!med)

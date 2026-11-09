@@ -77,7 +77,7 @@ function Body({ l, seller: m, own, stats, favs, toggleFav, cmp, toggleCmp, myCit
   const lv = trustLevel(m);
   const part = isPartCategory(l.cat);
   const flag = stats.flag(l.price, l.cat);
-  const med = stats.median(l.cat, 2);
+  const med = stats.median(l.cat, 5);
   const ind = priceIndicator(l, stats);
   const d = distanceLabel(myCity, l.city);
   const key = listingKey(l);

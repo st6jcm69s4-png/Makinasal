@@ -10,11 +10,13 @@ export function median(a: number[]): number {
   return n % 2 ? b[(n - 1) / 2] : (b[n / 2 - 1] + b[n / 2]) / 2;
 }
 
-/** Kategori medyanı. Parça/lastikte hesaplanmaz; yeterli ilan yoksa null. */
+/** Kategori medyanı. Parça/lastikte hesaplanmaz; yeterli ilan yoksa null.
+ * En az 5 benzer ilan olmadan fiyat yorumu yapılmaz (az örnekle yanıltıcı olur). */
+export const MIN_PRICE_SAMPLES = 5;
 export function categoryMedian(
   listings: Listing[],
   cat: string,
-  minCount = 2,
+  minCount = MIN_PRICE_SAMPLES,
 ): number | null {
   if (isPartCategory(cat)) return null;
   const live = listings.filter((l) => !l.demo);
@@ -60,7 +62,7 @@ export function buildPriceStats(listings: Listing[]): PriceStats {
     else byCat.set(l.cat, [l.price]);
   }
   const prices = (cat: string) => byCat.get(cat) ?? [];
-  const med = (cat: string, minCount = 2) => {
+  const med = (cat: string, minCount = MIN_PRICE_SAMPLES) => {
     if (isPartCategory(cat)) return null;
     const p = prices(cat);
     return p.length >= minCount ? median(p) : null;
