@@ -87,7 +87,7 @@ export function ListingCard({ item, variant = 'row' }: { item: Row; variant?: Ca
   const wide = variant === 'wide';
   return (
     <Pressable style={({ pressed }) => [s.card, wide ? s.wide : s.grid, pressed && s.pressed]} onPress={open} accessibilityRole="button">
-      <View style={[s.cardImg, wide ? { height: 156 } : { aspectRatio: 4 / 3 }]}>
+      <View style={[s.cardImg, wide ? { height: 124 } : { aspectRatio: 4 / 3 }]}>
         {img}{boostTag}{videoTag}
         <Pressable onPress={() => void heart()} hitSlop={8} style={s.heart} accessibilityRole="button" accessibilityLabel={tr(favLabel)}>
           <Heart on={fav} size={wide ? 20 : 18} color={fav ? fixed.heart : fixed.mediaInk} />
@@ -109,29 +109,29 @@ const s = StyleSheet.create({
   boost: { position: 'absolute', left: 6, top: 6, backgroundColor: color.teal, borderRadius: 8, paddingHorizontal: 7, paddingVertical: 3 },
   boostT: { color: color.tealInk, fontFamily: font.bold, fontSize: 11 },
   video: { position: 'absolute', right: 6, bottom: 6, width: 24, height: 24, borderRadius: 12, backgroundColor: 'rgba(20,20,18,0.7)', alignItems: 'center', justifyContent: 'center' },
-  meta: { color: color.muted, fontSize: 12.5 },
+  meta: { color: color.muted, fontSize: 12 },
   drop: { backgroundColor: color.goodBg, borderRadius: 6, paddingHorizontal: 6, paddingVertical: 2 },
   dropT: { color: color.good, fontFamily: font.textBold, fontSize: 11.5 },
   dropOnImg: { position: 'absolute', left: 8, bottom: 8, backgroundColor: color.good },
 
   // Satır kartı
-  row: { flexDirection: 'row', gap: 12, padding: 10, marginHorizontal: 12, marginBottom: 10, backgroundColor: color.surface, borderRadius: radius + 4, borderWidth: 1, borderColor: color.line },
-  rowImg: { width: 128, height: 104, borderRadius: radius, overflow: 'hidden', backgroundColor: color.plate },
+  row: { flexDirection: 'row', gap: 10, padding: 8, marginHorizontal: 12, marginBottom: 8, backgroundColor: color.surface, borderRadius: radius + 4, borderWidth: 1, borderColor: color.line },
+  rowImg: { width: 116, height: 92, borderRadius: radius, overflow: 'hidden', backgroundColor: color.plate },
   rowBody: { flex: 1, minWidth: 0, gap: 3 },
-  rowTitle: { flex: 1, fontFamily: font.displaySemi, color: color.ink, fontSize: 16.5, lineHeight: 20 },
+  rowTitle: { flex: 1, fontFamily: font.displaySemi, color: color.ink, fontSize: 15.5, lineHeight: 19 },
   rowHeart: { width: 30, height: 30, marginTop: -4, marginRight: -4, alignItems: 'center', justifyContent: 'center' },
   priceRow: { flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' },
-  rowPrice: { fontFamily: font.bold, color: color.tealText, fontSize: 20 },
+  rowPrice: { fontFamily: font.bold, color: color.tealText, fontSize: 18.5 },
 
   // Izgara ve vitrin kartı
   card: { backgroundColor: color.surface, borderRadius: radius + 4, overflow: 'hidden', borderWidth: 1, borderColor: color.line },
   grid: { flex: 1 },
-  wide: { width: 268 },
+  wide: { width: 208 },
   cardImg: { width: '100%', backgroundColor: color.plate },
-  heart: { position: 'absolute', top: 8, right: 8, width: 34, height: 34, borderRadius: 17, backgroundColor: 'rgba(255,255,255,0.94)', alignItems: 'center', justifyContent: 'center' },
-  cardBody: { paddingHorizontal: 10, paddingTop: 9, paddingBottom: 11, gap: 3 },
-  gridPrice: { fontFamily: font.bold, color: color.tealText, fontSize: 18.5 },
-  gridTitle: { fontFamily: font.displaySemi, color: color.ink, fontSize: 15, lineHeight: 18, minHeight: 36 },
-  widePrice: { fontFamily: font.bold, color: color.tealText, fontSize: 21 },
-  wideTitle: { fontFamily: font.displaySemi, color: color.ink, fontSize: 16.5, lineHeight: 20 },
+  heart: { position: 'absolute', top: 6, right: 6, width: 32, height: 32, borderRadius: 16, backgroundColor: 'rgba(255,255,255,0.94)', alignItems: 'center', justifyContent: 'center' },
+  cardBody: { paddingHorizontal: 9, paddingTop: 7, paddingBottom: 9, gap: 2 },
+  gridPrice: { fontFamily: font.bold, color: color.tealText, fontSize: 17 },
+  gridTitle: { fontFamily: font.displaySemi, color: color.ink, fontSize: 14, lineHeight: 17, minHeight: 34 },
+  widePrice: { fontFamily: font.bold, color: color.tealText, fontSize: 18 },
+  wideTitle: { fontFamily: font.displaySemi, color: color.ink, fontSize: 15, lineHeight: 18, minHeight: 36 },
 });

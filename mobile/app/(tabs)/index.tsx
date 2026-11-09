@@ -211,9 +211,9 @@ export default function Home() {
 
       <SectionHead title="Yeni ilanlar" action="Tümü" onAction={() => router.navigate({ pathname: '/ilanlar', params: { cat: '' } })} />
       {busy && !latest.length ? <CardSkeleton count={2} /> : null}
-      <View style={{ paddingHorizontal: 16, gap: 12 }}>
+      <View style={{ paddingHorizontal: 16, gap: 10 }}>
         {pairs.map((p) => (
-          <View key={p[0].id} style={{ flexDirection: 'row', gap: 12 }}>
+          <View key={p[0].id} style={{ flexDirection: 'row', gap: 10 }}>
             <ListingCard item={p[0]} variant="grid" />
             {p[1] ? <ListingCard item={p[1]} variant="grid" /> : <View style={{ flex: 1 }} />}
           </View>
@@ -252,38 +252,38 @@ export default function Home() {
 
 const s = StyleSheet.create({
   screen: { flex: 1, backgroundColor: color.bg },
-  hero: { backgroundColor: color.navy, paddingHorizontal: 16, paddingTop: 10, paddingBottom: 16, gap: 10, borderBottomWidth: 1, borderBottomColor: color.line },
+  hero: { backgroundColor: color.navy, paddingHorizontal: 16, paddingTop: 8, paddingBottom: 12, gap: 8, borderBottomWidth: 1, borderBottomColor: color.line },
   hello: { color: color.onNavy, fontSize: 15, lineHeight: 20 },
   searchRow: { flexDirection: 'row', gap: 8, alignItems: 'flex-start' },
   go: { backgroundColor: color.pop, borderRadius: radius + 2, paddingHorizontal: 18, height: 50, justifyContent: 'center' },
   goText: { color: color.popInk, fontFamily: font.bold, fontSize: 17 },
-  cats: { paddingHorizontal: 16, paddingTop: 16, gap: 10 },
-  cat: { width: 80, alignItems: 'center', gap: 6 },
-  catTile: { width: 78, height: 70, borderRadius: 20, backgroundColor: color.tile, borderWidth: 1, borderColor: color.line, alignItems: 'center', justifyContent: 'center' },
-  catImg: { width: 62, height: 48 },
-  catLabel: { fontFamily: font.semi, fontSize: 12.5, color: color.ink },
-  secHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginHorizontal: 16, marginTop: 24, marginBottom: 10 },
-  secTitle: { fontFamily: font.bold, fontSize: 21, color: color.ink, flexShrink: 1 },
+  cats: { paddingHorizontal: 16, paddingTop: 12, gap: 8 },
+  cat: { width: 70, alignItems: 'center', gap: 5 },
+  catTile: { width: 68, height: 58, borderRadius: 18, backgroundColor: color.tile, borderWidth: 1, borderColor: color.line, alignItems: 'center', justifyContent: 'center' },
+  catImg: { width: 54, height: 41 },
+  catLabel: { fontFamily: font.semi, fontSize: 12, color: color.ink },
+  secHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginHorizontal: 16, marginTop: 18, marginBottom: 8 },
+  secTitle: { fontFamily: font.bold, fontSize: 19, color: color.ink, flexShrink: 1 },
   secBtn: { flexDirection: 'row', alignItems: 'center', gap: 2, height: 32, paddingLeft: 12, paddingRight: 8, borderRadius: 16, backgroundColor: color.tealSoft },
   secAction: { fontFamily: font.semi, fontSize: 13.5, color: color.tealText },
-  svc: { marginHorizontal: 16, flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', rowGap: 10 },
-  svcCard: { width: '48.5%', minHeight: 66, flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 10, paddingHorizontal: 10, borderRadius: radius + 4, backgroundColor: color.surface, borderWidth: 1, borderColor: color.line },
-  svcIcon: { width: 38, height: 38, borderRadius: 12, backgroundColor: color.tealSoft, alignItems: 'center', justifyContent: 'center' },
-  svcT: { fontFamily: font.bold, fontSize: 15.5, lineHeight: 18, color: color.ink, flexShrink: 1 },
+  svc: { marginHorizontal: 16, flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', rowGap: 8 },
+  svcCard: { width: '48.8%', minHeight: 56, flexDirection: 'row', alignItems: 'center', gap: 9, paddingVertical: 8, paddingHorizontal: 10, borderRadius: radius + 4, backgroundColor: color.surface, borderWidth: 1, borderColor: color.line },
+  svcIcon: { width: 34, height: 34, borderRadius: 11, backgroundColor: color.tealSoft, alignItems: 'center', justifyContent: 'center' },
+  svcT: { fontFamily: font.bold, fontSize: 14.5, lineHeight: 17, color: color.ink, flexShrink: 1 },
   svcS: { fontSize: 12, color: color.muted },
   tag: { borderRadius: 6, paddingHorizontal: 5, paddingVertical: 1, backgroundColor: color.plate },
   tagT: { fontFamily: font.textBold, fontSize: 9.5, color: color.ink },
-  sum: { flexDirection: 'row', marginHorizontal: 16, marginTop: 16, backgroundColor: color.surface, borderRadius: radius + 4, borderWidth: 1, borderColor: color.line },
-  sumCell: { flex: 1, paddingVertical: 12, paddingHorizontal: 14, gap: 2 },
+  sum: { flexDirection: 'row', marginHorizontal: 16, marginTop: 12, backgroundColor: color.surface, borderRadius: radius + 4, borderWidth: 1, borderColor: color.line },
+  sumCell: { flex: 1, paddingVertical: 9, paddingHorizontal: 14, gap: 2 },
   sumSep: { borderLeftWidth: 1, borderLeftColor: color.line },
-  sumN: { fontFamily: font.bold, fontSize: 25, lineHeight: 28, color: color.ink },
+  sumN: { fontFamily: font.bold, fontSize: 22, lineHeight: 25, color: color.ink },
   sumL: { fontSize: 12.5, color: color.muted },
-  guest: { flexDirection: 'row', alignItems: 'center', gap: 12, marginHorizontal: 16, marginTop: 16, padding: 14, backgroundColor: color.surface, borderRadius: radius + 4, borderWidth: 1, borderColor: color.line },
+  guest: { flexDirection: 'row', alignItems: 'center', gap: 12, marginHorizontal: 16, marginTop: 12, padding: 12, backgroundColor: color.surface, borderRadius: radius + 4, borderWidth: 1, borderColor: color.line },
   guestT: { fontFamily: font.semi, color: color.ink, fontSize: 15 },
   guestS: { color: color.muted, fontSize: 14, marginTop: 2 },
   guestBtn: { backgroundColor: color.teal, paddingHorizontal: 16, minHeight: 42, justifyContent: 'center', borderRadius: 21 },
   guestBtnT: { color: color.tealInk, fontFamily: font.bold, fontSize: 15 },
-  rail: { paddingHorizontal: 16, gap: 12 },
+  rail: { paddingHorizontal: 16, gap: 10 },
   cta: { flexDirection: 'row', alignItems: 'center', gap: 12, marginHorizontal: 16, marginTop: 24, paddingVertical: 14, paddingHorizontal: 16, backgroundColor: color.navyDeep, borderRadius: radius + 4 },
   ctaT: { fontFamily: font.bold, fontSize: 19, color: color.accentInk },
   ctaS: { fontSize: 13.5, color: color.onDeepMuted },
