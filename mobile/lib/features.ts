@@ -52,7 +52,7 @@ export const FEATURES: Feature[] = [
   { id: 'saved', title: 'Kayıtlı aramalar', sub: 'Kaydettiğin aramalar', icon: 'bookmark', needsLogin: true, words: 'kayıtlı arama saved searches gespeicherte suchen', run: open('/kayitli-aramalar') },
   { id: 'compare', title: 'Karşılaştır', sub: 'İlanları yan yana gör', icon: 'columns', words: 'karşılaştır karşılaştırma compare vergleichen', run: open('/karsilastir') },
   { id: 'parts', title: 'Yedek parça', sub: 'Numaraya göre ara', icon: 'settings', words: 'yedek parça lastik filtre pompa spare parts tyres ersatzteile reifen', run: open('/yedek-parca') },
-  { id: 'map', title: 'İl haritası', sub: 'İllere göre ilan dağılımı', icon: 'map', words: 'harita il şehir map province karte', run: open('/harita') },
+  { id: 'map', title: 'İllere göre ilanlar', sub: 'Hangi ilde kaç ilan var', icon: 'map', words: 'harita il şehir map province karte', run: open('/harita') },
   { id: 'premium', title: 'Premium tarifeler', sub: 'Üstte görün, daha çok iş bul', icon: 'award', words: 'premium üyelik abonelik tarife paket fiyat limit hak reklamsız membership subscription plan abo mitgliedschaft', run: open('/premium') },
   { id: 'assistant', title: 'Yapay zeka asistanı', sub: 'Profilini ve ilanlarını güçlendir', icon: 'cpu', words: 'yapay zeka asistan ai öneri yardım chatgpt claude bot assistant ki assistent', run: open('/asistan') },
   // İş ağı

@@ -10,11 +10,10 @@ export default function CityMap() {
   const [counts, setCounts] = useState<[string, number][] | null>(null);
   const [error, setError] = useState('');
   useEffect(() => {
-    void supabase.from('listings').select('city').eq('status', 'active').eq('moderation_status', 'approved').limit(5000).then(({ data, error: e }) => {
-      if (e || !data) { setError('İl dağılımı yüklenemedi.'); return; }
-      const c: Record<string, number> = {};
-      for (const r of data as { city: string }[]) c[r.city] = (c[r.city] ?? 0) + 1;
-      setCounts(Object.entries(c).sort((a, b) => b[1] - a[1]));
+    // Sayım sunucuda yapılır; ilan sayısı ne kadar büyük olursa olsun doğru sonuç verir.
+    void supabase.rpc('listing_city_counts').then(({ data, error: e }) => {
+      if (e || !data) { setError('İl dağılımı yüklenemedi. Lütfen sayfayı yenileyin.'); return; }
+      setCounts((data as { city: string; n: number }[]).map((r) => [r.city, Number(r.n)] as [string, number]));
     });
   }, []);
   if (error) return <Text style={common.empty}>{error}</Text>;
@@ -25,7 +24,7 @@ export default function CityMap() {
       style={common.screen}
       data={counts}
       keyExtractor={([c]) => c}
-      ListHeaderComponent={<Text style={[common.meta, { padding: 12 }]}>İllere göre ilan dağılımı. Bir ile dokununca o ildeki ilanlar açılır.</Text>}
+      ListHeaderComponent={<Text style={[common.meta, { padding: 12 }]}>Yayındaki ilanların illere göre sayısı. Bir ile dokununca o ildeki ilanlar açılır.</Text>}
       ListEmptyComponent={<Text style={common.empty}>Henüz ilan yok.</Text>}
       renderItem={({ item: [city, n] }) => (
         <Pressable style={[common.card, { marginHorizontal: 12, marginBottom: 6 }]} onPress={() => router.push({ pathname: '/ilanlar', params: { city } })} accessibilityRole="button">

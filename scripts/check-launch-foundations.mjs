@@ -26,6 +26,10 @@ console.log('Launch foundations: CSV parsing/draft validation, server search par
 const id='10000000-0000-4000-8000-000000000001';
 assert.equal(notificationHref('/mesajlar/'+id),'/mesajlar/'+id);
 assert.equal(notificationHref('/ilanlar/'+id),'/ilanlar/'+id);
+assert.equal(notificationHref('/ag/ilan/'+id),'/is-agi/ilan/'+id);
+assert.equal(notificationHref('/destek'),'/destek');
+assert.equal(notificationHref('/kayitli-aramalar'),'/bildirimler');
+assert.equal(notificationHref('/ag/ilan/'+id+'/x'),'/bildirimler');
 for(const url of ['//evil.invalid','https://evil.invalid','javascript:alert(1)','/mesajlar/'+id+'?next=//evil.invalid','/ilanlar/invalid','/\\evil.invalid'])assert.equal(notificationHref(url),'/bildirimler');
 const pending=rowToListing({id,seller_id:id,category:'Ekskavatör',title:'Draft',price:1000,city:'Ankara',status:'active',moderation_status:'pending',created_at:'2026-10-18T00:00:00Z',listing_photos:[]},path=>path);
 assert.equal(pending.moderation,'pending');

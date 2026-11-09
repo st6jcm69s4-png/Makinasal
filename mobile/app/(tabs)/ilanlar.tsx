@@ -58,20 +58,29 @@ export default function Listings() {
     if (!session) return;
     void supabase.from('profiles').select('city').eq('id', session.user.id).maybeSingle().then((r) => { const c = (r.data as { city?: string | null } | null)?.city; if (c && COORDS[c]) setMyCity(c); });
   }, [session]);
-  const params = useLocalSearchParams<{ q?: string; cat?: string; city?: string; maxPrice?: string; brand?: string; n?: string }>();
+  const params = useLocalSearchParams<{ q?: string; cat?: string; city?: string; maxPrice?: string; brand?: string; n?: string; adv?: string }>();
   useEffect(() => {
     if (params.q !== undefined) setQ(params.q);
     if (params.cat !== undefined) setCat(params.cat);
     if (params.city) setCity(params.city);
     if (params.maxPrice) setMaxPrice(params.maxPrice);
     if (params.brand !== undefined) setAdv((a) => ({ ...a, brand: params.brand ?? '' }));
-  }, [params.q, params.cat, params.city, params.maxPrice, params.brand, params.n]);
+    // Kayıtlı aramadan gelen tüm gelişmiş filtreler
+    if (params.adv) {
+      try {
+        const p = JSON.parse(params.adv) as Partial<Adv>;
+        setAdv({ ...NO_ADV, ...Object.fromEntries(Object.entries(p).filter(([k]) => k in NO_ADV)) } as Adv);
+      } catch { /* bozuk parametre: yok say */ }
+    }
+  }, [params.q, params.cat, params.city, params.maxPrice, params.brand, params.n, params.adv]);
 
   async function saveSearch() {
     if (!session) { askLogin('Aramayı kaydedip yeni ilanlardan haberdar olmak için giriş yapman gerekir.'); return; }
-    const f = { cat: cat && !cat.startsWith('group:') ? cat : 'Tümü', city, maxPrice: Number(maxPrice), q: q.trim(), brand: adv.brand, unit: adv.unit, useMin: adv.useMin, useMax: adv.useMax, yMin: adv.yMin, yMax: adv.yMax, minScore: adv.minScore, incNew: true, ver: adv.ver, hide: adv.hide, takas: adv.takas, near: adv.near };
+    const f = { catRaw: cat, cat: cat && !cat.startsWith('group:') ? cat : 'Tümü', city, maxPrice: Number(maxPrice), q: q.trim(), brand: adv.brand, unit: adv.unit, useMin: adv.useMin, useMax: adv.useMax, yMin: adv.yMin, yMax: adv.yMax, minScore: adv.minScore, incNew: true, ver: adv.ver, hide: adv.hide, takas: adv.takas, near: adv.near };
     // Sunucu yarım saatte bir bu parametrelerle yeni ilan arar ve bildirim gönderir.
-    const params = { q: q.trim(), categories: cat ? categoryValues(cat) : [], city, maxPrice: Number(maxPrice), part: cat === 'Yedek parça' || cat === 'Lastik ve jant' || cat === 'group:parts', brand: adv.brand, yMin: adv.yMin, yMax: adv.yMax, useMin: adv.useMin, useMax: adv.useMax, unit: adv.unit, minScore: adv.minScore, incNew: true, ver: adv.ver, hide: adv.hide, takas: adv.takas };
+    const params = { q: q.trim(), categories: cat ? categoryValues(cat) : [], city, maxPrice: Number(maxPrice), part: cat === 'Yedek parça' || cat === 'Lastik ve jant' || cat === 'group:parts', brand: adv.brand, yMin: adv.yMin, yMax: adv.yMax, useMin: adv.useMin, useMax: adv.useMax, unit: adv.unit, minScore: adv.minScore, incNew: true, ver: adv.ver, hide: adv.hide, takas: adv.takas,
+      // Yakınlık filtresi bildirimde de korunsun (yalnızca açıksa, boyutu küçük tutmak için)
+      ...(adv.near ? { near: adv.near, distances: Object.fromEntries(Object.keys(COORDS).map((c) => [c, distanceKm(myCity, c) ?? 99999])) } : {}) };
     let { error: e } = await supabase.from('saved_searches').insert({ user_id: session.user.id, query: { f }, params, notify: true });
     if (e && /params|notify/.test(e.message)) ({ error: e } = await supabase.from('saved_searches').insert({ user_id: session.user.id, query: { f } }));
     Alert.alert('Aramayı kaydet', e ? (/limit/i.test(e.message) ? 'Kayıtlı arama sınırına ulaştın. Eskilerden birini sil.' : 'Arama kaydedilemedi. Tekrar dene.') : 'Arama kaydedildi. Bu aramaya uyan yeni ilan gelince sana bildirim göndereceğiz.');
@@ -114,7 +123,7 @@ export default function Listings() {
         <FChip icon="list" label={SORTS.find((o) => o.value === sort)?.label ?? 'Sırala'} drop onPress={() => setSheet('sort')} />
         <FChip icon="bookmark" label="Aramayı kaydet" onPress={() => void saveSearch()} />
         <FChip icon="settings" label="Yedek parça" onPress={() => router.push('/yedek-parca')} />
-        <FChip icon="map" label="İl haritası" onPress={() => router.push('/harita')} />
+        <FChip icon="map" label="İllere göre" onPress={() => router.push('/harita')} />
       </ScrollView>
       <PickerModal visible={sheet === 'cat'} title="Kategori" selected={cat} options={[{ value: '', label: 'Tümü' }, ...CATEGORY_GROUPS.map((g) => ({ value: 'group:' + g.id, label: g.label + ' (tümü)' })), ...CATEGORY_GROUPS.flatMap((g) => g.categories).map((c) => ({ value: c, label: c }))]} onPick={setCat} onClose={() => setSheet(null)} />
       <PickerModal visible={sheet === 'city'} title="İl" selected={city} options={['Tümü', ...CITIES].map((c) => ({ value: c, label: c }))} onPick={setCity} onClose={() => setSheet(null)} />

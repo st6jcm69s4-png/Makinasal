@@ -1,6 +1,6 @@
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Alert, FlatList, KeyboardAvoidingView, Pressable, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Alert, FlatList, KeyboardAvoidingView, Pressable, StyleSheet, View } from 'react-native';
 import { PlainText, Text, TextInput } from '../../components/LText';
 import { Icon } from '../../components/Icon';
 import { tr } from '../../lib/i18n';
@@ -23,6 +23,9 @@ const REASONS = [
 ];
 const hhmm = (iso: string) => { const d = new Date(iso); return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`; };
 const PAGE = 50;
+/** Tekrar göndermede aynı mesajın iki kez yazılmaması için istemci tarafı kimlik (UUID v4). */
+const uuid = () => 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => { const r = (Math.random() * 16) | 0; return (c === 'x' ? r : (r & 0x3) | 0x8).toString(16); });
+const merge = (a: Msg[], b: Msg[]) => { const seen = new Set<string>(); return [...a, ...b].filter((m) => (seen.has(m.id) ? false : (seen.add(m.id), true))).sort((x, y) => y.created_at.localeCompare(x.created_at)); };
 
 export default function Thread() {
   const insets = useSafeAreaInsets();
@@ -30,6 +33,10 @@ export default function Thread() {
   const { session } = useApp();
   const me = session?.user.id;
   const [msgs, setMsgs] = useState<Msg[]>([]);
+  const [older, setOlder] = useState<Msg[]>([]);
+  const [hasMore, setHasMore] = useState(true);
+  const [loadingOlder, setLoadingOlder] = useState(false);
+  const pending = useRef<{ body: string; id: string } | null>(null);
   const [info, setInfo] = useState<ThreadInfo | null>(null);
   const [text, setText] = useState('');
   const [error, setError] = useState('');
@@ -73,7 +80,9 @@ export default function Thread() {
     if (!alive.current) return;
     if (e) { setError('Mesajlar yüklenemedi. Bağlantını kontrol et.'); return; }
     setError('');
-    setMsgs((data ?? []) as Msg[]); // en yeni en üstte (liste ters çevrilmiş gösterilir)
+    const rows = (data ?? []) as Msg[];
+    setMsgs(rows); // en yeni en üstte (liste ters çevrilmiş gösterilir)
+    if (rows.length < PAGE) setHasMore(false);
     void supabase.rpc('mark_thread_read', { p_thread: id });
   }, [id]);
 
@@ -91,17 +100,41 @@ export default function Thread() {
     return () => { alive.current = false; clearInterval(t); };
   }, [load]);
 
+  /** Yukarı kaydırınca daha eski mesajları getirir. */
+  async function loadOlder() {
+    if (loadingOlder || !hasMore) return;
+    const all = merge(msgs, older);
+    const oldest = all[all.length - 1];
+    if (!oldest) return;
+    setLoadingOlder(true);
+    const r = await supabase.from('messages').select('id,sender_id,body,created_at,kind,offer_amount')
+      .eq('thread_id', id).lt('created_at', oldest.created_at).order('created_at', { ascending: false }).limit(PAGE);
+    setLoadingOlder(false);
+    if (r.error) return;
+    const rows = (r.data ?? []) as Msg[];
+    setOlder((cur) => merge(cur, rows));
+    if (rows.length < PAGE) setHasMore(false);
+  }
+
   async function reallySend(body: string) {
     if (!me) return;
+    // Aynı metin yeniden gönderilirse aynı kimlik kullanılır; sunucu ikinciyi reddeder (23505), çift mesaj oluşmaz.
+    if (!pending.current || pending.current.body !== body) pending.current = { body, id: uuid() };
+    const messageId = pending.current.id;
     setBusy(true); setError('');
-    const { error: e } = await supabase.from('messages').insert({ thread_id: id, sender_id: me, body });
+    let e: { message: string; code?: string } | null = null;
+    try {
+      ({ error: e } = await supabase.from('messages').insert({ id: messageId, thread_id: id, sender_id: me, body }));
+    } catch { e = { message: 'NETWORK' }; }
     setBusy(false);
+    if (e && e.code === '23505') e = null; // önceki deneme zaten ulaşmış
     if (e) {
       setError(e.message.includes('MESSAGE_BLOCKED') ? 'Bu kullanıcıyla mesajlaşma kapalı.' : e.message.includes('MESSAGE_PROFANITY') ? 'Küfür veya hakaret içeren mesaj gönderilemez. Lütfen mesajını düzenle.'
         : /RATE_LIMIT/.test(e.message) ? 'Çok fazla mesaj gönderdin. Bir dakika sonra tekrar dene.' : 'Mesaj gönderilemedi. Yazdığın mesaj korunuyor.');
       return;
     }
-    setText('');
+    if (pending.current?.id === messageId) pending.current = null;
+    setText((cur) => (cur.trim() === body ? '' : cur));
     void load();
   }
 
@@ -138,8 +171,11 @@ export default function Thread() {
       {info && me ? <DealBox threadId={id} me={me} buyerId={info.buyer_id} sellerId={info.seller_id} /> : null}
       <FlatList
         inverted
-        data={msgs}
+        data={merge(msgs, older)}
         keyExtractor={(m) => m.id}
+        onEndReached={() => void loadOlder()}
+        onEndReachedThreshold={0.3}
+        ListFooterComponent={loadingOlder ? <ActivityIndicator style={{ marginVertical: 10 }} color={color.teal} /> : !hasMore && msgs.length >= PAGE ? <Text style={s.empty}>Konuşmanın başı</Text> : null}
         contentContainerStyle={{ paddingHorizontal: 14, paddingVertical: 12, gap: 6 }}
         ListEmptyComponent={<Text style={s.empty}>Henüz mesaj yok. İlk mesajı sen yaz.</Text>}
         renderItem={({ item }) => {

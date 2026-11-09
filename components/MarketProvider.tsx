@@ -295,7 +295,13 @@ export function MarketProvider({ children }: { children: ReactNode }) {
     const now = new Date().toISOString();
     const supabase = getSupabase();
     if (supabase && profile) {
-      const ins = await supabase.from('saved_searches').insert({ user_id: profile.id, query: { f } }).select('id').single();
+      // Sunucu bildirimi bu parametrelerle eşleştirir (mobil ile aynı şema). Uzaklık yalnızca filtre açıksa saklanır.
+      const req = searchRequest(f, 'new', 1, myCity);
+      const rest: Record<string, unknown> = { ...req };
+      for (const k of ['page', 'since', 'sort', 'distances']) delete rest[k];
+      const params = Number(f.near) > 0 ? { ...rest, distances: req.distances } : rest;
+      let ins = await supabase.from('saved_searches').insert({ user_id: profile.id, query: { f }, params, notify: true }).select('id').single();
+      if (ins.error && /params|notify/.test(ins.error.message)) ins = await supabase.from('saved_searches').insert({ user_id: profile.id, query: { f } }).select('id').single();
       if (ins.error) { toast('Arama kaydedilemedi: ' + ins.error.message); return; }
       await loadUserData(profile.id);
     } else {
@@ -304,7 +310,7 @@ export function MarketProvider({ children }: { children: ReactNode }) {
       setSaved(next.map((s) => ({ ...s, local: true })));
     }
     toast("Arama kaydedildi. Favoriler sekmesinde görebilirsin.");
-  }, [profile, toast, loadUserData]);
+  }, [profile, toast, loadUserData, myCity]);
 
   const patchSaved = useCallback(async (id: string, patch: Partial<{ notify: boolean; lastSeen: string }>) => {
     setSaved((cur) => cur.map((s) => (s.id === id ? { ...s, ...patch } : s)));

@@ -101,7 +101,7 @@ function Member() {
         <Group title="Keşfet ve destek" items={[
           { icon: 'tool', label: 'Yedek parça', go: go('/yedek-parca') },
           { icon: 'life-buoy', label: 'Çekici bul', sub: 'En yakın çekiciler, puanlarıyla', go: go('/cekici') },
-          { icon: 'map', label: 'İl haritası', go: go('/harita') },
+          { icon: 'map', label: 'İllere göre ilanlar', go: go('/harita') },
           { icon: 'file-text', label: 'Hukuki bilgiler ve veri haklarım', go: go('/hukuki') },
           { icon: 'settings', label: 'Ayarlar ve yardım', go: go('/ayarlar') },
         ]} />
@@ -187,7 +187,7 @@ export default function Account() {
           <View style={s.guestCard}>
             <View style={s.guestCol}>
               <Text style={s.guestH}>Yapabilirsin</Text>
-              {['İlanları ve kategorileri gezmek', 'Yedek parça ve çekici aramak', 'İş ağı ilanlarına ve firmalara bakmak', 'İl haritasını görmek'].map((t) => <View key={t} style={s.guestRow}><Icon name="check" size={15} color={color.good} /><Text style={s.guestT}>{t}</Text></View>)}
+              {['İlanları ve kategorileri gezmek', 'Yedek parça ve çekici aramak', 'İş ağı ilanlarına ve firmalara bakmak', 'İllere göre ilanları görmek'].map((t) => <View key={t} style={s.guestRow}><Icon name="check" size={15} color={color.good} /><Text style={s.guestT}>{t}</Text></View>)}
             </View>
             <View style={[s.guestCol, { borderLeftWidth: 1, borderLeftColor: color.line }]}>
               <Text style={s.guestH}>Giriş gerekir</Text>
@@ -197,7 +197,7 @@ export default function Account() {
         </View>
         <Group title="Giriş yapmadan" items={[
           { icon: 'tool', label: 'Yedek parça ara', go: () => router.push('/yedek-parca') },
-          { icon: 'map', label: 'İl haritası', go: () => router.push('/harita') },
+          { icon: 'map', label: 'İllere göre ilanlar', go: () => router.push('/harita') },
           { icon: 'life-buoy', label: 'Yardım ve hukuki bilgiler', go: () => router.push('/destek') },
         ]} />
       </View>

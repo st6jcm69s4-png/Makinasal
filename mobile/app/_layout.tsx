@@ -59,7 +59,7 @@ function Screens() {
         <Stack.Screen name="sifremi-unuttum" options={{ title: T('Şifremi unuttum') }} />
         <Stack.Screen name="sifre-degistir" options={{ title: T('Şifreyi değiştir') }} />
         <Stack.Screen name="hesap-dogrula" options={{ title: T('Hesap güvenliği') }} />
-        <Stack.Screen name="harita" options={{ title: T('İl haritası') }} />
+        <Stack.Screen name="harita" options={{ title: T('İllere göre ilanlar') }} />
         <Stack.Screen name="yonetim" options={{ title: T('Yönetim') }} />
         <Stack.Screen name="ayarlar" options={{ title: T('Ayarlar') }} />
         <Stack.Screen name="ara" options={{ title: T('Uygulamada ara') }} />
