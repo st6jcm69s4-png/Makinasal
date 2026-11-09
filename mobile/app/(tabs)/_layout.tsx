@@ -1,6 +1,6 @@
 import { Tabs, router } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Pressable, View, type ColorValue } from 'react-native';
+import { Pressable, StyleSheet, View, type ColorValue } from 'react-native';
 import { Icon, type IconName } from '../../components/Icon';
 import { PlainText } from '../../components/LText';
 import { BrandMark } from '../../components/BrandMark';
@@ -48,10 +48,10 @@ const postIcon = () => (
 /** Başlıktaki yuvarlak simge düğmesi (isteğe bağlı sayı rozeti). */
 function HeadBtn({ icon, label, badge, onPress }: { icon: IconName; label: string; badge?: number; onPress: () => void }) {
   return (
-    <Pressable onPress={onPress} hitSlop={6} accessibilityRole="button" accessibilityLabel={badge ? `${label}, ${badge}` : label} style={({ pressed }) => [{ width: 42, height: 42, borderRadius: 21, alignItems: 'center', justifyContent: 'center', backgroundColor: pressed ? color.plate : color.surface, borderWidth: 1, borderColor: color.line }]}>
-      <Icon name={icon} size={20} color={color.ink} />
+    <Pressable onPress={onPress} hitSlop={6} accessibilityRole="button" accessibilityLabel={badge ? `${label}, ${badge}` : label} style={({ pressed }) => [{ width: 38, height: 38, borderRadius: 19, alignItems: 'center', justifyContent: 'center', backgroundColor: color.navy2 }, pressed && { opacity: 0.7 }]}>
+      <Icon name={icon} size={19} color={color.onBar} />
       {badge ? (
-        <View style={{ position: 'absolute', top: -4, right: -4, minWidth: 18, height: 18, paddingHorizontal: 4, borderRadius: 9, backgroundColor: color.pop, borderWidth: 2, borderColor: color.surface, alignItems: 'center', justifyContent: 'center' }}>
+        <View style={{ position: 'absolute', top: -3, right: -5, minWidth: 18, height: 18, paddingHorizontal: 4, borderRadius: 9, backgroundColor: color.pop, borderWidth: 2, borderColor: color.navy, alignItems: 'center', justifyContent: 'center' }}>
           <PlainText style={{ color: color.popInk, fontSize: 10, fontFamily: font.textBold }}>{badge > 99 ? '99+' : String(badge)}</PlainText>
         </View>
       ) : null}
@@ -64,7 +64,7 @@ function Logo() {
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
       <BrandMark size={28} />
-      <PlainText style={{ color: color.onBar, fontSize: 21, fontFamily: font.bold, letterSpacing: 1.6 }}>MAKİNA<PlainText style={{ color: color.tealText, fontSize: 21, fontFamily: font.bold, letterSpacing: 1.6 }}>SAL</PlainText></PlainText>
+      <PlainText style={{ color: color.onBar, fontSize: 21, fontFamily: font.bold, letterSpacing: 1.6 }}>MAKİNA<PlainText style={{ color: color.barActive, fontSize: 21, fontFamily: font.bold, letterSpacing: 1.6 }}>SAL</PlainText></PlainText>
     </View>
   );
 }
@@ -100,7 +100,7 @@ export default function TabsLayout() {
         // Dokunmada geçiş anında; kaydırmada animasyonu SwipeTabs yürütür
         animation: 'none',
         sceneStyle: { backgroundColor: color.bg },
-        headerStyle: { backgroundColor: color.navy, borderBottomWidth: 2, borderBottomColor: color.pop } as object,
+        headerStyle: { backgroundColor: color.navy, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: color.navy2 } as object,
         headerTintColor: color.onBar,
         headerShadowVisible: false,
         headerTitleAlign: 'left',
