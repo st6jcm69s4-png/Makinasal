@@ -5,10 +5,11 @@ import { Text, TextInput } from './LText';
 import { color } from '../lib/theme';
 
 /**
- * iPhone'da seçim listesi telefonun kendi alttan açılan penceresiyle (yarım / tam boy, aşağı çekerek kapanır)
- * gösterilir (@expo/ui). Sorun çıkarsa false yapılır: eski React Native penceresine döner.
+ * Seçim listesi telefonun kendi alttan açılan penceresiyle gösterilir (@expo/ui):
+ * iPhone'da SwiftUI, Android'de Material pencere. Yarım / tam boy, aşağı çekerek veya geri tuşuyla kapanır.
+ * Sorun çıkarsa false yapılır: eski React Native penceresine döner.
  */
-const NATIVE_SHEET = Platform.OS === 'ios';
+const NATIVE_SHEET = Platform.OS === 'ios' || Platform.OS === 'android';
 
 export type Option = { value: string; label: string };
 const norm = (v: string) => v.toLocaleLowerCase('tr-TR').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/ı/g, 'i').replace(/[^a-z0-9]/g, '');

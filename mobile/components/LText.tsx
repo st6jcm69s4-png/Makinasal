@@ -1,11 +1,12 @@
 import { Children, createContext, useContext, type ReactNode } from 'react';
-import { StyleSheet, Text as RNText, TextInput as RNTextInput, type TextInputProps, type TextProps } from 'react-native';
+import { StyleSheet, Text as RNText, TextInput as RNTextInput, type TextInputProps, type TextProps, Platform } from 'react-native';
 import { color, font, fontState } from '../lib/theme';
 import { tr } from '../lib/i18n';
 import { useLang } from '../lib/lang';
 
 /** Varsayılan yazı rengi (koyu görünümde siyah metin kalmasın); ekranlardaki renkler bunu ezer. */
-const base = { color: color.ink };
+// Android yazının üstüne fazladan boşluk ekler (Inter'de yazı aşağı kayık görünür); iPhone ile aynı hizaya getir.
+const base = Platform.OS === 'android' ? { color: color.ink, includeFontPadding: false } : { color: color.ink };
 const walk = (c: ReactNode): ReactNode => (typeof c === 'string' ? tr(c) : Array.isArray(c) ? Children.map(c, (x) => (typeof x === 'string' ? tr(x) : x)) : c);
 
 /** Ağırlığa göre Inter ailesini seçer; ekranda başka yazı tipi istenmişse dokunmaz. */

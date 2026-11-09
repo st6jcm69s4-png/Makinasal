@@ -1,7 +1,7 @@
 // Küçük arayüz kiti: shadcn/ui'daki Badge, Alert, Skeleton, Tabs, Avatar, Progress, Separator
 // kalıplarının React Native uyarlaması. Renkler ve 4px köşe Makinasal'a aittir.
 import { useEffect, useRef } from 'react';
-import { Animated, Pressable, StyleSheet, View, type ViewStyle } from 'react-native';
+import { Animated, Pressable, ScrollView, StyleSheet, View, type ViewStyle } from 'react-native';
 import { PlainText, Text } from './LText';
 import { Icon, type IconName } from './Icon';
 import { color, font, radius } from '../lib/theme';
@@ -124,27 +124,33 @@ export function FormSkeleton({ count = 6 }: { count?: number }) {
 export type TabItem<T extends string> = { id: T; label: string; count?: number; icon?: IconName };
 /** variant "filled": seçili sekme lacivert (ana bölüm anahtarı). "line": altı çizgili (alt bölümler). */
 export function Tabs<T extends string>({ items, value, onChange, variant = 'filled' }: { items: TabItem<T>[]; value: T; onChange: (v: T) => void; variant?: 'filled' | 'line' }) {
-  return (
-    <View style={[k.tabs, variant === 'line' && { backgroundColor: color.bg }]} accessibilityRole="tablist">
-      {items.map((t, i) => {
+  // 4 ve daha fazla sekme sığmaz: yatay kaydırılır, her sekme yazısı kadar geniş olur (kelime bölünmez).
+  const scroll = items.length > 3;
+  const body = items.map((t, i) => {
         const on = t.id === value;
         const filled = variant === 'filled';
         return (
           <Pressable
             key={t.id}
-            style={[k.tab, filled ? { backgroundColor: on ? color.teal : 'transparent' } : { borderBottomWidth: 3, borderBottomColor: on ? color.accent : 'transparent' }]}
+            style={[k.tab, scroll && k.tabScroll, filled ? { backgroundColor: on ? color.teal : 'transparent' } : { borderBottomWidth: 3, borderBottomColor: on ? color.accent : 'transparent' }]}
             onPress={() => onChange(t.id)} accessibilityRole="tab" accessibilityState={{ selected: on }}
           >
             {filled && i > 0 && !on && items[i - 1].id !== value ? <View style={k.tabDivider} /> : null}
             {t.icon ? <Icon name={t.icon} size={16} color={on && filled ? color.tealInk : on ? color.accentText : color.muted} /> : null}
-            <Text style={[k.tabText, { color: on ? (filled ? color.tealInk : color.ink) : color.muted }]}>{t.label}</Text>
+            <Text numberOfLines={1} style={[k.tabText, !scroll && { flexShrink: 1 }, { color: on ? (filled ? color.tealInk : color.ink) : color.muted }]}>{t.label}</Text>
             {t.count ? (on && filled
               ? <View style={[k.badge, { backgroundColor: color.tealInk, borderColor: color.tealInk }]}><Text style={[k.badgeText, { color: color.teal }]}>{String(t.count)}</Text></View>
               : <Badge variant="default">{t.count}</Badge>) : null}
           </Pressable>
         );
-      })}
+      });
+  const style = [k.tabs, variant === 'line' && { backgroundColor: color.bg }];
+  return scroll ? (
+    <View style={style} accessibilityRole="tablist">
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ flexGrow: 1 }}>{body}</ScrollView>
     </View>
+  ) : (
+    <View style={style} accessibilityRole="tablist">{body}</View>
   );
 }
 
@@ -179,6 +185,7 @@ const k = StyleSheet.create({
   tabs: { flexDirection: 'row', backgroundColor: color.surface, borderBottomWidth: 1, borderBottomColor: color.line },
   tabDivider: { position: 'absolute', left: 0, top: 10, bottom: 10, width: StyleSheet.hairlineWidth, backgroundColor: color.line },
   tab: { flex: 1, minHeight: 48, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingHorizontal: 6 },
+  tabScroll: { flex: 0, flexGrow: 1, paddingHorizontal: 14 },
   tabText: { fontSize: 14.5, fontFamily: font.bold },
   progress: { height: 8, backgroundColor: color.plate, borderWidth: 1, borderColor: color.line, overflow: 'hidden' },
 });
