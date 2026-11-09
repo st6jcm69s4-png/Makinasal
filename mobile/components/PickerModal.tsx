@@ -1,7 +1,14 @@
 import { useState } from 'react';
-import { FlatList, KeyboardAvoidingView, Modal, Pressable, StyleSheet, View } from 'react-native';
+import { FlatList, KeyboardAvoidingView, Modal, Platform, Pressable, StyleSheet, View } from 'react-native';
+import { BottomSheet, RNHostView } from '@expo/ui';
 import { Text, TextInput } from './LText';
 import { color } from '../lib/theme';
+
+/**
+ * iPhone'da seçim listesi telefonun kendi alttan açılan penceresiyle (yarım / tam boy, aşağı çekerek kapanır)
+ * gösterilir (@expo/ui). Sorun çıkarsa false yapılır: eski React Native penceresine döner.
+ */
+const NATIVE_SHEET = Platform.OS === 'ios';
 
 export type Option = { value: string; label: string };
 const norm = (v: string) => v.toLocaleLowerCase('tr-TR').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/ı/g, 'i').replace(/[^a-z0-9]/g, '');
@@ -18,6 +25,58 @@ export function PickerModal({ visible, title, options, selected, onPick, onClose
   const term = norm(q);
   const shown = term ? options.filter((o) => norm(o.label).includes(term)) : options;
   const custom = allowCustom && q.trim() && !options.some((o) => norm(o.label) === term) ? q.trim() : '';
+  const list = (
+    <FlatList
+      data={shown}
+      nestedScrollEnabled
+      style={NATIVE_SHEET ? { flex: 1 } : undefined}
+      keyboardShouldPersistTaps="handled"
+      keyExtractor={(o) => o.value || '_empty'}
+      ListHeaderComponent={custom ? (
+        <Pressable style={s.row} onPress={() => { onPick(custom); close(); }} accessibilityRole="button">
+          <Text style={[s.label, s.sel]}>Bunu kullan: “{custom}”</Text>
+        </Pressable>
+      ) : undefined}
+      renderItem={({ item }) => (
+        <Pressable style={({ pressed }) => [s.row, pressed && { backgroundColor: color.plate }]} onPress={() => { onPick(item.value); close(); }} accessibilityRole="button" accessibilityState={{ selected: item.value === selected }}>
+          <Text style={[s.label, item.value === selected && s.sel]}>{item.label}{item.value === selected ? '  ✓' : ''}</Text>
+        </Pressable>
+      )}
+    />
+  );
+  const head = (
+    <>
+      <View style={s.head}>
+        <Text style={s.title}>{title}</Text>
+        <Pressable onPress={close} accessibilityRole="button" hitSlop={10}><Text style={s.close}>Kapat</Text></Pressable>
+      </View>
+      {searchable || allowCustom ? (
+        <TextInput style={s.search} placeholder="Ara veya yaz" value={q} onChangeText={setQ} autoCorrect={false} />
+      ) : null}
+    </>
+  );
+
+  if (NATIVE_SHEET) {
+    // Kısa listeler (ör. evet/hayır) yarım boy açılır; uzun ve aramalı listeler tam boy da olabilir.
+    const short = !searchable && !allowCustom && options.length <= 6;
+    return (
+      <BottomSheet
+        isPresented={visible}
+        onDismiss={close}
+        snapPoints={short ? [{ height: 120 + options.length * 50 }] : ['half', 'full']}
+        containerColor={color.surface}
+        contentPadding={0}
+      >
+        <RNHostView>
+          <View style={{ flex: 1, backgroundColor: color.surface }}>
+            {head}
+            {list}
+          </View>
+        </RNHostView>
+      </BottomSheet>
+    );
+  }
+
   return (
     <Modal visible={visible} animationType="slide" onRequestClose={close} transparent>
       <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding">
@@ -25,28 +84,8 @@ export function PickerModal({ visible, title, options, selected, onPick, onClose
           {/* Boş alana dokununca kapanır */}
           <Pressable style={StyleSheet.absoluteFill} onPress={close} accessibilityRole="button" accessibilityLabel="Kapat" />
           <View style={s.sheet}>
-            <View style={s.head}>
-              <Text style={s.title}>{title}</Text>
-              <Pressable onPress={close} accessibilityRole="button" hitSlop={10}><Text style={s.close}>Kapat</Text></Pressable>
-            </View>
-            {searchable || allowCustom ? (
-              <TextInput style={s.search} placeholder="Ara veya yaz" value={q} onChangeText={setQ} autoCorrect={false} />
-            ) : null}
-            <FlatList
-              data={shown}
-              keyboardShouldPersistTaps="handled"
-              keyExtractor={(o) => o.value || '_empty'}
-              ListHeaderComponent={custom ? (
-                <Pressable style={s.row} onPress={() => { onPick(custom); close(); }} accessibilityRole="button">
-                  <Text style={[s.label, s.sel]}>Bunu kullan: “{custom}”</Text>
-                </Pressable>
-              ) : undefined}
-              renderItem={({ item }) => (
-                <Pressable style={s.row} onPress={() => { onPick(item.value); close(); }} accessibilityRole="button">
-                  <Text style={[s.label, item.value === selected && s.sel]}>{item.label}{item.value === selected ? '  ✓' : ''}</Text>
-                </Pressable>
-              )}
-            />
+            {head}
+            {list}
           </View>
         </View>
       </KeyboardAvoidingView>
