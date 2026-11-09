@@ -9,7 +9,7 @@ import { Btn } from '../../components/ui';
 import { AlertBox, CardSkeleton } from '../../components/kit';
 import { FirmCard, PostCard } from '../../components/NetCards';
 import { Icon, type IconName } from '../../components/Icon';
-import { activePalette, color, font, radius } from '../../lib/theme';
+import { color, font, radius } from '../../lib/theme';
 import { useLang } from '../../lib/lang';
 import { tr } from '../../lib/i18n';
 import { displayName, firstName } from '../../lib/person';
@@ -17,14 +17,13 @@ import { useApp } from '../../lib/AppContext';
 import { type MarketPost, type Provider } from '../../lib/network';
 import { supabase, type Row } from '../../lib/supabase';
 
-/** Kategori şeridi: iki tonlu çizimler (Bordo temada bordo tonlarıyla). */
-const B = activePalette === 'bordo';
+/** Kategori şeridi: sade, tek renkli çizimler (her temada aynı). */
 const CATS: { label: string; cat: string; img: ImageSourcePropType }[] = [
-  { label: 'Ekskavatör', cat: 'group:excavators', img: B ? require('../../assets/cat/excavator-bordo.png') : require('../../assets/cat/excavator.png') },
-  { label: 'Beko loder', cat: 'group:loaders', img: B ? require('../../assets/cat/loader-bordo.png') : require('../../assets/cat/loader.png') },
-  { label: 'Kamyon', cat: 'group:trucks', img: B ? require('../../assets/cat/truck-bordo.png') : require('../../assets/cat/truck.png') },
-  { label: 'Vinç', cat: 'group:cranes', img: B ? require('../../assets/cat/crane-bordo.png') : require('../../assets/cat/crane.png') },
-  { label: 'Parça, lastik', cat: 'group:parts', img: B ? require('../../assets/cat/parts-bordo.png') : require('../../assets/cat/parts.png') },
+  { label: 'Ekskavatör', cat: 'group:excavators', img: require('../../assets/cat/excavator.png') },
+  { label: 'Beko loder', cat: 'group:loaders', img: require('../../assets/cat/loader.png') },
+  { label: 'Kamyon', cat: 'group:trucks', img: require('../../assets/cat/truck.png') },
+  { label: 'Vinç', cat: 'group:cranes', img: require('../../assets/cat/crane.png') },
+  { label: 'Parça, lastik', cat: 'group:parts', img: require('../../assets/cat/parts.png') },
 ];
 const net = (kind: string) => () => router.navigate({ pathname: '/is-agi', params: { kind } });
 
@@ -32,7 +31,12 @@ function SectionHead({ title, action, onAction }: { title: string; action?: stri
   return (
     <View style={s.secHead}>
       <Text style={s.secTitle}>{title}</Text>
-      {action ? <Pressable onPress={onAction} hitSlop={10} accessibilityRole="button"><Text style={s.secAction}>{action}</Text></Pressable> : null}
+      {action ? (
+        <Pressable onPress={onAction} hitSlop={8} accessibilityRole="button" style={({ pressed }) => [s.secBtn, pressed && { opacity: 0.7 }]}>
+          <Text style={s.secAction}>{action}</Text>
+          <Icon name="chevron-right" size={15} color={color.tealText} />
+        </Pressable>
+      ) : null}
     </View>
   );
 }
@@ -137,52 +141,28 @@ export default function Home() {
         </Pressable>
       </ScrollView>
 
-      {/* Hizmetler: önem sırasına göre üç kat */}
-      <SectionHead title="Hizmetler" action="İş Ağı'na git" onAction={() => router.navigate('/is-agi')} />
+      {/* Hizmetler: eş boyutlu, iki sütunlu düzenli ızgara */}
+      <SectionHead title="Hizmetler" action="İş Ağı" onAction={() => router.navigate('/is-agi')} />
       <View style={s.svc}>
-        <View style={s.svcRow}>
-          <Pressable style={({ pressed }) => [s.big, { backgroundColor: color.navyDeep }, pressed && { opacity: 0.9 }]} onPress={net('rental_machine')} accessibilityRole="button">
-            <View style={[s.bigIcon, { backgroundColor: 'rgba(255,255,255,0.08)' }]}><Icon name="calendar" size={21} color={color.tealBright} /></View>
-            <View style={{ gap: 2 }}>
-              <Text style={s.bigT}>Kiralık makine</Text>
-              <Text style={[s.bigS, { color: color.onDeepMuted }]}>Günlük, aylık · operatörlü</Text>
-            </View>
-          </Pressable>
-          <Pressable style={({ pressed }) => [s.big, { backgroundColor: color.teal }, pressed && { opacity: 0.9 }]} onPress={net('rental_operator')} accessibilityRole="button">
-            <View style={[s.bigIcon, { backgroundColor: 'rgba(255,255,255,0.14)' }]}><Icon name="user-check" size={21} color={color.tealInk} /></View>
-            <View style={{ gap: 2 }}>
-              <Text style={s.bigT}>Operatör ve usta</Text>
-              <Text style={[s.bigS, { color: 'rgba(255,255,255,0.88)' }]}>Şoför, operatör, servis</Text>
-            </View>
-          </Pressable>
-        </View>
-        <View style={s.svcRow}>
-          {([
-            ['Çekici bul', 'truck', () => router.push('/cekici' as never), '7/24', 'bad'],
-            ['Açık artırma', 'award', () => router.push('/acik-artirmalar' as never), live ? `${live} ${tr('canlı')}` : '', 'good'],
-            ['İş talepleri', 'clipboard', net('job'), '', ''],
-          ] as [string, IconName, () => void, string, string][]).map(([t, ic, go, tag, tone]) => (
-            <Pressable key={t} style={({ pressed }) => [s.mid, pressed && { opacity: 0.88 }]} onPress={go} accessibilityRole="button">
-              <View style={s.midTop}>
-                <Icon name={ic} size={22} color={color.tealText} />
-                {tag ? <View style={[s.tag, { backgroundColor: tone === 'bad' ? color.badBg : color.goodBg }]}><PlainText style={[s.tagT, { color: tone === 'bad' ? color.bad : color.good }]}>{tag}</PlainText></View> : null}
+        {([
+          ['Kiralık makine', 'Günlük, aylık · operatörlü', 'calendar', net('rental_machine'), ''],
+          ['Operatör ve usta', 'Şoför, operatör, servis', 'user-check', net('rental_operator'), ''],
+          ['Çekici bul', 'En yakın, puanlı', 'truck', () => router.push('/cekici' as never), '7/24'],
+          ['Açık artırma', 'Teklif ver, kazan', 'award', () => router.push('/acik-artirmalar' as never), live ? `${live} ${tr('canlı')}` : ''],
+          ['İş talepleri', 'Teklif ver, işi al', 'clipboard', net('job'), ''],
+          ['Parça talebi', 'Aradığın parçayı yaz', 'search', net('part_request'), ''],
+        ] as [string, string, IconName, () => void, string][]).map(([t, sub, ic, go, tag]) => (
+          <Pressable key={t} style={({ pressed }) => [s.svcCard, pressed && { opacity: 0.88 }]} onPress={go} accessibilityRole="button">
+            <View style={s.svcIcon}><Icon name={ic} size={20} color={color.tealText} /></View>
+            <View style={{ flex: 1, gap: 1 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                <Text style={s.svcT} numberOfLines={1}>{t}</Text>
+                {tag ? <View style={s.tag}><PlainText style={s.tagT}>{tag}</PlainText></View> : null}
               </View>
-              <Text style={s.midT} numberOfLines={2}>{t}</Text>
-            </Pressable>
-          ))}
-        </View>
-        <View style={s.svcRow}>
-          {([
-            ['Parça talebi', 'search', net('part_request')],
-            ['Şirketler', 'briefcase', net('firma')],
-            ['İllere göre', 'map-pin', () => router.push('/harita' as never)],
-          ] as [string, IconName, () => void][]).map(([t, ic, go]) => (
-            <Pressable key={t} style={({ pressed }) => [s.pill, pressed && { opacity: 0.85 }]} onPress={go} accessibilityRole="button">
-              <Icon name={ic} size={15} color={color.tealText} />
-              <Text style={s.pillT} numberOfLines={1}>{t}</Text>
-            </Pressable>
-          ))}
-        </View>
+              <Text style={s.svcS} numberOfLines={1}>{sub}</Text>
+            </View>
+          </Pressable>
+        ))}
       </View>
 
       {/* Giriş yapmışsa: tek satır özet; misafirse giriş çağrısı */}
@@ -282,22 +262,17 @@ const s = StyleSheet.create({
   catTile: { width: 78, height: 70, borderRadius: 20, backgroundColor: color.tile, borderWidth: 1, borderColor: color.line, alignItems: 'center', justifyContent: 'center' },
   catImg: { width: 62, height: 48 },
   catLabel: { fontFamily: font.semi, fontSize: 12.5, color: color.ink },
-  secHead: { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between', marginHorizontal: 16, marginTop: 24, marginBottom: 10 },
+  secHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginHorizontal: 16, marginTop: 24, marginBottom: 10 },
   secTitle: { fontFamily: font.bold, fontSize: 21, color: color.ink, flexShrink: 1 },
-  secAction: { fontFamily: font.semi, fontSize: 14, color: color.tealText },
-  svc: { marginHorizontal: 16, gap: 10 },
-  svcRow: { flexDirection: 'row', gap: 10 },
-  big: { flex: 1, minHeight: 116, padding: 14, borderRadius: radius + 6, justifyContent: 'space-between', gap: 10 },
-  bigIcon: { width: 40, height: 40, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
-  bigT: { fontFamily: font.bold, fontSize: 19, lineHeight: 22, color: color.accentInk },
-  bigS: { fontSize: 12.5 },
-  mid: { flex: 1, padding: 12, gap: 8, borderRadius: radius + 4, backgroundColor: color.surface, borderWidth: 1, borderColor: color.line },
-  midTop: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 4 },
-  midT: { fontFamily: font.bold, fontSize: 16, lineHeight: 18, color: color.ink },
-  tag: { borderRadius: 6, paddingHorizontal: 5, paddingVertical: 2 },
-  tagT: { fontFamily: font.textBold, fontSize: 10 },
-  pill: { flex: 1, height: 44, borderRadius: 22, backgroundColor: color.plate, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingHorizontal: 6 },
-  pillT: { fontFamily: font.semi, fontSize: 13, color: color.ink, flexShrink: 1 },
+  secBtn: { flexDirection: 'row', alignItems: 'center', gap: 2, height: 32, paddingLeft: 12, paddingRight: 8, borderRadius: 16, backgroundColor: color.tealSoft },
+  secAction: { fontFamily: font.semi, fontSize: 13.5, color: color.tealText },
+  svc: { marginHorizontal: 16, flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', rowGap: 10 },
+  svcCard: { width: '48.5%', minHeight: 66, flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 10, paddingHorizontal: 10, borderRadius: radius + 4, backgroundColor: color.surface, borderWidth: 1, borderColor: color.line },
+  svcIcon: { width: 38, height: 38, borderRadius: 12, backgroundColor: color.tealSoft, alignItems: 'center', justifyContent: 'center' },
+  svcT: { fontFamily: font.bold, fontSize: 15.5, lineHeight: 18, color: color.ink, flexShrink: 1 },
+  svcS: { fontSize: 12, color: color.muted },
+  tag: { borderRadius: 6, paddingHorizontal: 5, paddingVertical: 1, backgroundColor: color.plate },
+  tagT: { fontFamily: font.textBold, fontSize: 9.5, color: color.ink },
   sum: { flexDirection: 'row', marginHorizontal: 16, marginTop: 16, backgroundColor: color.surface, borderRadius: radius + 4, borderWidth: 1, borderColor: color.line },
   sumCell: { flex: 1, paddingVertical: 12, paddingHorizontal: 14, gap: 2 },
   sumSep: { borderLeftWidth: 1, borderLeftColor: color.line },
