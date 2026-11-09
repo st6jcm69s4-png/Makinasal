@@ -59,7 +59,7 @@ export const TECH_BY_GROUP: Record<string, TechField[]> = {
   trucks: [
     { key: 'axle_config', label: 'Aks düzeni', type: 'select', options: ['4x2', '4x4', '6x2', '6x4', '6x6', '8x2', '8x4'], filter: true },
     { key: 'payload', label: 'Taşıma kapasitesi', unit: 'ton', type: 'number', filter: true },
-    { key: 'body_type', label: 'Kasa tipi', type: 'select', options: ['Damper', 'Kasa', 'Tanker', 'Mikser', 'Çekici', 'Kurtarıcı', 'Diğer'], filter: true },
+    { key: 'body_type', label: 'Kasa tipi', type: 'select', options: ['Damper', 'Kasa', 'Tanker', 'Mikser', 'Çekici (tır)', 'Kurtarıcı', 'Diğer'], filter: true },
     { key: 'gearbox', label: 'Şanzıman', type: 'select', options: ['Manuel', 'Otomatik'] },
     HP,
   ],

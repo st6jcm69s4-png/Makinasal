@@ -16,6 +16,7 @@ import { getSupabase } from '@/lib/supabase/client';
 import { trustLevel } from '@/lib/trust';
 import { useMarket } from './MarketProvider';
 import { ServiceRequestBox } from './ServiceRequestBox';
+import { AuctionStatus, ConditionPanel, ListingVideo, techRows } from './ListingExtras';
 import { IconCmp, IconFav, Pill, ScoreRow, toneClass } from './ui';
 
 const REPORT_REASONS = ['Sahte veya yanıltıcı ilan', 'Kapora / ön ödeme istiyor', 'Fiyat gerçek dışı', 'Hakaret veya taciz', 'Diğer'];
@@ -90,6 +91,7 @@ function Body({ l, seller: m, own, stats, favs, toggleFav, cmp, toggleCmp, myCit
   } else {
     if (l.year) rows.push(['Model yılı', String(l.year)]);
     if (usageLabel(l, language)) rows.push(['Kullanım', usageLabel(l, language)]);
+    for (const r of techRows(l)) rows.push(r);
     rows.push(['Seri / şasi no', l.serial ? <Pill cls="good">{tr("Beyan edildi")}</Pill> : <Pill>{tr("Beyan yok")}</Pill>]);
   }
   rows.push(['Konum', l.city + (d ? ` (${d})` : '')], ['Takas', l.takas ? <Pill cls="good">{tr("Kabul edilir")}</Pill> : 'Belirtilmedi'],
@@ -128,12 +130,16 @@ function Body({ l, seller: m, own, stats, favs, toggleFav, cmp, toggleCmp, myCit
           </div>
         ) : <div className="empty">{tr("Bu ilanda fotoğraf yok. Fotoğrafsız ilanlara dikkat et.")}</div>}
 
+        {!l.demo ? <AuctionStatus listingId={String(l.id)} /> : null}
+        <ListingVideo l={l} />
+
         {flag === 'low' && med ? <div className="note bad"><b>{tr("Fiyat piyasanın çok altında.")}</b> {tr(" Bu kategorideki ilanların ortancası ")}{formatTL(r1000(med), language)}{tr(". Çok düşük fiyat ve acele ettirme, kapora dolandırıcılığında sık görülen işaretlerdir.")}</div> : null}
         {flag === 'high' && med ? <div className="note">{tr("Fiyat kategori ortancası olan ")}{formatTL(r1000(med), language)} {tr(" seviyesinin belirgin üstünde. Pazarlık payını sor.")}</div> : null}
         {lv.label === 'Riskli' ? <div className="note bad"><b>{tr("Bu satıcı riskli seviyede.")}</b> {m.rep} {tr(" doğrulanmış şikayet var. Bu satıcıyla işlem yapmadan önce ürünü yerinde gör ve belgeleri kontrol et.")}</div> : null}
         {lv.label === 'Yeni üye' ? <div className="note">{tr("Bu üyenin henüz yeterli onaylı işlemi yok, puanı oluşmadı. Ürünü yerinde görmeden ödeme yapma.")}</div> : null}
 
         <PriceBox ind={ind} l={l} />
+        <ConditionPanel l={l} />
 
         <div className="two">
           <div className="panel">

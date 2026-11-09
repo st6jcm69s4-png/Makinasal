@@ -5,7 +5,7 @@ import type { Listing, Review, Seller } from './data/types';
 const BASE =
   'id,seller_id,kind,category,title,description,price,city,year,usage_value,usage_unit,spec,cond,compat,qty,status,moderation_status,created_at,listing_photos(path,position)';
 // 005-ozellikler.sql çalıştırılmışsa gelen ek sütunlar
-const EXTRA = 'equipment_category,part_group,brand,model,takas,serial_declared,prev_price,confirmed_at,boosted_until';
+const EXTRA = 'equipment_category,part_group,brand,model,takas,serial_declared,prev_price,confirmed_at,boosted_until,video_url,video_path,tech';
 
 type Row = {
   id: string; seller_id: string; kind: string; category: string; title: string; description: string;
@@ -15,6 +15,7 @@ type Row = {
   equipment_category?: string | null;part_group?: string | null;
   brand?: string | null; model?: string | null; takas?: boolean | null; serial_declared?: boolean | null;
   prev_price?: number | string | null; confirmed_at?: string | null; boosted_until?: string | null;
+  video_url?: string | null; video_path?: string | null; tech?: Record<string, string | number> | null;
 };
 
 const DAY = 86_400_000;
@@ -43,6 +44,9 @@ export function rowToListing(row: Row, publicUrl: (path: string) => string): Lis
     takas: !!row.takas,
     desc: row.description,
     boost: !!row.boosted_until && Date.parse(row.boosted_until) > Date.now(),
+    videoUrl: row.video_url ?? undefined,
+    videoPath: row.video_path ?? undefined,
+    tech: row.tech ?? undefined,
     spec: row.spec ?? undefined,
     cond: row.cond ?? undefined,
     compat: row.compat ?? undefined,

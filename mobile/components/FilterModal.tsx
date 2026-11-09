@@ -4,6 +4,7 @@ import { Text, TextInput } from './LText';
 import { PickerModal } from './PickerModal';
 import { Btn, Chip } from './ui';
 import { brandsForCategory } from '../lib/machineryCatalog';
+import { tr } from '../lib/i18n';
 import { filterFieldsFor, techFilterCount, type TechFilter } from '../lib/techSpecs';
 import { color } from '../lib/theme';
 
@@ -47,7 +48,7 @@ export function FilterModal({ visible, value, category, part, onApply, onClose }
                     const setT = (v: TechFilter[string] | undefined) => setA((c) => { const t = { ...(c.tech ?? {}) }; if (v === undefined) delete t[f.key]; else t[f.key] = v; return { ...c, tech: t }; });
                     return (
                       <View key={f.key} style={{ gap: 8 }}>
-                        <Text style={s.label}>{f.unit ? `${f.label} (${f.unit})` : f.label}</Text>
+                        <Text style={s.label}>{f.unit ? `${tr(f.label)} (${f.unit})` : f.label}</Text>
                         {f.type === 'select' ? (
                           <View style={[s.row, { flexWrap: 'wrap' }]}>
                             <Chip title="Hepsi" on={!cur} onPress={() => setT(undefined)} />

@@ -47,6 +47,11 @@ export type Listing = {
   desc: string;
   /** Tek ilan öne çıkarma (7 gün) */
   boost?: boolean;
+  /** YouTube/Vimeo bağlantısı veya yüklenen video yolu */
+  videoUrl?: string;
+  videoPath?: string;
+  /** Makineye özel teknik alanlar ve bakım beyanı */
+  tech?: Record<string, string | number>;
   photos?: string[];
   demo?: boolean;
   status?: string;
