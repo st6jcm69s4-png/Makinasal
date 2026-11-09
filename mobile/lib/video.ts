@@ -14,7 +14,8 @@ export function normalizeVideoUrl(raw: string): string | null {
 
 /** YouTube video kimliği (önizleme resmi için). */
 export function youtubeId(url: string): string | null {
-  const m = /youtu\.be\/([A-Za-z0-9_-]{6,})|[?&]v=([A-Za-z0-9_-]{6,})|shorts\/([A-Za-z0-9_-]{6,})/.exec(url);
+  // Yalnızca gerçek YouTube adresleri (alan adı başta sabit; "evil.com/?v=..." eşleşmez)
+  const m = /^https:\/\/(?:(?:www|m)\.)?(?:youtu\.be\/([A-Za-z0-9_-]{6,})|youtube\.com\/(?:watch\?(?:[^#]*&)?v=([A-Za-z0-9_-]{6,})|shorts\/([A-Za-z0-9_-]{6,})))/i.exec(url);
   return m ? (m[1] ?? m[2] ?? m[3] ?? null) : null;
 }
 
@@ -23,4 +24,4 @@ export const videoThumb = (url: string): string | null => {
   return id ? `https://img.youtube.com/vi/${id}/hqdefault.jpg` : null;
 };
 
-export const videoHost = (url: string) => (/vimeo\.com/i.test(url) ? 'Vimeo' : 'YouTube');
+export const videoHost = (url: string) => (/^https:\/\/(www\.)?vimeo\.com\//i.test(url) ? 'Vimeo' : 'YouTube');

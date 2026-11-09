@@ -17,8 +17,6 @@ Aşağıdaki adımlar projenin tarihsel gelişim notlarıdır; güncel kapsam i�
 5. Tarayıcı: http://localhost:3000
 
 ## Şu anki durum
-- Makinasal V6 prototipi `public/prototip.html` içinde korunuyor.
-- Next.js ana sayfası prototipi iframe içinde gösteriyor. **Bu, gerçek React bileşenlerine dönüşüm değildir.**
 - Demo ilanlar, mesajlar ve diğer etkileşimler gerçek bir sunucuya bağlı değildir.
 - Apple/Google/SMS girişi, veritabanı ve ödeme sistemi henüz yoktur.
 
@@ -35,10 +33,8 @@ Aşağıdaki adımlar projenin tarihsel gelişim notlarıdır; güncel kapsam i�
 `app/page.tsx` ana sayfadır. `app/layout.tsx` genel HTML iskeletidir. `public/` statik dosyaları tutar.
 
 ## Güvenlik
-Gerçek kimlik belgelerini prototipte saklama. Sunucu tarafı doğrulama ve RLS olmadan canlı kullanıcı verisi toplama.
 
 ## Kod yapısı (1. adım tamamlandı)
-- `lib/data/` — prototipten aktarılan kategoriler, şehirler, satıcılar ve demo ilanlar (TypeScript).
 - `lib/trust.ts` — güven seviyesi kuralı (Riskli / Yeni üye / Orta güven / Güvenilir / Çok güvenilir).
 - `lib/pricing.ts` — kategori medyanı ve fiyat uyarısı (parça/lastikte hesaplanmaz).
 - `lib/messageFilter.ts` — mesajda IBAN/link engeli, kapora uyarısı.
@@ -48,7 +44,6 @@ Gerçek kimlik belgelerini prototipte saklama. Sunucu tarafı doğrulama ve RLS 
 ## Sayfalar (2. adım)
 - `/ilanlar` — filtreli ilan listesi (arama, kategori, şehir, fiyat, sıralama)
 - `/ilanlar/[id]` — ilan detayı: özellikler, fiyat uyarısı, satıcı güven seviyesi
-- `/prototip.html` — eski HTML prototip (karşılaştırma için duruyor)
 Henüz yok: giriş, ilan verme, mesajlaşma, puanlama, veritabanı bağlantısı.
 
 ## Giriş sistemi (3. adım)
@@ -74,7 +69,6 @@ Henüz yok: giriş, ilan verme, mesajlaşma, puanlama, veritabanı bağlantısı
 
 
 ## Tasarım ve tüm özellikler (7. adım)
-Lacivert + sarı tema (`app/globals.css`) ve ilk prototipteki tüm özellikler:
 - Sayfalar: `/` ana sayfa, `/ilanlar` arama (filtreler, 10 sıralama, kayıtlı arama), `/ilanlar/[id]` detay (fiyat göstergesi, inceleme listesi, telefon, mesaj, teklif, şikayet), `/karsilastir`, `/favoriler`, `/profil`, `/magaza/[id]`, `/mesajlar`, `/ilan-ver` (yeni + `?duzenle=ID`), `/premium`, `/guven`, `/yol-haritasi`.
 - `components/MarketProvider.tsx`: ilanlar, satıcılar, favoriler, karşılaştırma, kayıtlı aramalar, okunmamış mesaj sayısı.
 - `lib/market.ts`: filtre, sıralama, etiket, fiyat göstergesi, inceleme listesi. `lib/pricing.ts`: kategori medyanı.
