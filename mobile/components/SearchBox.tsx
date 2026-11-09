@@ -101,6 +101,6 @@ const s = StyleSheet.create({
   label: { color: color.ink, fontFamily: font.semi, fontSize: 15.5 },
   path: { alignSelf: 'flex-start', backgroundColor: color.tealSoft, borderRadius: 8, paddingHorizontal: 7, paddingVertical: 2, maxWidth: '100%' },
   pathT: { color: color.tealText, fontFamily: font.semi, fontSize: 12 },
-  mark: { color: color.tealText, fontFamily: font.bold },
+  mark: { color: color.tealText, fontFamily: font.textBold },
   none: { padding: 14, color: color.muted, fontSize: 14, lineHeight: 20 },
 });

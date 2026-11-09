@@ -9,14 +9,16 @@ import { useLang } from '../lib/lang';
 const base = Platform.OS === 'android' ? { color: color.ink, includeFontPadding: false } : { color: color.ink };
 const walk = (c: ReactNode): ReactNode => (typeof c === 'string' ? tr(c) : Array.isArray(c) ? Children.map(c, (x) => (typeof x === 'string' ? tr(x) : x)) : c);
 
-/** Ağırlığa göre Inter ailesini seçer; ekranda başka yazı tipi istenmişse dokunmaz. */
+/** Ağırlığa göre yazı ailesini seçer (kalın: Barlow, diğerleri: Inter); ekranda başka yazı tipi istenmişse dokunmaz. */
 const Nested = createContext(false);
 function typeStyle(style: unknown, nested = false) {
   if (!fontState.ok) return style;
   const flat = StyleSheet.flatten(style as object) as { fontFamily?: string; fontWeight?: string | number; fontSize?: number } | undefined;
   if (flat?.fontFamily) return style;
   const w = String(flat?.fontWeight ?? '400');
-  const family = w === '700' || w === '800' || w === '900' || w === 'bold' ? font.bold : w === '600' ? font.semi : w === '500' ? font.medium : font.regular;
+  const heavy = w === '700' || w === '800' || w === '900' || w === 'bold';
+  // Tek başına kalın yazı (başlık, düğme, rozet) Barlow; cümle içindeki kalın kelime Inter kalır.
+  const family = heavy ? (nested ? font.textBold : font.bold) : w === '600' ? font.semi : w === '500' ? font.medium : font.regular;
   // Inter ile ekrandaki puntolar olduğu gibi kullanılır.
   const size = flat?.fontSize ? flat.fontSize : nested ? undefined : 16;
   return [style, { fontFamily: family, fontWeight: 'normal' as const, ...(size ? { fontSize: size } : {}), fontVariant: ['tabular-nums' as const] }];

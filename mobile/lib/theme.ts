@@ -102,9 +102,14 @@ export const hair = 1;
 
 /** Yazı tipi aileleri (yüklenemezse sistem yazı tipine düşer). */
 export const fontState = { ok: false };
+/**
+ * İki yazı tipi: metin Inter (okunaklı), başlık / fiyat / düğme / etiket Barlow Semi Condensed
+ * (sanayi tabelası karakteri). `bold` görüntü yazısıdır; paragraf içinde kalın metin için `textBold`.
+ */
 export const font = {
-  regular: 'Inter_400Regular', medium: 'Inter_500Medium', semi: 'Inter_600SemiBold', bold: 'Inter_700Bold',
-  label: 'Inter_600SemiBold', labelBold: 'Inter_700Bold',
+  regular: 'Inter_400Regular', medium: 'Inter_500Medium', semi: 'Inter_600SemiBold', textBold: 'Inter_700Bold',
+  bold: 'BarlowSemiCondensed_700Bold', displaySemi: 'BarlowSemiCondensed_600SemiBold',
+  label: 'BarlowSemiCondensed_600SemiBold', labelBold: 'BarlowSemiCondensed_700Bold',
 } as const;
 
 /** Etiketler Türkçe büyük harfle yazılır (i→İ). */

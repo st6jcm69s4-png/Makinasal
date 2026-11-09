@@ -53,7 +53,7 @@ const s = StyleSheet.create({
   noimg: { alignItems: 'center', justifyContent: 'center' },
   heart: { position: 'absolute', top: 10, right: 10, width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.94)', alignItems: 'center', justifyContent: 'center' },
   body: { paddingHorizontal: 14, paddingTop: 12, paddingBottom: 14, gap: 8 },
-  title: { fontFamily: font.semi, color: color.ink, fontSize: 17, lineHeight: 22 },
+  title: { fontFamily: font.displaySemi, color: color.ink, fontSize: 17.5, lineHeight: 22 },
   row: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12 },
   price: { fontFamily: font.bold, color: color.tealText, fontSize: 21 },
   where: { flexDirection: 'row', alignItems: 'center', gap: 4, flexShrink: 1 },
