@@ -69,6 +69,9 @@ export default function TabsLayout() {
       screenListeners={({ route }) => ({ tabPress: () => fireScrollTop(route.name) })}
       screenLayout={({ children, route }) => <SwipeTabs route={route.name}>{children}</SwipeTabs>}
       screenOptions={{
+        // Sekme değişiminde önceki ekran yavaşça kaybolur, yenisi belirir (kaydırma ve dokunma)
+        animation: 'fade',
+        transitionSpec: { animation: 'timing', config: { duration: 260 } },
         headerStyle: { backgroundColor: color.navy, borderBottomWidth: 2, borderBottomColor: color.pop } as object,
         headerTintColor: color.onBar,
         headerShadowVisible: false,
