@@ -170,7 +170,7 @@ export default function Home() {
         <View style={s.sum}>
           {([
             ['Gelen teklif', counts?.offers, '/ag/hesabim', true],
-            ['Açık işim', counts?.works, '/ag/hesabim', false],
+            ['İş Ağı ilanım', counts?.works, '/ag/hesabim', false],
             ['Yayında ilanım', counts?.mine, '/ilanlarim', false],
           ] as [string, number | undefined, string, boolean][]).map(([l, n, to, accent], i) => (
             <Pressable key={l} style={({ pressed }) => [s.sumCell, i > 0 && s.sumSep, pressed && { opacity: 0.85 }]} onPress={() => router.push(to as never)} accessibilityRole="button">
