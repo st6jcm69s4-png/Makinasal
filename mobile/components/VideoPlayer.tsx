@@ -3,7 +3,7 @@ import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { Icon } from './Icon';
 import { Text } from './LText';
-import { color, radius, shadow } from '../lib/theme';
+import { color, radius, shadow, fixed } from '../lib/theme';
 
 /** Uygulama içinde video oynatır (yüklenen mp4/mov). Dokununca yüklenir, veri harcamasın. */
 export function VideoPlayer({ uri, poster }: { uri: string; poster?: string | null }) {
@@ -28,11 +28,11 @@ export function VideoPlayer({ uri, poster }: { uri: string; poster?: string | nu
             onLoadEnd={() => setLoading(false)}
             setSupportMultipleWindows={false}
           />
-          {loading ? <View style={s.center} pointerEvents="none"><ActivityIndicator color="#FFFFFF" /></View> : null}
+          {loading ? <View style={s.center} pointerEvents="none"><ActivityIndicator color={fixed.onMedia} /></View> : null}
         </>
       ) : (
         <Pressable style={({ pressed }) => [s.center, pressed && { opacity: 0.85 }]} onPress={() => setOn(true)} accessibilityRole="button" accessibilityLabel="Videoyu oynat">
-          <View style={s.play}><Icon name="play" size={28} color="#FFFFFF" /></View>
+          <View style={s.play}><Icon name="play" size={28} color={fixed.onMedia} /></View>
           <Text style={s.t}>Videoyu oynat</Text>
         </Pressable>
       )}
@@ -41,9 +41,9 @@ export function VideoPlayer({ uri, poster }: { uri: string; poster?: string | nu
 }
 
 const s = StyleSheet.create({
-  box: { marginHorizontal: 16, height: 220, borderRadius: radius + 4, overflow: 'hidden', backgroundColor: '#141412', ...shadow },
-  web: { flex: 1, backgroundColor: '#000' },
+  box: { marginHorizontal: 16, height: 220, borderRadius: radius + 4, overflow: 'hidden', backgroundColor: fixed.mediaBg, ...shadow },
+  web: { flex: 1, backgroundColor: fixed.black },
   center: { position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, alignItems: 'center', justifyContent: 'center', gap: 10 },
   play: { width: 64, height: 64, borderRadius: 32, backgroundColor: color.teal, alignItems: 'center', justifyContent: 'center' },
-  t: { color: '#FFFFFF', fontSize: 14.5 },
+  t: { color: fixed.onMedia, fontSize: 14.5 },
 });

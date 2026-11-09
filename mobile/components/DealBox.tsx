@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Alert, Pressable, StyleSheet, View } from 'react-native';
 import { Text, TextInput } from './LText';
 import { supabase } from '../lib/supabase';
-import { color } from '../lib/theme';
+import { color, fixed } from '../lib/theme';
 
 type Deal = { buyer_confirmed: boolean; seller_confirmed: boolean; completed_at: string | null };
 type Review = { score: number; comment: string | null; tags?: string[] };
@@ -79,13 +79,13 @@ export function DealBox({ threadId, me, buyerId, sellerId }: { threadId: string;
           <Text style={s.b}>Satış tamamlandı. Karşı tarafı puanla:</Text>
           <View style={{ flexDirection: 'row', gap: 6 }}>
             {[1, 2, 3, 4, 5].map((n) => (
-              <Pressable key={n} onPress={() => setScore(n)} accessibilityRole="button" accessibilityLabel={`${n} yıldız`}><Text style={[s.star, n <= score && { color: '#e0a100' }]}>★</Text></Pressable>
+              <Pressable key={n} onPress={() => setScore(n)} accessibilityRole="button" accessibilityLabel={`${n} yıldız`}><Text style={[s.star, n <= score && { color: fixed.star }]}>★</Text></Pressable>
             ))}
           </View>
           <View style={s.tags}>
             {TAGS.map((t) => (
               <Pressable key={t} style={[s.tag, tags.includes(t) && s.tagOn]} onPress={() => setTags((c) => (c.includes(t) ? c.filter((x) => x !== t) : [...c, t]))}>
-                <Text style={tags.includes(t) ? { color: '#fff' } : undefined}>{t}</Text>
+                <Text style={tags.includes(t) ? { color: color.accentInk } : undefined}>{t}</Text>
               </Pressable>
             ))}
           </View>
@@ -103,7 +103,7 @@ const s = StyleSheet.create({
   b: { fontWeight: '700' },
   small: { color: color.muted, fontSize: 12 },
   btn: { backgroundColor: color.accent, padding: 12, borderRadius: 12, alignItems: 'center' },
-  btnText: { color: '#fff', fontWeight: '600' },
+  btnText: { color: color.accentInk, fontWeight: '600' },
   star: { fontSize: 30, color: color.line },
   tags: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   tag: { borderWidth: 1, borderColor: color.line, borderRadius: 12, paddingVertical: 6, paddingHorizontal: 10 },

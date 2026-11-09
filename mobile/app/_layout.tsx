@@ -11,6 +11,7 @@ import { tr } from '../lib/i18n';
 import { LangProvider, LanguageGate, useLang } from '../lib/lang';
 import { LoginPromptProvider } from '../components/LoginPrompt';
 import { AnimatedSplash } from '../components/AnimatedSplash';
+import { ToastHost } from '../components/Toast';
 
 function Screens() {
   const { lang } = useLang();
@@ -84,6 +85,7 @@ export default function RootLayout() {
         <LoginPromptProvider>
           <Screens />
           <LanguageGate />
+          <ToastHost />
           <AnimatedSplash />
         </LoginPromptProvider>
       </AppProvider>

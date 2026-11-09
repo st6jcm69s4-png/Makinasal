@@ -62,7 +62,7 @@ export default function Forgot() {
   if (step === 'done') {
     return (
       <View style={s.center}>
-        <View style={s.icon}><Icon name="check" size={24} color="#fff" /></View>
+        <View style={s.icon}><Icon name="check" size={24} color={color.accentInk} /></View>
         <Text style={s.title}>Şifren güncellendi</Text>
         <Text style={s.p}>Yeni şifrenle giriş yapabilirsin.</Text>
         <View style={{ alignSelf: 'stretch' }}><Btn title="Giriş yap" onPress={() => router.replace('/hesap' as never)} /></View>

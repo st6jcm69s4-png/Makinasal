@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, Image, Pressable, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
+import { RowSkeleton, AlertBox, Badge, StatusBadge, Tabs } from '../components/kit';
+import { Alert, Image, Pressable, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
 import { PlainText, Text } from '../components/LText';
 import { Icon, type IconName } from '../components/Icon';
 import { Btn, Label } from '../components/ui';
-import { AlertBox, Badge, StatusBadge, Tabs } from '../components/kit';
 import { router } from 'expo-router';
 import { useApp } from '../lib/AppContext';
 import { photoUrl, supabase, tl } from '../lib/supabase';
@@ -115,7 +115,7 @@ export default function Admin() {
   }
   const ask = (msg: string, fn: () => void) => Alert.alert('Onay', msg, [{ text: 'Vazgeç', style: 'cancel' }, { text: 'Evet', onPress: fn }]);
 
-  if (admin === null) return <ActivityIndicator style={{ margin: 24 }} />;
+  if (admin === null) return <RowSkeleton />;
   if (!admin) return <Text style={s.empty}>Bu bölüm yalnızca yetkili moderatörler içindir.</Text>;
 
   const newReq = ss.filter((x) => x.status === 'new').length;
@@ -299,7 +299,7 @@ const s = StyleSheet.create({
   tabOn: { backgroundColor: color.tealSoft, borderTopColor: color.teal },
   tabText: { fontSize: 14, fontFamily: font.bold, color: color.ink },
   dot: { minWidth: 20, height: 20, borderRadius: 10, backgroundColor: color.accent, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 5 },
-  dotText: { color: '#fff', fontSize: 11, fontWeight: '700' },
+  dotText: { color: color.accentInk, fontSize: 11, fontWeight: '700' },
   err: { color: color.bad, margin: 12 },
   card: { backgroundColor: color.surface, borderWidth: 1, borderColor: color.line, borderRadius: radius, overflow: 'hidden' },
   cardTop: { flexDirection: 'row', gap: 12, padding: 12, alignItems: 'flex-start' },

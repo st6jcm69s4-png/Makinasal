@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList, View } from 'react-native';
+import { PageSkeleton } from '../../components/kit';
+import { FlatList, View } from 'react-native';
 import { Text } from '../../components/LText';
 import { useLocalSearchParams } from 'expo-router';
 import { ListingCard } from '../../components/ListingCard';
@@ -58,7 +59,7 @@ export default function StorePage() {
     return () => { alive = false; };
   }, [id]);
 
-  if (loading) return <ActivityIndicator style={{ margin: 24 }} />;
+  if (loading) return <PageSkeleton />;
   if (!store) return <Text style={common.empty}>Satıcı bulunamadı.</Text>;
   const lv = trustLevel({ rep: store.rep, deals: store.deals, s: store.s });
   const fmt = (n: number | null) => (n == null ? '–' : n.toFixed(1).replace('.', ','));

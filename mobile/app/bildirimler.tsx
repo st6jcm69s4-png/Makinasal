@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react';
+import { RowSkeleton } from '../components/kit';
 import { GuestGate } from '../components/LoginPrompt';
-import { ActivityIndicator, FlatList, Pressable, StyleSheet, View } from 'react-native';
+import { FlatList, Pressable, StyleSheet, View } from 'react-native';
 import { Text } from '../components/LText';
 import { router, useFocusEffect } from 'expo-router';
 import { notificationTarget as target } from '../lib/notifyTarget';
@@ -34,7 +35,7 @@ export default function Notifications() {
   }
 
   if (!session) return <GuestGate icon="bell" text="Bildirimlerini görmek için giriş yap." />;
-  if (items === null) return <ActivityIndicator style={{ margin: 32 }} />;
+  if (items === null) return <RowSkeleton />;
   const unread = items.filter((n) => !n.read_at).map((n) => n.id);
   return (
     <View style={{ flex: 1, backgroundColor: color.bg }}>

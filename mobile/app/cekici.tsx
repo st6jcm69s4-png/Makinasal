@@ -154,7 +154,7 @@ export default function Cekici() {
             </View>
             <View style={s.actions}>
               <Pressable style={({ pressed }) => [s.call, pressed && { opacity: 0.85 }]} onPress={() => void call(t.user_id)} accessibilityRole="button">
-                <Icon name="phone" size={18} color="#fff" /><Text style={s.callText}>Ara</Text>
+                <Icon name="phone" size={18} color={color.accentInk} /><Text style={s.callText}>Ara</Text>
               </Pressable>
               <Pressable style={({ pressed }) => [s.more, pressed && { backgroundColor: color.plate }]} onPress={() => router.push(`/firma/${t.user_id}` as never)} accessibilityRole="button">
                 <Text style={s.moreText}>Firma sayfası</Text>
@@ -195,7 +195,7 @@ const s = StyleSheet.create({
   val: { fontSize: 15, color: color.ink, fontWeight: '500' },
   actions: { flexDirection: 'row', borderTopWidth: 1, borderTopColor: color.line },
   call: { flex: 1, backgroundColor: color.accent, minHeight: 48, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
-  callText: { color: '#fff', fontWeight: '700', fontSize: 16 },
+  callText: { color: color.accentInk, fontWeight: '700', fontSize: 16 },
   more: { flex: 1, minHeight: 48, alignItems: 'center', justifyContent: 'center' },
   moreText: { color: color.accentText, fontWeight: '600', fontSize: 15 },
 });

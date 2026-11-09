@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, Linking, Pressable, ScrollView, View } from 'react-native';
+import { PageSkeleton } from '../../components/kit';
+import { Alert, Linking, Pressable, ScrollView, View } from 'react-native';
 import { Text } from '../../components/LText';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Btn, common } from '../../components/ui';
@@ -34,7 +35,7 @@ export default function ProviderDetail() {
     if (error || !data) { Alert.alert('Telefon', 'Bu firma telefon numarasını paylaşmıyor.'); return; }
     void Linking.openURL(`tel:${String(data).replace(/[^\d+]/g, '')}`);
   }
-  if (loading) return <ActivityIndicator style={{ margin: 24 }} />;
+  if (loading) return <PageSkeleton />;
   if (!p) return <Text style={common.empty}>Firma bulunamadı veya yayından kaldırıldı.</Text>;
   return (
     <ScrollView style={common.screen} contentContainerStyle={{ padding: 12, gap: 10 }}>

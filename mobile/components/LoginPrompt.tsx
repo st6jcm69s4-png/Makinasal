@@ -56,7 +56,7 @@ export function LoginPromptProvider({ children }: { children: ReactNode }) {
           <Pressable style={StyleSheet.absoluteFill} onPress={close} accessibilityRole="button" accessibilityLabel="Kapat" />
           <View style={s.sheet}>
             <View style={s.body}>
-              <View style={s.icon}><Icon name="lock" size={24} color="#fff" /></View>
+              <View style={s.icon}><Icon name="lock" size={24} color={color.accentInk} /></View>
               <Text style={s.title}>Giriş yap</Text>
               <Text style={s.text}>{reason}</Text>
               <Btn title="Giriş yap" onPress={() => { close(); router.navigate('/hesap'); }} />
@@ -74,7 +74,7 @@ export function LoginPromptProvider({ children }: { children: ReactNode }) {
 export function GuestGate({ text, icon = 'lock' }: { text: string; icon?: IconName }) {
   return (
     <View style={g.wrap}>
-      <View style={s.icon}><Icon name={icon} size={24} color="#fff" /></View>
+      <View style={s.icon}><Icon name={icon} size={24} color={color.accentInk} /></View>
       <Text style={g.text}>{text}</Text>
       <View style={{ alignSelf: 'stretch', gap: 8 }}>
         <Btn title="Giriş yap" onPress={() => router.navigate('/hesap')} />

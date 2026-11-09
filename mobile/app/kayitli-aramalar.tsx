@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react';
+import { RowSkeleton } from '../components/kit';
 import { GuestGate } from '../components/LoginPrompt';
-import { ActivityIndicator, Alert, FlatList, Pressable, StyleSheet, Switch, View } from 'react-native';
+import { Alert, FlatList, Pressable, StyleSheet, Switch, View } from 'react-native';
 import { PlainText, Text } from '../components/LText';
 import { Icon } from '../components/Icon';
 import { router, useFocusEffect } from 'expo-router';
@@ -36,7 +37,7 @@ export default function SavedSearches() {
   }
 
   if (!session) return <GuestGate icon="bookmark" text="Kayıtlı aramalarını görmek için giriş yap." />;
-  if (rows === null) return <ActivityIndicator style={{ margin: 32 }} />;
+  if (rows === null) return <RowSkeleton />;
   return (
     <FlatList
       style={{ backgroundColor: color.bg }}

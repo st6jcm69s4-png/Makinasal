@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
+import { RowSkeleton } from '../../components/kit';
 import { GuestGate } from '../../components/LoginPrompt';
-import { ActivityIndicator, Alert, ScrollView, View } from 'react-native';
+import { Alert, ScrollView, View } from 'react-native';
 import { Text } from '../../components/LText';
 import { PickerModal } from '../../components/PickerModal';
 import { Btn, common, Field, Select } from '../../components/ui';
@@ -29,7 +30,7 @@ export default function Inventory() {
   }, [uid]);
   useEffect(() => { void load(); }, [load]);
   if (!uid) return <GuestGate icon="truck" text="Makinelerini yönetmek için giriş yap." />;
-  if (loading) return <ActivityIndicator style={{ margin: 24 }} />;
+  if (loading) return <RowSkeleton />;
 
   async function save() {
     if (!form) return;

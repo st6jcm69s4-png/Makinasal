@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
+import { RowSkeleton } from '../components/kit';
 import { GuestGate } from '../components/LoginPrompt';
-import { ActivityIndicator, Pressable, ScrollView } from 'react-native';
+import { Pressable, ScrollView } from 'react-native';
 import { Text } from '../components/LText';
 import { Btn, common } from '../components/ui';
 import { useApp } from '../lib/AppContext';
@@ -25,7 +26,7 @@ export default function Payments() {
     });
   }, [session]);
   if (!session) return <GuestGate icon="credit-card" text="Ödemelerini görmek için giriş yap." />;
-  if (loading) return <ActivityIndicator style={{ margin: 24 }} />;
+  if (loading) return <RowSkeleton />;
   return (
     <ScrollView style={common.screen} contentContainerStyle={{ padding: 12, gap: 8 }}>
       <Text style={common.meta}>Gönderdiğin ve aldığın ödemelerin doğrulanan durumu. Gerçek tahsilat henüz kullanıma açılmadı; kart bilgisi bu uygulamada istenmez.</Text>

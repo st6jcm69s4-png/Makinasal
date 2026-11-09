@@ -96,6 +96,30 @@ export function RowSkeleton({ count = 5 }: { count?: number }) {
   );
 }
 
+/** Ayrıntı sayfası iskeleti: büyük görsel + başlık + alanlar. */
+export function PageSkeleton({ hero = true }: { hero?: boolean }) {
+  return (
+    <View accessibilityLabel="Yükleniyor" accessibilityRole="progressbar" style={{ padding: 16, gap: 14 }}>
+      {hero ? <Skeleton height={170} style={{ borderRadius: radius + 4 }} /> : null}
+      <Skeleton width="70%" height={22} /><Skeleton width="40%" height={16} />
+      <View style={{ height: 6 }} />
+      {Array.from({ length: 5 }, (_, i) => (
+        <View key={i} style={{ flexDirection: 'row', justifyContent: 'space-between' }}><Skeleton width="30%" height={13} /><Skeleton width="38%" height={13} /></View>
+      ))}
+    </View>
+  );
+}
+/** Form iskeleti: etiket + alan çiftleri. */
+export function FormSkeleton({ count = 6 }: { count?: number }) {
+  return (
+    <View accessibilityLabel="Yükleniyor" accessibilityRole="progressbar" style={{ padding: 16, gap: 18 }}>
+      {Array.from({ length: count }, (_, i) => (
+        <View key={i} style={{ gap: 8 }}><Skeleton width={i % 2 ? '34%' : '26%'} height={11} /><Skeleton height={46} style={{ borderRadius: radius }} /></View>
+      ))}
+    </View>
+  );
+}
+
 /* ───────── Tabs ───────── */
 export type TabItem<T extends string> = { id: T; label: string; count?: number; icon?: IconName };
 /** variant "filled": seçili sekme lacivert (ana bölüm anahtarı). "line": altı çizgili (alt bölümler). */

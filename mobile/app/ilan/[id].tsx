@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { toast } from '../../components/Toast';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ActivityIndicator, Alert, Dimensions, Image, Linking, Modal, Pressable, ScrollView, StyleSheet, Switch, View } from 'react-native';
 import { PlainText, Text, TextInput } from '../../components/LText';
@@ -16,7 +17,7 @@ import { AuctionBox, type Auction } from '../../components/AuctionBox';
 import { VideoPlayer } from '../../components/VideoPlayer';
 import { videoHost, videoThumb } from '../../lib/video';
 import { CONDITION_FIELDS, formatTech, techFieldsFor } from '../../lib/techSpecs';
-import { color, font, radius, shadow } from '../../lib/theme';
+import { color, font, radius, shadow, fixed } from '../../lib/theme';
 
 type Detail = {
   id: string; seller_id: string; category: string; title: string; description: string | null; price: number | string; city: string; year: number | null;
@@ -147,7 +148,7 @@ export default function ListingScreen() {
     if (!session) return needLogin('Şikayet');
     const { error } = await supabase.from('reports').insert({ reporter_id: session.user.id, listing_id: id, reason });
     if (error) Alert.alert('Şikayet', /duplicate|unique/i.test(error.message) ? 'Bu ilanı zaten şikayet ettin.' : 'Şikayet gönderilemedi. Daha sonra tekrar dene.');
-    else Alert.alert('Şikayet', 'Şikayet alındı. Moderatörler inceleyecek.');
+    else toast('Şikayet alındı. Moderatörler inceleyecek.');
   }
 
   async function sendService() {
@@ -157,7 +158,7 @@ export default function ListingScreen() {
     setSvcBusy(false);
     if (error) { Alert.alert('Talep', /duplicate|unique/i.test(error.message) ? 'Bu talebi zaten gönderdin.' : /RATE_LIMIT/.test(error.message) ? 'Çok fazla işlem. Bir dakika sonra tekrar dene.' : 'Talep gönderilemedi. Daha sonra tekrar dene.'); return; }
     setService(null); setNote('');
-    Alert.alert('Talep', 'Talebin alındı. Makinasal ekibi seninle iletişime geçecek.');
+    toast('Talebin alındı. Makinasal ekibi seninle iletişime geçecek.');
   }
 
   async function setBoost(days: number) {
@@ -196,10 +197,10 @@ export default function ListingScreen() {
           {photos.length > 1 ? <View style={s.counter}><PlainText style={s.counterT}>{`${slide + 1} / ${photos.length}`}</PlainText></View> : null}
           <View style={s.overlay}>
             <Pressable style={s.round} accessibilityRole="button" accessibilityLabel={fav ? 'Favorilerden çıkar' : 'Favorilere ekle'} onPress={async () => { const err = await toggleFav(item.id, item.price); if (err) notify('Favoriler', err, (a) => void a.toggleFav(item.id, item.price)); }}>
-              <Heart on={fav} size={22} color={fav ? '#E5484D' : '#2A2620'} />
+              <Heart on={fav} size={22} color={fav ? fixed.heart : fixed.mediaInk} />
             </Pressable>
             <Pressable style={[s.round, inCmp && { backgroundColor: color.teal }]} accessibilityRole="button" accessibilityLabel={inCmp ? 'Karşılaştırmada' : 'Karşılaştırmaya ekle'} onPress={() => { const err = toggleCmp(item.id); if (err) Alert.alert('Karşılaştır', err); }}>
-              <Icon name="repeat" size={19} color={inCmp ? color.tealInk : '#2A2620'} />
+              <Icon name="repeat" size={19} color={inCmp ? color.tealInk : fixed.mediaInk} />
             </Pressable>
           </View>
         </View>
@@ -237,7 +238,7 @@ export default function ListingScreen() {
             <Pressable style={({ pressed }) => [s.video, pressed && { opacity: 0.9 }]} onPress={() => void Linking.openURL(item.video_url!)} accessibilityRole="button" accessibilityLabel={`Videoyu ${videoHost(item.video_url)} uygulamasında aç`}>
               {thumb ? <Image source={{ uri: thumb }} style={StyleSheet.absoluteFill} resizeMode="cover" /> : null}
               <View style={s.videoShade} />
-              <View style={s.play}><Icon name="play" size={26} color="#FFFFFF" /></View>
+              <View style={s.play}><Icon name="play" size={26} color={fixed.onMedia} /></View>
               <PlainText style={s.videoT}>{`${videoHost(item.video_url)} · `}<Text style={s.videoT}>Videoyu izle</Text></PlainText>
             </Pressable>
           </>
@@ -390,7 +391,7 @@ const s = StyleSheet.create({
   photo: { width: W, height: 290, backgroundColor: color.plate },
   noPhoto: { alignItems: 'center', justifyContent: 'center' },
   counter: { position: 'absolute', bottom: 12, right: 12, backgroundColor: 'rgba(0,0,0,0.55)', borderRadius: 12, paddingHorizontal: 10, paddingVertical: 4 },
-  counterT: { color: '#fff', fontSize: 12.5, fontWeight: '600' },
+  counterT: { color: fixed.onMedia, fontSize: 12.5, fontWeight: '600' },
   overlay: { position: 'absolute', top: 12, right: 12, gap: 10 },
   round: { width: 42, height: 42, borderRadius: 21, backgroundColor: 'rgba(255,255,255,0.94)', alignItems: 'center', justifyContent: 'center' },
   head: { backgroundColor: color.surface, marginTop: -18, borderTopLeftRadius: 22, borderTopRightRadius: 22, paddingHorizontal: 16, paddingTop: 18, paddingBottom: 16, gap: 8 },
@@ -435,10 +436,10 @@ const s = StyleSheet.create({
   stars: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   starsT: { color: color.ink, fontFamily: font.bold, fontSize: 13.5 },
   starsN: { color: color.muted, fontSize: 13 },
-  video: { marginHorizontal: 16, height: 190, borderRadius: radius + 4, overflow: 'hidden', backgroundColor: '#141412', alignItems: 'center', justifyContent: 'center', ...shadow },
+  video: { marginHorizontal: 16, height: 190, borderRadius: radius + 4, overflow: 'hidden', backgroundColor: fixed.mediaBg, alignItems: 'center', justifyContent: 'center', ...shadow },
   videoShade: { position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.28)' },
-  play: { width: 60, height: 60, borderRadius: 30, backgroundColor: 'rgba(0,0,0,0.55)', alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: '#FFFFFF' },
-  videoT: { position: 'absolute', left: 14, bottom: 12, color: '#FFFFFF', fontFamily: font.semi, fontSize: 14 },
+  play: { width: 60, height: 60, borderRadius: 30, backgroundColor: 'rgba(0,0,0,0.55)', alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: fixed.onMedia },
+  videoT: { position: 'absolute', left: 14, bottom: 12, color: fixed.onMedia, fontFamily: font.semi, fontSize: 14 },
   backdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.45)', justifyContent: 'flex-end' },
   sheet: { backgroundColor: color.surface, paddingHorizontal: 16, paddingTop: 10, paddingBottom: 34, gap: 12, borderTopLeftRadius: 22, borderTopRightRadius: 22 },
   grab: { alignSelf: 'center', width: 40, height: 5, borderRadius: 3, backgroundColor: color.line, marginBottom: 4 },

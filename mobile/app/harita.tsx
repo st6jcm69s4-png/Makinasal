@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, FlatList, Pressable, View } from 'react-native';
+import { RowSkeleton } from '../components/kit';
+import { FlatList, Pressable, View } from 'react-native';
 import { Text } from '../components/LText';
 import { router } from 'expo-router';
 import { common } from '../components/ui';
@@ -17,7 +18,7 @@ export default function CityMap() {
     });
   }, []);
   if (error) return <Text style={common.empty}>{error}</Text>;
-  if (!counts) return <ActivityIndicator style={{ margin: 24 }} />;
+  if (!counts) return <RowSkeleton count={8} />;
   const max = Math.max(1, ...counts.map(([, n]) => n));
   return (
     <FlatList

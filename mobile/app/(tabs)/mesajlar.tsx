@@ -176,7 +176,7 @@ const s = StyleSheet.create({
   modeOn: { backgroundColor: color.navy, borderTopColor: color.accent },
   modeText: { fontSize: 15, fontFamily: font.bold, color: color.ink },
   dot: { minWidth: 20, height: 20, borderRadius: 10, backgroundColor: color.accent, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 5 },
-  dotText: { color: '#fff', fontSize: 11, fontWeight: '700' },
+  dotText: { color: color.accentInk, fontSize: 11, fontWeight: '700' },
   search: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: color.surface, borderWidth: 1, borderColor: color.line, borderRadius: radius + 2, paddingHorizontal: 14, minHeight: 50 },
   searchInput: { flex: 1, paddingVertical: 11, fontSize: 16, color: color.ink },
   err: { color: color.bad, marginHorizontal: 12 },
@@ -193,5 +193,5 @@ const s = StyleSheet.create({
   listing: { color: color.tealText, fontSize: 13.5, fontWeight: '600' },
   last: { flex: 1, color: color.muted, fontSize: 14.5 },
   badge: { minWidth: 22, height: 22, borderRadius: 11, backgroundColor: color.accent, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 6 },
-  badgeText: { color: '#fff', fontSize: 12, fontWeight: '700' },
+  badgeText: { color: color.accentInk, fontSize: 12, fontWeight: '700' },
 });

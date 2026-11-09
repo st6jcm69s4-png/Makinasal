@@ -90,7 +90,7 @@ const s = StyleSheet.create({
   title: { fontSize: 17, fontWeight: '600', color: color.ink },
   desc: { color: color.muted, fontSize: 14 },
   fresh: { backgroundColor: color.accent, paddingHorizontal: 6, paddingVertical: 1, borderRadius: 8 },
-  freshText: { color: '#fff', fontSize: 10.5, fontWeight: '700', letterSpacing: 0.6 },
+  freshText: { color: color.accentInk, fontSize: 10.5, fontWeight: '700', letterSpacing: 0.6 },
   strip: { flexDirection: 'row', borderTopWidth: 1, borderTopColor: color.line },
   cell: { paddingVertical: 7, paddingHorizontal: 12, gap: 1 },
   cellL: { borderLeftWidth: 1, borderLeftColor: color.line },

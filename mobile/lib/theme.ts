@@ -92,6 +92,9 @@ export const color = Object.fromEntries((Object.keys(light) as ColorKey[]).map((
 /** Görünüm seçimi her iki platformda da var (Android'de yeniden başlatarak uygulanır). */
 export const themeSupportsChoice = true;
 
+/** Temadan bağımsız sabit renkler: fotoğraf ve video üstündeki öğeler her temada aynı kalır. */
+export const fixed = { onMedia: '#FFFFFF', mediaInk: '#2A2620', mediaBg: '#141412', black: '#000000', heart: '#E5484D', star: '#E0A100' } as const;
+
 export const radius = 12;
 /** Yumuşak gölge: aşağı kayık, geniş blur. */
 export const shadow = { shadowColor: '#0B1220', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.1, shadowRadius: 14, elevation: 3 } as const;

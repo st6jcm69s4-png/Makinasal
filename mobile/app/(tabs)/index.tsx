@@ -278,7 +278,7 @@ const s = StyleSheet.create({
   spot: { marginHorizontal: 16, marginTop: 4, marginBottom: 16, backgroundColor: color.surface, borderRadius: radius + 8, overflow: 'hidden', ...shadow },
   spotPhoto: { width: '100%', height: 220, backgroundColor: color.plate },
   spotTag: { position: 'absolute', top: 12, left: 12, backgroundColor: 'rgba(0,0,0,0.55)', paddingHorizontal: 12, paddingVertical: 5, borderRadius: 14 },
-  spotTagText: { color: '#fff', fontSize: 12.5 },
+  spotTagText: { color: color.accentInk, fontSize: 12.5 },
   spotBar: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14 },
   spotTitle: { flex: 1, color: color.ink, fontFamily: font.semi, fontSize: 17, lineHeight: 22 },
   spotPrice: { backgroundColor: color.pop, paddingHorizontal: 14, paddingVertical: 8, borderRadius: 18 },

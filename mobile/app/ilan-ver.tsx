@@ -1,4 +1,6 @@
 import { normalizeVideoUrl } from '../lib/video';
+import { toast } from '../components/Toast';
+import { FormSkeleton } from '../components/kit';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CONDITION_FIELDS, cleanTech, techFieldsFor, type TechField } from '../lib/techSpecs';
 import { useEffect, useState, type ReactNode } from 'react';
@@ -14,7 +16,7 @@ import { useApp } from '../lib/AppContext';
 import { CATEGORIES, CITIES, KM_CATEGORIES, LIMITS, MACHINE_CATEGORIES, PART_GROUPS } from '../lib/data';
 import { brandsForCategory, canonicalBrand } from '../lib/machineryCatalog';
 import { photoUrl, supabase } from '../lib/supabase';
-import { color, font, radius, shadow } from '../lib/theme';
+import { color, font, radius, shadow, fixed } from '../lib/theme';
 
 const CONDITIONS = ['Sıfır', 'Çıkma', 'Revizyonlu'];
 const YEAR_MAX = new Date().getFullYear() + 1;
@@ -241,7 +243,8 @@ export default function NewListing() {
       const videoOk = await uploadVideo(id);
       const published = await supabase.from('listings').update({ status: 'active' }).eq('id', id).eq('seller_id', uid);
       if (published.error) throw new Error('İlan kaydedildi ancak yayına alınamadı. İlanlarım ekranından "Yayına al" ile tekrar dene.');
-      Alert.alert('İlan', videoOk ? 'İlan incelemeye gönderildi. Onaylandığında yayımlanacak.' : 'İlan incelemeye gönderildi ancak video yüklenemedi. İlanı düzenleyip videoyu tekrar ekleyebilirsin.');
+      if (videoOk) toast('İlan incelemeye gönderildi. Onaylandığında yayımlanacak.');
+      else Alert.alert('İlan', 'İlan incelemeye gönderildi ancak video yüklenemedi. İlanı düzenleyip videoyu tekrar ekleyebilirsin.');
       router.replace('/ilanlarim');
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Bir hata oluştu.');
@@ -250,7 +253,7 @@ export default function NewListing() {
   }
 
   if (!session) return <GuestGate icon="plus-square" text="İlan vermek için giriş yap. Hesabın yoksa uygulamadan ücretsiz kayıt olabilirsin." />;
-  if (!loadedEdit) return <ActivityIndicator style={{ margin: 32 }} />;
+  if (!loadedEdit) return <FormSkeleton />;
   const field = (label: string, value: string, set: (v: string) => void, extra: Record<string, unknown> = {}) => (
     <View style={s.field}><Text style={s.label}>{label}</Text><TextInput style={s.input} value={value} onChangeText={set} {...extra} /></View>
   );
@@ -377,7 +380,7 @@ export default function NewListing() {
                   <Image source={{ uri: photoUrl(p.path) }} style={s.thumb} />
                 </Pressable>
                 {i === 0 ? <View style={s.cover}><Text style={s.coverT}>Kapak</Text></View> : null}
-                <Pressable style={s.x} onPress={() => { setExisting((cur) => cur.filter((x) => x.id !== p.id)); setRemoved((cur) => [...cur, p]); }} hitSlop={8} accessibilityRole="button" accessibilityLabel={tr('Fotoğrafı kaldır')}><Icon name="x" size={14} color="#fff" /></Pressable>
+                <Pressable style={s.x} onPress={() => { setExisting((cur) => cur.filter((x) => x.id !== p.id)); setRemoved((cur) => [...cur, p]); }} hitSlop={8} accessibilityRole="button" accessibilityLabel={tr('Fotoğrafı kaldır')}><Icon name="x" size={14} color={fixed.onMedia} /></Pressable>
               </View>
             ))}
             {photos.map((u, i) => (
@@ -386,7 +389,7 @@ export default function NewListing() {
                   <Image source={{ uri: u }} style={s.thumb} />
                 </Pressable>
                 {existing.length === 0 && i === 0 ? <View style={s.cover}><Text style={s.coverT}>Kapak</Text></View> : null}
-                <Pressable style={s.x} onPress={() => setPhotos((cur) => cur.filter((_, j) => j !== i))} hitSlop={8} accessibilityRole="button" accessibilityLabel={tr('Fotoğrafı kaldır')}><Icon name="x" size={14} color="#fff" /></Pressable>
+                <Pressable style={s.x} onPress={() => setPhotos((cur) => cur.filter((_, j) => j !== i))} hitSlop={8} accessibilityRole="button" accessibilityLabel={tr('Fotoğrafı kaldır')}><Icon name="x" size={14} color={fixed.onMedia} /></Pressable>
               </View>
             ))}
             {total < maxPhotos ? (
@@ -448,7 +451,7 @@ const s = StyleSheet.create({
   tile: { width: 96, height: 96, borderRadius: radius, overflow: 'hidden' },
   thumb: { width: 96, height: 96, backgroundColor: color.plate },
   cover: { position: 'absolute', left: 6, bottom: 6, backgroundColor: 'rgba(0,0,0,0.6)', borderRadius: 8, paddingHorizontal: 6, paddingVertical: 2 },
-  coverT: { color: '#fff', fontSize: 11, fontWeight: '700' },
+  coverT: { color: fixed.onMedia, fontSize: 11, fontWeight: '700' },
   x: { position: 'absolute', top: 6, right: 6, width: 24, height: 24, borderRadius: 12, backgroundColor: 'rgba(0,0,0,0.6)', alignItems: 'center', justifyContent: 'center' },
   add: { borderWidth: 1.5, borderStyle: 'dashed', borderColor: color.teal, backgroundColor: color.tealSoft, alignItems: 'center', justifyContent: 'center', gap: 4 },
   addT: { color: color.tealText, fontFamily: font.semi, fontSize: 13 },

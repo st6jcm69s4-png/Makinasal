@@ -5,7 +5,7 @@ import { router } from 'expo-router';
 import { useApp } from '../lib/AppContext';
 import { useLoginPrompt } from './LoginPrompt';
 import { photoUrl, tl, type Row } from '../lib/supabase';
-import { color, font, radius, shadow } from '../lib/theme';
+import { color, font, radius, shadow, fixed } from '../lib/theme';
 
 /** İlan kartı: önce büyük fotoğraf, altında başlık, fiyat ve yer/yıl. */
 export function ListingCard({ item }: { item: Row }) {
@@ -23,7 +23,7 @@ export function ListingCard({ item }: { item: Row }) {
           accessibilityLabel={fav ? 'Favorilerden çıkar' : 'Favorilere ekle'}
           onPress={async () => { const err = await toggleFav(item.id, item.price); if (err) notify('Favoriler', err, (a) => void a.toggleFav(item.id, item.price)); }}
         >
-          <Heart on={fav} size={22} color={fav ? '#E5484D' : '#44505F'} />
+          <Heart on={fav} size={22} color={fav ? fixed.heart : fixed.mediaInk} />
         </Pressable>
         {item.boosted_until && Date.parse(item.boosted_until) > Date.now() ? (
           <View style={s.boost}><Icon name="trending-up" size={12} color={color.tealInk} /><Text style={s.boostT}>Öne çıkan</Text></View>

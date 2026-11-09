@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
+import { FormSkeleton } from '../../components/kit';
 import { GuestGate } from '../../components/LoginPrompt';
-import { ActivityIndicator, ScrollView } from 'react-native';
+import { ScrollView } from 'react-native';
 import { Text } from '../../components/LText';
 import { Redirect, router, useLocalSearchParams } from 'expo-router';
 import { PickerModal } from '../../components/PickerModal';
@@ -39,7 +40,7 @@ export default function NewPost() {
 
   if ((kind as string) === 'rental_operator') return <Redirect href={(edit ? `/ag/tanit?edit=${edit}` : '/ag/tanit') as never} />;
   if (!session) return <GuestGate icon="plus-square" text="İş ağında ilan vermek için giriş yap." />;
-  if (loading) return <ActivityIndicator style={{ margin: 24 }} />;
+  if (loading) return <FormSkeleton />;
 
   async function save() {
     if (f.title.trim().length < 5 || f.description.trim().length < 20) { setError('Başlık en az 5, açıklama en az 20 karakter olmalı.'); return; }

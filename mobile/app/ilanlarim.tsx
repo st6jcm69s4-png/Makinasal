@@ -1,6 +1,8 @@
 import { useCallback, useState } from 'react';
+import { toast } from '../components/Toast';
+import { CardSkeleton } from '../components/kit';
 import { GuestGate } from '../components/LoginPrompt';
-import { ActivityIndicator, Alert, FlatList, Image, Modal, Pressable, StyleSheet, View } from 'react-native';
+import { Alert, FlatList, Image, Modal, Pressable, StyleSheet, View } from 'react-native';
 import { PlainText, Text, TextInput } from '../components/LText';
 import { Icon, type IconName } from '../components/Icon';
 import { tr } from '../lib/i18n';
@@ -94,7 +96,7 @@ export default function MyListings() {
   }
 
   if (!session) return <GuestGate icon="list" text="İlanlarını görmek ve yönetmek için giriş yap." />;
-  if (rows === null) return <ActivityIndicator style={{ margin: 32 }} />;
+  if (rows === null) return <CardSkeleton />;
   return (
     <View style={{ flex: 1, backgroundColor: color.bg }}>
       {error ? <Text style={s.err}>{error}</Text> : null}
@@ -189,7 +191,7 @@ export default function MyListings() {
               setABusy(false);
               if (e) { setAErr(tr(e.message.includes('LISTING_NOT_LIVE') ? 'İlan onaylanıp yayına girince açık artırma başlatabilirsin.' : e.message.includes('AUCTION_EXISTS') ? 'Bu ilan zaten açık artırmada.' : e.message.includes('AUCTION_LIMIT') ? 'Aynı anda en fazla 10 açık artırma olabilir.' : 'Açık artırma başlatılamadı.')); return; }
               setAuc(null); void load();
-              Alert.alert(tr('Açık artırma'), tr('Açık artırma başladı. Gelen teklifleri bildirimlerden takip edebilirsin.'));
+              toast('Açık artırma başladı. Gelen teklifleri bildirimlerden takip edebilirsin.');
             }} accessibilityRole="button"><Text style={s.aBtnT}>Başlat</Text></Pressable>
             <Pressable style={s.cancel} onPress={() => setAuc(null)} accessibilityRole="button"><Text style={s.cancelT}>Vazgeç</Text></Pressable>
           </Pressable>

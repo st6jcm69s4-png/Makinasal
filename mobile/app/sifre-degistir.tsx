@@ -37,7 +37,7 @@ export default function ChangePassword() {
   if (done) {
     return (
       <View style={s.center}>
-        <View style={s.icon}><Icon name="check" size={24} color="#fff" /></View>
+        <View style={s.icon}><Icon name="check" size={24} color={color.accentInk} /></View>
         <Text style={s.title}>Şifren güncellendi</Text>
         <Text style={s.p}>Bir sonraki girişte yeni şifreni kullan.</Text>
         <View style={{ alignSelf: 'stretch' }}><Btn title="Tamam" onPress={() => router.back()} /></View>

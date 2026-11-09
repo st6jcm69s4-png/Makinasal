@@ -63,7 +63,7 @@ export default function Register() {
   if (!SIGNUP_OPEN) {
     return (
       <View style={s.center}>
-        <View style={s.icon}><Icon name="user-plus" size={24} color="#fff" /></View>
+        <View style={s.icon}><Icon name="user-plus" size={24} color={color.accentInk} /></View>
         <Text style={s.title}>Kayıt yakında</Text>
         <Text style={s.p}>Yeni üyelik kısa süre içinde açılacak. Hesabın varsa giriş yapabilir, uygulamayı misafir olarak gezebilirsin.</Text>
         <View style={{ alignSelf: 'stretch' }}><Btn title="Giriş yap" onPress={() => router.navigate('/hesap')} /></View>
@@ -73,7 +73,7 @@ export default function Register() {
   if (sent) {
     return (
       <View style={s.center}>
-        <View style={[s.icon, { backgroundColor: color.good }]}><Icon name="mail" size={24} color="#fff" /></View>
+        <View style={[s.icon, { backgroundColor: color.good }]}><Icon name="mail" size={24} color={color.accentInk} /></View>
         <Text style={s.title}>E-postanı kontrol et</Text>
         <Text style={s.p}>{`${email.trim()} adresine bir doğrulama bağlantısı gönderdik. Bağlantıya dokununca hesabın etkinleşir. Gelmediyse spam klasörüne bak.`}</Text>
         <View style={{ alignSelf: 'stretch' }}><Btn title="Giriş ekranına dön" onPress={() => router.navigate('/hesap')} /></View>
@@ -108,7 +108,7 @@ export default function Register() {
           <Field label="Şifre tekrar" value={password2} onChangeText={setPassword2} secureTextEntry autoCapitalize="none" textContentType="newPassword" />
           {password2 && password !== password2 ? <Text style={[s.ruleText, { color: color.bad }]}>Şifreler eşleşmiyor.</Text> : null}
           <Pressable style={s.check} onPress={() => setAccepted((a) => !a)} accessibilityRole="checkbox" accessibilityState={{ checked: accepted }}>
-            <View style={[s.box, accepted && { backgroundColor: color.accent, borderColor: color.accent }]}>{accepted ? <Icon name="check" size={15} color="#fff" /> : null}</View>
+            <View style={[s.box, accepted && { backgroundColor: color.accent, borderColor: color.accent }]}>{accepted ? <Icon name="check" size={15} color={color.accentInk} /> : null}</View>
             <Text style={s.checkText}>Kullanım koşullarını ve KVKK aydınlatma metnini okudum, kabul ediyorum.</Text>
           </Pressable>
           <View style={{ flexDirection: 'row', gap: 16 }}>

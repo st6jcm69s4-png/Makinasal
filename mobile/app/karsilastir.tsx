@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { PageSkeleton } from '../components/kit';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { Text } from '../components/LText';
 import { router } from 'expo-router';
 import { useApp } from '../lib/AppContext';
@@ -18,7 +19,7 @@ export default function Compare() {
     void supabase.from('listings').select('id,title,price,city,year,usage_value,usage_unit,brand,model,takas,category,tech').in('id', cmp).eq('status', 'active').eq('moderation_status', 'approved')
       .then(({ data }) => setRows(cmp.map((id) => ((data ?? []) as L[]).find((r) => r.id === id)).filter(Boolean) as L[]));
   }, [cmp]);
-  if (rows === null) return <ActivityIndicator style={{ margin: 32 }} />;
+  if (rows === null) return <PageSkeleton />;
   if (!rows.length) return <Text style={s.msg}>Karşılaştırılacak ilan yok. İlan detayında "Karşılaştırmaya ekle"ye dokun (en fazla 3).</Text>;
   const min = Math.min(...rows.map((r) => Number(r.price)));
   const lines: [string, (r: L) => string][] = [

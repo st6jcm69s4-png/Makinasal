@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
+import { PageSkeleton } from '../../../components/kit';
 import { PersonDetailsView } from '../../../components/PersonDetails';
-import { Alert, ActivityIndicator, ScrollView, View } from 'react-native';
+import { Alert, ScrollView, View } from 'react-native';
 import { Text } from '../../../components/LText';
 import { router, useLocalSearchParams } from 'expo-router';
 import { PickerModal } from '../../../components/PickerModal';
@@ -40,7 +41,7 @@ export default function PostDetail() {
   }, [id, uid]);
   useEffect(() => { void load(); }, [load]);
 
-  if (loading) return <ActivityIndicator style={{ margin: 24 }} />;
+  if (loading) return <PageSkeleton hero={false} />;
   if (!post) return <Text style={common.empty}>{error || 'İlan bulunamadı.'}</Text>;
   const isOwner = uid === post.owner_id;
   const mine = quotes.find((q) => q.bidder_id === uid);

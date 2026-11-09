@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Alert, Pressable, Share, StyleSheet, View } from 'react-native';
+import { toast } from './Toast';
+import { Pressable, Share, StyleSheet, View } from 'react-native';
 import { PlainText, Text, TextInput } from './LText';
 import { Icon } from './Icon';
 import { Label } from './ui';
@@ -43,14 +44,14 @@ export function ReferralBox() {
     const { error } = await supabase.rpc('claim_referral', { p_code: input });
     setBusy(false);
     if (error) { setMsg(/RATE_LIMIT/.test(error.message) ? 'Çok fazla deneme. Daha sonra tekrar dene.' : error.message); return; }
-    Alert.alert('Davet', 'Davet kodu kaydedildi.'); setInput(''); setEnter(false); void load();
+    toast('Davet kodu kaydedildi.'); setInput(''); setEnter(false); void load();
   }
   const share = () => { if (code) void Share.share({ message: `Makinasal'a katıl: iş makinesi, kamyon ve yedek parça pazarı. Kayıt olurken davet kodumu gir: ${code}` }); };
 
   return (
     <View style={s.wrap}>
       <Pressable style={({ pressed }) => [s.top, pressed && { opacity: 0.92 }]} onPress={() => setOpen((v) => !v)} accessibilityRole="button" accessibilityState={{ expanded: open }}>
-        <View style={s.gift}><Icon name="gift" size={22} color="#fff" /></View>
+        <View style={s.gift}><Icon name="gift" size={22} color={color.accentInk} /></View>
         <View style={{ flex: 1, gap: 2 }}>
           <Text style={s.title}>Arkadaşını davet et</Text>
           <Text style={s.lead}>Ücretsiz ilan hakkı kazan</Text>
@@ -81,7 +82,7 @@ export function ReferralBox() {
                   <PlainText style={s.code} selectable>{code || '······'}</PlainText>
                 </View>
                 <Pressable style={({ pressed }) => [s.share, pressed && { opacity: 0.85 }]} onPress={share} disabled={!code} accessibilityRole="button">
-                  <Icon name="share-2" size={18} color="#fff" /><Text style={s.shareText}>Paylaş</Text>
+                  <Icon name="share-2" size={18} color={color.accentInk} /><Text style={s.shareText}>Paylaş</Text>
                 </Pressable>
               </View>
             ) : (
@@ -122,7 +123,7 @@ const s = StyleSheet.create({
   ticket: { flexDirection: 'row', alignItems: 'center', gap: 12, borderWidth: 1.5, borderStyle: 'dashed', borderColor: color.muted, padding: 12, backgroundColor: color.navy },
   code: { color: color.onBar, fontFamily: font.labelBold, fontSize: 30, letterSpacing: 4 },
   share: { backgroundColor: color.accent, flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 14, minHeight: 44, borderRadius: radius },
-  shareText: { color: '#fff', fontWeight: '700' },
+  shareText: { color: color.accentInk, fontWeight: '700' },
   progress: { flexDirection: 'row', alignItems: 'center', gap: 14 },
   seg: { flex: 1, height: 10, backgroundColor: color.plate, borderWidth: 1, borderColor: color.line },
   segOn: { backgroundColor: color.accent, borderColor: color.accent },

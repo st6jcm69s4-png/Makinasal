@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { toast } from '../../components/Toast';
 import { useLoginPrompt } from '../../components/LoginPrompt';
 import { CardSkeleton } from '../../components/kit';
 import { useTabScrollTop } from '../../lib/scrollTop';
@@ -85,7 +86,8 @@ export default function Listings() {
       ...(adv.near ? { near: adv.near, distances: Object.fromEntries(Object.keys(COORDS).map((c) => [c, distanceKm(myCity, c) ?? 99999])) } : {}) };
     let { error: e } = await supabase.from('saved_searches').insert({ user_id: session.user.id, query: { f }, params, notify: true });
     if (e && /params|notify/.test(e.message)) ({ error: e } = await supabase.from('saved_searches').insert({ user_id: session.user.id, query: { f } }));
-    Alert.alert('Aramayı kaydet', e ? (/limit/i.test(e.message) ? 'Kayıtlı arama sınırına ulaştın. Eskilerden birini sil.' : 'Arama kaydedilemedi. Tekrar dene.') : 'Arama kaydedildi. Bu aramaya uyan yeni ilan gelince sana bildirim göndereceğiz.');
+    if (e) Alert.alert('Aramayı kaydet', /limit/i.test(e.message) ? 'Kayıtlı arama sınırına ulaştın. Eskilerden birini sil.' : 'Arama kaydedilemedi. Tekrar dene.');
+    else toast('Arama kaydedildi. Bu aramaya uyan yeni ilan gelince sana bildirim göndereceğiz.');
   }
   const [q, setQ] = useState('');
   const [rows, setRows] = useState<Row[]>([]);
