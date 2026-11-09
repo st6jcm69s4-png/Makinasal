@@ -175,7 +175,7 @@ export default function Thread() {
         keyExtractor={(m) => m.id}
         onEndReached={() => void loadOlder()}
         onEndReachedThreshold={0.3}
-        ListFooterComponent={loadingOlder ? <ActivityIndicator style={{ marginVertical: 10 }} color={color.teal} /> : !hasMore && msgs.length >= PAGE ? <Text style={s.empty}>Konuşmanın başı</Text> : null}
+        ListFooterComponent={loadingOlder ? <ActivityIndicator style={{ marginVertical: 10 }} color={color.teal} /> : !hasMore && msgs.length >= PAGE ? <Text style={s.empty}>Konuşmanın başı</Text> : undefined}
         contentContainerStyle={{ paddingHorizontal: 14, paddingVertical: 12, gap: 6 }}
         ListEmptyComponent={<Text style={s.empty}>Henüz mesaj yok. İlk mesajı sen yaz.</Text>}
         renderItem={({ item }) => {
