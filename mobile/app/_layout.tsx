@@ -34,6 +34,8 @@ function Screens() {
       >
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="ilan/[id]" options={{ title: T('İlan') }} />
+        <Stack.Screen name="mesajlar" options={{ title: T('Mesajlar') }} />
+        <Stack.Screen name="favoriler" options={{ title: T('Favorilerim') }} />
         <Stack.Screen name="ilan-ver" options={{ title: T('İlan ver') }} />
         <Stack.Screen name="ilanlarim" options={{ title: T('İlanlarım') }} />
         <Stack.Screen name="mesaj/[id]" options={{ title: T('Mesajlar') }} />

@@ -135,7 +135,7 @@ export default function Home() {
             <Text style={s.catLabel} numberOfLines={1}>{c.label}</Text>
           </Pressable>
         ))}
-        <Pressable style={({ pressed }) => [s.cat, pressed && { opacity: 0.85 }]} onPress={() => router.navigate('/ilanlar')} accessibilityRole="button">
+        <Pressable style={({ pressed }) => [s.cat, pressed && { opacity: 0.85 }]} onPress={() => router.navigate({ pathname: '/ilanlar', params: { cat: '' } })} accessibilityRole="button">
           <View style={s.catTile}><Icon name="grid" size={26} color={color.tealText} /></View>
           <Text style={s.catLabel} numberOfLines={1}>Tümü</Text>
         </Pressable>
@@ -193,7 +193,7 @@ export default function Home() {
 
       {featured.length ? (
         <>
-          <SectionHead title="Öne çıkanlar" action="Tümü" onAction={() => router.navigate('/ilanlar')} />
+          <SectionHead title="Öne çıkanlar" action="Tümü" onAction={() => router.navigate({ pathname: '/ilanlar', params: { cat: '' } })} />
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.rail}>
             {featured.map((r) => <ListingCard key={'f' + r.id} item={r} variant="wide" />)}
           </ScrollView>
@@ -209,7 +209,7 @@ export default function Home() {
         </>
       ) : null}
 
-      <SectionHead title="Yeni ilanlar" action="Tümü" onAction={() => router.navigate('/ilanlar')} />
+      <SectionHead title="Yeni ilanlar" action="Tümü" onAction={() => router.navigate({ pathname: '/ilanlar', params: { cat: '' } })} />
       {busy && !latest.length ? <CardSkeleton count={2} /> : null}
       <View style={{ paddingHorizontal: 16, gap: 12 }}>
         {pairs.map((p) => (

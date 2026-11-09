@@ -6,7 +6,7 @@ import { color } from '../lib/theme';
 /** Alt menü sırası; sağa/sola kaydırınca bir önceki/sonraki sekmeye geçilir. */
 export const TAB_ORDER = ['index', 'ilanlar', 'is-agi', 'hesap'] as const;
 type Tab = (typeof TAB_ORDER)[number];
-const PATH: Record<string, string> = { index: '/', ilanlar: '/ilanlar', 'is-agi': '/is-agi', favoriler: '/favoriler', mesajlar: '/mesajlar', hesap: '/hesap' };
+const PATH: Record<string, string> = { index: '/', ilanlar: '/ilanlar', 'is-agi': '/is-agi', hesap: '/hesap' };
 
 /*
  * Sekme geçişi yalnızca kaydırınca canlandırılır (alt menüdeki simgeye dokununca anında geçer):

@@ -48,10 +48,10 @@ const postIcon = () => (
 /** Başlıktaki yuvarlak simge düğmesi (isteğe bağlı sayı rozeti). */
 function HeadBtn({ icon, label, badge, onPress }: { icon: IconName; label: string; badge?: number; onPress: () => void }) {
   return (
-    <Pressable onPress={onPress} hitSlop={6} accessibilityRole="button" accessibilityLabel={badge ? `${label}, ${badge}` : label} style={({ pressed }) => [{ width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' }, pressed && { opacity: 0.6 }]}>
-      <Icon name={icon} size={21} color={color.onBar} />
+    <Pressable onPress={onPress} hitSlop={6} accessibilityRole="button" accessibilityLabel={badge ? `${label}, ${badge}` : label} style={({ pressed }) => [{ width: 42, height: 42, borderRadius: 21, alignItems: 'center', justifyContent: 'center', backgroundColor: pressed ? color.plate : color.surface, borderWidth: 1, borderColor: color.line }]}>
+      <Icon name={icon} size={20} color={color.ink} />
       {badge ? (
-        <View style={{ position: 'absolute', top: 2, right: 0, minWidth: 18, height: 18, paddingHorizontal: 4, borderRadius: 9, backgroundColor: color.pop, borderWidth: 2, borderColor: color.navy, alignItems: 'center', justifyContent: 'center' }}>
+        <View style={{ position: 'absolute', top: -4, right: -4, minWidth: 18, height: 18, paddingHorizontal: 4, borderRadius: 9, backgroundColor: color.pop, borderWidth: 2, borderColor: color.surface, alignItems: 'center', justifyContent: 'center' }}>
           <PlainText style={{ color: color.popInk, fontSize: 10, fontFamily: font.textBold }}>{badge > 99 ? '99+' : String(badge)}</PlainText>
         </View>
       ) : null}
@@ -107,10 +107,10 @@ export default function TabsLayout() {
         headerTitle: () => <Logo />,
         // Mesajlar üstte, okunmamış sayısıyla (alt menüde yer açmak için)
         headerRight: () => (
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 2, paddingRight: 10 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingRight: 12 }}>
             <HeadBtn icon="search" label={tr('Uygulamada ara')} onPress={() => router.push('/ara' as never)} />
             <HeadBtn icon="bell" label={tr('Bildirimler')} onPress={() => router.push(session ? '/bildirimler' as never : '/hesap' as never)} />
-            <HeadBtn icon="message-square" label={tr('Mesajlar')} badge={unread} onPress={() => router.navigate('/mesajlar' as never)} />
+            <HeadBtn icon="message-square" label={tr('Mesajlar')} badge={unread} onPress={() => router.push('/mesajlar' as never)} />
           </View>
         ),
         tabBarActiveTintColor: color.barActive,
@@ -124,9 +124,6 @@ export default function TabsLayout() {
       <Tabs.Screen name="yeni" options={{ tabBarLabel: label(tr('İlan ver')), tabBarIcon: postIcon, tabBarAccessibilityLabel: tr('İlan ver') }} />
       <Tabs.Screen name="is-agi" options={{ tabBarLabel: label(tr('İş Ağı')), tabBarIcon: icon('briefcase') }} />
       <Tabs.Screen name="hesap" options={{ tabBarLabel: label(tr('Hesabım')), tabBarIcon: icon('user') }} />
-      {/* Menüde görünmeyen sekmeler: Mesajlar başlıkta, Favoriler Hesabım'da */}
-      <Tabs.Screen name="mesajlar" options={{ href: null }} />
-      <Tabs.Screen name="favoriler" options={{ href: null }} />
     </Tabs>
   );
 }

@@ -80,9 +80,9 @@ function Member() {
         ]} />
         <Group title="İlanlarım ve takip" items={[
           { icon: 'list', label: 'İlanlarım', sub: active ? `${active} yayında` : undefined, go: go('/ilanlarim') },
-          { icon: 'message-square', label: 'Mesajlar', badge: unread || undefined, go: () => router.navigate('/mesajlar') },
+          { icon: 'message-square', label: 'Mesajlar', badge: unread || undefined, go: () => router.push('/mesajlar') },
           { icon: 'bell', label: 'Bildirimler', badge: notif || undefined, go: go('/bildirimler') },
-          { icon: 'heart', label: 'Favorilerim', sub: `${favs.size} ilan`, go: () => router.navigate('/favoriler') },
+          { icon: 'heart', label: 'Favorilerim', sub: `${favs.size} ilan`, go: () => router.push('/favoriler') },
           { icon: 'bookmark', label: 'Kayıtlı aramalar', go: go('/kayitli-aramalar') },
           { icon: 'repeat', label: 'Karşılaştırma', go: go('/karsilastir') },
         ]} />
