@@ -4,3 +4,6 @@ node_modules
 .env*.local
 tsconfig.tsbuildinfo
 *.tsbuildinfo
+
+# Expo kural betiklerinin önbelleği
+.claude/skills/**/.cache/
