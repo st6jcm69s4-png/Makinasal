@@ -17,12 +17,15 @@ import { AuctionBox, type Auction } from '../../components/AuctionBox';
 import { VideoPlayer } from '../../components/VideoPlayer';
 import { videoHost, videoThumb } from '../../lib/video';
 import { CONDITION_FIELDS, formatTech, techFieldsFor } from '../../lib/techSpecs';
-import { color, font, radius, shadow, fixed } from '../../lib/theme';
+import { caps, color, font, radius, shadow, fixed } from '../../lib/theme';
+import { getLang, localeOf, tr } from '../../lib/i18n';
+import { useLang } from '../../lib/lang';
 
 type Detail = {
   id: string; seller_id: string; category: string; title: string; description: string | null; price: number | string; city: string; year: number | null;
   usage_value: number | null; usage_unit: string | null; brand: string | null; model: string | null;
   video_url?: string | null; video_path?: string | null; boosted_until?: string | null; tech?: Record<string, string | number> | null;
+  prev_price?: number | string | null; takas?: boolean | null; serial_declared?: boolean | null;
   listing_photos: { path: string; position: number }[] | null;
 };
 const REPORT_REASONS = ['Sahte veya yanıltıcı ilan', 'Kapora / ön ödeme istiyor', 'Fiyat gerçek dışı', 'Hakaret veya taciz', 'Diğer'];
@@ -36,6 +39,7 @@ const W = Dimensions.get('window').width;
 export default function ListingScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { favs, toggleFav, session, cmp, toggleCmp } = useApp();
+  const { lang } = useLang();
   const { askLogin, notify } = useLoginPrompt();
   const [offerOpen, setOfferOpen] = useState(false);
   const [offerAmt, setOfferAmt] = useState('');
@@ -73,7 +77,7 @@ export default function ListingScreen() {
     const base = 'id,seller_id,category,title,description,price,city,year,usage_value,usage_unit,brand,model,listing_photos(path,position)';
     const q = (cols: string) => supabase.from('listings').select(cols).eq('id', id).eq('status', 'active').eq('moderation_status', 'approved').maybeSingle();
     // video_url yeni sütun: eski veritabanında yoksa onsuz tekrar dene
-    void q(base + ',video_url,video_path,boosted_until,tech').then((r) => (r.error ? q(base) : r))
+    void q(base + ',video_url,video_path,boosted_until,tech,prev_price,takas,serial_declared').then((r) => (r.error ? q(base) : r))
       .then(async ({ data, error }) => {
         if (!alive) return;
         if (error) { setState('error'); return; }
@@ -186,7 +190,16 @@ export default function ListingScreen() {
     ...techFieldsFor(item.category).map((f) => [f.label, formatTech(f, item.tech?.[f.key])] as [string, string | null]).filter(([, v]) => v !== null),
   ];
   const condition = CONDITION_FIELDS.map((f) => [f.label, formatTech(f, item.tech?.[f.key])] as [string, string | null]).filter(([, v]) => v !== null);
-  const chips: [IconName, string][] = ([['map-pin', item.city], ['calendar', item.year ? String(item.year) : ''], ['activity', item.usage_value ? `${item.usage_value} ${item.usage_unit ?? ''}`.trim() : '']] as [IconName, string][]).filter(([, v]) => !!v);
+  // Üstteki "ruhsat" kutuları: alıcının ilk baktığı 6 bilgi (yıl, kullanım, en önemli teknik alanlar, il)
+  const nf = (n: number) => n.toLocaleString(localeOf(getLang()));
+  const key6: [string, string][] = ([
+    ['Yıl', item.year ? String(item.year) : ''],
+    [item.usage_unit === 'km' ? 'Kilometre' : 'Çalışma', item.usage_value ? `${nf(item.usage_value)} ${item.usage_unit === 'km' ? 'km' : tr('sa')}` : ''],
+    ...techFieldsFor(item.category).filter((f) => f.filter).map((f) => [f.label, formatTech(f, item.tech?.[f.key]) ?? ''] as [string, string]),
+    ['İl', item.city],
+  ] as [string, string][]).filter(([, v]) => !!v).slice(0, 6);
+  const drop = Number(item.prev_price ?? 0) > Number(item.price) && Number(item.price) > 0 ? Number(item.prev_price) - Number(item.price) : 0;
+  const tags = [item.takas ? 'Takas olur' : '', item.serial_declared ? 'Seri no beyan edildi' : ''].filter(Boolean);
   return (
     <View style={s.screen}>
       <ScrollView contentContainerStyle={{ paddingBottom: own ? 32 : 120 }}>
@@ -206,12 +219,28 @@ export default function ListingScreen() {
         </View>
 
         <View style={s.head}>
-          {boosted ? <View style={s.boost}><Icon name="trending-up" size={13} color={color.tealInk} /><Text style={s.boostT}>Öne çıkan</Text></View> : null}
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+            <PlainText style={s.kicker}>{caps(tr(item.category), lang)}</PlainText>
+            {boosted ? <View style={s.boost}><Icon name="trending-up" size={12} color={color.tealInk} /><Text style={s.boostT}>Öne çıkan</Text></View> : null}
+          </View>
           <Text style={s.title}>{item.title}</Text>
-          <PlainText style={s.price}>{tl(item.price)}{part ? <Text style={s.unit}> (birim fiyat)</Text> : null}</PlainText>
-          {chips.length ? (
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+            <PlainText style={s.price}>{tl(item.price)}{part ? <Text style={s.unit}> (birim fiyat)</Text> : null}</PlainText>
+            {drop ? <View style={s.dropChip}><PlainText style={s.dropT}>{`↓ ${tl(drop)} ${tr('düştü')}`}</PlainText></View> : null}
+          </View>
+          {tags.length ? (
             <View style={s.chips}>
-              {chips.map(([ic, v]) => <View key={ic} style={s.chip}><Icon name={ic} size={14} color={color.tealText} /><PlainText style={s.chipT}>{v}</PlainText></View>)}
+              {tags.map((t) => <View key={t} style={s.chip}><Text style={s.chipT}>{t}</Text></View>)}
+            </View>
+          ) : null}
+          {key6.length ? (
+            <View style={s.keys}>
+              {key6.map(([k, v], i) => (
+                <View key={k} style={[s.keyCell, i % 3 !== 2 && s.keyR, i < key6.length - (key6.length % 3 || 3) && s.keyB]}>
+                  <PlainText style={s.keyK} numberOfLines={1}>{caps(tr(k), lang)}</PlainText>
+                  <PlainText style={s.keyV} numberOfLines={1}>{v}</PlainText>
+                </View>
+              ))}
             </View>
           ) : null}
           {cmp.length >= 2 ? (
@@ -395,11 +424,20 @@ const s = StyleSheet.create({
   overlay: { position: 'absolute', top: 12, right: 12, gap: 10 },
   round: { width: 42, height: 42, borderRadius: 21, backgroundColor: 'rgba(255,255,255,0.94)', alignItems: 'center', justifyContent: 'center' },
   head: { backgroundColor: color.surface, marginTop: -18, borderTopLeftRadius: 22, borderTopRightRadius: 22, paddingHorizontal: 16, paddingTop: 18, paddingBottom: 16, gap: 8 },
-  title: { fontFamily: font.bold, fontSize: 22, lineHeight: 28, color: color.ink },
-  price: { fontFamily: font.bold, fontSize: 27, color: color.tealText },
+  title: { fontFamily: font.bold, fontSize: 24, lineHeight: 28, color: color.ink },
+  price: { fontFamily: font.bold, fontSize: 30, color: color.tealText },
+  kicker: { fontFamily: font.label, fontSize: 12, letterSpacing: 0.8, color: color.muted },
+  dropChip: { backgroundColor: color.goodBg, borderRadius: 8, paddingHorizontal: 8, paddingVertical: 3 },
+  dropT: { color: color.good, fontFamily: font.textBold, fontSize: 13 },
+  keys: { flexDirection: 'row', flexWrap: 'wrap', marginTop: 6, borderWidth: 1, borderColor: color.line, borderRadius: radius + 4, backgroundColor: color.bg, overflow: 'hidden' },
+  keyCell: { width: '33.333%', paddingVertical: 10, paddingHorizontal: 12, gap: 2 },
+  keyR: { borderRightWidth: 1, borderRightColor: color.line },
+  keyB: { borderBottomWidth: 1, borderBottomColor: color.line },
+  keyK: { fontFamily: font.label, fontSize: 11.5, letterSpacing: 0.6, color: color.muted },
+  keyV: { fontFamily: font.bold, fontSize: 17, color: color.ink },
   unit: { fontSize: 14, fontFamily: font.medium, color: color.muted },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 2 },
-  chip: { flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: color.tealSoft, borderRadius: 14, paddingHorizontal: 10, paddingVertical: 5 },
+  chip: { flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: color.plate, borderRadius: 8, paddingHorizontal: 9, paddingVertical: 4 },
   chipT: { color: color.ink, fontSize: 13.5, fontWeight: '600' },
   cmpLink: { flexDirection: 'row', alignItems: 'center', gap: 6, alignSelf: 'flex-start', paddingVertical: 4 },
   linkT: { color: color.tealText, fontFamily: font.semi, fontSize: 14.5 },
