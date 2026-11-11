@@ -103,6 +103,7 @@ function Member() {
           { icon: 'life-buoy', label: 'Çekici bul', sub: 'En yakın çekiciler, puanlarıyla', go: go('/cekici') },
           { icon: 'map', label: 'İllere göre ilanlar', go: go('/harita') },
           { icon: 'file-text', label: 'Hukuki bilgiler ve veri haklarım', go: go('/hukuki') },
+          { icon: 'book-open', label: 'Kullanım rehberi', sub: 'Her bölüm adım adım', go: go('/rehber') },
           { icon: 'settings', label: 'Ayarlar ve yardım', go: go('/ayarlar') },
         ]} />
         <View style={{ gap: 6 }}>

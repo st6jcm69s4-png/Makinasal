@@ -3,7 +3,7 @@ import { listingScore, type ScoreInput } from '../lib/listingScore';
 import { toast } from '../components/Toast';
 import { CardSkeleton } from '../components/kit';
 import { GuestGate } from '../components/LoginPrompt';
-import { Alert, FlatList, Image, Modal, Pressable, StyleSheet, View } from 'react-native';
+import { Alert, FlatList, Image, Modal, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { PlainText, Text, TextInput } from '../components/LText';
 import { Icon, type IconName } from '../components/Icon';
 import { tr } from '../lib/i18n';
@@ -44,6 +44,7 @@ export default function MyListings() {
   const [rows, setRows] = useState<Row[] | null>(null);
   const [error, setError] = useState('');
   const [menu, setMenu] = useState<Row | null>(null);
+  const [quality, setQuality] = useState<Row | null>(null);
   const [stats, setStats] = useState<Map<string, Stat>>(new Map());
   const [auctions, setAuctions] = useState<Map<string, { current_price: number | null; bid_count: number }>>(new Map());
   const [auc, setAuc] = useState<Row | null>(null);
@@ -139,8 +140,11 @@ export default function MyListings() {
               </Pressable>
               {stats.get(r.id) ? (
                 <View style={s.stats}>
-                  {([['eye', stats.get(r.id)!.views, 'görüntülenme'], ['heart', stats.get(r.id)!.favorites, 'favori'], ['message-circle', stats.get(r.id)!.threads, 'mesaj'], ['phone', stats.get(r.id)!.phones, 'telefon']] as [IconName, number, string][]).map(([ic, n, l]) => (
-                    <View key={l} style={s.stat} accessibilityLabel={`${n} ${tr(l)}`}><Icon name={ic} size={14} color={color.muted} /><PlainText style={s.statN}>{fmt(n)}</PlainText></View>
+                  {([['eye', stats.get(r.id)!.views, 'görüntülenme'], ['heart', stats.get(r.id)!.favorites, 'favori'], ['message-circle', stats.get(r.id)!.threads, 'mesaj'], ['phone', stats.get(r.id)!.phones, 'telefon']] as [IconName, number, string][]).map(([ic, n, l], i) => (
+                    <View key={l} style={[s.stat, i > 0 && s.statSep]} accessible accessibilityLabel={`${n} ${tr(l)}`}>
+                      <View style={s.statHead}><Icon name={ic} size={13} color={color.muted} /><Text style={s.statL} numberOfLines={1}>{l}</Text></View>
+                      <PlainText style={s.statN}>{fmt(n)}</PlainText>
+                    </View>
                   ))}
                 </View>
               ) : null}
@@ -149,13 +153,16 @@ export default function MyListings() {
                 const q = listingScore(r as ScoreInput);
                 const tone = q.score >= 80 ? color.good : q.score >= 50 ? color.warn : color.bad;
                 return (
-                  <Pressable style={s.quality} onPress={() => router.push({ pathname: '/ilan-ver', params: { duzenle: r.id } } as never)} accessibilityRole="button" accessibilityLabel={`${tr('İlan kalitesi')} ${q.score}/100`}>
+                  <Pressable style={({ pressed }) => [s.quality, pressed && { opacity: 0.75 }]} onPress={() => setQuality(r)} accessibilityRole="button" accessibilityLabel={`${tr('İlan kalitesi')} ${q.score}/100`} accessibilityHint={tr('Puanın nasıl hesaplandığını gösterir')}>
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
                       <Text style={s.qLabel}>İlan kalitesi</Text>
                       <View style={s.qBar}><View style={{ width: `${q.score}%`, backgroundColor: tone, borderRadius: 3 }} /></View>
                       <PlainText style={[s.qScore, { color: tone }]}>{`${q.score}/100`}</PlainText>
                     </View>
-                    {q.tips.length ? <PlainText style={s.qTips} numberOfLines={2}>{q.tips.map((t) => tr(t)).join(' · ')}</PlainText> : <Text style={s.qTips}>Harika: ilanın eksiksiz.</Text>}
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                      {q.tips.length ? <PlainText style={[s.qTips, { flex: 1 }]} numberOfLines={2}>{q.tips.map((t) => tr(t)).join(' · ')}</PlainText> : <Text style={[s.qTips, { flex: 1 }]}>Harika: ilanın eksiksiz.</Text>}
+                      <Text style={s.qWhy}>Neden?</Text>
+                    </View>
                   </Pressable>
                 );
               })() : null}
@@ -177,6 +184,45 @@ export default function MyListings() {
               </Pressable>
             )) : null}
             <Pressable style={s.cancel} onPress={() => setMenu(null)} accessibilityRole="button"><Text style={s.cancelT}>Vazgeç</Text></Pressable>
+          </Pressable>
+        </Pressable>
+      </Modal>
+      {/* İlan kalitesi: puanın maddeleri ve eksikler */}
+      <Modal visible={!!quality} transparent animationType="slide" onRequestClose={() => setQuality(null)}>
+        <Pressable style={s.backdrop} onPress={() => setQuality(null)} accessibilityLabel={tr('Kapat')}>
+          <Pressable style={[s.sheet, { maxHeight: '86%' }]} onPress={() => undefined}>
+            {quality ? (() => {
+              const q = listingScore(quality as ScoreInput);
+              const tone = q.score >= 80 ? color.good : q.score >= 50 ? color.warn : color.bad;
+              return (
+                <ScrollView contentContainerStyle={{ gap: 12 }}>
+                  <Text style={s.qhTitle}>İlan kalitesi</Text>
+                  <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 8 }}>
+                    <PlainText style={[s.qhScore, { color: tone }]}>{String(q.score)}</PlainText>
+                    <PlainText style={s.qhOf}>/ 100</PlainText>
+                  </View>
+                  <Text style={s.qhLead}>Puan, alıcıların bir ilanda en çok baktığı bilgilere göre hesaplanır. Eksikleri tamamladıkça ilanın aramalarda daha çok ilgi görür. Bu puanı yalnızca sen görürsün.</Text>
+                  <View style={s.qhList}>
+                    {q.items.map((x, i) => (
+                      <View key={x.label} style={[s.qhRow, i > 0 && s.sep]}>
+                        <View style={{ flex: 1, gap: 3 }}>
+                          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                            <Icon name={x.got >= x.max ? 'check-circle' : 'alert-circle'} size={16} color={x.got >= x.max ? color.good : color.warn} />
+                            <Text style={s.qhLabel}>{x.label}</Text>
+                          </View>
+                          <PlainText style={s.qhDetail}>{`${tr('Şu an')}: ${x.detail}`}{x.tip ? `  ·  ${tr(x.tip)}` : ''}</PlainText>
+                        </View>
+                        <PlainText style={s.qhPts}>{`${x.got} / ${x.max}`}</PlainText>
+                      </View>
+                    ))}
+                  </View>
+                  <Pressable style={({ pressed }) => [s.qhBtn, pressed && { opacity: 0.85 }]} onPress={() => { const id = quality.id; setQuality(null); setTimeout(() => router.push(`/ilan-ver?duzenle=${id}`), 250); }} accessibilityRole="button">
+                    <Icon name="edit-2" size={17} color={color.tealInk} /><Text style={s.qhBtnT}>Eksikleri tamamla</Text>
+                  </Pressable>
+                  <Pressable style={s.cancel} onPress={() => setQuality(null)} accessibilityRole="button"><Text style={s.cancelT}>Kapat</Text></Pressable>
+                </ScrollView>
+              );
+            })() : null}
           </Pressable>
         </Pressable>
       </Modal>
@@ -238,14 +284,29 @@ const s = StyleSheet.create({
   price: { color: color.tealText, fontFamily: font.bold, fontSize: 15 },
   pill: { alignSelf: 'flex-start', borderRadius: 10, paddingHorizontal: 9, paddingVertical: 3 },
   pillT: { fontFamily: font.semi, fontSize: 12.5 },
+  qWhy: { color: color.tealText, fontFamily: font.semi, fontSize: 12.5 },
+  qhTitle: { fontFamily: font.bold, fontSize: 21, color: color.ink, textAlign: 'center' },
+  qhScore: { fontFamily: font.bold, fontSize: 44, lineHeight: 48 },
+  qhOf: { fontFamily: font.semi, fontSize: 18, color: color.muted },
+  qhLead: { fontSize: 14, lineHeight: 20, color: color.muted },
+  qhList: { borderWidth: 1, borderColor: color.line, borderRadius: radius + 2, paddingHorizontal: 12, backgroundColor: color.bg },
+  qhRow: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 10 },
+  qhLabel: { fontFamily: font.semi, fontSize: 15, color: color.ink },
+  qhDetail: { fontSize: 12.5, lineHeight: 17, color: color.muted, marginLeft: 24 },
+  qhPts: { fontFamily: font.bold, fontSize: 15, color: color.ink },
+  qhBtn: { height: 48, borderRadius: radius + 2, backgroundColor: color.teal, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
+  qhBtnT: { fontFamily: font.bold, fontSize: 16.5, color: color.tealInk },
   quality: { borderTopWidth: 1, borderTopColor: color.line, paddingVertical: 9, paddingHorizontal: 12, gap: 5 },
   qLabel: { fontFamily: font.label, fontSize: 12.5, color: color.muted },
   qBar: { flex: 1, height: 6, borderRadius: 3, backgroundColor: color.plate, flexDirection: 'row', overflow: 'hidden' },
   qScore: { fontFamily: font.bold, fontSize: 14 },
   qTips: { fontSize: 12.5, lineHeight: 17, color: color.muted },
-  stats: { flexDirection: 'row', borderTopWidth: 1, borderTopColor: color.line, paddingVertical: 9, paddingHorizontal: 12 },
-  stat: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 5 },
-  statN: { color: color.ink, fontFamily: font.semi, fontSize: 13.5 },
+  stats: { flexDirection: 'row', borderTopWidth: 1, borderTopColor: color.line, paddingVertical: 10 },
+  stat: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 3, paddingHorizontal: 2 },
+  statSep: { borderLeftWidth: 1, borderLeftColor: color.line },
+  statHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4 },
+  statL: { color: color.muted, fontSize: 11.5, textAlign: 'center' },
+  statN: { color: color.ink, fontFamily: font.bold, fontSize: 18, textAlign: 'center' },
   sum: { backgroundColor: color.surface, borderRadius: radius + 4, padding: 14, gap: 10, marginBottom: 2, ...shadow },
   sumT: { color: color.ink, fontFamily: font.bold, fontSize: 16 },
   sumRow: { flexDirection: 'row' },

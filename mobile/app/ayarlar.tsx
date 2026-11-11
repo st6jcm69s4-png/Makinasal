@@ -130,6 +130,7 @@ export default function Settings() {
       <View style={r.group}>
         <Row icon="award" title="Üyelik ve ilan hakları" onPress={() => router.push('/premium')} />
         <Row icon="shield" title="Güven sistemi" onPress={() => router.push('/guven')} />
+        <Row icon="book-open" title="Kullanım rehberi" onPress={() => router.push('/rehber' as never)} />
         <Row icon="help-circle" title="Yardım merkezi" onPress={() => router.push('/destek')} />
         <Row icon="file-text" title="Hukuki bilgiler" onPress={() => router.push('/hukuki' as never)} last />
       </View>
