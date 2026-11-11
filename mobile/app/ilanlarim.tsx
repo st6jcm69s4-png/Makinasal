@@ -15,10 +15,10 @@ import { color, font, radius, shadow } from '../lib/theme';
 type Row = {
   id: string; title: string; price: number | string; city: string; status: string;
   moderation_status: 'pending' | 'approved' | 'rejected' | null; listing_photos: { path: string; position: number }[] | null;
-  boosted_until?: string | null;
+  boosted_until?: string | null; category?: string | null; usage_unit?: string | null;
 };
 type Stat = { views: number; phones: number; favorites: number; threads: number };
-const COLS = 'id,title,price,city,status,moderation_status,boosted_until,category,description,year,usage_value,brand,model,video_url,video_path,tech,listing_photos(path,position)';
+const COLS = 'id,title,price,city,status,moderation_status,boosted_until,category,description,year,usage_value,usage_unit,brand,model,video_url,video_path,tech,listing_photos(path,position)';
 const isBoosted = (r: Row) => !!r.boosted_until && Date.parse(r.boosted_until) > Date.now();
 const fmt = (n: number) => n.toLocaleString('tr-TR');
 
@@ -91,6 +91,7 @@ export default function MyListings() {
       const p = Number(r.price) || 0;
       setAStart(p ? String(Math.round(p * 0.7)) : ''); setAInc(p ? String(Math.max(100, Math.round(p * 0.01 / 100) * 100)) : ''); setADays(7); setAErr(''); setAuc(r);
     } });
+    if (r.category !== 'Yedek parça' && r.category !== 'Lastik ve jant') list.push({ icon: 'tool', label: 'Makine karnesi', run: () => router.push({ pathname: '/karne/[id]', params: { id: r.id, title: r.title, unit: r.usage_unit ?? '' } } as never) });
     if (r.status === 'active' && r.moderation_status === 'approved') list.push({ icon: 'grid', label: 'Satılık afişi (QR kod)', run: () => router.push({ pathname: '/afis/[id]', params: { id: r.id, title: r.title, price: tl(r.price), city: r.city } } as never) });
     if (r.status === 'paused') list.push({ icon: 'play-circle', label: 'Yayına al', run: () => void patch(r.id, 'active') });
     list.push({ icon: 'trash-2', label: 'Kaldır', danger: true, run: () => confirm(r, 'removed', 'İlan kaldırılsın mı? İşlem ve değerlendirme geçmişi korunur.', 'Kaldır', true) });

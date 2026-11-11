@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { fmtLogDate, type ServiceLog } from '../karne/[id]';
 import { TransportEstimate } from '../../components/TransportEstimate';
 import { ListingCard } from '../../components/ListingCard';
 import { toast } from '../../components/Toast';
@@ -61,6 +62,8 @@ export default function ListingScreen() {
   const [slide, setSlide] = useState(0);
   const [rating, setRating] = useState<{ score: number; count: number } | null>(null);
   const [similar, setSimilar] = useState<Row[]>([]);
+  const [logs, setLogs] = useState<ServiceLog[]>([]);
+  const [allLogs, setAllLogs] = useState(false);
   const [myCity, setMyCity] = useState('');
   const [boostBusy, setBoostBusy] = useState(false);
   const [auction, setAuction] = useState<Auction | null>(null);
@@ -88,6 +91,8 @@ export default function ListingScreen() {
         if (!data) { setState('missing'); return; }
         setItem(data as unknown as Detail); setState('ok');
         void supabase.rpc('track_view', { p_listing: id });
+        void supabase.from('listing_service_logs').select('id,done_on,usage_value,work').eq('listing_id', id).order('done_on', { ascending: false }).limit(50)
+          .then(({ data: lg }) => { if (alive && lg) setLogs(lg as ServiceLog[]); });
         // Benzer ilanlar: aynı kategori, bu ilan hariç
         const d0 = data as unknown as Detail;
         void supabase.rpc('search_listings', { p: { q: '', categories: [d0.category], city: 'Tümü', maxPrice: 6000000, page: 1, sort: 'rec' }, count_only: false })
@@ -323,6 +328,26 @@ export default function ListingScreen() {
           </>
         ) : null}
 
+        {logs.length || (own && !part) ? (
+          <>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginHorizontal: 16, marginTop: 22, marginBottom: 10 }}>
+              <Text style={[s.h2, { margin: 0 }]}>Makine karnesi</Text>
+              <View style={s.declared}><Icon name="user" size={12} color={color.muted} /><Text style={s.declaredT}>Satıcı beyanı</Text></View>
+            </View>
+            <View style={s.card}>
+              {(allLogs ? logs : logs.slice(0, 4)).map((g, i) => (
+                <View key={g.id} style={[{ paddingVertical: 10, gap: 2 }, i > 0 && s.sep]}>
+                  <PlainText style={s.logD}>{fmtLogDate(g.done_on)}{g.usage_value != null ? ` · ${g.usage_value.toLocaleString(localeOf(getLang()))} ${item.usage_unit === 'km' ? 'km' : tr('saat')}` : ''}</PlainText>
+                  <PlainText style={s.logW}>{g.work}</PlainText>
+                </View>
+              ))}
+              {!logs.length ? <Text style={[s.logW, { paddingVertical: 12, color: color.muted }]}>Henüz bakım kaydı eklemedin. Kayıtlar alıcıya güven verir.</Text> : null}
+              {logs.length > 4 && !allLogs ? <Pressable onPress={() => setAllLogs(true)} accessibilityRole="button" style={[s.sep, { paddingVertical: 11 }]}><PlainText style={s.linkT}>{`${tr('Tüm kayıtları göster')} (${logs.length})`}</PlainText></Pressable> : null}
+              {own ? <Pressable onPress={() => router.push({ pathname: '/karne/[id]', params: { id: item.id, title: item.title, unit: item.usage_unit ?? '' } } as never)} accessibilityRole="button" style={[s.sep, { paddingVertical: 11 }]}><Text style={s.linkT}>Bakım kaydı ekle veya düzenle</Text></Pressable> : null}
+            </View>
+          </>
+        ) : null}
+
         {item.description ? (
           <>
             <Text style={s.h2}>Açıklama</Text>
@@ -469,6 +494,8 @@ const s = StyleSheet.create({
   overlay: { position: 'absolute', top: 12, right: 12, gap: 10 },
   round: { width: 42, height: 42, borderRadius: 21, backgroundColor: 'rgba(255,255,255,0.94)', alignItems: 'center', justifyContent: 'center' },
   head: { backgroundColor: color.surface, marginTop: -18, borderTopLeftRadius: 22, borderTopRightRadius: 22, paddingHorizontal: 16, paddingTop: 18, paddingBottom: 16, gap: 8 },
+  logD: { fontFamily: font.bold, fontSize: 14, color: color.tealText },
+  logW: { fontSize: 14.5, lineHeight: 20, color: color.ink },
   simNote: { marginHorizontal: 16, marginBottom: 10, fontSize: 13.5, lineHeight: 19, color: color.muted },
   inspect: { flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 16, paddingVertical: 12 },
   inspectIcon: { width: 40, height: 40, borderRadius: 12, backgroundColor: color.tealSoft, alignItems: 'center', justifyContent: 'center' },

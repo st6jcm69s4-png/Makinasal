@@ -42,6 +42,7 @@ function Screens() {
         <Stack.Screen name="karsilastir" options={{ title: T('Karşılaştır') }} />
         <Stack.Screen name="kontrol/[id]" options={{ title: T('Ekspertiz kontrol listesi') }} />
         <Stack.Screen name="afis/[id]" options={{ title: T('Satılık afişi') }} />
+        <Stack.Screen name="karne/[id]" options={{ title: T('Makine karnesi') }} />
         <Stack.Screen name="bildirimler" options={{ title: T('Bildirimler') }} />
         <Stack.Screen name="profil-duzenle" options={{ title: T('Profili düzenle') }} />
         <Stack.Screen name="kayitli-aramalar" options={{ title: T('Kayıtlı aramalar') }} />
