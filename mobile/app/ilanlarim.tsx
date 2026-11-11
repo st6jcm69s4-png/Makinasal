@@ -91,6 +91,7 @@ export default function MyListings() {
       const p = Number(r.price) || 0;
       setAStart(p ? String(Math.round(p * 0.7)) : ''); setAInc(p ? String(Math.max(100, Math.round(p * 0.01 / 100) * 100)) : ''); setADays(7); setAErr(''); setAuc(r);
     } });
+    if (r.status === 'active' && r.moderation_status === 'approved') list.push({ icon: 'grid', label: 'Satılık afişi (QR kod)', run: () => router.push({ pathname: '/afis/[id]', params: { id: r.id, title: r.title, price: tl(r.price), city: r.city } } as never) });
     if (r.status === 'paused') list.push({ icon: 'play-circle', label: 'Yayına al', run: () => void patch(r.id, 'active') });
     list.push({ icon: 'trash-2', label: 'Kaldır', danger: true, run: () => confirm(r, 'removed', 'İlan kaldırılsın mı? İşlem ve değerlendirme geçmişi korunur.', 'Kaldır', true) });
     return list;

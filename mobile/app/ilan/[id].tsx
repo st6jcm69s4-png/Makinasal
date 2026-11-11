@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react';
+import { TransportEstimate } from '../../components/TransportEstimate';
+import { ListingCard } from '../../components/ListingCard';
 import { toast } from '../../components/Toast';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ActivityIndicator, Alert, Dimensions, Image, Linking, Modal, Pressable, ScrollView, StyleSheet, Switch, View } from 'react-native';
@@ -10,7 +12,7 @@ import { checkMessage } from '../../lib/messageFilter';
 import { PickerModal } from '../../components/PickerModal';
 import { useApp } from '../../lib/AppContext';
 import { useLoginPrompt } from '../../components/LoginPrompt';
-import { SITE_URL, photoUrl, supabase, tl, videoFileUrl } from '../../lib/supabase';
+import { SITE_URL, photoUrl, supabase, tl, videoFileUrl, type Row } from '../../lib/supabase';
 import { trustLevel, type TrustLevel } from '../../lib/trust';
 import { LoanCalculator } from '../../components/LoanCalculator';
 import { AuctionBox, type Auction } from '../../components/AuctionBox';
@@ -58,6 +60,8 @@ export default function ListingScreen() {
   const [svcBusy, setSvcBusy] = useState(false);
   const [slide, setSlide] = useState(0);
   const [rating, setRating] = useState<{ score: number; count: number } | null>(null);
+  const [similar, setSimilar] = useState<Row[]>([]);
+  const [myCity, setMyCity] = useState('');
   const [boostBusy, setBoostBusy] = useState(false);
   const [auction, setAuction] = useState<Auction | null>(null);
   useEffect(() => {
@@ -84,6 +88,11 @@ export default function ListingScreen() {
         if (!data) { setState('missing'); return; }
         setItem(data as unknown as Detail); setState('ok');
         void supabase.rpc('track_view', { p_listing: id });
+        // Benzer ilanlar: aynı kategori, bu ilan hariç
+        const d0 = data as unknown as Detail;
+        void supabase.rpc('search_listings', { p: { q: '', categories: [d0.category], city: 'Tümü', maxPrice: 6000000, page: 1, sort: 'rec' }, count_only: false })
+          .then(({ data: sd }) => { if (alive) setSimilar((((sd as { rows?: Row[] } | null)?.rows) ?? []).filter((x) => x.id !== d0.id).slice(0, 9)); });
+        if (session) void supabase.from('profiles').select('city').eq('id', session.user.id).maybeSingle().then(({ data: pc }) => { if (alive) setMyCity((pc as { city?: string | null } | null)?.city ?? ''); });
         const sid = (data as unknown as Detail).seller_id;
         const [st, pr] = await Promise.all([
           supabase.from('user_stats').select('score,review_count,deals,reports').eq('id', sid).maybeSingle(),
@@ -339,6 +348,31 @@ export default function ListingScreen() {
           </>
         ) : null}
 
+        {!part && item.city ? (
+          <>
+            <Text style={s.h2}>Nakliye tahmini</Text>
+            <TransportEstimate from={item.city} ton={typeof item.tech?.operating_weight === 'number' ? item.tech.operating_weight : undefined} myCity={myCity} />
+          </>
+        ) : null}
+
+        {similar.length ? (
+          <>
+            <Text style={s.h2}>Benzer ilanlar</Text>
+            {similar.length >= 5 ? (() => {
+              // En az 5 benzer ilan varsa ortanca fiyatla karşılaştır
+              const ps = similar.map((x) => Number(x.price)).filter((x) => x > 0).sort((x, y) => x - y);
+              const med = ps.length ? ps[Math.floor(ps.length / 2)] : 0;
+              const p = Number(item.price);
+              if (!med || !p) return null;
+              const diff = Math.round((p - med) / med * 100);
+              return <PlainText style={s.simNote}>{`${tr('Benzer ilanların ortanca fiyatı')}: ${tl(med)} · ${tr('bu ilan')} ${diff === 0 ? tr('aynı düzeyde') : `%${Math.abs(diff)} ${tr(diff < 0 ? 'daha ucuz' : 'daha pahalı')}`}`}</PlainText>;
+            })() : null}
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 16, gap: 10 }}>
+              {similar.map((r) => <ListingCard key={r.id} item={r} variant="wide" />)}
+            </ScrollView>
+          </>
+        ) : null}
+
         {isAdmin ? (
           <>
             <Text style={s.h2}>Yönetici</Text>
@@ -435,6 +469,7 @@ const s = StyleSheet.create({
   overlay: { position: 'absolute', top: 12, right: 12, gap: 10 },
   round: { width: 42, height: 42, borderRadius: 21, backgroundColor: 'rgba(255,255,255,0.94)', alignItems: 'center', justifyContent: 'center' },
   head: { backgroundColor: color.surface, marginTop: -18, borderTopLeftRadius: 22, borderTopRightRadius: 22, paddingHorizontal: 16, paddingTop: 18, paddingBottom: 16, gap: 8 },
+  simNote: { marginHorizontal: 16, marginBottom: 10, fontSize: 13.5, lineHeight: 19, color: color.muted },
   inspect: { flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 16, paddingVertical: 12 },
   inspectIcon: { width: 40, height: 40, borderRadius: 12, backgroundColor: color.tealSoft, alignItems: 'center', justifyContent: 'center' },
   inspectT: { fontFamily: font.bold, fontSize: 17, color: color.ink },
