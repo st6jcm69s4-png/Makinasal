@@ -116,7 +116,7 @@ export default function MyListings() {
               <Text style={s.sumT}>Tüm ilanların</Text>
               <View style={s.sumRow}>
                 {([['eye', t.views, 'Görüntülenme'], ['heart', t.favorites, 'Favori'], ['message-circle', t.threads, 'Mesaj'], ['phone', t.phones, 'Telefon']] as [IconName, number, string][]).map(([ic, n, l]) => (
-                  <View key={l} style={s.sumItem}><Icon name={ic} size={16} color={color.tealText} /><PlainText style={s.sumN}>{fmt(n)}</PlainText><Text style={s.sumL}>{l}</Text></View>
+                  <View key={l} style={s.sumItem} accessible accessibilityLabel={`${n} ${tr(l)}`}><Icon name={ic} size={16} color={color.tealText} /><Text style={s.sumL} numberOfLines={1}>{l}</Text><PlainText style={s.sumN}>{fmt(n)}</PlainText></View>
                 ))}
               </View>
             </View>
