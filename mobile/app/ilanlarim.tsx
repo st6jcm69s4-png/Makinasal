@@ -1,4 +1,5 @@
 import { useCallback, useState } from 'react';
+import { listingScore, type ScoreInput } from '../lib/listingScore';
 import { toast } from '../components/Toast';
 import { CardSkeleton } from '../components/kit';
 import { GuestGate } from '../components/LoginPrompt';
@@ -17,7 +18,7 @@ type Row = {
   boosted_until?: string | null;
 };
 type Stat = { views: number; phones: number; favorites: number; threads: number };
-const COLS = 'id,title,price,city,status,moderation_status,boosted_until,listing_photos(path,position)';
+const COLS = 'id,title,price,city,status,moderation_status,boosted_until,category,description,year,usage_value,brand,model,video_url,video_path,tech,listing_photos(path,position)';
 const isBoosted = (r: Row) => !!r.boosted_until && Date.parse(r.boosted_until) > Date.now();
 const fmt = (n: number) => n.toLocaleString('tr-TR');
 
@@ -141,6 +142,21 @@ export default function MyListings() {
                   ))}
                 </View>
               ) : null}
+              {r.status === 'active' ? (() => {
+                // İlan kalite puanı: eksikleri tamamlayınca ilan daha çok ilgi görür
+                const q = listingScore(r as ScoreInput);
+                const tone = q.score >= 80 ? color.good : q.score >= 50 ? color.warn : color.bad;
+                return (
+                  <Pressable style={s.quality} onPress={() => router.push({ pathname: '/ilan-ver', params: { duzenle: r.id } } as never)} accessibilityRole="button" accessibilityLabel={`${tr('İlan kalitesi')} ${q.score}/100`}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                      <Text style={s.qLabel}>İlan kalitesi</Text>
+                      <View style={s.qBar}><View style={{ width: `${q.score}%`, backgroundColor: tone, borderRadius: 3 }} /></View>
+                      <PlainText style={[s.qScore, { color: tone }]}>{`${q.score}/100`}</PlainText>
+                    </View>
+                    {q.tips.length ? <PlainText style={s.qTips} numberOfLines={2}>{q.tips.map((t) => tr(t)).join(' · ')}</PlainText> : <Text style={s.qTips}>Harika: ilanın eksiksiz.</Text>}
+                  </Pressable>
+                );
+              })() : null}
               <Pressable style={s.more} onPress={() => setMenu(r)} hitSlop={8} accessibilityRole="button" accessibilityLabel={tr('İlan seçenekleri')}>
                 <Icon name="more-vertical" size={20} color={color.ink} />
               </Pressable>
@@ -220,6 +236,11 @@ const s = StyleSheet.create({
   price: { color: color.tealText, fontFamily: font.bold, fontSize: 15 },
   pill: { alignSelf: 'flex-start', borderRadius: 10, paddingHorizontal: 9, paddingVertical: 3 },
   pillT: { fontFamily: font.semi, fontSize: 12.5 },
+  quality: { borderTopWidth: 1, borderTopColor: color.line, paddingVertical: 9, paddingHorizontal: 12, gap: 5 },
+  qLabel: { fontFamily: font.label, fontSize: 12.5, color: color.muted },
+  qBar: { flex: 1, height: 6, borderRadius: 3, backgroundColor: color.plate, flexDirection: 'row', overflow: 'hidden' },
+  qScore: { fontFamily: font.bold, fontSize: 14 },
+  qTips: { fontSize: 12.5, lineHeight: 17, color: color.muted },
   stats: { flexDirection: 'row', borderTopWidth: 1, borderTopColor: color.line, paddingVertical: 9, paddingHorizontal: 12 },
   stat: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 5 },
   statN: { color: color.ink, fontFamily: font.semi, fontSize: 13.5 },

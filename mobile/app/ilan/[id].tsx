@@ -321,6 +321,17 @@ export default function ListingScreen() {
           </>
         ) : null}
 
+        {!part ? (
+          <Pressable style={({ pressed }) => [s.card, s.inspect, pressed && { opacity: 0.88 }]} onPress={() => router.push({ pathname: '/kontrol/[id]', params: { id: item.id, title: item.title, cat: item.category } } as never)} accessibilityRole="button">
+            <View style={s.inspectIcon}><Icon name="clipboard" size={20} color={color.tealText} /></View>
+            <View style={{ flex: 1, gap: 2 }}>
+              <Text style={s.inspectT}>Ekspertiz kontrol listesi</Text>
+              <Text style={s.inspectS}>Makineyi görmeye giderken neye bakacağını madde madde işaretle.</Text>
+            </View>
+            <Icon name="chevron-right" size={20} color={color.muted} />
+          </Pressable>
+        ) : null}
+
         {!part && Number(item.price) > 0 ? (
           <>
             <Text style={s.h2}>Kredi / leasing hesapla</Text>
@@ -424,6 +435,10 @@ const s = StyleSheet.create({
   overlay: { position: 'absolute', top: 12, right: 12, gap: 10 },
   round: { width: 42, height: 42, borderRadius: 21, backgroundColor: 'rgba(255,255,255,0.94)', alignItems: 'center', justifyContent: 'center' },
   head: { backgroundColor: color.surface, marginTop: -18, borderTopLeftRadius: 22, borderTopRightRadius: 22, paddingHorizontal: 16, paddingTop: 18, paddingBottom: 16, gap: 8 },
+  inspect: { flexDirection: 'row', alignItems: 'center', gap: 12, marginTop: 16, paddingVertical: 12 },
+  inspectIcon: { width: 40, height: 40, borderRadius: 12, backgroundColor: color.tealSoft, alignItems: 'center', justifyContent: 'center' },
+  inspectT: { fontFamily: font.bold, fontSize: 17, color: color.ink },
+  inspectS: { fontSize: 13, lineHeight: 18, color: color.muted },
   title: { fontFamily: font.bold, fontSize: 24, lineHeight: 28, color: color.ink },
   price: { fontFamily: font.bold, fontSize: 30, color: color.tealText },
   kicker: { fontFamily: font.label, fontSize: 12, letterSpacing: 0.8, color: color.muted },

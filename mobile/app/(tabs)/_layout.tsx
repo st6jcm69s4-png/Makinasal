@@ -8,6 +8,7 @@ import { SwipeTabs, currentTab } from '../../components/SwipeTabs';
 import { color, font } from '../../lib/theme';
 import { useApp } from '../../lib/AppContext';
 import { tr } from '../../lib/i18n';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLang } from '../../lib/lang';
 import { supabase } from '../../lib/supabase';
 import { fireScrollTop } from '../../lib/scrollTop';
@@ -45,17 +46,39 @@ const postIcon = () => (
   </View>
 );
 
-/** Başlıktaki yuvarlak simge düğmesi (isteğe bağlı sayı rozeti). */
+/** Başlıktaki simge düğmesi (isteğe bağlı sayı rozeti). */
 function HeadBtn({ icon, label, badge, onPress }: { icon: IconName; label: string; badge?: number; onPress: () => void }) {
   return (
-    <Pressable onPress={onPress} hitSlop={6} accessibilityRole="button" accessibilityLabel={badge ? `${label}, ${badge}` : label} style={({ pressed }) => [{ width: 38, height: 38, borderRadius: 19, alignItems: 'center', justifyContent: 'center', backgroundColor: color.navy2 }, pressed && { opacity: 0.7 }]}>
-      <Icon name={icon} size={19} color={color.onBar} />
+    <Pressable onPress={onPress} hitSlop={4} accessibilityRole="button" accessibilityLabel={badge ? `${label}, ${badge}` : label} style={({ pressed }) => [{ width: 44, height: 40, alignItems: 'center', justifyContent: 'center' }, pressed && { opacity: 0.55 }]}>
+      <Icon name={icon} size={21} color={color.onBar} />
       {badge ? (
-        <View style={{ position: 'absolute', top: -3, right: -5, minWidth: 18, height: 18, paddingHorizontal: 4, borderRadius: 9, backgroundColor: color.pop, borderWidth: 2, borderColor: color.navy, alignItems: 'center', justifyContent: 'center' }}>
-          <PlainText style={{ color: color.popInk, fontSize: 10, fontFamily: font.textBold }}>{badge > 99 ? '99+' : String(badge)}</PlainText>
+        <View style={{ position: 'absolute', top: 3, right: 4, minWidth: 17, height: 17, paddingHorizontal: 4, borderRadius: 9, backgroundColor: color.pop, alignItems: 'center', justifyContent: 'center' }}>
+          <PlainText style={{ color: color.popInk, fontSize: 10, lineHeight: 13, fontFamily: font.textBold }}>{badge > 99 ? '99+' : String(badge)}</PlainText>
         </View>
       ) : null}
     </Pressable>
+  );
+}
+
+/**
+ * Sekmelerin üst çubuğu: logo solda, üç düğme sağda tek bir hap içinde.
+ * Yerleşim tamamen burada (telefonun hazır başlığı düğmeleri dikeyde kaydırıyordu).
+ */
+function TabHeader({ unread, signedIn }: { unread: number; signedIn: boolean }) {
+  const insets = useSafeAreaInsets();
+  return (
+    <View style={{ backgroundColor: color.navy, paddingTop: insets.top }}>
+      <View style={{ height: 54, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingLeft: 16, paddingRight: 12 }}>
+        <Logo />
+        <View style={{ flexDirection: 'row', alignItems: 'center', height: 40, borderRadius: 20, backgroundColor: color.navy2, paddingHorizontal: 4 }}>
+          <HeadBtn icon="search" label={tr('Uygulamada ara')} onPress={() => router.push('/ara' as never)} />
+          <View style={{ width: StyleSheet.hairlineWidth, height: 18, backgroundColor: color.onNavy, opacity: 0.35 }} />
+          <HeadBtn icon="bell" label={tr('Bildirimler')} onPress={() => router.push(signedIn ? '/bildirimler' as never : '/hesap' as never)} />
+          <View style={{ width: StyleSheet.hairlineWidth, height: 18, backgroundColor: color.onNavy, opacity: 0.35 }} />
+          <HeadBtn icon="message-square" label={tr('Mesajlar')} badge={unread} onPress={() => router.push('/mesajlar' as never)} />
+        </View>
+      </View>
+    </View>
   );
 }
 
@@ -100,19 +123,8 @@ export default function TabsLayout() {
         // Dokunmada geçiş anında; kaydırmada animasyonu SwipeTabs yürütür
         animation: 'none',
         sceneStyle: { backgroundColor: color.bg },
-        headerStyle: { backgroundColor: color.navy, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: color.navy2 } as object,
-        headerTintColor: color.onBar,
-        headerShadowVisible: false,
-        headerTitleAlign: 'left',
-        headerTitle: () => <Logo />,
         // Mesajlar üstte, okunmamış sayısıyla (alt menüde yer açmak için)
-        headerRight: () => (
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingRight: 12 }}>
-            <HeadBtn icon="search" label={tr('Uygulamada ara')} onPress={() => router.push('/ara' as never)} />
-            <HeadBtn icon="bell" label={tr('Bildirimler')} onPress={() => router.push(session ? '/bildirimler' as never : '/hesap' as never)} />
-            <HeadBtn icon="message-square" label={tr('Mesajlar')} badge={unread} onPress={() => router.push('/mesajlar' as never)} />
-          </View>
-        ),
+        header: () => <TabHeader unread={unread} signedIn={!!session} />,
         tabBarActiveTintColor: color.barActive,
         tabBarInactiveTintColor: color.onNavy,
         tabBarStyle: { backgroundColor: color.navy, borderTopWidth: 1, borderTopColor: color.navy2, paddingTop: 6 },
