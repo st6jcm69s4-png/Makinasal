@@ -4,7 +4,7 @@ import {legalIdentity,legalReady} from '@/lib/legal';
 import {pageMetadata} from '@/lib/seo';
 import {CookiePreferences} from '@/components/CookiePreferences';
 import {LEGAL_TR,LEGAL_VERSION_LABEL,fillLegal,type LegalSlugTr} from '@/lib/legalTexts';
-const sections={kvkk:['KVKK aydınlatma','Privacy notice'],kullanim:['Kullanım koşulları','Terms of use'],cerez:['Çerez politikası','Cookie policy'],satis:['Satış ve ödeme bilgileri','Sales and payments'],'ilan-kurallari':['İlan yayınlama kuralları','Listing rules']} as const;
+const sections={kvkk:['KVKK aydınlatma','Privacy notice'],kullanim:['Kullanım koşulları','Terms of use'],cerez:['Çerez politikası','Cookie policy'],satis:['Satış ve ödeme bilgileri','Sales and payments'],'ilan-kurallari':['İlan yayınlama kuralları','Listing rules'],'acik-artirma':['Açık artırma kuralları','Auction rules'],'premium-on-bilgi':['Premium ön bilgilendirme formu','Premium pre-contract information'],'premium-sozlesme':['Premium üyelik sözleşmesi','Premium membership agreement']} as const;
 type Props={params:Promise<{slug:string}>};
 export async function generateMetadata({params}:Props){const {slug:section}=await params;const v=sections[section as keyof typeof sections];return pageMetadata('/hukuki/'+section,v?.[0]||'Hukuki bilgiler','Makinasal hukuki bilgiler ve tercihler.',!legalReady());}
 export default async function Page({params}:Props){const {slug:section}=await params;const aliases:Record<string,string>={'kullanim-sozlesmesi':'kullanim','cerez-politikasi':'cerez','mesafeli-satis-ve-ticaret':'satis'};if(Object.prototype.hasOwnProperty.call(aliases,section))redirect('/hukuki/'+aliases[section]);if(!(section in sections))notFound();const lc=(await cookies()).get('makinasal-language')?.value;const en=lc==='en'||lc==='de';const identity=legalIdentity();const ready=legalReady();
@@ -52,6 +52,7 @@ export default async function Page({params}:Props){const {slug:section}=await pa
  ];
  const enContent=section==='kvkk'?kvkk:section==='kullanim'?terms:section==='cerez'?cookie:sales;
  const doc=LEGAL_TR[section as LegalSlugTr];
- const showEn=en&&section!=='ilan-kurallari';
+ // İngilizce özeti olmayan belgeler Türkçe gösterilir
+const showEn=en&&['kvkk','kullanim','cerez','satis'].includes(section);
  return <><h1>{showEn?sections[section as keyof typeof sections][1]:doc.title}</h1>{!ready?<p className="note" role="status">{en?'Private beta review draft · operator details and legal approval pending.':'Özel beta · işletmeci bilgileri ve hukuk onayı bekleniyor.'}</p>:null}<p className="sub">{en?'Version: '+LEGAL_VERSION_LABEL+(showEn?'':' · Turkish text'):'Sürüm: '+LEGAL_VERSION_LABEL}</p>{showEn?enContent.map(([title,body])=><section className="panel" style={{marginTop:16}} key={title}><h2>{title}</h2><p>{body}</p></section>):<>{doc.intro?<p>{fillLegal(doc.intro,identity)}</p>:null}{doc.sections.map(([title,paras])=><section className="panel" style={{marginTop:16}} key={title}><h2>{title}</h2>{paras.map(t=><p key={t}>{fillLegal(t,identity)}</p>)}</section>)}</>}{section==='cerez'?<CookiePreferences/>:null}<p><a href="/hukuki">{en?'All legal information':'Tüm hukuki bilgiler'}</a></p></>;
 }

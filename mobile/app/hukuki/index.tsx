@@ -15,7 +15,10 @@ export default function Legal() {
         { icon: 'lock', label: 'KVKK aydınlatma metni', sub: 'Kişisel verilerin nasıl işlendiği', go: () => router.push('/hukuki/kvkk' as never) },
         { icon: 'settings', label: 'Çerez politikası', go: () => router.push('/hukuki/cerez' as never) },
         { icon: 'check-square', label: 'İlan yayınlama kuralları', sub: 'Yasaklı ilanlar, doğru bilgi', go: () => router.push('/hukuki/ilan-kurallari' as never) },
-        { icon: 'credit-card', label: 'Satış ve ödeme bilgileri', sub: 'Mesafeli satış, ön bilgilendirme', go: () => router.push('/hukuki/satis' as never) },
+        { icon: 'credit-card', label: 'Satış ve ödeme bilgileri', sub: 'Ödeme, alıcı ve satıcı önerileri', go: () => router.push('/hukuki/satis' as never) },
+        { icon: 'award', label: 'Açık artırma kuralları', sub: 'Teklif, geri çekme, ödemeyen kazanan', go: () => router.push('/hukuki/acik-artirma' as never) },
+        { icon: 'star', label: 'Premium ön bilgilendirme formu', sub: 'Fiyat, yenileme, iptal, cayma', go: () => router.push('/hukuki/premium-on-bilgi' as never) },
+        { icon: 'file', label: 'Premium üyelik sözleşmesi', sub: 'Mesafeli hizmet sözleşmesi', go: () => router.push('/hukuki/premium-sozlesme' as never) },
       ]} />
       <Group title="Haklarım" items={[
         { icon: 'user-check', label: 'Veri haklarım (KVKK md. 11)', sub: 'Veri kopyası, düzeltme, silme, itiraz', go: () => router.push('/haklarim' as never) },
