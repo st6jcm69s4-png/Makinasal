@@ -23,7 +23,8 @@ export function PremiumView() {
         return <section key={p.id} className={`panel premium-plan${p.id === 'business' ? ' featured' : ''}`}>
           <header><h2>{tr(p.name)}</h2>{p.id === 'business' ? <span className="premium-tag">{tr('Şirketler için')}</span> : null}</header>
           <p className="sub">{tr(p.tagline)}</p>
-          <p className="premium-price">{money(period === 'yearly' ? yearlyTotal(p) : p.monthly, lang)} <small>/ {tr(period === 'yearly' ? 'yıl' : 'ay')}</small></p>
+          <p className="premium-price">{money(period === 'yearly' ? yearlyTotal(p) : p.intro, lang)} <small>/ {tr(period === 'yearly' ? 'yıl' : 'ilk ay')}</small></p>
+          {period === 'monthly' ? <p className="premium-per" style={{ color: 'inherit', fontWeight: 600 }}>{tr('Sonraki aylar')} {money(p.monthly, lang)} / {tr('ay')}</p> : null}
           <p className="premium-per">{period === 'yearly' ? `${tr('12 ay kullan, 10 ay öde')} · ${tr('2 ay bedava')} (${money(p.monthly * 2, lang)})` : `${tr('Yıllık üyelikte 2 ay bedava')}: ${money(yearlyTotal(p), lang)} / ${tr('yıl')}`}</p>
           <ul className="premium-features">{p.features.map(f => <li key={f}>{tr(f)}</li>)}</ul>
           <button type="button" className="btn" disabled={mine} onClick={() => setNotice(true)}>{tr(mine ? 'Mevcut tarifen' : 'Bu tarifeyi seç')}</button>

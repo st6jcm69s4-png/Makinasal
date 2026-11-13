@@ -1,4 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { cachedPlan, forgetPlan, requestPlans } from '../components/ProBadge';
+import { FREE, PREMIUM } from './plans';
 import type { Session } from '@supabase/supabase-js';
 import { supabase } from './supabase';
 
@@ -36,6 +38,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setFavs(new Set((data ?? []).map((r: { listing_id: string }) => r.listing_id)));
   }, [uid]);
   useEffect(() => { void reloadFavs(); }, [reloadFavs]);
+  // Kendi tarifem (karşılaştırma sınırı ve rozetler için)
+  useEffect(() => { if (uid) { forgetPlan(uid); requestPlans([uid]); } }, [uid]);
   useEffect(() => {
     if (!uid) { setNetFavs(new Set()); return; }
     void supabase.from('network_favorites').select('kind,ref_id').eq('user_id', uid).then(({ data }) => {
@@ -74,9 +78,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const toggleCmp = useCallback((listingId: string) => {
     if (cmp.includes(listingId)) { setCmp(cmp.filter((x) => x !== listingId)); return null; }
-    if (cmp.length >= 3) return 'En fazla 3 ilan karşılaştırabilirsin.';
+    // Ücretsiz üye 3, premium üye 5 ilanı yan yana karşılaştırır
+    if (cachedPlan(uid)) { if (cmp.length >= PREMIUM.compare) return 'En fazla 5 ilan karşılaştırabilirsin.'; }
+    else if (cmp.length >= FREE.compare) return 'En fazla 3 ilan karşılaştırabilirsin. Pro üyeler 5 ilanı karşılaştırabilir.';
     setCmp([...cmp, listingId]); return null;
-  }, [cmp]);
+  }, [cmp, uid]);
 
   const value = useMemo(() => ({ session, ready, favs, toggleFav, reloadFavs, netFavs, toggleNetFav, cmp, toggleCmp }), [session, ready, favs, toggleFav, reloadFavs, netFavs, toggleNetFav, cmp, toggleCmp]);
   return <AppCtx.Provider value={value}>{children}</AppCtx.Provider>;

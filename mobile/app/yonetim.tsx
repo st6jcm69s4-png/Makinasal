@@ -1,4 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
+import { activePlan } from '../lib/plans';
+import { ProBadgeOf } from '../components/ProBadge';
 import { RowSkeleton, AlertBox, Badge, StatusBadge, Tabs } from '../components/kit';
 import { Alert, Image, Pressable, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
 import { PlainText, Text } from '../components/LText';
@@ -69,10 +71,13 @@ export default function Admin() {
     if (!dr.error) setDs((dr.data ?? []) as unknown as D[]);
     const ids = [...new Set(lrows.map((x) => x.seller_id))];
     if (ids.length) {
-      const p = await supabase.from('profiles').select('id,full_name').in('id', ids);
+      const p = await supabase.from('profiles').select('id,full_name,is_premium,premium_plan,premium_until').in('id', ids);
       const m: Record<string, string> = {};
-      for (const x of (p.data ?? []) as { id: string; full_name: string | null }[]) m[x.id] = x.full_name ?? '—';
+      const prem = new Set<string>();
+      for (const x of (p.data ?? []) as { id: string; full_name: string | null; is_premium?: boolean | null; premium_plan?: string | null; premium_until?: string | null }[]) { m[x.id] = x.full_name ?? '—'; if (activePlan(x)) prem.add(x.id); }
       setSellers(m);
+      // Öncelikli inceleme: premium üyelerin ilanları listenin başında (kendi içlerinde eskiden yeniye)
+      setLs([...lrows].sort((a, b2) => Number(prem.has(b2.seller_id)) - Number(prem.has(a.seller_id))));
     }
     const [users, active, newUsers, newListings, posts, quotes] = await Promise.all([
       count(supabase.from('profiles').select('id', { count: 'exact', head: true })),
@@ -151,6 +156,7 @@ export default function Admin() {
                 <View style={{ flex: 1, gap: 3 }}>
                   <Text style={s.title} numberOfLines={2}>{l.title}</Text>
                   <PlainText style={s.price}>{tl(l.price)}</PlainText>
+                  <ProBadgeOf userId={l.seller_id} small />
                 </View>
               </Pressable>
               <View style={s.strip}>

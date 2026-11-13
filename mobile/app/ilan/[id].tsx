@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { ProBadgeOf } from '../../components/ProBadge';
 import { fmtLogDate, type ServiceLog } from '../karne/[id]';
 import { TransportEstimate } from '../../components/TransportEstimate';
 import { ListingCard } from '../../components/ListingCard';
@@ -303,6 +304,7 @@ export default function ListingScreen() {
           <View style={{ flex: 1, gap: 3 }}>
             <PlainText style={s.sellerName} numberOfLines={1}>{seller || '—'}</PlainText>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+              <ProBadgeOf userId={item.seller_id} />
               {trust ? <View style={[s.trust, { borderColor: trust.color }]}><Text style={[s.trustT, { color: trust.color }]}>{trust.label}</Text></View> : null}
               {rating ? <View style={s.stars}><Icon name="star" size={13} color={color.tealText} /><PlainText style={s.starsT}>{rating.score.toFixed(1).replace('.', ',')}</PlainText><PlainText style={s.starsN}>{`(${rating.count})`}</PlainText></View> : null}
             </View>

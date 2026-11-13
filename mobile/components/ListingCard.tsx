@@ -1,6 +1,7 @@
 import { Image, Pressable, StyleSheet, View } from 'react-native';
 import { PlainText, Text } from './LText';
 import { Heart, Icon } from './Icon';
+import { ProBadge, usePlanOf } from './ProBadge';
 import { router } from 'expo-router';
 import { useApp } from '../lib/AppContext';
 import { useLoginPrompt } from './LoginPrompt';
@@ -48,6 +49,7 @@ export function ListingCard({ item, variant = 'row' }: { item: Row; variant?: Ca
   const { notify } = useLoginPrompt();
   const photo = [...(item.listing_photos ?? [])].sort((a, b) => a.position - b.position)[0];
   const fav = favs.has(item.id);
+  const plan = usePlanOf(item.seller_id);
   const spec = specLine(item);
   const when = ago(item.created_at);
   const drop = priceDrop(item);
@@ -78,6 +80,8 @@ export function ListingCard({ item, variant = 'row' }: { item: Row; variant?: Ca
           <View style={s.priceRow}>
             <PlainText style={s.rowPrice} numberOfLines={1}>{tl(item.price)}</PlainText>
             {drop ? <View style={s.drop}><PlainText style={s.dropT}>{`↓ ${tl(drop)}`}</PlainText></View> : null}
+            <View style={{ flex: 1 }} />
+            <ProBadge plan={plan} small />
           </View>
         </View>
       </Pressable>
@@ -97,7 +101,10 @@ export function ListingCard({ item, variant = 'row' }: { item: Row; variant?: Ca
       <View style={s.cardBody}>
         <PlainText style={wide ? s.widePrice : s.gridPrice} numberOfLines={1}>{tl(item.price)}</PlainText>
         <Text style={wide ? s.wideTitle : s.gridTitle} numberOfLines={2}>{item.title}</Text>
-        <PlainText style={s.meta} numberOfLines={1}>{[spec, item.city].filter(Boolean).join(' · ')}</PlainText>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+          <PlainText style={[s.meta, { flex: 1 }]} numberOfLines={1}>{[spec, item.city].filter(Boolean).join(' · ')}</PlainText>
+          {wide ? <ProBadge plan={plan} small /> : null}
+        </View>
       </View>
     </Pressable>
   );

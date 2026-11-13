@@ -1,14 +1,17 @@
-// Premium tarifeleri. Fiyatlar TL; yıllık üyelikte 2 ay bedava: yıllık ücret tam olarak 10 aylık ücrettir.
+// Premium tarifeleri. Fiyatlar TL. Aylık üyelikte ilk ay tanışma fiyatı (intro), sonraki aylar normal fiyat (monthly).
+// Yıllık üyelikte 2 ay bedava: yıllık ücret tam olarak normal aylık ücretin 10 katıdır.
 export type PlanId = 'pro' | 'business';
 export type Period = 'monthly' | 'yearly';
-export type Plan = { id: PlanId; name: string; tagline: string; monthly: number; yearly: number; aiLimit: number; listings: number; features: string[] };
+export type Plan = { id: PlanId; name: string; tagline: string; monthly: number; intro: number; yearly: number; aiLimit: number; listings: number; features: string[] };
 
 export const YEARLY_DISCOUNT = 0.15;
-export const FREE = { listings: 3, photos: 8 };
+export const FREE = { listings: 3, photos: 8, savedSearches: 20, compare: 3 };
+/** Premium üyelerin (Pro ve Firma Pro) ek hakları. */
+export const PREMIUM = { savedSearches: 50, compare: 5 };
 
 export const PLANS: Plan[] = [
   {
-    id: 'pro', name: 'Pro', monthly: 69.99, yearly: 699.90, aiLimit: 40, listings: 30,
+    id: 'pro', name: 'Pro', monthly: 89.99, intro: 69.99, yearly: 899.90, aiLimit: 40, listings: 30,
     tagline: 'Bireysel satıcılar, operatörler ve ustalar için',
     features: [
       'Yapay zeka iş asistanı (ayda 40 soru)',
@@ -16,11 +19,14 @@ export const PLANS: Plan[] = [
       '30 ilan hakkı, ilan başına 20 fotoğraf',
       'Açık artırmalara katılma (teklif verme)',
       'Telefondan ilan videosu yükleme',
+      'İlanlarında, profilinde ve yazdığın değerlendirmelerde Pro rozeti',
+      '50 kayıtlı arama, 5 ilanı yan yana karşılaştırma',
+      'İlan onayında ve destek taleplerinde öncelik',
       'Reklamsız kullanım',
     ],
   },
   {
-    id: 'business', name: 'Firma Pro', monthly: 179.99, yearly: 1799.90, aiLimit: 200, listings: 100,
+    id: 'business', name: 'Firma Pro', monthly: 229.99, intro: 179.99, yearly: 2299.90, aiLimit: 200, listings: 100,
     tagline: 'Şirketler, filolar ve bayiler için',
     features: [
       'Pro tarifesindeki her şey',

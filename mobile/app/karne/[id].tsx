@@ -40,7 +40,7 @@ export default function ServiceLogScreen() {
   const u = unit === 'km' ? 'km' : tr('saat');
 
   const load = useCallback(async () => {
-    const { data, error } = await supabase.from('listing_service_logs').select('id,done_on,usage_value,work').eq('listing_id', id).order('done_on', { ascending: false }).limit(50);
+    const { data, error } = await supabase.from('listing_service_logs').select('id,done_on,usage_value,work').eq('listing_id', id).order('done_on', { ascending: false }).limit(100);
     if (error) { setErr(tr('Kayıtlar yüklenemedi. Tekrar dene.')); setRows([]); return; }
     setRows((data ?? []) as ServiceLog[]);
   }, [id]);
@@ -56,7 +56,7 @@ export default function ServiceLogScreen() {
     setBusy(true); setErr('');
     const { error } = await supabase.from('listing_service_logs').insert({ listing_id: id, done_on: iso, usage_value: n, work: w.slice(0, 300) });
     setBusy(false);
-    if (error) { setErr(/50/.test(error.message) ? tr('Bir ilana en fazla 50 bakım kaydı eklenebilir.') : tr('Kayıt eklenemedi. Tekrar dene.')); return; }
+    if (error) { setErr(/limit/i.test(error.message) ? tr('Bu ilan için bakım kaydı sınırına ulaştın (ücretsiz 50, Pro 100).') : tr('Kayıt eklenemedi. Tekrar dene.')); return; }
     setWork(''); setUsage('');
     toast('Bakım kaydı eklendi.');
     void load();

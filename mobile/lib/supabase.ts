@@ -21,6 +21,7 @@ export type Row = {
   boosted_until?: string | null;
   /** Kartta gösterilen ek bilgiler (search_listings hepsini döndürür; bazı listelerde boş olabilir). */
   usage_value?: number | null; usage_unit?: string | null; prev_price?: number | string | null;
+  seller_id?: string | null;
   created_at?: string | null; video_url?: string | null; video_path?: string | null; category?: string | null;
   tech?: Record<string, string | number> | null;
 };

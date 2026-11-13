@@ -99,7 +99,7 @@ export const GUIDE: GuideSection[] = [
       'İlan kartındaki kalbe dokunarak favorilere ekle; Hesabım → Favorilerim altından ulaş.',
       'Favorindeki ilanın fiyatı düşerse bildirim alırsın.',
       'Kayıtlı aramalar sayfasında her arama için bildirimi açıp kapatabilir, aramayı tek dokunuşla yeniden çalıştırabilirsin.',
-      'İlan sayfasından en fazla 3 ilanı karşılaştırmaya ekleyip yan yana kıyasla.',
+      'İlan sayfasından en fazla 3 ilanı (Pro üyeler 5) karşılaştırmaya ekleyip yan yana kıyasla.',
     ],
     go: '/favoriler', goLabel: 'Favorilerimi aç',
   },
@@ -146,9 +146,11 @@ export const GUIDE: GuideSection[] = [
   },
   {
     id: 'premium', icon: 'star', title: 'Premium üyelik',
-    intro: 'Pro ve Firma Pro üyelikler daha fazla ilan hakkı, öne çıkma, video yükleme ve açık artırmada teklif verme sağlar.',
+    intro: 'Pro ve Firma Pro üyelikler daha fazla ilan hakkı, öne çıkma, video yükleme, açık artırmada teklif verme, Pro rozeti ve öncelikli destek sağlar.',
     steps: [
       'Hesabım → Üyelik ve ilan hakları altından planları karşılaştır.',
+      'Aylık üyelikte ilk ay tanışma fiyatıyla başlar, sonraki aylar normal fiyat uygulanır.',
+      'Pro rozeti ilanlarında, profilinde ve yazdığın değerlendirmelerde görünür; güven puanını etkilemez.',
       'Ödeme sistemi açılınca satın alma bu sayfadan yapılacak.',
     ],
     go: '/premium', goLabel: 'Planları gör',

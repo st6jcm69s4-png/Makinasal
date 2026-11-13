@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { ProBadge, usePlanOf } from '../../components/ProBadge';
 import { PageSkeleton } from '../../components/kit';
 import { FlatList, View } from 'react-native';
 import { Text } from '../../components/LText';
@@ -9,8 +10,20 @@ import { trustLevel } from '../../lib/trust';
 import { supabase, type Row } from '../../lib/supabase';
 import { getLang, localeOf } from '../../lib/i18n';
 
-type Review = { who: string; role: string; rating: number; text: string; date: string; tags: string[] };
+type Review = { uid: string; who: string; role: string; rating: number; text: string; date: string; tags: string[] };
 type Store = { name: string; store: boolean; premium: boolean; verified: boolean; city: string; bio: string; companyBio: string; since: number; s: number | null; b: number | null; deals: number; rep: number };
+
+/** Değerlendirmeyi yazan üye premium ise küçük bir satır: "Pro üye tarafından değerlendirildi". */
+function ReviewerPlan({ userId }: { userId: string }) {
+  const plan = usePlanOf(userId);
+  if (!plan) return null;
+  return (
+    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+      <ProBadge plan={plan} small />
+      <Text style={common.meta}>{plan === 'business' ? 'Firma Pro üye tarafından değerlendirildi' : 'Pro üye tarafından değerlendirildi'}</Text>
+    </View>
+  );
+}
 
 export default function StorePage() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -53,7 +66,7 @@ export default function StorePage() {
         for (const x of ps ?? []) names.set(x.id as string, ((x.is_store && x.store_name) || x.full_name || 'Üye') as string);
       }
       if (!alive) return;
-      setReviews(rrows.map((r) => ({ who: names.get(r.reviewer_id) ?? 'Üye', role: r.role === 'seller' ? 'Alıcı' : 'Satıcı', rating: Number(r.score), text: r.comment ?? '', date: new Date(r.created_at).toLocaleDateString(localeOf(getLang())), tags: r.tags ?? [] })));
+      setReviews(rrows.map((r) => ({ uid: r.reviewer_id, who: names.get(r.reviewer_id) ?? 'Üye', role: r.role === 'seller' ? 'Alıcı' : 'Satıcı', rating: Number(r.score), text: r.comment ?? '', date: new Date(r.created_at).toLocaleDateString(localeOf(getLang())), tags: r.tags ?? [] })));
       setLoading(false);
     })();
     return () => { alive = false; };
@@ -91,6 +104,7 @@ export default function StorePage() {
           {reviews.map((r, i) => (
             <View key={i} style={common.card}>
               <Text style={common.title}>{r.who} <Text style={common.meta}>({r.role})</Text></Text>
+              <ReviewerPlan userId={r.uid} />
               <Text style={common.price}>{'★'.repeat(Math.max(0, Math.min(5, Math.round(r.rating))))} <Text style={common.meta}>{r.date}</Text></Text>
               {r.text ? <Text>{r.text}</Text> : null}
               {r.tags.length ? <Text style={common.meta}>{r.tags.join(' · ')}</Text> : null}

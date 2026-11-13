@@ -27,7 +27,7 @@ export default function Premium() {
 
   const buy = (p: Plan) => {
     if (!session) { router.navigate('/hesap'); return; }
-    Alert.alert(tr('Çok yakında'), `${tr(p.name)} · ${period === 'yearly' ? money(yearlyTotal(p), lang) + ' / ' + tr('yıl') : money(p.monthly, lang) + ' / ' + tr('ay')}\n\n${tr('Premium satın alma, ödeme altyapısı ve sözleşmeler onaylandığında açılacak. Şu anda kart bilgisi alınmıyor.')}`);
+    Alert.alert(tr('Çok yakında'), `${tr(p.name)} · ${period === 'yearly' ? money(yearlyTotal(p), lang) + ' / ' + tr('yıl') : `${tr('İlk ay')} ${money(p.intro, lang)}, ${tr('sonra')} ${money(p.monthly, lang)} / ${tr('ay')}`}\n\n${tr('Premium satın alma, ödeme altyapısı ve sözleşmeler onaylandığında açılacak. Şu anda kart bilgisi alınmıyor.')}`);
   };
 
   return (
@@ -64,11 +64,11 @@ export default function Premium() {
 
       <View style={s.free}>
         <Text style={s.freeT}>Ücretsiz üyelik</Text>
-        {[`${FREE.listings} ${tr('ilan hakkı')}, ${tr('ilan başına')} ${FREE.photos} ${tr('fotoğraf')}`, tr('Mesajlaşma, favoriler ve kayıtlı aramalar'), tr('İş ağında talep ve teklif')].map((t) => (
+        {[`${FREE.listings} ${tr('ilan hakkı')}, ${tr('ilan başına')} ${FREE.photos} ${tr('fotoğraf')}`, tr('Mesajlaşma, favoriler ve 20 kayıtlı arama'), tr('İş ağında talep ve teklif')].map((t) => (
           <View key={t} style={s.feat}><Icon name="check" size={16} color={color.muted} /><PlainText style={s.freeF}>{t}</PlainText></View>
         ))}
       </View>
-      <Text style={s.note}>Fiyatlar Türk lirasıdır. Güven puanı ve doğrulama rozetleri satın alınamaz; premium yalnızca görünürlük ve araçlar sağlar.</Text>
+      <Text style={s.note}>Fiyatlar Türk lirasıdır. Güven puanı ve doğrulama rozetleri satın alınamaz; Pro rozeti yalnızca üyelik türünü gösterir. Premium görünürlük ve araçlar sağlar.</Text>
     </ScrollView>
   );
 }
@@ -84,9 +84,10 @@ function PlanCard({ p, period, lang, current, onBuy }: { p: Plan; period: Period
       </View>
       <Text style={s.tagline}>{p.tagline}</Text>
       <View style={s.priceRow}>
-        <PlainText style={s.price}>{money(period === 'yearly' ? yearlyTotal(p) : p.monthly, lang)}</PlainText>
-        <PlainText style={s.per}>{` / ${tr(period === 'yearly' ? 'yıl' : 'ay')}`}</PlainText>
+        <PlainText style={s.price}>{money(period === 'yearly' ? yearlyTotal(p) : p.intro, lang)}</PlainText>
+        <PlainText style={s.per}>{` / ${tr(period === 'yearly' ? 'yıl' : 'ilk ay')}`}</PlainText>
       </View>
+      {period === 'monthly' ? <PlainText style={s.then}>{`${tr('Sonraki aylar')} ${money(p.monthly, lang)} / ${tr('ay')}`}</PlainText> : null}
       {period === 'yearly'
         ? <PlainText style={s.perMonth}>{`${tr('12 ay kullan, 10 ay öde')} · ${tr('2 ay bedava')} (${money(p.monthly * 2, lang)})`}</PlainText>
         : <PlainText style={s.perMonth}>{`${tr('Yıllık üyelikte 2 ay bedava')}: ${money(yearlyTotal(p), lang)} / ${tr('yıl')}`}</PlainText>}
@@ -133,6 +134,7 @@ const s = StyleSheet.create({
   priceRow: { flexDirection: 'row', alignItems: 'flex-end', marginTop: 14 },
   price: { color: color.ink, fontFamily: font.bold, fontSize: 32, lineHeight: 36 },
   per: { color: color.muted, fontSize: 16, marginBottom: 4 },
+  then: { color: color.ink, fontFamily: font.semi, fontSize: 14.5, marginTop: 3 },
   perMonth: { color: color.tealText, fontFamily: font.semi, fontSize: 13.5, marginTop: 4 },
   feat: { flexDirection: 'row', alignItems: 'flex-start', gap: 10 },
   check: { width: 22, height: 22, borderRadius: 11, backgroundColor: color.tealSoft, alignItems: 'center', justifyContent: 'center', marginTop: 1 },

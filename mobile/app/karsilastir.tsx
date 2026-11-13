@@ -20,7 +20,7 @@ export default function Compare() {
       .then(({ data }) => setRows(cmp.map((id) => ((data ?? []) as L[]).find((r) => r.id === id)).filter(Boolean) as L[]));
   }, [cmp]);
   if (rows === null) return <PageSkeleton />;
-  if (!rows.length) return <Text style={s.msg}>Karşılaştırılacak ilan yok. İlan detayında "Karşılaştırmaya ekle"ye dokun (en fazla 3).</Text>;
+  if (!rows.length) return <Text style={s.msg}>Karşılaştırılacak ilan yok. İlan detayında "Karşılaştırmaya ekle"ye dokun (en fazla 3; Pro üyeler 5).</Text>;
   const min = Math.min(...rows.map((r) => Number(r.price)));
   const lines: [string, (r: L) => string][] = [
     ['Fiyat', (r) => tl(r.price)], ['İl', (r) => r.city], ['Model yılı', (r) => (r.year ? String(r.year) : '–')],
