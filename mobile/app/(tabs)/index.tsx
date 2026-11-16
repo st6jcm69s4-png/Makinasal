@@ -272,7 +272,7 @@ const s = StyleSheet.create({
   svcT: { fontFamily: font.bold, fontSize: 14.5, lineHeight: 17, color: color.ink, flexShrink: 1 },
   svcS: { fontSize: 12, color: color.muted },
   tag: { borderRadius: 6, paddingHorizontal: 5, paddingVertical: 1, backgroundColor: color.plate },
-  tagT: { fontFamily: font.textBold, fontSize: 9.5, color: color.ink },
+  tagT: { fontFamily: font.textBold, fontSize: 11, color: color.ink },
   sum: { flexDirection: 'row', marginHorizontal: 16, marginTop: 12, backgroundColor: color.surface, borderRadius: radius + 4, borderWidth: 1, borderColor: color.line },
   sumCell: { flex: 1, paddingVertical: 9, paddingHorizontal: 14, gap: 2 },
   sumSep: { borderLeftWidth: 1, borderLeftColor: color.line },

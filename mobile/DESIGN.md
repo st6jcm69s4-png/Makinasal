@@ -17,3 +17,24 @@ Renkler web ile aynıdır ve değişmez: lacivert #25272D, bordo #800020, kâğ�
 
 ## Arayüz kiti (components/kit.tsx)
 shadcn/ui kalıplarının React Native uyarlaması: Badge, StatusBadge, AlertBox, Skeleton (CardSkeleton/RowSkeleton), Tabs (filled/line), Avatar, Progress, Separator. Renkler ve 4px köşe Makinasal'a aittir; yüklenme için dönen çember yerine iskelet, hata/uyarı için AlertBox, durum için StatusBadge kullanılır.
+
+## Apple yönergeleri (16 Kasım 2026)
+Kaynak: Apple İnsan Arayüzü Yönergeleri ("Apple Look", github.com/dickwu/apple-design-skill) ve Emil Kowalski'nin hareket kuralları ("Apple Motion", `.claude/skills/apple-design`, `animate-expo`, `gestures`). Yeni ekran ve bileşenler bu listeye uyar:
+
+- **Dokunma alanı:** en az 44×44 pt (Android 48 dp). Görsel küçükse `hitSlop` eklenir, görsel büyütülmez.
+- **Ekran okuyucu:** yalnızca simgeden oluşan her düğmede `accessibilityLabel` olur.
+- **Yazı:** en küçük 11 pt (LText büyütmesinden önce). Telefonun yazı boyutu ayarı kapatılmaz (`allowFontScaling` açık).
+- **Harf aralığı:** boyuta göre otomatik (LText, Inter formülü): büyük yazıda sıkı, küçük yazıda biraz açık. Büyük harfli etiketler kendi aralığını belirler.
+- **Kontrast:** metin en az 4.5:1 (tüm paletler hesaplandı; başarı yeşili açık temada #17633A).
+- **Geri bildirim:** başarı mesajı `toast`, hata ve onay soruları `Alert`. Basınca anında tepki: `scale 0.97` + hafif solma (`ui.tsx › s.pressed`).
+- **Hareket:** kurallar ve değerler `lib/motion.ts` içinde.
+  - Parmağın tuttuğu her şey yayla hareket eder ve bırakıldığı hızı korur.
+  - Karar, parmağın hızıyla ulaşacağı noktaya göre verilir (fırlatma da sayılır).
+  - Kenarlarda sert duruş yok, giderek artan direnç var.
+  - Parmak olmayan geçişler ease-out ve 300 ms'nin altında; arayüzde ease-in kullanılmaz; `scale(0)` ile belirme yok.
+- **Hareketi azalt:** açıksa kayma, zıplama ve iskelet nabzı kalkar, yalnızca kısa solma kalır (`useReducedMotion`).
+- **Titreşim:** yalnızca anlamlı anlarda ve görsel geri bildirimle birlikte (`lib/haptics.ts`): favori eklendi, ilan yayına gönderildi, teklif verildi, sekme değişti.
+- **120 Hz:** ProMotion ekranlarda akıcı hareket için `CADisableMinimumFrameDurationOnPhone` açık.
+- **Bilinçli ayrılıklar:**
+  - Uygulamada açık/koyu görünüm seçimi var; Apple uygulama içi görünüm düğmesi önermez ama kullanıcı istedi.
+  - Sekmeler arası kaydırma canlandırması da kullanıcı isteği; simgeye dokununca geçiş anında olur.

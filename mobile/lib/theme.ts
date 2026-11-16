@@ -12,7 +12,7 @@ const petrolLight: Palette = {
   pop: '#0D7468', popInk: '#FFFFFF', popSoft: '#CFE6DE',
   teal: '#0D7468', tealInk: '#FFFFFF', tealSoft: '#CFE6DE', tealText: '#0A6257',
   bg: '#EDE5D6', surface: '#F7F1E6', plate: '#E2D7C2', ink: '#1E211C', muted: '#544F3C', line: '#D2C4A9',
-  good: '#1B6F40', goodBg: '#DCEFE3', warn: '#7F5200', warnBg: '#FFF0C2', bad: '#9C2626', badBg: '#F5DADA',
+  good: '#17633A', goodBg: '#DCEFE3', warn: '#7F5200', warnBg: '#FFF0C2', bad: '#9C2626', badBg: '#F5DADA',
   onNavy: '#4D4734', barActive: '#0A6257', onBar: '#1E211C',
   navyDeep: '#1A1B18', tealBright: '#5FD3C4', onDeepMuted: '#D4CAB7', tile: '#F7F1E6',
 };

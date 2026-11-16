@@ -1,4 +1,5 @@
 import { useCallback, useState } from 'react';
+import { toast } from '../components/Toast';
 import { GuestGate } from '../components/LoginPrompt';
 import { Alert, ScrollView, StyleSheet, View } from 'react-native';
 import { Text, TextInput } from '../components/LText';
@@ -41,7 +42,7 @@ export default function Rights() {
       return;
     }
     setNote(''); void load();
-    Alert.alert('Başvuru alındı', 'Başvurun kaydedildi. Kanun gereği en geç 30 gün içinde yanıtlanır.');
+    toast('Başvurun kaydedildi. Kanun gereği en geç 30 gün içinde yanıtlanır.');
   }
   function ask(k: (typeof KINDS)[number]) {
     if (!k.confirm) { void send(k.kind); return; }

@@ -58,7 +58,7 @@ export function ProBadge({ plan, small }: { plan: PlanId | null; small?: boolean
   return (
     <View style={[s.badge, small && s.small]} accessibilityLabel={`${tr(planLabel(plan))} ${tr('üye')}`}>
       <Icon name="award" size={small ? 10 : 12} color={color.tealText} />
-      <PlainText style={[s.t, small && { fontSize: 10.5 }]}>{tr(planLabel(plan))}</PlainText>
+      <PlainText style={[s.t, small && { fontSize: 11 }]}>{tr(planLabel(plan))}</PlainText>
     </View>
   );
 }

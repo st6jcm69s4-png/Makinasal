@@ -30,7 +30,7 @@ export function Select({ label, value, onPress, placeholder = 'Seç' }: { label:
 export function Btn({ title, onPress, ghost, danger, disabled }: { title: string; onPress: () => void; ghost?: boolean; danger?: boolean; disabled?: boolean }) {
   return (
     <Pressable
-      style={({ pressed }) => [s.btn, ghost && s.ghost, danger && s.danger, disabled && { opacity: 0.45 }, pressed && !disabled && { opacity: 0.8 }]}
+      style={({ pressed }) => [s.btn, ghost && s.ghost, danger && s.danger, disabled && { opacity: 0.45 }, pressed && !disabled && s.pressed]}
       disabled={disabled} onPress={onPress} accessibilityRole="button" accessibilityState={{ disabled: !!disabled }}
     >
       <Text style={[s.btnText, ghost && s.ghostText, danger && s.dangerText]}>{title}</Text>
@@ -39,7 +39,7 @@ export function Btn({ title, onPress, ghost, danger, disabled }: { title: string
 }
 export function Chip({ title, on, onPress }: { title: string; on?: boolean; onPress: () => void }) {
   return (
-    <Pressable style={({ pressed }) => [s.chip, on && s.chipOn, pressed && { opacity: 0.8 }]} onPress={onPress} accessibilityRole="button" accessibilityState={{ selected: !!on }}>
+    <Pressable style={({ pressed }) => [s.chip, on && s.chipOn, pressed && s.pressed]} onPress={onPress} accessibilityRole="button" accessibilityState={{ selected: !!on }}>
       <Text style={[s.chipText, on && { color: color.tealInk }]}>{title}</Text>
     </Pressable>
   );
@@ -85,6 +85,8 @@ export const common = StyleSheet.create({
   h2: { fontWeight: '700', fontSize: 17, color: color.ink },
 });
 const s = StyleSheet.create({
+  // Basınca anında tepki (Apple: bırakmayı beklemeden): hafif küçülme + solma
+  pressed: { opacity: 0.85, transform: [{ scale: 0.97 }] },
   labelText: { fontSize: 13, color: color.muted },
   cell: { gap: 5 },
   input: { paddingVertical: 13, paddingHorizontal: 14, backgroundColor: color.surface, borderRadius: radius, borderWidth: 1, borderColor: color.line, fontSize: 16, color: color.ink },

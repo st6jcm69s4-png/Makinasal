@@ -203,7 +203,7 @@ export function AuctionBox({ auction: initial, own, signedIn, askLogin }: { auct
             </View>
             <View style={{ flexDirection: 'row', gap: 8 }}>
               {[min, min + Number(a.min_increment), min + Number(a.min_increment) * 4].map((v) => (
-                <Pressable key={v} style={s.quick} onPress={() => setAmount(String(Math.round(v)))} accessibilityRole="button">
+                <Pressable hitSlop={6} key={v} style={s.quick} onPress={() => setAmount(String(Math.round(v)))} accessibilityRole="button">
                   <PlainText style={s.quickT} numberOfLines={1}>{tl(Math.round(v))}</PlainText>
                 </Pressable>
               ))}

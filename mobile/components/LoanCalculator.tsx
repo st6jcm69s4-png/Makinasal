@@ -21,7 +21,7 @@ function Choice({ items, value, onChange, fmt }: { items: number[]; value: numbe
       {items.map((v) => {
         const on = v === value;
         return (
-          <Pressable key={v} style={[s.segItem, on && s.segOn]} onPress={() => onChange(v)} accessibilityRole="radio" accessibilityState={{ selected: on }}>
+          <Pressable hitSlop={6} key={v} style={[s.segItem, on && s.segOn]} onPress={() => onChange(v)} accessibilityRole="radio" accessibilityState={{ selected: on }}>
             <PlainText style={[s.segT, on && { color: color.tealInk }]}>{fmt(v)}</PlainText>
           </Pressable>
         );

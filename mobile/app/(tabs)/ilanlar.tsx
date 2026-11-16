@@ -147,7 +147,7 @@ export default function Listings() {
         {/* Görünüm: liste (fotoğraf solda) veya iki sütunlu ızgara */}
         <View style={s.seg} accessibilityRole="radiogroup">
           {(['row', 'grid'] as const).map((v) => (
-            <Pressable key={v} onPress={() => setView(v)} style={[s.segBtn, view === v && s.segOn]} accessibilityRole="radio" accessibilityState={{ selected: view === v }} accessibilityLabel={tr(v === 'row' ? 'Liste görünümü' : 'Izgara görünümü')}>
+            <Pressable hitSlop={6} key={v} onPress={() => setView(v)} style={[s.segBtn, view === v && s.segOn]} accessibilityRole="radio" accessibilityState={{ selected: view === v }} accessibilityLabel={tr(v === 'row' ? 'Liste görünümü' : 'Izgara görünümü')}>
               <Icon name={v === 'row' ? 'list' : 'grid'} size={16} color={view === v ? color.ink : color.muted} />
             </Pressable>
           ))}

@@ -5,6 +5,7 @@ import { PlainText } from './LText';
 import { Icon } from './Icon';
 import { color, font, shadow } from '../lib/theme';
 import { tr } from '../lib/i18n';
+import { useReducedMotion } from '../lib/motion';
 
 /**
  * Kısa bilgi bandı: "kaydedildi", "gönderildi" gibi başarı mesajları için.
@@ -25,16 +26,18 @@ export function toast(text: string, kind: Kind = 'ok') {
 
 export function ToastHost() {
   const insets = useSafeAreaInsets();
+  const reduced = useReducedMotion();
   const [item, setItem] = useState<Item | null>(null);
   const a = useRef(new Animated.Value(0)).current;
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    const hide = () => Animated.timing(a, { toValue: 0, duration: 180, easing: Easing.in(Easing.quad), useNativeDriver: true }).start(({ finished }) => { if (finished) setItem(null); });
+    // Apple yönergesi: arayüzde ease-in kullanılmaz (hareket geç başlar); çıkış da ease-out
+    const hide = () => Animated.timing(a, { toValue: 0, duration: 180, easing: Easing.bezier(0.23, 1, 0.32, 1), useNativeDriver: true }).start(({ finished }) => { if (finished) setItem(null); });
     push = (t) => {
       if (timer.current) clearTimeout(timer.current);
       setItem(t);
-      Animated.timing(a, { toValue: 1, duration: 220, easing: Easing.out(Easing.cubic), useNativeDriver: true }).start();
+      Animated.timing(a, { toValue: 1, duration: 220, easing: Easing.bezier(0.23, 1, 0.32, 1), useNativeDriver: true }).start();
       // Okuma süresi metnin uzunluğuna göre (en az 2,4 sn, en çok 5 sn)
       timer.current = setTimeout(hide, Math.min(5000, Math.max(2400, t.text.length * 55)));
     };
@@ -45,7 +48,7 @@ export function ToastHost() {
   return (
     <Animated.View
       pointerEvents="box-none"
-      style={[s.wrap, { bottom: insets.bottom + 76, opacity: a, transform: [{ translateY: a.interpolate({ inputRange: [0, 1], outputRange: [12, 0] }) }] }]}
+      style={[s.wrap, { bottom: insets.bottom + 76, opacity: a, transform: [{ translateY: a.interpolate({ inputRange: [0, 1], outputRange: [reduced ? 0 : 12, 0] }) }] }]}
     >
       <Pressable
         style={s.pill}

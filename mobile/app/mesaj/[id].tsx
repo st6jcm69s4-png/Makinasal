@@ -1,4 +1,5 @@
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { toast } from '../../components/Toast';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Alert, FlatList, KeyboardAvoidingView, Pressable, StyleSheet, View } from 'react-native';
 import { PlainText, Text, TextInput } from '../../components/LText';
@@ -67,7 +68,7 @@ export default function Thread() {
     const id2 = reportMsg; setReportMsg(null);
     if (!id2) return;
     const r = await supabase.from('message_reports').insert({ message_id: id2, reason });
-    if (!r.error) Alert.alert(tr('Şikayet'), tr('Şikayetin alındı. Ekibimiz inceleyecek. İstersen bu kişiyi engelleyebilirsin.'));
+    if (!r.error) toast('Şikayetin alındı. Ekibimiz inceleyecek. İstersen bu kişiyi engelleyebilirsin.');
     else Alert.alert(tr('Şikayet'), r.error.code === '23505' ? tr('Bu mesajı zaten şikayet ettin.') : tr('Şikayet gönderilemedi. Daha sonra tekrar dene.'));
   }
 

@@ -36,7 +36,7 @@ export function AnimatedSplash() {
           t(word, 260, 120),
         ]),
         Animated.delay(160),
-        Animated.timing(out, { toValue: 1, duration: 240, easing: Easing.in(Easing.quad), useNativeDriver: true }),
+        Animated.timing(out, { toValue: 1, duration: 240, easing: Easing.bezier(0.23, 1, 0.32, 1), useNativeDriver: true }),
       ]).start(() => { if (alive) setDone(true); });
     });
     return () => { alive = false; };

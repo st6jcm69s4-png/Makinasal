@@ -126,7 +126,7 @@ export default function Introduce() {
     </View>
   );
   const chip = (label: string, on: boolean, onPress: () => void, translate = true) => (
-    <Pressable key={label} style={[s.chip, on && s.chipOn]} onPress={onPress} accessibilityRole="button" accessibilityState={{ selected: on }}>
+    <Pressable hitSlop={6} key={label} style={[s.chip, on && s.chipOn]} onPress={onPress} accessibilityRole="button" accessibilityState={{ selected: on }}>
       {on ? <Icon name="check" size={14} color={color.tealInk} /> : null}
       {translate ? <Text style={[s.chipT, on && s.chipTOn]}>{label}</Text> : <PlainText style={[s.chipT, on && s.chipTOn]}>{label}</PlainText>}
     </Pressable>

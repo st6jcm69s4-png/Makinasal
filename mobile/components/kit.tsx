@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react';
 import { Animated, Pressable, ScrollView, StyleSheet, View, type ViewStyle } from 'react-native';
 import { PlainText, Text } from './LText';
 import { Icon, type IconName } from './Icon';
+import { useReducedMotion } from '../lib/motion';
 import { color, font, radius } from '../lib/theme';
 
 /* ───────── Badge ───────── */
@@ -53,14 +54,17 @@ export function AlertBox({ variant = 'default', title, children, style }: { vari
 /* ───────── Skeleton ───────── */
 export function Skeleton({ width = '100%', height = 14, style }: { width?: number | `${number}%`; height?: number; style?: ViewStyle }) {
   const o = useRef(new Animated.Value(0.45)).current;
+  const reduced = useReducedMotion();
   useEffect(() => {
+    // "Hareketi azalt" açıkken iskelet nabız atmaz, sabit durur
+    if (reduced) { o.setValue(0.7); return; }
     const loop = Animated.loop(Animated.sequence([
       Animated.timing(o, { toValue: 1, duration: 750, useNativeDriver: true }),
       Animated.timing(o, { toValue: 0.45, duration: 750, useNativeDriver: true }),
     ]));
     loop.start();
     return () => loop.stop();
-  }, [o]);
+  }, [o, reduced]);
   return <Animated.View style={[{ width, height, backgroundColor: color.line, borderRadius: 8, opacity: o }, style]} />;
 }
 /** İlan kartı iskeleti: yüklenirken dönen çember yerine. */

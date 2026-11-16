@@ -53,7 +53,7 @@ function HeadBtn({ icon, label, badge, onPress }: { icon: IconName; label: strin
       <Icon name={icon} size={21} color={color.onBar} />
       {badge ? (
         <View style={{ position: 'absolute', top: 3, right: 4, minWidth: 17, height: 17, paddingHorizontal: 4, borderRadius: 9, backgroundColor: color.pop, alignItems: 'center', justifyContent: 'center' }}>
-          <PlainText style={{ color: color.popInk, fontSize: 10, lineHeight: 13, fontFamily: font.textBold }}>{badge > 99 ? '99+' : String(badge)}</PlainText>
+          <PlainText style={{ color: color.popInk, fontSize: 11, lineHeight: 13, fontFamily: font.textBold }}>{badge > 99 ? '99+' : String(badge)}</PlainText>
         </View>
       ) : null}
     </Pressable>

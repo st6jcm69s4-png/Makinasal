@@ -238,7 +238,7 @@ export default function MyListings() {
             <Text style={s.aK}>Süre</Text>
             <View style={s.aSeg}>
               {[1, 3, 5, 7, 10].map((d) => (
-                <Pressable key={d} style={[s.aSegI, aDays === d && { backgroundColor: color.teal }]} onPress={() => setADays(d)} accessibilityRole="radio" accessibilityState={{ selected: aDays === d }}>
+                <Pressable hitSlop={6} key={d} style={[s.aSegI, aDays === d && { backgroundColor: color.teal }]} onPress={() => setADays(d)} accessibilityRole="radio" accessibilityState={{ selected: aDays === d }}>
                   <PlainText style={[s.aSegT, aDays === d && { color: color.tealInk }]}>{`${d} ${tr('gün')}`}</PlainText>
                 </Pressable>
               ))}

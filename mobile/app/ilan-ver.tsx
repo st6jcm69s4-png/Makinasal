@@ -273,7 +273,7 @@ export default function NewListing() {
           {(f.options ?? []).map((o) => {
             const on = tech[f.key] === o;
             return (
-              <Pressable key={o} style={[s.chip, on && s.chipOn]} onPress={() => setTech((t) => ({ ...t, [f.key]: on ? '' : o }))} accessibilityRole="radio" accessibilityState={{ selected: on }}>
+              <Pressable hitSlop={6} key={o} style={[s.chip, on && s.chipOn]} onPress={() => setTech((t) => ({ ...t, [f.key]: on ? '' : o }))} accessibilityRole="radio" accessibilityState={{ selected: on }}>
                 <Text style={[s.chipT, on && { color: color.tealInk }]}>{o}</Text>
               </Pressable>
             );
