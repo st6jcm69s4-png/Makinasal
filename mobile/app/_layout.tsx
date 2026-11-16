@@ -3,8 +3,9 @@ import { BarlowSemiCondensed_600SemiBold, BarlowSemiCondensed_700Bold } from '@e
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { caps, color, fontState } from '../lib/theme';
-import { AppHeader } from '../components/AppHeader';
+import { fontState } from '../lib/theme';
+import { headerOptions, largeTitle, navTheme } from '../lib/nav';
+import { ThemeProvider } from 'expo-router/react-navigation';
 import { loadTheme, watchSystemTheme } from '../lib/themePref';
 import { StatusBar } from 'expo-status-bar';
 import { AppProvider } from '../lib/AppContext';
@@ -17,26 +18,21 @@ import { DoubleTapSearch } from '../components/DoubleTapSearch';
 import { noteAppOpen } from '../lib/review';
 
 function Screens() {
-  const { lang } = useLang();
-  const T = (x: string) => caps(tr(x), lang);
+  useLang();
+  // Başlıklar normal yazımla (Apple: başlıklar büyük harfle yazılmaz)
+  const T = (x: string) => tr(x);
   return (
     <>
       <StatusBar style="auto" />
       {/* Her sayfada çift dokunuş: arama ekranı */}
       <DoubleTapSearch>
-      <Stack
-        screenOptions={{
-          // Kendi başlığımız: renkleri sayfayla aynı anda değişir.
-          header: ({ navigation, options, back }) => (
-            <AppHeader title={typeof options.title === 'string' ? options.title : ''} canGoBack={!!back} onBack={() => navigation.goBack()} />
-          ),
-          contentStyle: { backgroundColor: color.bg },
-        }}
-      >
+      <ThemeProvider value={navTheme}>
+      {/* Telefonun kendi başlık çubuğu (bkz. lib/nav.ts) */}
+      <Stack screenOptions={headerOptions}>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="ilan/[id]" options={{ title: T('İlan') }} />
-        <Stack.Screen name="mesajlar" options={{ title: T('Mesajlar') }} />
-        <Stack.Screen name="favoriler" options={{ title: T('Favorilerim') }} />
+        <Stack.Screen name="mesajlar" options={{ title: T('Mesajlar'), ...largeTitle }} />
+        <Stack.Screen name="favoriler" options={{ title: T('Favorilerim'), ...largeTitle }} />
         <Stack.Screen name="ilan-ver" options={{ title: T('İlan ver') }} />
         <Stack.Screen name="ilanlarim" options={{ title: T('İlanlarım') }} />
         <Stack.Screen name="mesaj/[id]" options={{ title: T('Mesajlar') }} />
@@ -76,6 +72,7 @@ function Screens() {
         <Stack.Screen name="ayarlar" options={{ title: T('Ayarlar') }} />
         <Stack.Screen name="ara" options={{ title: T('Uygulamada ara') }} />
       </Stack>
+      </ThemeProvider>
       </DoubleTapSearch>
     </>
   );

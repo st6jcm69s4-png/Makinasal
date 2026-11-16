@@ -1,12 +1,14 @@
-import { Image, Pressable, StyleSheet, View } from 'react-native';
+import type { ReactElement } from 'react';
+import { Alert, Image, Platform, Pressable, Share, StyleSheet, View } from 'react-native';
 import { PlainText, Text } from './LText';
 import { Heart, Icon } from './Icon';
 import { ProBadge, usePlanOf } from './ProBadge';
-import { router } from 'expo-router';
+import { Link } from 'expo-router';
+import { toast } from './Toast';
 import { useApp } from '../lib/AppContext';
 import { useLoginPrompt } from './LoginPrompt';
 import { getLang, localeOf, tr } from '../lib/i18n';
-import { photoUrl, tl, type Row } from '../lib/supabase';
+import { photoUrl, SITE_URL, tl, type Row } from '../lib/supabase';
 import { color, font, radius, fixed } from '../lib/theme';
 
 /**
@@ -45,7 +47,7 @@ const priceDrop = (r: Row) => {
 };
 
 export function ListingCard({ item, variant = 'row' }: { item: Row; variant?: CardVariant }) {
-  const { favs, toggleFav } = useApp();
+  const { favs, toggleFav, cmp, toggleCmp } = useApp();
   const { notify } = useLoginPrompt();
   const photo = [...(item.listing_photos ?? [])].sort((a, b) => a.position - b.position)[0];
   const fav = favs.has(item.id);
@@ -54,9 +56,37 @@ export function ListingCard({ item, variant = 'row' }: { item: Row; variant?: Ca
   const when = ago(item.created_at);
   const drop = priceDrop(item);
   const video = !!(item.video_url || item.video_path);
-  const open = () => router.push(`/ilan/${item.id}`);
+  const inCmp = cmp.includes(item.id);
   const heart = async () => { const err = await toggleFav(item.id, item.price); if (err) notify('Favoriler', err, (a) => void a.toggleFav(item.id, item.price)); };
   const favLabel = fav ? 'Favorilerden çıkar' : 'Favorilere ekle';
+  const cmpLabel = inCmp ? 'Karşılaştırmadan çıkar' : 'Karşılaştırmaya ekle';
+  const compare = () => { const err = toggleCmp(item.id); if (err) toast(err, 'info'); else if (!inCmp) toast('Karşılaştırmaya eklendi.'); };
+  const share = () => {
+    const url = SITE_URL ? `${SITE_URL.replace(/\/$/, '')}/ilan/${item.id}` : '';
+    void Share.share({ message: [item.title, tl(item.price), url].filter(Boolean).join('\n') }).catch(() => undefined);
+  };
+  // Android: uzun basınca aynı seçenekler (iPhone'da sistemin kendi menüsü açılır)
+  const androidMenu = Platform.OS === 'android' ? () => Alert.alert(item.title, undefined, [
+    { text: tr(favLabel), onPress: () => void heart() },
+    { text: tr(cmpLabel), onPress: compare },
+    { text: tr('Paylaş'), onPress: share },
+    { text: tr('Vazgeç'), style: 'cancel' },
+  ]) : undefined;
+  /*
+   * Kart telefonun kendi bağlantısı: dokununca ilan açılır; iPhone'da uzun basınca ilanın önizlemesi
+   * ve menü (favori, karşılaştır, paylaş) çıkar. Apple yönergesi: bağlam menüsü + önizleme.
+   */
+  const wrap = (card: ReactElement) => (
+    <Link href={`/ilan/${item.id}`} asChild>
+      <Link.Trigger>{card}</Link.Trigger>
+      <Link.Preview />
+      <Link.Menu>
+        <Link.MenuAction title={tr(favLabel)} icon={fav ? 'heart.slash' : 'heart'} onPress={() => void heart()} />
+        <Link.MenuAction title={tr(cmpLabel)} icon="square.split.2x1" onPress={compare} />
+        <Link.MenuAction title={tr('Paylaş')} icon="square.and.arrow.up" onPress={share} />
+      </Link.Menu>
+    </Link>
+  );
   const img = photo
     ? <Image source={{ uri: photoUrl(photo.path) }} style={StyleSheet.absoluteFill} />
     : <View style={[StyleSheet.absoluteFill, s.noimg]}><Icon name="truck" size={variant === 'row' ? 30 : 40} color={color.muted} /></View>;
@@ -64,8 +94,8 @@ export function ListingCard({ item, variant = 'row' }: { item: Row; variant?: Ca
   const videoTag = video ? <View style={s.video} accessibilityLabel={tr('Videolu')}><Icon name="play" size={11} color={fixed.onMedia} /></View> : null;
 
   if (variant === 'row') {
-    return (
-      <Pressable style={({ pressed }) => [s.row, pressed && s.pressed]} onPress={open} accessibilityRole="button">
+    return wrap(
+      <Pressable style={({ pressed }) => [s.row, pressed && s.pressed]} onLongPress={androidMenu} accessibilityRole="button">
         <View style={s.rowImg}>{img}{boostTag}{videoTag}</View>
         <View style={s.rowBody}>
           <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 4 }}>
@@ -89,8 +119,8 @@ export function ListingCard({ item, variant = 'row' }: { item: Row; variant?: Ca
   }
 
   const wide = variant === 'wide';
-  return (
-    <Pressable style={({ pressed }) => [s.card, wide ? s.wide : s.grid, pressed && s.pressed]} onPress={open} accessibilityRole="button">
+  return wrap(
+    <Pressable style={({ pressed }) => [s.card, wide ? s.wide : s.grid, pressed && s.pressed]} onLongPress={androidMenu} accessibilityRole="button">
       <View style={[s.cardImg, wide ? { height: 124 } : { aspectRatio: 4 / 3 }]}>
         {img}{boostTag}{videoTag}
         <Pressable onPress={() => void heart()} hitSlop={8} style={s.heart} accessibilityRole="button" accessibilityLabel={tr(favLabel)}>

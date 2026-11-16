@@ -9,6 +9,7 @@ import { Btn } from '../../components/ui';
 import { AlertBox, CardSkeleton } from '../../components/kit';
 import { FirmCard, PostCard } from '../../components/NetCards';
 import { Icon, type IconName } from '../../components/Icon';
+import { HomeHeader } from '../../components/HomeHeader';
 import { color, font, radius } from '../../lib/theme';
 import { useLang } from '../../lib/lang';
 import { tr } from '../../lib/i18n';
@@ -117,7 +118,9 @@ export default function Home() {
   for (let i = 0; i < latest.length; i += 2) pairs.push(latest.slice(i, i + 2));
 
   return (
-    <ScrollView ref={scroller} style={s.screen} contentContainerStyle={{ paddingBottom: 32 }} refreshControl={<RefreshControl refreshing={busy} onRefresh={() => void load()} />} keyboardShouldPersistTaps="handled">
+    <View style={{ flex: 1, backgroundColor: color.bg }}>
+    <HomeHeader />
+    <ScrollView ref={scroller} style={s.screen} contentContainerStyle={{ paddingBottom: 32 }} contentInsetAdjustmentBehavior="automatic" refreshControl={<RefreshControl refreshing={busy} onRefresh={() => void load()} />} keyboardShouldPersistTaps="handled">
       {/* Selam + arama */}
       <View style={s.hero}>
         <PlainText style={s.hello}>{session && name ? `${tr('Merhaba,')} ${name}. ${tr('Bugün ne arıyorsun?')}` : tr('Makine, parça ve iş: hepsi burada.')}</PlainText>
@@ -247,6 +250,7 @@ export default function Home() {
         <Text style={s.link2}>Güvenli alım rehberi</Text>
       </Pressable>
     </ScrollView>
+    </View>
   );
 }
 

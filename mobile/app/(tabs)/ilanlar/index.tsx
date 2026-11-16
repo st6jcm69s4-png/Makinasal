@@ -1,26 +1,26 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { toast } from '../../components/Toast';
-import { useLoginPrompt } from '../../components/LoginPrompt';
-import { CardSkeleton } from '../../components/kit';
-import { useTabScrollTop } from '../../lib/scrollTop';
+import { toast } from '../../../components/Toast';
+import { useLoginPrompt } from '../../../components/LoginPrompt';
+import { CardSkeleton } from '../../../components/kit';
+import { useTabScrollTop } from '../../../lib/scrollTop';
 import { ActivityIndicator, FlatList, Pressable, ScrollView, StyleSheet, View } from 'react-native';
-import { PlainText, Text, TextInput } from '../../components/LText';
-import { Icon, type IconName } from '../../components/Icon';
-import { SearchBox } from '../../components/SearchBox';
-import { PickerModal } from '../../components/PickerModal';
-import { advCount, FilterModal, NO_ADV, type Adv } from '../../components/FilterModal';
-import { techFilterParams } from '../../lib/techSpecs';
-import { CITIES } from '../../lib/data';
-import { COORDS, distanceKm } from '../../lib/geo';
-import { CATEGORY_GROUPS, categoryLabel, categoryValues } from '../../lib/machineryCatalog';
+import { PlainText, Text, TextInput } from '../../../components/LText';
+import { Icon, type IconName } from '../../../components/Icon';
+import { SearchBox } from '../../../components/SearchBox';
+import { PickerModal } from '../../../components/PickerModal';
+import { advCount, FilterModal, NO_ADV, type Adv } from '../../../components/FilterModal';
+import { techFilterParams } from '../../../lib/techSpecs';
+import { CITIES } from '../../../lib/data';
+import { COORDS, distanceKm } from '../../../lib/geo';
+import { CATEGORY_GROUPS, categoryLabel, categoryValues } from '../../../lib/machineryCatalog';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Alert } from 'react-native';
-import { useApp } from '../../lib/AppContext';
-import { ListingCard, type CardVariant } from '../../components/ListingCard';
+import { useApp } from '../../../lib/AppContext';
+import { ListingCard, type CardVariant } from '../../../components/ListingCard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { configured, supabase, type Row } from '../../lib/supabase';
-import { color, font } from '../../lib/theme';
-import { tr } from '../../lib/i18n';
+import { configured, supabase, type Row } from '../../../lib/supabase';
+import { color, font } from '../../../lib/theme';
+import { tr } from '../../../lib/i18n';
 
 function FChip({ icon, label, on, drop, onPress }: { icon: IconName; label: string; on?: boolean; drop?: boolean; onPress: () => void }) {
   return (
@@ -121,39 +121,44 @@ export default function Listings() {
     return () => clearTimeout(t);
   }, [q, cat, city, maxPrice, sort, adv, load]);
 
+  // Arama, filtreler ve sayı listenin başında: liste ekranın ilk öğesi olunca büyük başlık kaydırınca küçülür
+  const header = (
+    <View>
+          <View style={{ marginHorizontal: 16, marginTop: 12, marginBottom: 10 }}><SearchBox value={q} onChangeText={setQ} placeholder="Marka, model veya parça numarası ara" /></View>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flexGrow: 0 }} contentContainerStyle={s.chips}>
+            <FChip icon="grid" label={cat ? categoryLabel(cat) : 'Kategori'} on={!!cat} drop onPress={() => setSheet('cat')} />
+            <FChip icon="map-pin" label={city === 'Tümü' ? 'İl' : city} on={city !== 'Tümü'} drop onPress={() => setSheet('city')} />
+            <FChip icon="tag" label={maxPrice === '6000000' ? 'Fiyat' : PRICES.find((p) => p.value === maxPrice)?.label ?? 'Fiyat'} on={maxPrice !== '6000000'} drop onPress={() => setSheet('price')} />
+            <FChip icon="sliders" label={advCount(adv, cat) ? `${tr('Filtreler')} (${advCount(adv, cat)})` : 'Filtreler'} on={advCount(adv, cat) > 0} onPress={() => setAdvOpen(true)} />
+            <FChip icon="list" label={SORTS.find((o) => o.value === sort)?.label ?? 'Sırala'} drop onPress={() => setSheet('sort')} />
+            <FChip icon="bookmark" label="Aramayı kaydet" onPress={() => void saveSearch()} />
+            <FChip icon="settings" label="Yedek parça" onPress={() => router.push('/yedek-parca')} />
+            <FChip icon="map" label="İllere göre" onPress={() => router.push('/harita')} />
+          </ScrollView>
+          {error ? <Text style={s.err}>{error}</Text> : null}
+          <View style={s.countRow}>
+            <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 5, flex: 1 }}>
+              {!loading || rows.length ? <><PlainText style={s.countN}>{String(total)}</PlainText><Text style={s.countT}>ilan</Text></> : null}
+            </View>
+            {/* Görünüm: liste (fotoğraf solda) veya iki sütunlu ızgara */}
+            <View style={s.seg} accessibilityRole="radiogroup">
+              {(['row', 'grid'] as const).map((v) => (
+                <Pressable hitSlop={6} key={v} onPress={() => setView(v)} style={[s.segBtn, view === v && s.segOn]} accessibilityRole="radio" accessibilityState={{ selected: view === v }} accessibilityLabel={tr(v === 'row' ? 'Liste görünümü' : 'Izgara görünümü')}>
+                  <Icon name={v === 'row' ? 'list' : 'grid'} size={16} color={view === v ? color.ink : color.muted} />
+                </Pressable>
+              ))}
+            </View>
+          </View>
+    </View>
+  );
+
   return (
-    <View style={s.screen}>
-      <View style={{ marginHorizontal: 16, marginTop: 12, marginBottom: 10 }}><SearchBox value={q} onChangeText={setQ} placeholder="Marka, model veya parça numarası ara" /></View>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flexGrow: 0 }} contentContainerStyle={s.chips}>
-        <FChip icon="grid" label={cat ? categoryLabel(cat) : 'Kategori'} on={!!cat} drop onPress={() => setSheet('cat')} />
-        <FChip icon="map-pin" label={city === 'Tümü' ? 'İl' : city} on={city !== 'Tümü'} drop onPress={() => setSheet('city')} />
-        <FChip icon="tag" label={maxPrice === '6000000' ? 'Fiyat' : PRICES.find((p) => p.value === maxPrice)?.label ?? 'Fiyat'} on={maxPrice !== '6000000'} drop onPress={() => setSheet('price')} />
-        <FChip icon="sliders" label={advCount(adv, cat) ? `${tr('Filtreler')} (${advCount(adv, cat)})` : 'Filtreler'} on={advCount(adv, cat) > 0} onPress={() => setAdvOpen(true)} />
-        <FChip icon="list" label={SORTS.find((o) => o.value === sort)?.label ?? 'Sırala'} drop onPress={() => setSheet('sort')} />
-        <FChip icon="bookmark" label="Aramayı kaydet" onPress={() => void saveSearch()} />
-        <FChip icon="settings" label="Yedek parça" onPress={() => router.push('/yedek-parca')} />
-        <FChip icon="map" label="İllere göre" onPress={() => router.push('/harita')} />
-      </ScrollView>
-      <PickerModal visible={sheet === 'cat'} title="Kategori" selected={cat} options={[{ value: '', label: 'Tümü' }, ...CATEGORY_GROUPS.map((g) => ({ value: 'group:' + g.id, label: g.label + ' (tümü)' })), ...CATEGORY_GROUPS.flatMap((g) => g.categories).map((c) => ({ value: c, label: c }))]} onPick={setCat} onClose={() => setSheet(null)} />
-      <PickerModal visible={sheet === 'city'} title="İl" selected={city} options={['Tümü', ...CITIES].map((c) => ({ value: c, label: c }))} onPick={setCity} onClose={() => setSheet(null)} />
-      <PickerModal visible={sheet === 'price'} title="En yüksek fiyat" selected={maxPrice} options={PRICES} onPick={setMaxPrice} onClose={() => setSheet(null)} />
-      <PickerModal visible={sheet === 'sort'} title="Sırala" selected={sort} options={SORTS} onPick={setSort} onClose={() => setSheet(null)} />
-      <FilterModal visible={advOpen} value={adv} category={cat} part={isPart} onApply={setAdv} onClose={() => setAdvOpen(false)} />
-      {error ? <Text style={s.err}>{error}</Text> : null}
-      <View style={s.countRow}>
-        <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 5, flex: 1 }}>
-          {!loading || rows.length ? <><PlainText style={s.countN}>{String(total)}</PlainText><Text style={s.countT}>ilan</Text></> : null}
-        </View>
-        {/* Görünüm: liste (fotoğraf solda) veya iki sütunlu ızgara */}
-        <View style={s.seg} accessibilityRole="radiogroup">
-          {(['row', 'grid'] as const).map((v) => (
-            <Pressable hitSlop={6} key={v} onPress={() => setView(v)} style={[s.segBtn, view === v && s.segOn]} accessibilityRole="radio" accessibilityState={{ selected: view === v }} accessibilityLabel={tr(v === 'row' ? 'Liste görünümü' : 'Izgara görünümü')}>
-              <Icon name={v === 'row' ? 'list' : 'grid'} size={16} color={view === v ? color.ink : color.muted} />
-            </Pressable>
-          ))}
-        </View>
-      </View>
+    <>
       <FlatList
+        style={s.screen}
+        contentInsetAdjustmentBehavior="automatic"
+        keyboardShouldPersistTaps="handled"
+        ListHeaderComponent={header}
         ref={scroller}
         key={view}
         numColumns={view === 'grid' ? 2 : 1}
@@ -166,7 +171,12 @@ export default function Listings() {
         ListFooterComponent={loading ? <CardSkeleton count={rows.length ? 1 : 4} /> : undefined}
         renderItem={({ item }) => <ListingCard item={item} variant={view} />}
       />
-    </View>
+      <PickerModal visible={sheet === 'cat'} title="Kategori" selected={cat} options={[{ value: '', label: 'Tümü' }, ...CATEGORY_GROUPS.map((g) => ({ value: 'group:' + g.id, label: g.label + ' (tümü)' })), ...CATEGORY_GROUPS.flatMap((g) => g.categories).map((c) => ({ value: c, label: c }))]} onPick={setCat} onClose={() => setSheet(null)} />
+      <PickerModal visible={sheet === 'city'} title="İl" selected={city} options={['Tümü', ...CITIES].map((c) => ({ value: c, label: c }))} onPick={setCity} onClose={() => setSheet(null)} />
+      <PickerModal visible={sheet === 'price'} title="En yüksek fiyat" selected={maxPrice} options={PRICES} onPick={setMaxPrice} onClose={() => setSheet(null)} />
+      <PickerModal visible={sheet === 'sort'} title="Sırala" selected={sort} options={SORTS} onPick={setSort} onClose={() => setSheet(null)} />
+      <FilterModal visible={advOpen} value={adv} category={cat} part={isPart} onApply={setAdv} onClose={() => setAdvOpen(false)} />
+    </>
   );
 }
 

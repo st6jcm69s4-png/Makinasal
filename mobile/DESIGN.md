@@ -33,8 +33,15 @@ Kaynak: Apple İnsan Arayüzü Yönergeleri ("Apple Look", github.com/dickwu/app
   - Kenarlarda sert duruş yok, giderek artan direnç var.
   - Parmak olmayan geçişler ease-out ve 300 ms'nin altında; arayüzde ease-in kullanılmaz; `scale(0)` ile belirme yok.
 - **Hareketi azalt:** açıksa kayma, zıplama ve iskelet nabzı kalkar, yalnızca kısa solma kalır (`useReducedMotion`).
-- **Titreşim:** yalnızca anlamlı anlarda ve görsel geri bildirimle birlikte (`lib/haptics.ts`): favori eklendi, ilan yayına gönderildi, teklif verildi, sekme değişti.
+- **Titreşim:** yalnızca anlamlı anlarda ve görsel geri bildirimle birlikte (`lib/haptics.ts`): favori eklendi, ilan yayına gönderildi, teklif verildi.
 - **120 Hz:** ProMotion ekranlarda akıcı hareket için `CADisableMinimumFrameDurationOnPhone` açık.
 - **Bilinçli ayrılıklar:**
   - Uygulamada açık/koyu görünüm seçimi var; Apple uygulama içi görünüm düğmesi önermez ama kullanıcı istedi.
-  - Sekmeler arası kaydırma canlandırması da kullanıcı isteği; simgeye dokununca geçiş anında olur.
+
+## Telefonun kendi parçaları (16 Kasım 2026)
+- **Alt menü:** `NativeTabs` (`app/(tabs)/_layout.tsx`). iOS 26'da cam görünümlü sistem çubuğu (aşağı kaydırınca küçülür), Android'de Material 3. Simgeler iPhone'da SF Symbols, Android'de Material Symbols. "İlan ver" bir sekmedir ve ilan türünü seçtiren sayfayı açar (sekmeler eylem yapmaz). Sekmeler arası kaydırma kaldırıldı (Apple: sekmeler kaydırılmaz).
+- **Başlıklar:** her yerde telefonun kendi başlık çubuğu (`lib/nav.ts › headerOptions`). Başlıklar normal yazımla, büyük harfle değil. Geri düğmesinde yalnızca ok.
+- **Büyük başlık:** İlanlar, İlan ver, İş Ağı, Hesabım, Mesajlar, Favorilerim. Kaydırınca küçülüp çubuğa yerleşir; bunun için ekranın ilk öğesi kaydırılan liste olmalı (İlanlar'da arama ve filtreler listenin başında).
+- **Başlık düğmeleri:** sekmelerde sağda arama, bildirimler, mesajlar (`HeaderButtons`, okunmamış sayısı `lib/unread.ts`). Ana sayfada marka başlığı (`HomeHeader`); marka yalnızca orada.
+- **Gruplu satırlar:** `components/Rows.tsx`, iPhone Ayarlar düzeni: gölgesiz beyaz kart, renkli kare simge, ince ara çizgi, basınca gri satır, kırmızı "Çıkış yap" satırı. Hesabım, İlan ver ve Hukuki bilgiler bunu kullanır.
+- **İlan kartında uzun basma:** iPhone'da ilanın önizlemesi ve sistem menüsü (Favori, Karşılaştır, Paylaş: `Link.Preview` + `Link.Menu`). Android'de aynı seçenekler pencerede.
