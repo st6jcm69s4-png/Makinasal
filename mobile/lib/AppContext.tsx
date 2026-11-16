@@ -3,6 +3,7 @@ import { cachedPlan, forgetPlan, requestPlans } from '../components/ProBadge';
 import { FREE, PREMIUM } from './plans';
 import type { Session } from '@supabase/supabase-js';
 import { supabase } from './supabase';
+import * as haptic from './haptics';
 import { maybeAskReview } from './review';
 
 type Ctx = {
@@ -74,7 +75,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       if (error && /price_at_save/.test(error.message)) ({ error } = await supabase.from('favorites').insert({ user_id: uid, listing_id: listingId }));
     }
     if (error) { await reloadFavs(); return 'İşlem kaydedilemedi. Bağlantını kontrol et.'; }
-    if (!had) void maybeAskReview('favorite');
+    if (!had) { haptic.tap(); void maybeAskReview('favorite'); }
     return null;
   }, [uid, favs, reloadFavs]);
 

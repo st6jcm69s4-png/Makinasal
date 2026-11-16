@@ -2,6 +2,7 @@ import { useCallback, useRef, type ReactNode } from 'react';
 import { Animated, Dimensions, PanResponder } from 'react-native';
 import { router, useFocusEffect } from 'expo-router';
 import { color } from '../lib/theme';
+import * as haptic from '../lib/haptics';
 import { EASE_OUT, SPRING_RELEASE, SPRING_SETTLE, reduceMotion } from '../lib/motion';
 
 /** Alt menü sırası; sağa/sola kaydırınca bir önceki/sonraki sekmeye geçilir. */
@@ -46,6 +47,7 @@ function goTab(next: string, velocity = 0) {
   const from = screens.get(current);
   busy = true;
   pendingDir = dir;
+  haptic.tick();
   const finish = () => {
     router.navigate(PATH[next] as never);
     setTimeout(() => { busy = false; }, 60);

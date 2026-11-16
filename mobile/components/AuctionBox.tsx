@@ -5,6 +5,7 @@ import { PlainText, Text, TextInput } from './LText';
 import { Icon, type IconName } from './Icon';
 import { supabase, tl } from '../lib/supabase';
 import { tr } from '../lib/i18n';
+import * as haptic from '../lib/haptics';
 import { color, font, radius, shadow } from '../lib/theme';
 
 export type Auction = {
@@ -101,7 +102,8 @@ export function AuctionBox({ auction: initial, own, signedIn, askLogin }: { auct
     setBusy(true); setErr('');
     const { error } = await fn();
     setBusy(false);
-    if (error) { setErr(tr(errText(error.message))); void refresh(); return; }
+    if (error) { haptic.failure(); setErr(tr(errText(error.message))); void refresh(); return; }
+    haptic.success();
     after?.();
     void refresh();
   }
