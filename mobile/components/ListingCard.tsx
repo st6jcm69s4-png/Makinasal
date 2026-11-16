@@ -1,4 +1,4 @@
-import type { ReactElement } from 'react';
+import { useState, type ReactElement } from 'react';
 import { Alert, Image, Platform, Pressable, Share, StyleSheet, View } from 'react-native';
 import { PlainText, Text } from './LText';
 import { Heart, Icon } from './Icon';
@@ -57,6 +57,14 @@ export function ListingCard({ item, variant = 'row' }: { item: Row; variant?: Ca
   const drop = priceDrop(item);
   const video = !!(item.video_url || item.video_path);
   const inCmp = cmp.includes(item.id);
+  /*
+   * Kart, menü ve önizlemeyi sağlayan Link'in içinde. Link stili kartın üzerine birleştirirken yalnızca düz bir
+   * stil nesnesi okuyabiliyor: "basınca" stili işlev ({ pressed }) => ... ya da dizi olarak verilirse kartın bütün
+   * düzeni (yan yana yerleşim, zemin, kenar boşlukları) kayboluyordu. Bu yüzden basılı durum burada tutulur
+   * ve stil StyleSheet.flatten ile tek nesneye indirilir.
+   */
+  const [pressed, setPressed] = useState(false);
+  const press = { onPressIn: () => setPressed(true), onPressOut: () => setPressed(false) };
   const heart = async () => { const err = await toggleFav(item.id, item.price); if (err) notify('Favoriler', err, (a) => void a.toggleFav(item.id, item.price)); };
   const favLabel = fav ? 'Favorilerden çıkar' : 'Favorilere ekle';
   const cmpLabel = inCmp ? 'Karşılaştırmadan çıkar' : 'Karşılaştırmaya ekle';
@@ -95,7 +103,7 @@ export function ListingCard({ item, variant = 'row' }: { item: Row; variant?: Ca
 
   if (variant === 'row') {
     return wrap(
-      <Pressable style={({ pressed }) => [s.row, pressed && s.pressed]} onLongPress={androidMenu} accessibilityRole="button">
+      <Pressable style={StyleSheet.flatten([s.row, pressed && s.pressed])} {...press} onLongPress={androidMenu} accessibilityRole="button">
         <View style={s.rowImg}>{img}{boostTag}{videoTag}</View>
         <View style={s.rowBody}>
           <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 4 }}>
@@ -120,7 +128,7 @@ export function ListingCard({ item, variant = 'row' }: { item: Row; variant?: Ca
 
   const wide = variant === 'wide';
   return wrap(
-    <Pressable style={({ pressed }) => [s.card, wide ? s.wide : s.grid, pressed && s.pressed]} onLongPress={androidMenu} accessibilityRole="button">
+    <Pressable style={StyleSheet.flatten([s.card, wide ? s.wide : s.grid, pressed && s.pressed])} {...press} onLongPress={androidMenu} accessibilityRole="button">
       <View style={[s.cardImg, wide ? { height: 124 } : { aspectRatio: 4 / 3 }]}>
         {img}{boostTag}{videoTag}
         <Pressable onPress={() => void heart()} hitSlop={8} style={s.heart} accessibilityRole="button" accessibilityLabel={tr(favLabel)}>
