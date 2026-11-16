@@ -115,7 +115,7 @@ export default function Favorites() {
 
   if (!session) {
     return (
-      <GuestGate icon="heart" text="Beğendiğin ilanları kaydetmek, fiyatı düşünce görmek için giriş yap." />
+      <ScrollView contentInsetAdjustmentBehavior="automatic" style={{ flex: 1, backgroundColor: color.bg }} contentContainerStyle={{ flexGrow: 1 }}><GuestGate icon="heart" text="Beğendiğin ilanları kaydetmek, fiyatı düşünce görmek için giriş yap." /></ScrollView>
     );
   }
 
@@ -166,6 +166,7 @@ export default function Favorites() {
 
   return (
     <SectionList<Fav | Net, { title: string; data: (Fav | Net)[] }>
+      contentInsetAdjustmentBehavior="automatic"
       ref={scroller}
       style={{ flex: 1, backgroundColor: color.bg }}
       sections={data}

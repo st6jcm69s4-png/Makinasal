@@ -1,5 +1,5 @@
 import { TabStack } from '../../../components/TabStack';
 
 export default function Layout() {
-  return <TabStack title="İlanlar" />;
+  return <TabStack title="İlanlar" large={false} />;
 }

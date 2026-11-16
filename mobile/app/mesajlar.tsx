@@ -1,6 +1,6 @@
 import { useCallback, useRef, useState } from 'react';
 import { GuestGate } from '../components/LoginPrompt';
-import { ActivityIndicator, FlatList, Image, Pressable, RefreshControl, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, FlatList, Image, Pressable, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
 import { PlainText, Text, TextInput } from '../components/LText';
 import { Icon } from '../components/Icon';
 import { Btn, Chip } from '../components/ui';
@@ -89,10 +89,11 @@ export default function Messages() {
 
   if (!session) {
     return (
-      <GuestGate icon="message-square" text="Satıcı ve alıcılarla yazışmak, teklifleri takip etmek için giriş yap." />
+      // Büyük başlıklı ekranda içerik başlığın altında kalmasın: her durum kaydırma görünümünün içinde
+      <ScrollView contentInsetAdjustmentBehavior="automatic" style={{ flex: 1, backgroundColor: color.bg }} contentContainerStyle={{ flexGrow: 1 }}><GuestGate icon="message-square" text="Satıcı ve alıcılarla yazışmak, teklifleri takip etmek için giriş yap." /></ScrollView>
     );
   }
-  if (threads === null) return <RowSkeleton count={6} />;
+  if (threads === null) return <ScrollView contentInsetAdjustmentBehavior="automatic" style={{ flex: 1, backgroundColor: color.bg }} contentContainerStyle={{ flexGrow: 1 }}><RowSkeleton count={6} /></ScrollView>;
 
   const term = q.trim().toLocaleLowerCase('tr-TR');
   const shown = threads.filter((t) => (filter === 'unread' ? t.unread > 0 : filter === 'offer' ? t.offer : true) && (!term || `${t.other} ${t.title} ${t.last}`.toLocaleLowerCase('tr-TR').includes(term)));
@@ -121,6 +122,7 @@ export default function Messages() {
 
   return (
     <FlatList<Thread | Quote>
+      contentInsetAdjustmentBehavior="automatic"
       ref={scroller}
       style={{ flex: 1, backgroundColor: color.bg }}
       data={mode === 'ilan' ? shown : quotes}

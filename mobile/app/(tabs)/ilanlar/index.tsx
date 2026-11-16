@@ -156,7 +156,6 @@ export default function Listings() {
     <>
       <FlatList
         style={s.screen}
-        contentInsetAdjustmentBehavior="automatic"
         keyboardShouldPersistTaps="handled"
         ListHeaderComponent={header}
         ref={scroller}

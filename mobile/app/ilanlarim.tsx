@@ -4,14 +4,14 @@ import { toast } from '../components/Toast';
 import { maybeAskReview } from '../lib/review';
 import { CardSkeleton } from '../components/kit';
 import { GuestGate } from '../components/LoginPrompt';
-import { Alert, FlatList, Image, Modal, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { ActionSheetIOS, Alert, FlatList, Image, Modal, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { PlainText, Text, TextInput } from '../components/LText';
 import { Icon, type IconName } from '../components/Icon';
 import { tr } from '../lib/i18n';
 import { router, useFocusEffect } from 'expo-router';
 import { useApp } from '../lib/AppContext';
 import { photoUrl, supabase, tl } from '../lib/supabase';
-import { color, font, radius, shadow } from '../lib/theme';
+import { color, font, launchScheme } from '../lib/theme';
 
 type Row = {
   id: string; title: string; price: number | string; city: string; status: string;
@@ -101,6 +101,23 @@ export default function MyListings() {
     return list;
   }
 
+  /** İlan seçenekleri: iPhone'da sistemin kendi eylem sayfası, Android'de alttan açılan sayfa. */
+  function openMenu(r: Row) {
+    if (Platform.OS !== 'ios') { setMenu(r); return; }
+    const list = actions(r);
+    ActionSheetIOS.showActionSheetWithOptions(
+      {
+        title: r.title,
+        options: [...list.map((a) => tr(a.label)), tr('Vazgeç')],
+        cancelButtonIndex: list.length,
+        ...(list.some((a) => a.danger) ? { destructiveButtonIndex: list.findIndex((a) => a.danger) } : {}),
+        userInterfaceStyle: launchScheme,
+        tintColor: color.accentText,
+      },
+      (i) => { if (i < list.length) list[i].run(); },
+    );
+  }
+
   if (!session) return <GuestGate icon="list" text="İlanlarını görmek ve yönetmek için giriş yap." />;
   if (rows === null) return <CardSkeleton />;
   return (
@@ -109,16 +126,16 @@ export default function MyListings() {
       <FlatList
         data={rows}
         keyExtractor={(r) => r.id}
-        contentContainerStyle={{ padding: 16, gap: 12 }}
+        contentContainerStyle={{ padding: 16, gap: 14, paddingBottom: 40 }}
         ListEmptyComponent={<Text style={s.msg}>Henüz ilanın yok.</Text>}
         ListHeaderComponent={rows.length && stats.size ? (() => {
           const t = [...stats.values()].reduce((a, x) => ({ views: a.views + x.views, phones: a.phones + x.phones, favorites: a.favorites + x.favorites, threads: a.threads + x.threads }), { views: 0, phones: 0, favorites: 0, threads: 0 });
           return (
-            <View style={s.sum}>
-              <Text style={s.sumT}>Tüm ilanların</Text>
-              <View style={s.sumRow}>
-                {([['eye', t.views, 'Görüntülenme'], ['heart', t.favorites, 'Favori'], ['message-circle', t.threads, 'Mesaj'], ['phone', t.phones, 'Telefon']] as [IconName, number, string][]).map(([ic, n, l]) => (
-                  <View key={l} style={s.sumItem} accessible accessibilityLabel={`${n} ${tr(l)}`}><Icon name={ic} size={16} color={color.tealText} /><Text style={s.sumL} numberOfLines={1}>{l}</Text><PlainText style={s.sumN}>{fmt(n)}</PlainText></View>
+            <View style={{ gap: 7, marginBottom: 6 }}>
+              <Text style={s.secT} accessibilityRole="header">Tüm ilanların</Text>
+              <View style={[s.card, s.sumRow]}>
+                {([['eye', t.views, 'Görüntülenme'], ['heart', t.favorites, 'Favori'], ['message-circle', t.threads, 'Mesaj'], ['phone', t.phones, 'Telefon']] as [IconName, number, string][]).map(([ic, n, l], i) => (
+                  <View key={l} style={[s.sumItem, i > 0 && s.statSep]} accessible accessibilityLabel={`${n} ${tr(l)}`}><Icon name={ic} size={16} color={color.tealText} /><Text style={s.sumL} numberOfLines={1}>{l}</Text><PlainText style={s.sumN}>{fmt(n)}</PlainText></View>
                 ))}
               </View>
             </View>
@@ -128,11 +145,11 @@ export default function MyListings() {
           const photo = [...(r.listing_photos ?? [])].sort((a, b) => a.position - b.position)[0];
           return (
             <View style={s.card}>
-              <Pressable style={s.top} onPress={() => router.push(`/ilan/${r.id}`)} accessibilityRole="button">
+              <Pressable style={({ pressed }) => [s.top, pressed && { backgroundColor: color.plate }]} onPress={() => router.push(`/ilan/${r.id}`)} accessibilityRole="button">
                 {photo ? <Image source={{ uri: photoUrl(photo.path) }} style={s.img} /> : <View style={[s.img, { backgroundColor: color.plate }]} />}
-                <View style={{ flex: 1, gap: 4, paddingRight: 34 }}>
+                <View style={{ flex: 1, gap: 4, paddingRight: 36 }}>
                   <Text style={s.title} numberOfLines={2}>{r.title}</Text>
-                  <PlainText style={s.price}>{`${tl(r.price)} · ${r.city}`}</PlainText>
+                  <PlainText style={s.price} numberOfLines={1}>{tl(r.price)}<PlainText style={s.city}>{`  ·  ${r.city}`}</PlainText></PlainText>
                   <View style={{ flexDirection: 'row', gap: 6, flexWrap: 'wrap' }}>
                     <View style={[s.pill, { backgroundColor: statusTone(r).bg }]}><Text style={[s.pillT, { color: statusTone(r).fg }]}>{statusText(r)}</Text></View>
                     {auctions.has(r.id) ? <View style={[s.pill, { backgroundColor: color.teal }]}><Text style={[s.pillT, { color: color.tealInk }]}>{auctions.get(r.id)!.bid_count ? `${tr('Açık artırmada')} · ${auctions.get(r.id)!.bid_count} ${tr('teklif')}` : tr('Açık artırmada')}</Text></View> : null}
@@ -164,12 +181,13 @@ export default function MyListings() {
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
                       {q.tips.length ? <PlainText style={[s.qTips, { flex: 1 }]} numberOfLines={2}>{q.tips.map((t) => tr(t)).join(' · ')}</PlainText> : <Text style={[s.qTips, { flex: 1 }]}>Harika: ilanın eksiksiz.</Text>}
                       <Text style={s.qWhy}>Neden?</Text>
+                      <View style={{ opacity: 0.55 }}><Icon name="chevron-right" size={16} color={color.muted} /></View>
                     </View>
                   </Pressable>
                 );
               })() : null}
-              <Pressable style={s.more} onPress={() => setMenu(r)} hitSlop={8} accessibilityRole="button" accessibilityLabel={tr('İlan seçenekleri')}>
-                <Icon name="more-vertical" size={20} color={color.ink} />
+              <Pressable style={({ pressed }) => [s.more, pressed && { opacity: 0.5 }]} onPress={() => openMenu(r)} hitSlop={8} accessibilityRole="button" accessibilityLabel={tr('İlan seçenekleri')}>
+                <View style={s.moreDot}><Icon name="more-horizontal" size={18} color={color.accentText} /></View>
               </Pressable>
             </View>
           );
@@ -178,10 +196,11 @@ export default function MyListings() {
       <Modal visible={!!menu} transparent animationType="fade" onRequestClose={() => setMenu(null)}>
         <Pressable style={s.backdrop} onPress={() => setMenu(null)} accessibilityLabel={tr('Kapat')}>
           <Pressable style={s.sheet} onPress={() => undefined}>
+            <View style={s.grab} />
             {menu ? <PlainText style={s.sheetTitle} numberOfLines={1}>{menu.title}</PlainText> : null}
             {menu ? actions(menu).map((a, i) => (
               <Pressable key={a.label} style={({ pressed }) => [s.row, i > 0 && s.sep, pressed && { opacity: 0.7 }]} onPress={() => { setMenu(null); setTimeout(a.run, 250); }} accessibilityRole="button">
-                <View style={[s.rowIcon, a.danger && { backgroundColor: color.badBg }]}><Icon name={a.icon} size={19} color={a.danger ? color.bad : color.tealText} /></View>
+                <View style={[s.rowIcon, a.danger && { backgroundColor: color.bad }]}><Icon name={a.icon} size={17} color="#FFFFFF" /></View>
                 <Text style={[s.rowT, a.danger && { color: color.bad }]}>{a.label}</Text>
               </Pressable>
             )) : null}
@@ -193,6 +212,7 @@ export default function MyListings() {
       <Modal visible={!!quality} transparent animationType="slide" onRequestClose={() => setQuality(null)}>
         <Pressable style={s.backdrop} onPress={() => setQuality(null)} accessibilityLabel={tr('Kapat')}>
           <Pressable style={[s.sheet, { maxHeight: '86%' }]} onPress={() => undefined}>
+            <View style={s.grab} />
             {quality ? (() => {
               const q = listingScore(quality as ScoreInput);
               const tone = q.score >= 80 ? color.good : q.score >= 50 ? color.warn : color.bad;
@@ -231,6 +251,7 @@ export default function MyListings() {
       <Modal visible={!!auc} transparent animationType="slide" onRequestClose={() => setAuc(null)}>
         <Pressable style={s.backdrop} onPress={() => setAuc(null)} accessibilityLabel={tr('Kapat')}>
           <Pressable style={[s.sheet, { gap: 10 }]} onPress={() => undefined}>
+            <View style={[s.grab, { marginBottom: 2 }]} />
             <Text style={s.aTitle}>Açık artırmaya çıkar</Text>
             {auc ? <PlainText style={s.sheetTitle} numberOfLines={1}>{auc.title}</PlainText> : null}
             <Text style={s.aK}>Başlangıç fiyatı (₺)</Text>
@@ -240,8 +261,8 @@ export default function MyListings() {
             <Text style={s.aK}>Süre</Text>
             <View style={s.aSeg}>
               {[1, 3, 5, 7, 10].map((d) => (
-                <Pressable hitSlop={6} key={d} style={[s.aSegI, aDays === d && { backgroundColor: color.teal }]} onPress={() => setADays(d)} accessibilityRole="radio" accessibilityState={{ selected: aDays === d }}>
-                  <PlainText style={[s.aSegT, aDays === d && { color: color.tealInk }]}>{`${d} ${tr('gün')}`}</PlainText>
+                <Pressable hitSlop={6} key={d} style={[s.aSegI, aDays === d && s.aSegOn]} onPress={() => setADays(d)} accessibilityRole="radio" accessibilityState={{ selected: aDays === d }}>
+                  <PlainText style={[s.aSegT, aDays === d && { fontFamily: font.semi }]}>{`${d} ${tr('gün')}`}</PlainText>
                 </Pressable>
               ))}
             </View>
@@ -267,62 +288,71 @@ export default function MyListings() {
   );
 }
 
+/*
+ * Görünüm: iPhone'un gruplu liste düzeni (bkz. components/Rows.tsx). Gölgesiz ve çerçevesiz kartlar,
+ * ince ara çizgiler, basınca gri satır, sistem ölçüleri (en az 44 pt dokunma alanı).
+ */
+const HAIR = StyleSheet.hairlineWidth;
 const s = StyleSheet.create({
-  aTitle: { color: color.ink, fontFamily: font.bold, fontSize: 19 },
-  aK: { color: color.muted, fontFamily: font.semi, fontSize: 13.5 },
-  aIn: { minHeight: 48, paddingHorizontal: 14, fontSize: 16, color: color.ink, backgroundColor: color.bg, borderRadius: radius, borderWidth: 1, borderColor: color.line },
-  aSeg: { flexDirection: 'row', gap: 4, padding: 4, borderRadius: radius, backgroundColor: color.bg, borderWidth: 1, borderColor: color.line },
-  aSegI: { flex: 1, minHeight: 38, borderRadius: radius - 3, alignItems: 'center', justifyContent: 'center' },
-  aSegT: { color: color.ink, fontFamily: font.semi, fontSize: 13.5 },
-  aNote: { color: color.muted, fontSize: 12.5, lineHeight: 18 },
-  aBtn: { minHeight: 50, borderRadius: radius, backgroundColor: color.teal, alignItems: 'center', justifyContent: 'center' },
-  aBtnT: { color: color.tealInk, fontFamily: font.bold, fontSize: 16 },
+  secT: { fontSize: 13, color: color.muted, marginLeft: 16 },
+  aTitle: { color: color.ink, fontFamily: font.semi, fontSize: 19, textAlign: 'center' },
+  aK: { color: color.muted, fontSize: 13, marginLeft: 4 },
+  aIn: { minHeight: 48, paddingHorizontal: 14, fontSize: 17, color: color.ink, backgroundColor: color.bg, borderRadius: 12 },
+  // iPhone'un bölümlü seçicisi: gri zemin, seçili parça beyaz ve hafif gölgeli
+  aSeg: { flexDirection: 'row', padding: 2, borderRadius: 9, backgroundColor: color.plate },
+  aSegI: { flex: 1, minHeight: 38, borderRadius: 7, alignItems: 'center', justifyContent: 'center' },
+  aSegOn: { backgroundColor: color.surface, shadowColor: '#000', shadowOpacity: 0.12, shadowRadius: 3, shadowOffset: { width: 0, height: 1 }, elevation: 2 },
+  aSegT: { color: color.ink, fontFamily: font.medium, fontSize: 13.5 },
+  aNote: { color: color.muted, fontSize: 13, lineHeight: 18, marginHorizontal: 4 },
+  aBtn: { minHeight: 50, borderRadius: 14, backgroundColor: color.teal, alignItems: 'center', justifyContent: 'center' },
+  aBtnT: { color: color.tealInk, fontFamily: font.semi, fontSize: 17 },
   msg: { textAlign: 'center', color: color.muted, margin: 24 },
   err: { color: color.bad, margin: 12 },
-  card: { backgroundColor: color.surface, borderRadius: radius + 4, ...shadow },
+  card: { backgroundColor: color.surface, borderRadius: 16, overflow: 'hidden' },
   top: { flexDirection: 'row', gap: 12, padding: 12 },
-  img: { width: 96, height: 76, borderRadius: radius },
-  title: { fontFamily: font.semi, color: color.ink, fontSize: 15.5, lineHeight: 20 },
-  price: { color: color.tealText, fontFamily: font.bold, fontSize: 15 },
-  pill: { alignSelf: 'flex-start', borderRadius: 10, paddingHorizontal: 9, paddingVertical: 3 },
-  pillT: { fontFamily: font.semi, fontSize: 12.5 },
-  qWhy: { color: color.tealText, fontFamily: font.semi, fontSize: 12.5 },
-  qhTitle: { fontFamily: font.bold, fontSize: 21, color: color.ink, textAlign: 'center' },
+  img: { width: 92, height: 70, borderRadius: 10 },
+  title: { fontFamily: font.semi, color: color.ink, fontSize: 16, lineHeight: 21 },
+  price: { color: color.ink, fontFamily: font.semi, fontSize: 15 },
+  city: { color: color.muted, fontFamily: font.regular, fontSize: 14 },
+  pill: { alignSelf: 'flex-start', borderRadius: 6, paddingHorizontal: 7, paddingVertical: 2 },
+  pillT: { fontFamily: font.semi, fontSize: 12 },
+  qWhy: { color: color.accentText, fontSize: 13 },
+  qhTitle: { fontFamily: font.semi, fontSize: 19, color: color.ink, textAlign: 'center' },
   qhScore: { fontFamily: font.bold, fontSize: 44, lineHeight: 48 },
   qhOf: { fontFamily: font.semi, fontSize: 18, color: color.muted },
   qhLead: { fontSize: 14, lineHeight: 20, color: color.muted },
-  qhList: { borderWidth: 1, borderColor: color.line, borderRadius: radius + 2, paddingHorizontal: 12, backgroundColor: color.bg },
-  qhRow: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 10 },
-  qhLabel: { fontFamily: font.semi, fontSize: 15, color: color.ink },
-  qhDetail: { fontSize: 12.5, lineHeight: 17, color: color.muted, marginLeft: 24 },
-  qhPts: { fontFamily: font.bold, fontSize: 15, color: color.ink },
-  qhBtn: { height: 48, borderRadius: radius + 2, backgroundColor: color.teal, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
-  qhBtnT: { fontFamily: font.bold, fontSize: 16.5, color: color.tealInk },
-  quality: { borderTopWidth: 1, borderTopColor: color.line, paddingVertical: 9, paddingHorizontal: 12, gap: 5 },
-  qLabel: { fontFamily: font.label, fontSize: 12.5, color: color.muted },
-  qBar: { flex: 1, height: 6, borderRadius: 3, backgroundColor: color.plate, flexDirection: 'row', overflow: 'hidden' },
-  qScore: { fontFamily: font.bold, fontSize: 14 },
-  qTips: { fontSize: 12.5, lineHeight: 17, color: color.muted },
-  stats: { flexDirection: 'row', borderTopWidth: 1, borderTopColor: color.line, paddingVertical: 10 },
+  qhList: { borderRadius: 14, paddingHorizontal: 14, backgroundColor: color.bg },
+  qhRow: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 11 },
+  qhLabel: { fontSize: 16, color: color.ink },
+  qhDetail: { fontSize: 13, lineHeight: 17, color: color.muted, marginLeft: 24 },
+  qhPts: { fontFamily: font.semi, fontSize: 15, color: color.muted },
+  qhBtn: { height: 50, borderRadius: 14, backgroundColor: color.teal, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
+  qhBtnT: { fontFamily: font.semi, fontSize: 17, color: color.tealInk },
+  quality: { borderTopWidth: HAIR, borderTopColor: color.line, marginLeft: 12, paddingVertical: 10, paddingRight: 12, gap: 5 },
+  qLabel: { fontSize: 13, color: color.muted },
+  qBar: { flex: 1, height: 4, borderRadius: 2, backgroundColor: color.plate, flexDirection: 'row', overflow: 'hidden' },
+  qScore: { fontFamily: font.semi, fontSize: 14 },
+  qTips: { fontSize: 13, lineHeight: 17, color: color.muted },
+  stats: { flexDirection: 'row', borderTopWidth: HAIR, borderTopColor: color.line, marginLeft: 12, paddingVertical: 10 },
   stat: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 3, paddingHorizontal: 2 },
-  statSep: { borderLeftWidth: 1, borderLeftColor: color.line },
+  statSep: { borderLeftWidth: HAIR, borderLeftColor: color.line },
   statHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4 },
-  statL: { color: color.muted, fontSize: 11.5, textAlign: 'center' },
-  statN: { color: color.ink, fontFamily: font.bold, fontSize: 18, textAlign: 'center' },
-  sum: { backgroundColor: color.surface, borderRadius: radius + 4, padding: 14, gap: 10, marginBottom: 2, ...shadow },
-  sumT: { color: color.ink, fontFamily: font.bold, fontSize: 16 },
-  sumRow: { flexDirection: 'row' },
+  statL: { color: color.muted, fontSize: 12, textAlign: 'center' },
+  statN: { color: color.ink, fontFamily: font.semi, fontSize: 17, textAlign: 'center' },
+  sumRow: { flexDirection: 'row', paddingVertical: 12 },
   sumItem: { flex: 1, alignItems: 'center', gap: 3 },
-  sumN: { color: color.ink, fontFamily: font.bold, fontSize: 18 },
+  sumN: { color: color.ink, fontFamily: font.semi, fontSize: 19 },
   sumL: { color: color.muted, fontSize: 12 },
-  more: { position: 'absolute', top: 6, right: 4, width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
-  backdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.45)', justifyContent: 'flex-end' },
-  sheet: { backgroundColor: color.surface, borderTopLeftRadius: 22, borderTopRightRadius: 22, paddingHorizontal: 16, paddingTop: 16, paddingBottom: 34 },
-  sheetTitle: { color: color.muted, fontFamily: font.semi, fontSize: 14, textAlign: 'center', marginBottom: 8 },
-  row: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 56 },
-  sep: { borderTopWidth: 1, borderTopColor: color.line },
-  rowIcon: { width: 38, height: 38, borderRadius: 12, backgroundColor: color.tealSoft, alignItems: 'center', justifyContent: 'center' },
-  rowT: { color: color.ink, fontFamily: font.semi, fontSize: 16 },
-  cancel: { marginTop: 10, minHeight: 50, borderRadius: radius, backgroundColor: color.plate, alignItems: 'center', justifyContent: 'center' },
-  cancelT: { color: color.ink, fontFamily: font.semi, fontSize: 16 },
+  more: { position: 'absolute', top: 4, right: 2, width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },
+  moreDot: { width: 30, height: 30, borderRadius: 15, backgroundColor: color.plate, alignItems: 'center', justifyContent: 'center' },
+  backdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' },
+  sheet: { backgroundColor: color.surface, borderTopLeftRadius: 26, borderTopRightRadius: 26, paddingHorizontal: 16, paddingTop: 8, paddingBottom: 34 },
+  grab: { alignSelf: 'center', width: 36, height: 5, borderRadius: 3, backgroundColor: color.line, marginBottom: 10 },
+  sheetTitle: { color: color.muted, fontSize: 13, textAlign: 'center', marginBottom: 6 },
+  row: { flexDirection: 'row', alignItems: 'center', gap: 14, minHeight: 52 },
+  sep: { borderTopWidth: HAIR, borderTopColor: color.line },
+  rowIcon: { width: 30, height: 30, borderRadius: 7, backgroundColor: color.teal, alignItems: 'center', justifyContent: 'center' },
+  rowT: { color: color.ink, fontSize: 16.5 },
+  cancel: { marginTop: 10, minHeight: 50, borderRadius: 14, backgroundColor: color.plate, alignItems: 'center', justifyContent: 'center' },
+  cancelT: { color: color.ink, fontFamily: font.semi, fontSize: 17 },
 });
