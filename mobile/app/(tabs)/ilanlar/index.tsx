@@ -121,11 +121,11 @@ export default function Listings() {
     return () => clearTimeout(t);
   }, [q, cat, city, maxPrice, sort, adv, load]);
 
-  // Arama, filtreler ve sayı listenin başında: liste ekranın ilk öğesi olunca büyük başlık kaydırınca küçülür
+  // Arama, filtreler ve sayı listenin üstünde sabit durur (liste kaydırılırken yerinden oynamaz)
   const header = (
     <View>
           <View style={{ marginHorizontal: 16, marginTop: 12, marginBottom: 10 }}><SearchBox value={q} onChangeText={setQ} placeholder="Marka, model veya parça numarası ara" /></View>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flexGrow: 0 }} contentContainerStyle={s.chips}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flexGrow: 0 }} contentContainerStyle={s.chips} contentInsetAdjustmentBehavior="never">
             <FChip icon="grid" label={cat ? categoryLabel(cat) : 'Kategori'} on={!!cat} drop onPress={() => setSheet('cat')} />
             <FChip icon="map-pin" label={city === 'Tümü' ? 'İl' : city} on={city !== 'Tümü'} drop onPress={() => setSheet('city')} />
             <FChip icon="tag" label={maxPrice === '6000000' ? 'Fiyat' : PRICES.find((p) => p.value === maxPrice)?.label ?? 'Fiyat'} on={maxPrice !== '6000000'} drop onPress={() => setSheet('price')} />
@@ -153,11 +153,14 @@ export default function Listings() {
   );
 
   return (
-    <>
+    <View style={s.screen}>
+      {header}
       <FlatList
-        style={s.screen}
+        style={{ flex: 1 }}
+        // Sekme çubuğunun altındaki boşluğu yalnızca liste alır (yatay filtre şeridi değil)
+        contentInsetAdjustmentBehavior="automatic"
         keyboardShouldPersistTaps="handled"
-        ListHeaderComponent={header}
+        keyboardDismissMode="on-drag"
         ref={scroller}
         key={view}
         numColumns={view === 'grid' ? 2 : 1}
@@ -175,7 +178,7 @@ export default function Listings() {
       <PickerModal visible={sheet === 'price'} title="En yüksek fiyat" selected={maxPrice} options={PRICES} onPick={setMaxPrice} onClose={() => setSheet(null)} />
       <PickerModal visible={sheet === 'sort'} title="Sırala" selected={sort} options={SORTS} onPick={setSort} onClose={() => setSheet(null)} />
       <FilterModal visible={advOpen} value={adv} category={cat} part={isPart} onApply={setAdv} onClose={() => setAdvOpen(false)} />
-    </>
+    </View>
   );
 }
 

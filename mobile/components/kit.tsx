@@ -136,19 +136,19 @@ export function Tabs<T extends string>({ items, value, onChange, variant = 'fill
         return (
           <Pressable
             key={t.id}
-            style={[k.tab, scroll && k.tabScroll, filled ? { backgroundColor: on ? color.teal : 'transparent' } : { borderBottomWidth: 3, borderBottomColor: on ? color.accent : 'transparent' }]}
+            style={[k.tab, scroll && k.tabScroll, filled ? (on ? k.segOn : null) : { borderBottomWidth: 3, borderBottomColor: on ? color.accent : 'transparent' }]}
             onPress={() => onChange(t.id)} accessibilityRole="tab" accessibilityState={{ selected: on }}
           >
             {filled && i > 0 && !on && items[i - 1].id !== value ? <View style={k.tabDivider} /> : null}
-            {t.icon ? <Icon name={t.icon} size={16} color={on && filled ? color.tealInk : on ? color.accentText : color.muted} /> : null}
-            <Text numberOfLines={1} style={[k.tabText, !scroll && { flexShrink: 1 }, { color: on ? (filled ? color.tealInk : color.ink) : color.muted }]}>{t.label}</Text>
+            {t.icon ? <Icon name={t.icon} size={16} color={on && filled ? color.ink : on ? color.accentText : color.muted} /> : null}
+            <Text numberOfLines={1} style={[k.tabText, !scroll && { flexShrink: 1 }, { color: on ? color.ink : color.muted }]}>{t.label}</Text>
             {t.count ? (on && filled
-              ? <View style={[k.badge, { backgroundColor: color.tealInk, borderColor: color.tealInk }]}><Text style={[k.badgeText, { color: color.teal }]}>{String(t.count)}</Text></View>
+              ? <View style={[k.badge, { backgroundColor: color.teal, borderColor: color.teal }]}><Text style={[k.badgeText, { color: color.tealInk }]}>{String(t.count)}</Text></View>
               : <Badge variant="default">{t.count}</Badge>) : null}
           </Pressable>
         );
       });
-  const style = [k.tabs, variant === 'line' && { backgroundColor: color.bg }];
+  const style = variant === 'line' ? [k.tabs, { backgroundColor: color.bg }] : [k.seg];
   return scroll ? (
     <View style={style} accessibilityRole="tablist">
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ flexGrow: 1 }}>{body}</ScrollView>
@@ -188,8 +188,11 @@ const k = StyleSheet.create({
   skRow: { flexDirection: 'row', gap: 12, padding: 12, backgroundColor: color.surface, borderBottomWidth: 1, borderBottomColor: color.line },
   tabs: { flexDirection: 'row', backgroundColor: color.surface, borderBottomWidth: 1, borderBottomColor: color.line },
   tabDivider: { position: 'absolute', left: 0, top: 10, bottom: 10, width: StyleSheet.hairlineWidth, backgroundColor: color.line },
-  tab: { flex: 1, minHeight: 48, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingHorizontal: 6 },
+  tab: { flex: 1, minHeight: 40, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingHorizontal: 6 },
   tabScroll: { flex: 0, flexGrow: 1, paddingHorizontal: 14 },
-  tabText: { fontSize: 14.5, fontFamily: font.bold },
+  tabText: { fontSize: 14.5, fontFamily: font.semi },
+  // "filled": iPhone bölümlü seçicisi (gri zemin, seçili parça beyaz kabarcık)
+  seg: { flexDirection: 'row', marginHorizontal: 16, marginVertical: 8, padding: 2, borderRadius: 10, backgroundColor: color.plate },
+  segOn: { backgroundColor: color.surface, borderRadius: 8, shadowColor: '#000', shadowOpacity: 0.12, shadowRadius: 3, shadowOffset: { width: 0, height: 1 }, elevation: 2 },
   progress: { height: 8, backgroundColor: color.plate, borderWidth: 1, borderColor: color.line, overflow: 'hidden' },
 });

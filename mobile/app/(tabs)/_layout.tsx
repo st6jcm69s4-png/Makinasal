@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { Platform } from 'react-native';
 import { NativeTabs } from 'expo-router/native-tabs';
 import { color } from '../../lib/theme';
 import { useApp } from '../../lib/AppContext';
@@ -8,7 +9,7 @@ import { watchUnread } from '../../lib/unread';
 
 /*
  * Alt menü: telefonun kendi sekme çubuğu.
- * - iPhone (iOS 26+): cam görünümlü sistem çubuğu, aşağı kaydırınca küçülür; simgeler SF Symbols.
+ * - iPhone (iOS 26+): cam görünümlü sistem çubuğu; simgeler SF Symbols.
  * - Android: Material 3 alt gezinme çubuğu; simgeler Material Symbols.
  * Apple yönergesi: sekmeler yalnızca gezinir, eylem yapmaz. Bu yüzden "İlan ver" de bir sekmedir
  * ve ne tür ilan verileceğini seçtiren bir sayfa açar. Açık sekmeye tekrar dokununca liste en üste çıkar (sistem).
@@ -19,7 +20,7 @@ export default function TabsLayout() {
   useEffect(() => { watchUnread(session?.user.id ?? ''); }, [session]);
   return (
     <NativeTabs
-      minimizeBehavior="onScrollDown"
+      // Çubuk kaydırınca küçülmez: küçülüp büyürken listelerin alt boşluğu değişip içerik zıplıyordu
       tintColor={color.accentText}
       iconColor={{ default: color.muted, selected: color.accentText }}
       labelStyle={{ default: { color: color.muted }, selected: { color: color.accentText } }}
@@ -33,7 +34,8 @@ export default function TabsLayout() {
         <NativeTabs.Trigger.Icon sf={{ default: 'house', selected: 'house.fill' }} md="home" />
         <NativeTabs.Trigger.Label>{tr('Ana sayfa')}</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="ilanlar">
+      {/* İlanlar: arama ve filtreler listenin üstünde sabit; sistemin otomatik boşluğu yerine listenin kendi ayarı (iPhone) */}
+      <NativeTabs.Trigger name="ilanlar" disableTransparentOnScrollEdge disableAutomaticContentInsets={Platform.OS === 'ios'}>
         <NativeTabs.Trigger.Icon sf={{ default: 'square.grid.2x2', selected: 'square.grid.2x2.fill' }} md="grid_view" />
         <NativeTabs.Trigger.Label>{tr('İlanlar')}</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>

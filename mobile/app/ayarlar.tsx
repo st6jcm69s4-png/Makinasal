@@ -13,13 +13,15 @@ import { PALETTES, activePalette, color, font, radius, savePalette, shadow, them
 import { tr } from '../lib/i18n';
 import { restartApp } from '../lib/restart';
 
-/** Ayar satırı: yumuşak ikon, kalın yazı ve sağda küçük ayraç. */
+/** Ayar satırı (iPhone Ayarlar düzeni): renkli kare simge, ince ara çizgi, basınca gri satır. */
 function Row({ icon, title, onPress, last }: { icon: IconName; title: string; onPress: () => void; last?: boolean }) {
   return (
-    <Pressable style={({ pressed }) => [r.row, !last && r.sep, pressed && { opacity: 0.8 }]} onPress={onPress} accessibilityRole="button">
-      <View style={r.icon}><Icon name={icon} size={19} color={color.tealText} /></View>
-      <Text style={r.title}>{title}</Text>
-      <Icon name="chevron-right" size={18} color={color.muted} />
+    <Pressable style={({ pressed }) => [r.row, pressed && { backgroundColor: color.plate }]} onPress={onPress} accessibilityRole="button">
+      <View style={r.icon}><Icon name={icon} size={17} color="#FFFFFF" /></View>
+      <View style={[r.rowMain, !last && r.sep]}>
+        <Text style={r.title}>{title}</Text>
+        <View style={{ opacity: 0.55 }}><Icon name="chevron-right" size={18} color={color.muted} /></View>
+      </View>
     </Pressable>
   );
 }
@@ -31,8 +33,8 @@ function Segment<T extends string>({ items, value, onChange }: { items: { id: T;
         const on = it.id === value;
         return (
           <Pressable key={it.id} style={({ pressed }) => [r.segItem, on && r.segOn, pressed && !on && { opacity: 0.7 }]} onPress={() => onChange(it.id)} accessibilityRole="radio" accessibilityState={{ selected: on }}>
-            {it.icon ? <Icon name={it.icon} size={15} color={on ? color.tealInk : color.muted} /> : null}
-            <Text style={[r.segT, on && { color: color.tealInk }]} numberOfLines={1}>{it.label}</Text>
+            {it.icon ? <Icon name={it.icon} size={15} color={on ? color.ink : color.muted} /> : null}
+            <Text style={[r.segT, on && { color: color.ink, fontFamily: font.semi }]} numberOfLines={1}>{it.label}</Text>
           </Pressable>
         );
       })}
@@ -40,19 +42,22 @@ function Segment<T extends string>({ items, value, onChange }: { items: { id: T;
   );
 }
 const r = StyleSheet.create({
-  group: { backgroundColor: color.surface, borderRadius: radius + 4, paddingHorizontal: 12, ...shadow },
-  row: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 58, paddingVertical: 8 },
-  sep: { borderBottomWidth: 1, borderBottomColor: color.line },
-  icon: { width: 38, height: 38, borderRadius: 12, backgroundColor: color.tealSoft, alignItems: 'center', justifyContent: 'center' },
-  title: { flex: 1, color: color.ink, fontFamily: font.semi, fontSize: 16 },
-  head: { fontFamily: font.bold, fontSize: 18, color: color.ink, marginTop: 8, marginBottom: -2, marginHorizontal: 4 },
-  box: { backgroundColor: color.surface, borderRadius: radius + 4, padding: 12, gap: 10, ...shadow },
-  note: { color: color.muted, fontSize: 13.5, lineHeight: 19, marginHorizontal: 4 },
-  seg: { flexDirection: 'row', gap: 4, padding: 4, borderRadius: radius, backgroundColor: color.bg, borderWidth: 1, borderColor: color.line },
-  segItem: { flex: 1, minHeight: 42, borderRadius: radius - 3, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingHorizontal: 4 },
-  segOn: { backgroundColor: color.teal },
-  segT: { color: color.ink, fontFamily: font.semi, fontSize: 14.5 },
-  pal: { flex: 1, gap: 10, padding: 12, borderRadius: radius, borderWidth: 1, borderColor: color.line, backgroundColor: color.bg },
+  group: { backgroundColor: color.surface, borderRadius: 14, overflow: 'hidden' },
+  row: { flexDirection: 'row', alignItems: 'center', paddingLeft: 16, minHeight: 48 },
+  rowMain: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 8, minHeight: 48, paddingRight: 14 },
+  sep: { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: color.line },
+  icon: { width: 30, height: 30, borderRadius: 7, backgroundColor: color.teal, alignItems: 'center', justifyContent: 'center', marginRight: 14 },
+  title: { flex: 1, color: color.ink, fontSize: 16.5 },
+  // Bölüm başlığı: küçük, soluk (iPhone Ayarlar)
+  head: { fontSize: 13, color: color.muted, marginTop: 10, marginBottom: -4, marginHorizontal: 16 },
+  box: { backgroundColor: color.surface, borderRadius: 14, padding: 12, gap: 10 },
+  note: { color: color.muted, fontSize: 13, lineHeight: 18, marginHorizontal: 16 },
+  // iPhone bölümlü seçicisi: gri zemin, seçili parça beyaz ve hafif gölgeli
+  seg: { flexDirection: 'row', padding: 2, borderRadius: 9, backgroundColor: color.plate },
+  segItem: { flex: 1, minHeight: 38, borderRadius: 7, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingHorizontal: 4 },
+  segOn: { backgroundColor: color.surface, shadowColor: '#000', shadowOpacity: 0.12, shadowRadius: 3, shadowOffset: { width: 0, height: 1 }, elevation: 2 },
+  segT: { color: color.ink, fontFamily: font.medium, fontSize: 14 },
+  pal: { flex: 1, gap: 10, padding: 12, borderRadius: 12, borderWidth: StyleSheet.hairlineWidth, borderColor: color.line, backgroundColor: color.bg },
   swatches: { flexDirection: 'row', gap: 4 },
   sw: { flex: 1, height: 28, borderRadius: 8, borderWidth: 1, borderColor: 'rgba(0,0,0,0.12)' },
   palT: { color: color.ink, fontFamily: font.semi, fontSize: 15 },

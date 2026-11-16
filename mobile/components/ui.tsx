@@ -76,7 +76,8 @@ export function Hatch(_props: { height?: number }) {
 
 export const common = StyleSheet.create({
   screen: { flex: 1, backgroundColor: color.bg },
-  card: { backgroundColor: color.surface, padding: 14, borderRadius: radius + 4, gap: 4, borderWidth: 1, borderColor: color.line, ...shadow },
+  // Kart: gölgesiz ve çerçevesiz düz yüzey (iPhone gruplu liste)
+  card: { backgroundColor: color.surface, padding: 14, borderRadius: 16, gap: 4 },
   title: { fontWeight: '600', color: color.ink, fontSize: 16 },
   price: { fontWeight: '700', color: color.accentText, fontSize: 17 },
   meta: { color: color.muted, fontSize: 14 },
@@ -89,13 +90,14 @@ const s = StyleSheet.create({
   pressed: { opacity: 0.85, transform: [{ scale: 0.97 }] },
   labelText: { fontSize: 13, color: color.muted },
   cell: { gap: 5 },
-  input: { paddingVertical: 13, paddingHorizontal: 14, backgroundColor: color.surface, borderRadius: radius, borderWidth: 1, borderColor: color.line, fontSize: 16, color: color.ink },
+  input: { paddingVertical: 13, paddingHorizontal: 14, backgroundColor: color.surface, borderRadius: 12, borderWidth: StyleSheet.hairlineWidth, borderColor: color.line, fontSize: 16.5, color: color.ink, minHeight: 48 },
   selectRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  btn: { backgroundColor: color.accent, paddingVertical: 13, paddingHorizontal: 18, borderRadius: radius, alignItems: 'center', minHeight: 50, justifyContent: 'center' },
-  btnText: { color: color.accentInk, fontWeight: '600', fontSize: 16 },
-  ghost: { backgroundColor: 'transparent', borderWidth: 1.5, borderColor: color.teal },
+  // iPhone düğmeleri: ana düğme dolu, ikincil düğme açık renk zeminli (çerçevesiz), tehlikeli düğme kırmızı yazılı
+  btn: { backgroundColor: color.accent, paddingVertical: 13, paddingHorizontal: 18, borderRadius: 14, alignItems: 'center', minHeight: 50, justifyContent: 'center' },
+  btnText: { color: color.accentInk, fontFamily: font.semi, fontSize: 17 },
+  ghost: { backgroundColor: color.tealSoft },
   ghostText: { color: color.tealText },
-  danger: { backgroundColor: 'transparent', borderWidth: 1, borderColor: color.bad },
+  danger: { backgroundColor: color.badBg },
   dangerText: { color: color.bad },
   chip: { paddingVertical: 9, paddingHorizontal: 15, backgroundColor: color.surface, borderRadius: 999, borderWidth: 1, borderColor: color.line, minHeight: 40, justifyContent: 'center' },
   chipOn: { backgroundColor: color.teal, borderColor: color.teal },
