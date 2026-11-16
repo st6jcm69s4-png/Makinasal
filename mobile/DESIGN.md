@@ -39,7 +39,7 @@ Kaynak: Apple İnsan Arayüzü Yönergeleri ("Apple Look", github.com/dickwu/app
   - Uygulamada açık/koyu görünüm seçimi var; Apple uygulama içi görünüm düğmesi önermez ama kullanıcı istedi.
 
 ## Telefonun kendi parçaları (16 Kasım 2026)
-- **Alt menü:** `NativeTabs` (`app/(tabs)/_layout.tsx`). iOS 26'da cam görünümlü sistem çubuğu (kaydırınca küçülmez; küçülürken listeler zıplıyordu), Android'de Material 3. Simgeler iPhone'da SF Symbols, Android'de Material Symbols. "İlan ver" bir sekmedir ve ilan türünü seçtiren sayfayı açar (sekmeler eylem yapmaz). Sekmeler arası kaydırma kaldırıldı (Apple: sekmeler kaydırılmaz).
+- **Alt menü:** `NativeTabs` (`app/(tabs)/_layout.tsx`). iOS 26'da cam görünümlü sistem çubuğu (kaydırınca küçülmez; küçülürken listeler zıplıyordu), Android'de Material 3. Simgeler iPhone'da SF Symbols, Android'de Material Symbols. "İlan ver" bir sekmedir ve ilan türünü seçtiren sayfayı açar (sekmeler eylem yapmaz). Sekmeler arası parmakla kaydırma kullanıcı isteğiyle duruyor (`SwipeTabs`, beş sekmenin hepsinde; simgeye dokununca anında geçer).
 - **Başlıklar:** her yerde telefonun kendi başlık çubuğu (`lib/nav.ts › headerOptions`). Başlıklar normal yazımla, büyük harfle değil. Geri düğmesinde yalnızca ok.
 - **Büyük başlık:** İlan ver, Hesabım, Mesajlar, Favorilerim. Kaydırınca küçülüp çubuğa yerleşir. Yalnızca ilk öğesi sade bir kaydırma listesi olan ekranlarda açılır ve o listede `contentInsetAdjustmentBehavior="automatic"` olmalıdır; yoksa içerik başlığın altında kalır. İlanlar ve İş Ağı'nda (arama kutusu, bölüm seçici) denendi: içerik başlığın altında kaldı ve liste yüklenirken kaydı, bu yüzden orada normal başlık var.
 - **İlan seçenekleri (İlanlarım):** iPhone'da sistemin kendi eylem sayfası (`ActionSheetIOS`), Android'de alttan açılan sayfa.
@@ -48,3 +48,5 @@ Kaynak: Apple İnsan Arayüzü Yönergeleri ("Apple Look", github.com/dickwu/app
 - **İlan kartında uzun basma:** iPhone'da ilanın önizlemesi ve sistem menüsü (Favori, Karşılaştır, Paylaş: `Link.Preview` + `Link.Menu`). Android'de aynı seçenekler pencerede.
 - **Ortak parçalar (Apple düzeni):** düğmeler 14 köşe, ikincil düğme çerçevesiz açık zeminli, tehlikeli düğme açık kırmızı zeminli; giriş kutuları ince çizgili; `common.card` gölgesiz; `Tabs variant="filled"` iPhone bölümlü seçicisi (gri zemin, seçili parça beyaz). Ayarlar ekranı da gruplu satır düzeninde.
 - **İlanlar kayması:** arama ve filtreler listenin üstünde sabit, otomatik alt boşluk yalnızca listeye (`disableAutomaticContentInsets` + listede `contentInsetAdjustmentBehavior="automatic"`), sekme çubuğu kaydırınca küçülmez.
+- **Yazı tipi:** her yerde Inter (`font.bold`, `label` vb. de Inter'e bağlı). Barlow yalnızca logodaki MAKİNASAL yazısında (`font.brand`).
+- **En üste çık:** Ana sayfada logoya, diğer sekmelerde başlığa dokununca liste başa döner (`fireScrollTop`). iPhone'da saate dokunmak ve açık sekmeye tekrar dokunmak da aynısını yapar.

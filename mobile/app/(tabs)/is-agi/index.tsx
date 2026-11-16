@@ -1,3 +1,4 @@
+import { SwipeTabs } from '../../../components/SwipeTabs';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, FlatList, Modal, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { PlainText, Text, TextInput } from '../../../components/LText';
@@ -24,7 +25,7 @@ const SECTIONS: { id: Section; icon: IconName; title: string; sub: string; tabs:
 const sectionOf = (t: Tab): Section => (t === 'staff_wanted' ? 'seek' : t === 'rental_operator' ? 'hire' : 'market');
 const PAGE = 20;
 
-export default function NetworkTab() {
+function NetworkTabScreen() {
   const { kind } = useLocalSearchParams<{ kind?: string }>();
   const scroller = useRef<never>(null);
   useTabScrollTop('is-agi', scroller);
@@ -175,3 +176,8 @@ const s = StyleSheet.create({
   cellL: { borderLeftWidth: 1, borderLeftColor: color.line },
   val: { fontSize: 15, color: color.ink, fontWeight: '500' },
 });
+
+/** Sağa/sola kaydırarak komşu sekmeye geçilir (bkz. components/SwipeTabs.tsx). */
+export default function NetworkTab() {
+  return <SwipeTabs route="is-agi"><NetworkTabScreen /></SwipeTabs>;
+}

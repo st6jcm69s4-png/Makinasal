@@ -1,3 +1,4 @@
+import { SwipeTabs } from '../../../components/SwipeTabs';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from '../../../components/Toast';
 import { useLoginPrompt } from '../../../components/LoginPrompt';
@@ -43,7 +44,7 @@ const PRICES = [
 ];
 type Sheet = null | 'cat' | 'city' | 'price' | 'sort';
 
-export default function Listings() {
+function ListingsScreen() {
   const { askLogin } = useLoginPrompt();
   const scroller = useRef<never>(null);
   useTabScrollTop('ilanlar', scroller);
@@ -198,3 +199,8 @@ const s = StyleSheet.create({
   err: { color: color.bad, marginHorizontal: 16 },
   empty: { textAlign: 'center', margin: 24, color: color.muted },
 });
+
+/** Sağa/sola kaydırarak komşu sekmeye geçilir (bkz. components/SwipeTabs.tsx). */
+export default function Listings() {
+  return <SwipeTabs route="ilanlar"><ListingsScreen /></SwipeTabs>;
+}

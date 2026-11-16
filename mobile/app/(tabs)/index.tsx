@@ -1,3 +1,4 @@
+import { SwipeTabs } from '../../components/SwipeTabs';
 import { useCallback, useRef, useState } from 'react';
 import { useTabScrollTop } from '../../lib/scrollTop';
 import { Image, Pressable, RefreshControl, ScrollView, StyleSheet, View, type ImageSourcePropType } from 'react-native';
@@ -42,7 +43,7 @@ function SectionHead({ title, action, onAction }: { title: string; action?: stri
   );
 }
 
-export default function Home() {
+function HomeScreen() {
   const scroller = useRef<never>(null);
   useLang();
   useTabScrollTop('index', scroller);
@@ -294,3 +295,8 @@ const s = StyleSheet.create({
   link2: { color: color.tealText, fontFamily: font.semi, fontSize: 14 },
   empty: { color: color.muted, marginHorizontal: 16 },
 });
+
+/** Sağa/sola kaydırarak komşu sekmeye geçilir (bkz. components/SwipeTabs.tsx). */
+export default function Home() {
+  return <SwipeTabs route="index"><HomeScreen /></SwipeTabs>;
+}

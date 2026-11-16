@@ -9,7 +9,7 @@ import { useLang } from '../lib/lang';
 const base = Platform.OS === 'android' ? { color: color.ink, includeFontPadding: false } : { color: color.ink };
 const walk = (c: ReactNode): ReactNode => (typeof c === 'string' ? tr(c) : Array.isArray(c) ? Children.map(c, (x) => (typeof x === 'string' ? tr(x) : x)) : c);
 
-/** Ağırlığa göre yazı ailesini seçer (kalın: Barlow, diğerleri: Inter); ekranda başka yazı tipi istenmişse dokunmaz. */
+/** Ağırlığa göre Inter'in kalınlığını seçer; ekranda başka yazı tipi istenmişse dokunmaz. Barlow yalnızca logoda. */
 const Nested = createContext(false);
 /**
  * Genel boyut: ekranlardaki puntolar bir tık büyütülür. Barlow dar bir yazı olduğu için biraz daha fazla.
@@ -37,14 +37,14 @@ function typeStyle(style: unknown, nested = false) {
   const flat = StyleSheet.flatten(style as object) as { fontFamily?: string; fontWeight?: string | number; fontSize?: number; lineHeight?: number; letterSpacing?: number } | undefined;
   if (flat?.fontFamily) {
     const k = flat.fontFamily.startsWith('Barlow') ? SCALE_DISPLAY : flat.fontFamily.startsWith('Inter') ? SCALE_TEXT : 1;
-    return k === 1 ? style : [style, scaled(flat, k, nested ? undefined : 16, k === SCALE_TEXT)];
+    return k === 1 ? style : [style, scaled(flat, k, nested ? undefined : 16, flat.fontFamily.startsWith('Inter'))];
   }
   const w = String(flat?.fontWeight ?? '400');
   const heavy = w === '700' || w === '800' || w === '900' || w === 'bold';
-  // Tek başına kalın yazı (başlık, düğme, rozet) Barlow; cümle içindeki kalın kelime Inter kalır.
+  // Kalın yazı Inter Bold (başlık, düğme, rozet ve cümle içi kalın kelime aynı aile).
   const family = heavy ? (nested ? font.textBold : font.bold) : w === '600' ? font.semi : w === '500' ? font.medium : font.regular;
-  const k = family === font.bold ? SCALE_DISPLAY : SCALE_TEXT;
-  return [style, { fontFamily: family, fontWeight: 'normal' as const, ...scaled(flat, k, nested ? undefined : 16, k === SCALE_TEXT), fontVariant: ['tabular-nums' as const] }];
+  const k = family.startsWith('Barlow') ? SCALE_DISPLAY : SCALE_TEXT;
+  return [style, { fontFamily: family, fontWeight: 'normal' as const, ...scaled(flat, k, nested ? undefined : 16, family.startsWith('Inter')), fontVariant: ['tabular-nums' as const] }];
 }
 
 /** react-native Text ile aynı; metinleri seçili dile çevirir ve Inter ile yazar. */

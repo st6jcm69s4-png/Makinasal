@@ -1,4 +1,7 @@
+import { SwipeTabs } from '../../../components/SwipeTabs';
+import { useRef } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { useTabScrollTop } from '../../../lib/scrollTop';
 import { router } from 'expo-router';
 import { Text } from '../../../components/LText';
 import { Icon, type IconName } from '../../../components/Icon';
@@ -34,11 +37,13 @@ function Big({ c }: { c: Choice }) {
   );
 }
 
-export default function NewListing() {
+function NewListingScreen() {
   useLang();
   const { session } = useApp();
+  const scroller = useRef<never>(null);
+  useTabScrollTop('yeni', scroller);
   return (
-    <ScrollView style={{ backgroundColor: color.bg }} contentContainerStyle={s.body} contentInsetAdjustmentBehavior="automatic">
+    <ScrollView ref={scroller} style={{ backgroundColor: color.bg }} contentContainerStyle={s.body} contentInsetAdjustmentBehavior="automatic">
       <Big c={MAIN} />
       <Group title="İş Ağı'na ilan ver" items={OTHERS.map((c, i) => ({ icon: c.icon, tint: i === 0 ? 'accent' : i === 1 ? 'green' : i === 2 ? 'ink' : i === 3 ? 'purple' : 'gold', label: c.title, sub: c.sub, go: () => router.push(c.to as never) }))} />
       <Group
@@ -61,3 +66,8 @@ const s = StyleSheet.create({
   bigTitle: { color: color.tealInk, fontFamily: font.bold, fontSize: 20 },
   bigSub: { color: color.tealInk, opacity: 0.85, fontSize: 14, lineHeight: 19 },
 });
+
+/** Sağa/sola kaydırarak komşu sekmeye geçilir (bkz. components/SwipeTabs.tsx). */
+export default function NewListing() {
+  return <SwipeTabs route="yeni"><NewListingScreen /></SwipeTabs>;
+}

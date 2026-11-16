@@ -1,3 +1,4 @@
+import { SwipeTabs } from '../../../components/SwipeTabs';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTabScrollTop } from '../../../lib/scrollTop';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
@@ -113,7 +114,7 @@ function Member() {
   );
 }
 
-export default function Account() {
+function AccountScreen() {
   const { session } = useApp();
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState<PhoneValue>(emptyPhone);
@@ -229,3 +230,8 @@ const s = StyleSheet.create({
   body: { paddingHorizontal: 16, paddingTop: 8, paddingBottom: 40, gap: 24 },
   outTextOld: { color: color.tealInk, fontFamily: font.bold, fontSize: 16 },
 });
+
+/** Sağa/sola kaydırarak komşu sekmeye geçilir (bkz. components/SwipeTabs.tsx). */
+export default function Account() {
+  return <SwipeTabs route="hesap"><AccountScreen /></SwipeTabs>;
+}

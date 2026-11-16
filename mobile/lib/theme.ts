@@ -107,13 +107,15 @@ export const hair = 1;
 /** Yazı tipi aileleri (yüklenemezse sistem yazı tipine düşer). */
 export const fontState = { ok: false };
 /**
- * İki yazı tipi: metin Inter (okunaklı), başlık / fiyat / düğme / etiket Barlow Semi Condensed
- * (sanayi tabelası karakteri). `bold` görüntü yazısıdır; paragraf içinde kalın metin için `textBold`.
+ * Tek yazı ailesi: her yerde Inter (Apple yönergesi: az yazı tipi, hiyerarşi ağırlık ve boyutla kurulur).
+ * Eski adlar (bold, displaySemi, label, labelBold) ekranlar bozulmasın diye duruyor ve Inter'e bağlı.
+ * Barlow Semi Condensed yalnızca logodaki MAKİNASAL yazısında kalır (`brand`).
  */
 export const font = {
   regular: 'Inter_400Regular', medium: 'Inter_500Medium', semi: 'Inter_600SemiBold', textBold: 'Inter_700Bold',
-  bold: 'BarlowSemiCondensed_700Bold', displaySemi: 'BarlowSemiCondensed_600SemiBold',
-  label: 'BarlowSemiCondensed_600SemiBold', labelBold: 'BarlowSemiCondensed_700Bold',
+  bold: 'Inter_700Bold', displaySemi: 'Inter_600SemiBold',
+  label: 'Inter_600SemiBold', labelBold: 'Inter_700Bold',
+  brand: 'BarlowSemiCondensed_700Bold',
 } as const;
 
 /** Etiketler Türkçe büyük harfle yazılır (i→İ). */
