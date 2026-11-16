@@ -14,6 +14,7 @@ import { LoginPromptProvider } from '../components/LoginPrompt';
 import { AnimatedSplash } from '../components/AnimatedSplash';
 import { ToastHost } from '../components/Toast';
 import { DoubleTapSearch } from '../components/DoubleTapSearch';
+import { noteAppOpen } from '../lib/review';
 
 function Screens() {
   const { lang } = useLang();
@@ -87,6 +88,7 @@ export default function RootLayout() {
   const [themeReady, setThemeReady] = useState(false);
   useEffect(() => { void loadTheme().finally(() => setThemeReady(true)); }, []);
   useEffect(() => watchSystemTheme(), []);
+  useEffect(() => { void noteAppOpen(); }, []);
   useEffect(() => { const t = setTimeout(() => setTimedOut(true), 2500); return () => clearTimeout(t); }, []);
   fontState.ok = !!loaded && !error;
   if ((!loaded && !error && !timedOut) || !themeReady) return null;

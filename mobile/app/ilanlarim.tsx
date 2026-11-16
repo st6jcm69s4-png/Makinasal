@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react';
 import { listingScore, type ScoreInput } from '../lib/listingScore';
 import { toast } from '../components/Toast';
+import { maybeAskReview } from '../lib/review';
 import { CardSkeleton } from '../components/kit';
 import { GuestGate } from '../components/LoginPrompt';
 import { Alert, FlatList, Image, Modal, Pressable, ScrollView, StyleSheet, View } from 'react-native';
@@ -68,6 +69,7 @@ export default function MyListings() {
 
   async function patch(id: string, status: string) {
     const { error: e } = await supabase.from('listings').update({ status }).eq('id', id);
+    if (!e && status === 'sold') void maybeAskReview('sold');
     if (e) Alert.alert('İlan', e.message.includes('AUCTION_HAS_BIDS') ? 'Teklif almış açık artırma sürerken ilan değiştirilemez, duraklatılamaz veya kaldırılamaz.' : e.message.includes('limit') || e.message.includes('limitine') ? 'İlan limitine ulaştın.' : 'İşlem kaydedilemedi.');
     void load();
   }

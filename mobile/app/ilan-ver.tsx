@@ -16,6 +16,7 @@ import { useApp } from '../lib/AppContext';
 import { CATEGORIES, CITIES, KM_CATEGORIES, LIMITS, MACHINE_CATEGORIES, PART_GROUPS } from '../lib/data';
 import { brandsForCategory, canonicalBrand } from '../lib/machineryCatalog';
 import { photoUrl, supabase } from '../lib/supabase';
+import { maybeAskReview } from '../lib/review';
 import { color, font, radius, shadow, fixed } from '../lib/theme';
 
 const CONDITIONS = ['Sıfır', 'Çıkma', 'Revizyonlu'];
@@ -243,7 +244,7 @@ export default function NewListing() {
       const videoOk = await uploadVideo(id);
       const published = await supabase.from('listings').update({ status: 'active' }).eq('id', id).eq('seller_id', uid);
       if (published.error) throw new Error('İlan kaydedildi ancak yayına alınamadı. İlanlarım ekranından "Yayına al" ile tekrar dene.');
-      if (videoOk) toast('İlan incelemeye gönderildi. Onaylandığında yayımlanacak.');
+      if (videoOk) { toast('İlan incelemeye gönderildi. Onaylandığında yayımlanacak.'); void maybeAskReview('published', 2500); }
       else Alert.alert('İlan', 'İlan incelemeye gönderildi ancak video yüklenemedi. İlanı düzenleyip videoyu tekrar ekleyebilirsin.');
       router.replace('/ilanlarim');
     } catch (e) {
