@@ -5,7 +5,7 @@ import * as haptic from '../lib/haptics';
 
 /*
  * Seçilen düğme büyür ve yukarı doğru hafifçe yükselir (alt kenarı yerinde kalır).
- * - Hareket yayla (spring): hızlı başlar, hafif bir esneyerek yerine oturur; araya girilebilir
+ * - Hareket yayla (spring): yumuşak başlar, zıplamadan yerine oturur; araya girilebilir
  *   (kullanıcı başka düğmeye geçerse animasyon kesilip yeni hedefe döner).
  * - Basılıyken hafifçe küçülür (dokunmanın karşılığı), bırakınca geri gelir.
  * - Seçim değişince iPhone'da hafif bir "tık" titreşimi.
@@ -14,7 +14,7 @@ import * as haptic from '../lib/haptics';
  */
 const GROW = 1.08;
 const LIFT = -3;
-const SELECT_SPRING = { stiffness: 380, damping: 22, mass: 1, useNativeDriver: true } as const; // hafif esneme
+const SELECT_SPRING = { stiffness: 170, damping: 25, mass: 1, useNativeDriver: true } as const; // zıplamasız, yumuşak
 const PRESS_SPRING = { stiffness: 500, damping: 34, mass: 1, useNativeDriver: true } as const;
 
 export function useGrow(on: boolean) {

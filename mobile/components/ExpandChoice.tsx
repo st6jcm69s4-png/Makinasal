@@ -9,11 +9,11 @@ import * as haptic from '../lib/haptics';
  * diğerleri hafifçe küçülür (%95). Alt kenarlar hizalı kalır, satırın yüksekliği değişmez
  * (alttaki içerik zıplamaz).
  *
- * Hareket: Apple'ın "yumuşak" yayı (zıplamasız, ~0,45 sn). Araya girilebilir: hareket bitmeden
+ * Hareket: Apple'ın "yumuşak" yayı (zıplamasız, ~0,6 sn). Araya girilebilir: hareket bitmeden
  * başka kutuya basılırsa oradan yeni hedefe akar. Basılıyken kutu hafifçe küçülür.
  * Seçim değişince hafif titreşim. "Hareketi azalt" açıksa anında değişir.
  */
-const SMOOTH = { stiffness: 220, damping: 26, mass: 1 } as const; // sönüm oranı ≈ 0,88
+const SMOOTH = { stiffness: 140, damping: 25, mass: 1 } as const; // sönüm oranı ≈ 1,05: zıplamasız, ~0,6 sn yumuşak yerleşme
 const PRESS = { stiffness: 500, damping: 34, mass: 1 } as const;
 
 export function ChoiceRow({ children, style }: { children: ReactNode; style?: StyleProp<ViewStyle> }) {
