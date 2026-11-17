@@ -32,7 +32,7 @@ export function PremiumView() {
       })}
     </div>
     {notice ? <p className="note" role="status">{tr('Premium satın alma, ödeme altyapısı ve sözleşmeler onaylandığında açılacak. Şu anda kart bilgisi alınmıyor.')}</p> : null}
-    <section className="panel premium-free"><h2>{tr('Ücretsiz üyelik')}</h2><ul className="clean"><li>{FREE.listings} {tr('ilan hakkı')}, {tr('ilan başına')} {FREE.photos} {tr('fotoğraf')}</li><li>{tr("Mesajlaşma, favoriler ve kayıtlı aramalar")}</li><li>{tr('İş ağında talep ve teklif')}</li></ul><p><a className="btn" href="/ilan-ver">{tr("İlan ver")}</a></p></section>
+    <section className="panel premium-free"><h2>{tr('Ücretsiz üyelik')}</h2><ul className="clean"><li>{tr('Ayda')} {FREE.listings} {tr('yeni ilan')}, {tr('ilan başına')} {FREE.photos} {tr('fotoğraf')}</li><li>{tr('Hak bitince tek ilan için ek ilan hakkı (mobil uygulamadan)')}</li><li>{tr("Mesajlaşma, favoriler ve kayıtlı aramalar")}</li><li>{tr('İş ağında talep ve teklif')}</li></ul><p><a className="btn" href="/ilan-ver">{tr("İlan ver")}</a></p></section>
     <p className="note">{tr('Yapay zeka asistanı premium üyelere mobil uygulamada sunulur.')} {tr('Fiyatlar Türk lirasıdır. Güven puanı ve doğrulama rozetleri satın alınamaz; premium yalnızca görünürlük ve araçlar sağlar.')}</p>
   </div>;
 }

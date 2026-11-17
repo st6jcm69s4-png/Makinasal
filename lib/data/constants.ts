@@ -259,13 +259,14 @@ export const COORDS: Record<string, [number, number]> = {
   Yozgat: [39.82, 34.81],
   Zonguldak: [41.45, 31.8],
 };
+/** Fotoğraf sınırı ve ayda verilebilecek yeni ilan sayısı (yıllık üyelikte 12 katı; asıl denetim sunucuda). */
 export const LIMITS = {
   free: {
     photos: 8,
-    listings: 3,
+    listings: 2,
   },
   prem: {
     photos: 20,
-    listings: 30,
+    listings: 5,
   },
 } as const;

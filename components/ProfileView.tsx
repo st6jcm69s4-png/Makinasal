@@ -134,7 +134,7 @@ export function ProfileView() {
           </div>
           <div className={`panel${profile.is_premium ? ' prem' : ''}`}>
             <h3>{tr("Üyelik")}</h3>
-            <p style={{ margin: '10px 0 12px' }}>{profile.is_premium ? tr("Premium üyesin. 30 aktif ilan, 20 fotoğraf ve öne çıkma özelliklerin açık.") : tr("Ücretsiz üyesin. {0} aktif ilan ve ilan başına {1} fotoğraf ekleyebilirsin.", {"0":LIMITS.free.listings,"1":LIMITS.free.photos})}</p>
+            <p style={{ margin: '10px 0 12px' }}>{profile.is_premium ? tr("Premium üyesin. Daha fazla ilan hakkı, ilan başına 20 fotoğraf ve öne çıkma özelliklerin açık.") : tr("Ücretsiz üyesin. Ayda {0} yeni ilan verebilir, ilan başına {1} fotoğraf ekleyebilirsin.", {"0":LIMITS.free.listings,"1":LIMITS.free.photos})}</p>
             <a className={`btn${profile.is_premium ? ' ghost' : ''}`} href="/premium">{profile.is_premium ? tr("Üyeliği yönet") : tr("Premium özelliklerini gör")}</a>
           </div>
         </div>

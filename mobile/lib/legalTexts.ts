@@ -268,13 +268,15 @@ export const LEGAL_TR: Record<LegalSlugTr, LegalDoc> = {
         'Unvan: {{unvan}}. Adres: {{adres}}. E-posta: {{eposta}}. Vergi dairesi ve numarası, MERSİS numarası ve telefon: [AVUKAT/ŞİRKET BİLGİSİ İLE DOLDURULACAK].',
       ]],
       ['2. Hizmetin temel nitelikleri', [
-        'Pro: bireysel satıcılar, operatörler ve ustalar için; 30 ilan hakkı, ilan başına 20 fotoğraf, ilanların ve iş ağı ilanlarının üst sıralarda gösterilmesi, açık artırmalarda teklif verme, telefondan ilan videosu yükleme, yapay zeka iş asistanı (ayda 40 soru), Pro rozeti, 50 kayıtlı arama, 5 ilanı karşılaştırma, ilan onayında ve destek taleplerinde öncelik, reklamsız kullanım.',
-        'Firma Pro: şirketler, filolar ve bayiler için; Pro’daki her şeye ek olarak 100 ilan hakkı, yapay zeka iş asistanı (ayda 200 soru), firma profilinin ve iş, kiralama ve eleman ilanlarının en üstte, satış ilanlarının aramalarda en üstte gösterilmesi.',
+        'Pro: bireysel satıcılar, operatörler ve ustalar için; aylık üyelikte ayda 5, yıllık üyelikte üyelik yılı başına 60 yeni ilan hakkı, ilan başına 20 fotoğraf, ilanların ve iş ağı ilanlarının üst sıralarda gösterilmesi, açık artırmalarda teklif verme, telefondan ilan videosu yükleme, yapay zeka iş asistanı (ayda 40 soru), Pro rozeti, 50 kayıtlı arama, 5 ilanı karşılaştırma, ilan onayında ve destek taleplerinde öncelik, reklamsız kullanım.',
+        'Firma Pro: şirketler, filolar ve bayiler için; Pro’daki her şeye ek olarak aylık üyelikte ayda 25, yıllık üyelikte üyelik yılı başına 300 yeni ilan hakkı, yapay zeka iş asistanı (ayda 200 soru), firma profilinin ve iş, kiralama ve eleman ilanlarının en üstte, satış ilanlarının aramalarda en üstte gösterilmesi.',
+        'İlan hakları: ücretsiz üyelikte ayda 2 yeni ilan verilebilir. Her yeni ilan ve satılmış ya da kaldırılmış bir ilanın yeniden yayına alınması bir ilan hakkı kullanır; ilanı duraklatıp devam ettirmek hak kullanmaz. Aylık haklar her ayın 1’inde (Türkiye saati) yenilenir, kullanılmayan haklar sonraki aya devretmez. Silinen ilan için kullanılan hak geri verilmez.',
+        'Ek ilan hakkı: dönem hakkı biten kullanıcı, mobil uygulamadan App Store veya Google Play aracılığıyla tek ilan için ek ilan hakkı satın alabilir (49,99 TL). Ek ilan hakları süresizdir ve dönem hakkı bittiğinde kullanılır. Davet programıyla kazanılan haklar da ek ilan hakkı olarak eklenir.',
         'Öne çıkarma ve sıralama avantajları, arama kriterlerine uyan ilanlar arasında uygulanır; belirli bir görüntülenme, mesaj veya satış sonucu garanti edilmez.',
       ]],
       ['3. Fiyat ve vergiler', [
-        'Aylık Pro: ilk ay 69,99 TL, sonraki her ay 89,99 TL. Aylık Firma Pro: ilk ay 179,99 TL, sonraki her ay 229,99 TL. İlk ay fiyatı, hesap başına yalnızca ilk aylık premium üyelikte bir kez uygulanır.',
-        'Yıllık Pro: 899,90 TL. Yıllık Firma Pro: 2.299,90 TL. Yıllık üyelik 12 ay kullanım sağlar ve normal aylık fiyatın 10 katıdır.',
+        'Aylık Pro: ilk ay 99,99 TL, sonraki her ay 149,99 TL. Aylık Firma Pro: ilk ay 349,99 TL, sonraki her ay 499,99 TL. İlk ay fiyatı, hesap başına yalnızca ilk aylık premium üyelikte bir kez uygulanır.',
+        'Yıllık Pro: 1.499,90 TL. Yıllık Firma Pro: 4.999,90 TL. Yıllık üyelik 12 ay kullanım sağlar ve normal aylık fiyatın 10 katıdır.',
         'Fiyatlara KDV dahildir [AVUKAT/MALİ MÜŞAVİR TEYİT EDECEK]. Ödeme dışında ek bir masraf alınmaz.',
       ]],
       ['4. Ödeme ve yenileme', [

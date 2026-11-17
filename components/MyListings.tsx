@@ -4,7 +4,6 @@ import { useLanguage } from "@/components/LanguageProvider";
 
 import type { QueryResult } from '@/lib/supabase/result';
 import { useCallback, useEffect, useState } from 'react';
-import { LIMITS } from '@/lib/data/constants';
 import { formatTL } from '@/lib/format';
 import { getSupabase } from '@/lib/supabase/client';
 import { useMarket } from './MarketProvider';
@@ -26,6 +25,7 @@ export function MyListings() {
   const [rows, setRows] = useState<Row[] | null>(null);
   const [stats, setStats] = useState<Record<string, Stat>>({});
   const [error, setError] = useState('');
+  const [quota, setQuota] = useState<{ limit: number; used: number; remaining: number; credits: number; period: string; resets_at: string } | null>(null);
 
   const load = useCallback(async (uid: string) => {
     const supabase = getSupabase();
@@ -35,6 +35,8 @@ export function MyListings() {
     if (res.error) { setError("İlanların yüklenemedi. Lütfen tekrar dene."); setRows([]); return; }
     const list = res.data as unknown as Row[];
     setRows(list);
+    const q = await supabase.rpc('my_listing_quota');
+    if (!q.error && q.data) setQuota(q.data as typeof quota);
     const st = await supabase.from('listing_stats').select('listing_id,views,phones').in('listing_id', list.map((r) => r.id));
     const map: Record<string, Stat> = {};
     for (const s of (st.data ?? []) as unknown as { listing_id: string; views: number; phones: number }[]) map[s.listing_id] = { views: s.views, phones: s.phones };
@@ -67,11 +69,15 @@ export function MyListings() {
 
   if (!authReady) return <div className="panel">{tr("Yükleniyor…")}</div>;
   if (!profile) return <div className="panel">{tr("İlanlarını görmek için ")}<a className="linkbtn" href="/giris">{tr("giriş yap")}</a>.</div>;
-  const limit = profile.is_premium ? LIMITS.prem.listings : LIMITS.free.listings;
-  const live = (rows ?? []).filter((r) => r.status === 'active' || r.status === 'paused').length;
   return (
     <>
-      <p className="sub">{live} / {limit} {tr(" ilan hakkı kullanıldı (")}{profile.is_premium ? tr("premium") : tr("ücretsiz")} {tr(" üyelik). Yayında ve duraklatılmış ilanlar hakkı kullanır; satılan ve silinen ilanlar hakkı geri açar.")}</p>
+      {quota ? (
+        <p className="sub">
+          {quota.period === 'yearly' ? tr("Bu üyelik yılında") : tr("Bu ay")}: {quota.remaining} / {quota.limit} {tr("ilan hakkı kaldı")}
+          {quota.credits > 0 ? <> · {quota.credits} {tr("ek ilan hakkı")}</> : null}
+          {' · '}{tr("Her yeni ilan ve satılmış / kaldırılmış ilanı yeniden yayına almak bir hak kullanır; duraklatıp devam ettirmek kullanmaz.")}
+        </p>
+      ) : null}
       {error ? <div className="err" role="alert">{tr(error)}</div> : null}
       {rows === null ? <div className="panel">{tr("Yükleniyor…")}</div> : rows.length === 0 ? (
         <div className="empty">{tr("Henüz ilanın yok. ")}<a className="linkbtn" href="/ilan-ver">{tr("İlk ilanını ver")}</a></div>

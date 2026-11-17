@@ -12,6 +12,8 @@ import {
   type FormEvent,
 } from "react";
 import { CITIES, KM_CATEGORIES, LIMITS } from "@/lib/data/constants";
+
+const QUOTA_MESSAGE = "Bu dönemdeki ilan hakkın doldu. Premium sayfasından daha fazla ilan hakkı olan bir tarifeye geçebilir ya da mobil uygulamadan ek ilan hakkı alabilirsin.";
 import { formatTL } from "@/lib/format";
 import { resizeImage } from "@/lib/image";
 import { isPartCategory } from "@/lib/pricing";
@@ -44,9 +46,6 @@ function Form() {
   const maxPhotos = profile?.is_premium
     ? LIMITS.prem.photos
     : LIMITS.free.photos;
-  const maxListings = profile?.is_premium
-    ? LIMITS.prem.listings
-    : LIMITS.free.listings;
 
   const [loaded, setLoaded] = useState(!editId);
   const [publishAfterSave, setPublishAfterSave] = useState(!editId);
@@ -292,15 +291,11 @@ function Form() {
     let savedListingId: string | null = null;
     try {
       if (!editId) {
-        const { count } = await supabase
-          .from("listings")
-          .select("id", { count: "exact", head: true })
-          .eq("seller_id", profile.id)
-          .in("status", ["active", "paused"]);
-        if ((count ?? 0) >= maxListings)
-          throw new Error(
-            `${profile.is_premium ? "Premium" : "Ücretsiz"} üyelikte aynı anda ${maxListings} ilan olabilir. Profilinden bir ilanı satıldı yap ya da sil${profile.is_premium ? "" : ", veya Premium sayfasına bak"}.`,
-          );
+        // İlan hakkı (asıl denetim sunucuda): ücretsiz ayda 2, Pro ayda 5, Firma Pro ayda 25; yıllıkta 12 katı
+        const quota = await supabase.rpc("my_listing_quota");
+        const q = quota.data as { limit: number; remaining: number; credits: number; period: string } | null;
+        if (q && q.remaining <= 0 && q.credits <= 0)
+          throw new Error(QUOTA_MESSAGE);
       }
       const base = {
         status: "paused",
@@ -345,7 +340,7 @@ function Form() {
       )
         res = await write(base); // 005 henüz çalıştırılmadıysa
       if (res.error || !res.data)
-        throw new Error(res.error?.message ?? "İlan kaydedilemedi");
+        throw new Error(res.error?.message?.includes("LISTING_QUOTA") ? QUOTA_MESSAGE : res.error?.message ?? "İlan kaydedilemedi");
       const id = res.data.id as string;
       savedListingId = id;
 

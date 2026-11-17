@@ -5,18 +5,21 @@ export type Period = 'monthly' | 'yearly';
 export type Plan = { id: PlanId; name: string; tagline: string; monthly: number; intro: number; yearly: number; aiLimit: number; listings: number; features: string[] };
 
 export const YEARLY_DISCOUNT = 0.15;
-export const FREE = { listings: 3, photos: 8, savedSearches: 20, compare: 3 };
+/** listings: ayda verilebilecek yeni ilan sayısı (asıl denetim sunucuda: my_listing_quota / enforce_listing_limit). */
+export const FREE = { listings: 2, photos: 8, savedSearches: 20, compare: 3 };
+/** Hak bitince tek ilan için ek ilan hakkı (mağazada makinasal.listing.single). */
+export const LISTING_CREDIT_PRICE = 49.99;
 /** Premium üyelerin (Pro ve Firma Pro) ek hakları. */
 export const PREMIUM = { savedSearches: 50, compare: 5 };
 
 export const PLANS: Plan[] = [
   {
-    id: 'pro', name: 'Pro', monthly: 89.99, intro: 69.99, yearly: 899.90, aiLimit: 40, listings: 30,
+    id: 'pro', name: 'Pro', monthly: 149.99, intro: 99.99, yearly: 1499.90, aiLimit: 40, listings: 5,
     tagline: 'Bireysel satıcılar, operatörler ve ustalar için',
     features: [
       'Yapay zeka iş asistanı (ayda 40 soru)',
       'İlanların ve iş ağı ilanların üst sıralarda',
-      '30 ilan hakkı, ilan başına 20 fotoğraf',
+      'Ayda 5 yeni ilan (yıllıkta 60), ilan başına 20 fotoğraf',
       'Açık artırmalara katılma (teklif verme)',
       'Telefondan ilan videosu yükleme',
       'İlanlarında, profilinde ve yazdığın değerlendirmelerde Pro rozeti',
@@ -26,14 +29,14 @@ export const PLANS: Plan[] = [
     ],
   },
   {
-    id: 'business', name: 'Firma Pro', monthly: 229.99, intro: 179.99, yearly: 2299.90, aiLimit: 200, listings: 100,
+    id: 'business', name: 'Firma Pro', monthly: 499.99, intro: 349.99, yearly: 4999.90, aiLimit: 200, listings: 25,
     tagline: 'Şirketler, filolar ve bayiler için',
     features: [
       'Pro tarifesindeki her şey',
       'Yapay zeka iş asistanı (ayda 200 soru)',
       'Firma profilin, iş, kiralama ve eleman ilanların en üstte',
       'Satış ilanların aramalarda en üstte',
-      '100 ilan hakkı, ilan başına 20 fotoğraf',
+      'Ayda 25 yeni ilan (yıllıkta 300), ilan başına 20 fotoğraf',
     ],
   },
 ];

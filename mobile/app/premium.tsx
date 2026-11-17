@@ -7,11 +7,12 @@ import { useApp } from '../lib/AppContext';
 import { useLang } from '../lib/lang';
 import { tr } from '../lib/i18n';
 import { supabase } from '../lib/supabase';
-import { FREE, PLANS, activePlan, money, yearlyTotal, type Period, type Plan, type PlanId } from '../lib/plans';
+import { FREE, LISTING_CREDIT_PRICE, PLANS, activePlan, money, yearlyTotal, type Period, type Plan, type PlanId } from '../lib/plans';
 import { openTab } from '../lib/tabBack';
 import { available as storeAvailable, buy as storeBuy, loadProducts, manage, redeemCode, restore, type StoreProducts } from '../lib/purchases';
 import { success as hapticSuccess } from '../lib/haptics';
 import { toast } from '../components/Toast';
+import { fetchQuota, purchaseListingCredit, quotaLine, type Quota } from '../lib/quota';
 import { color, font, radius, shadow } from '../lib/theme';
 
 type Prof = { is_premium?: boolean | null; premium_plan?: string | null; premium_until?: string | null };
@@ -23,6 +24,8 @@ export default function Premium() {
   const [period, setPeriod] = useState<Period>('monthly');
   const [products, setProducts] = useState<StoreProducts>({});
   const [busy, setBusy] = useState<string | null>(null);
+  const [quota, setQuota] = useState<Quota | null>(null);
+  useEffect(() => { if (session) void fetchQuota().then(setQuota); else setQuota(null); }, [session, prof]);
   const native = Platform.OS !== 'web';
 
   const readProfile = useCallback(async () => {
@@ -142,9 +145,26 @@ export default function Premium() {
 
       <View style={s.free}>
         <Text style={s.freeT}>Ücretsiz üyelik</Text>
-        {[`${FREE.listings} ${tr('ilan hakkı')}, ${tr('ilan başına')} ${FREE.photos} ${tr('fotoğraf')}`, tr('Mesajlaşma, favoriler ve 20 kayıtlı arama'), tr('İş ağında talep ve teklif')].map((t) => (
+        {[`${tr('Ayda')} ${FREE.listings} ${tr('yeni ilan')}, ${tr('ilan başına')} ${FREE.photos} ${tr('fotoğraf')}`, tr('Mesajlaşma, favoriler ve 20 kayıtlı arama'), tr('İş ağında talep ve teklif')].map((t) => (
           <View key={t} style={s.feat}><Icon name="check" size={16} color={color.muted} /><PlainText style={s.freeF}>{t}</PlainText></View>
         ))}
+      </View>
+      {/* Ek ilan hakkı: üyelik almadan tek ilan */}
+      <View style={s.free}>
+        <Text style={s.freeT}>Ek ilan hakkı</Text>
+        <PlainText style={s.freeF}>{`${tr('İlan hakkın bitince tek bir ilan için ek ilan hakkı alabilirsin')}: ${money(LISTING_CREDIT_PRICE, lang)}. ${tr('Ek haklar süresizdir, dönem hakkın bitince kullanılır.')}`}</PlainText>
+        {quota ? <PlainText style={[s.freeF, { color: color.ink, fontFamily: font.semi }]}>{quotaLine(quota, lang)}</PlainText> : null}
+        {native ? (
+          <Pressable style={({ pressed }) => [s.creditBtn, pressed && { opacity: 0.85 }]} disabled={!!busy} accessibilityRole="button"
+            onPress={() => {
+              if (!session) { openTab('/hesap'); return; }
+              if (!storeAvailable()) { notReady(); return; }
+              setBusy('credit');
+              void purchaseListingCredit().then((ok) => { if (ok) toast(tr('Ek ilan hakkın eklendi')); return fetchQuota(); }).then((q) => { if (q) setQuota(q); }).finally(() => setBusy(null));
+            }}>
+            {busy === 'credit' ? <ActivityIndicator color={color.tealText} /> : <Text style={s.linkT}>Ek ilan hakkı al</Text>}
+          </Pressable>
+        ) : null}
       </View>
       <Text style={s.note}>Fiyatlar Türk lirasıdır. Güven puanı ve doğrulama rozetleri satın alınamaz; Pro rozeti yalnızca üyelik türünü gösterir. Premium görünürlük ve araçlar sağlar.</Text>
       {native ? (
@@ -246,6 +266,7 @@ const s = StyleSheet.create({
   links: { marginHorizontal: 16, marginTop: 16, borderRadius: radius + 4, backgroundColor: color.surface, borderWidth: 1, borderColor: color.line, overflow: 'hidden' },
   linkBtn: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 50, paddingHorizontal: 16, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: color.line },
   linkT: { color: color.tealText, fontFamily: font.semi, fontSize: 15.5 },
+  creditBtn: { marginTop: 6, minHeight: 44, borderRadius: radius, borderWidth: 1, borderColor: color.teal, alignItems: 'center', justifyContent: 'center' },
   legal: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', gap: 6, marginHorizontal: 20, marginTop: 14 },
   legalT: { color: color.tealText, fontFamily: font.semi, fontSize: 13 },
   legalDot: { color: color.muted, fontSize: 13 },

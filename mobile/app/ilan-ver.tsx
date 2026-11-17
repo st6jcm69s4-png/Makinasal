@@ -19,6 +19,8 @@ import { photoUrl, supabase } from '../lib/supabase';
 import { maybeAskReview } from '../lib/review';
 import * as haptic from '../lib/haptics';
 import { shrinkPhoto } from '../lib/photo';
+import { ensureListingQuota, fetchQuota, isQuotaError, quotaLine, type Quota } from '../lib/quota';
+import { useLang } from '../lib/lang';
 import { color, font, radius, shadow, fixed } from '../lib/theme';
 
 const CONDITIONS = ['Sıfır', 'Çıkma', 'Revizyonlu'];
@@ -61,6 +63,9 @@ export default function NewListing() {
   const [busy, setBusy] = useState(false);
   const [progress, setProgress] = useState('');
   const [error, setError] = useState('');
+  const [quota, setQuota] = useState<Quota | null>(null);
+  const { lang } = useLang();
+  useEffect(() => { if (uid && !editId) void fetchQuota().then(setQuota); }, [uid, editId]);
 
   useEffect(() => {
     if (!uid) return;
@@ -200,12 +205,17 @@ export default function NewListing() {
     if (photos.length + existing.length === 0) return setError('En az 1 fotoğraf ekle. Alıcılar fotoğrafsız ilanlara güvenmez.');
     if (!pledge && !editId) return setError('Kapora taahhüdünü onaylaman gerekiyor.');
 
+    // İlan hakkı: bittiyse ek ilan hakkı ya da Premium seçenekleri sorulur (sunucu ayrıca denetler)
+    if (!editId) {
+      setBusy(true);
+      const ok = await ensureListingQuota();
+      setBusy(false);
+      void fetchQuota().then(setQuota);
+      if (!ok) return;
+    }
     setBusy(true);
     let id: string | null = null;
     try {
-      const { count } = editId ? { count: 0 } : await supabase.from('listings').select('id', { count: 'exact', head: true }).eq('seller_id', uid).in('status', ['active', 'paused']);
-      const maxListings = premium ? LIMITS.prem.listings : LIMITS.free.listings;
-      if ((count ?? 0) >= maxListings) throw new Error(`${premium ? 'Premium' : 'Ücretsiz'} üyelikte aynı anda ${maxListings} ilan olabilir. İlanlarından birini satıldı yap ya da kaldır.`);
       const base = {
         seller_id: uid, status: 'paused', kind, category: cat, title: `${brand.trim()} ${model.trim()}`, description: desc.trim(), price: priceNum, city,
         year: part ? null : yearNum, usage_value: !part ? Number(usage) : null, usage_unit: !part ? unit : null,
@@ -219,6 +229,7 @@ export default function NewListing() {
       const created = editId
         ? await supabase.from('listings').update({ ...changes, status: 'paused' }).eq('id', editId).eq('seller_id', uid).select('id').single()
         : await supabase.from('listings').insert(base).select('id').single();
+      if (created.error && isQuotaError(created.error.message)) throw new Error('İlan hakkın doldu. Ek ilan hakkı alabilir ya da Premium tarifelere bakabilirsin; taslağın kayıtlı.');
       if (created.error || !created.data) throw new Error(created.error?.message.includes('AUCTION_HAS_BIDS') ? 'Teklif almış açık artırma sürerken ilan düzenlenemez.' : created.error?.message.includes('RATE_LIMIT') ? 'Çok fazla işlem. Bir dakika sonra tekrar dene.' : 'İlan kaydedilemedi. Bilgileri kontrol edip tekrar dene.');
       id = (created.data as { id: string }).id;
       clearDraft(); // ilan oluştu (duraklatılmış da olsa); aynı taslaktan ikinci ilan açılmasın
@@ -299,6 +310,13 @@ export default function NewListing() {
   return (
     <KeyboardAvoidingView style={{ flex: 1, backgroundColor: color.bg }} behavior="padding">
       <ScrollView style={{ backgroundColor: color.bg }} contentContainerStyle={s.form} keyboardShouldPersistTaps="handled">
+        {!editId && quota ? (
+          <Pressable style={({ pressed }) => [s.quota, pressed && { opacity: 0.8 }]} onPress={() => router.push('/premium')} accessibilityRole="button">
+            <Icon name="layers" size={16} color={quota.remaining + quota.credits > 0 ? color.tealText : color.bad} />
+            <PlainText style={[s.quotaT, quota.remaining + quota.credits === 0 && { color: color.bad }]}>{quotaLine(quota, lang)}</PlainText>
+            <Icon name="chevron-right" size={16} color={color.muted} />
+          </Pressable>
+        ) : null}
         {section('Ne satıyorsun?', 'tag', <>
           {select('Kategori', cat, 'cat')}
           {part ? (
@@ -432,6 +450,8 @@ export default function NewListing() {
 }
 
 const s = StyleSheet.create({
+  quota: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 14, minHeight: 44, borderRadius: radius, backgroundColor: color.surface, borderWidth: StyleSheet.hairlineWidth, borderColor: color.line },
+  quotaT: { flex: 1, color: color.ink, fontFamily: font.medium, fontSize: 14 },
   hint: { color: color.muted, fontSize: 12.5, lineHeight: 18 },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   chip: { minHeight: 38, paddingHorizontal: 14, borderRadius: 19, borderWidth: 1, borderColor: color.line, backgroundColor: color.bg, alignItems: 'center', justifyContent: 'center' },

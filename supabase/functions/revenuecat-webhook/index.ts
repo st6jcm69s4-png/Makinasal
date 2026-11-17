@@ -2,6 +2,7 @@
 // RevenueCat panelinde Webhook adresi: https://<proje>.supabase.co/functions/v1/revenuecat-webhook
 // Yetki: RevenueCat'te girilen "Authorization header" değeri, Supabase gizli anahtarı REVENUECAT_WEBHOOK_SECRET ile aynı olmalı.
 // Ürün kimlikleri: makinasal.pro.monthly / makinasal.pro.yearly / makinasal.business.monthly / makinasal.business.yearly
+// Tek seferlik (tüketilebilir) ürün: makinasal.listing.single = 1 ek ilan hakkı
 import { createClient } from 'npm:@supabase/supabase-js@2';
 
 const url = Deno.env.get('SUPABASE_URL')!;
@@ -14,6 +15,8 @@ type Ev = {
 };
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const isCredit = (product?: string) => !!product && /listing\.single|ek_ilan|extra_listing/i.test(product);
+const periodOf = (product?: string) => (product && /year|annual|yillik/i.test(product) ? 'yearly' : 'monthly');
 const planOf = (product?: string) => (!product ? null : /business|firma/i.test(product) ? 'business' : /pro/i.test(product) ? 'pro' : null);
 
 // Equal-time karşılaştırma (yetki anahtarı tahmin edilmesin)
@@ -50,6 +53,19 @@ Deno.serve(async (req) => {
   if (!uid) return Response.json({ ok: true, skipped: 'no-user' });
   if (ev.type === 'TEST') return Response.json({ ok: true });
 
+  // Ek ilan hakkı: aynı olay ikinci kez gelirse (yinelenen kayıt) hak tekrar verilmez
+  if (isCredit(product)) {
+    if (ev.type !== 'NON_RENEWING_PURCHASE' && ev.type !== 'INITIAL_PURCHASE') return Response.json({ ok: true, ignored: ev.type });
+    if (log.error) return Response.json({ ok: true, duplicate: true });
+    const g = await admin.rpc('grant_listing_credits', { p_uid: uid, p_n: 1 });
+    if (g.error) {
+      // Kayıt silinir ki RevenueCat yeniden denediğinde hak verilebilsin
+      await admin.from('store_events').delete().eq('id', ev.id);
+      return new Response('DB', { status: 500 });
+    }
+    return Response.json({ ok: true, credit: 1 });
+  }
+
   const plan = planOf(product);
   let r;
   switch (ev.type) {
@@ -60,10 +76,10 @@ Deno.serve(async (req) => {
     case 'NON_RENEWING_PURCHASE':
     case 'SUBSCRIPTION_EXTENDED':
     case 'TEMPORARY_ENTITLEMENT_GRANT':
-      r = await admin.rpc('set_store_premium', { p_uid: uid, p_plan: plan, p_until: expires });
+      r = await admin.rpc('set_store_premium', { p_uid: uid, p_plan: plan, p_until: expires, p_period: periodOf(product) });
       break;
     case 'EXPIRATION':
-      r = await admin.rpc('set_store_premium', { p_uid: uid, p_plan: null, p_until: null });
+      r = await admin.rpc('set_store_premium', { p_uid: uid, p_plan: null, p_until: null, p_period: null });
       break;
     default:
       // CANCELLATION (yenileme kapandı ama süre bitene kadar sürer), BILLING_ISSUE vb.: üyelik değişmez

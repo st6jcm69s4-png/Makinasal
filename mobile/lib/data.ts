@@ -177,18 +177,19 @@ export const CITIES: string[] = [
   "Zonguldak",
 ];
 /** Şehir merkezi koordinatları [enlem, boylam] (yaklaşık) */
+/** Fotoğraf sınırı ve ayda verilebilecek yeni ilan sayısı (yıllık üyelikte 12 katı; asıl denetim sunucuda). */
 export const LIMITS = {
   free: {
     photos: 8,
-    listings: 3,
+    listings: 2,
   },
   prem: {
     photos: 20,
-    listings: 30,
+    listings: 5,
   },
   business: {
     photos: 20,
-    listings: 100,
+    listings: 25,
   },
 } as const;
 

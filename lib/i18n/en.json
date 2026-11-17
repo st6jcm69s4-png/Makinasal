@@ -1539,5 +1539,17 @@
   "Premium ön bilgilendirme formu": "Premium pre-contract information",
   "Fiyat, yenileme, iptal, cayma": "Price, renewal, cancellation, withdrawal",
   "Premium üyelik sözleşmesi": "Premium membership agreement",
-  "Mesafeli hizmet sözleşmesi": "Distance service contract"
+  "Mesafeli hizmet sözleşmesi": "Distance service contract",
+  "Bu üyelik yılında": "This membership year",
+  "Bu ay": "This month",
+  "ilan hakkı kaldı": "listings left",
+  "ek ilan hakkı": "extra listings",
+  "Her yeni ilan ve satılmış / kaldırılmış ilanı yeniden yayına almak bir hak kullanır; duraklatıp devam ettirmek kullanmaz.": "Each new listing, and republishing a sold or removed one, uses one listing; pausing and resuming doesn't.",
+  "Bu dönemdeki ilan hakkın doldu. Premium sayfasından daha fazla ilan hakkı olan bir tarifeye geçebilir ya da mobil uygulamadan ek ilan hakkı alabilirsin.": "You've used all listings for this period. Switch to a plan with more listings on the Premium page or buy an extra listing in the mobile app.",
+  "Premium üyesin. Daha fazla ilan hakkı, ilan başına 20 fotoğraf ve öne çıkma özelliklerin açık.": "You're a premium member. More listings, 20 photos per listing and boost features are on.",
+  "Ücretsiz üyesin. Ayda {0} yeni ilan verebilir, ilan başına {1} fotoğraf ekleyebilirsin.": "You're a free member. You can post {0} new listings a month with {1} photos each.",
+  "Ayda": "Per month:",
+  "Hak bitince tek ilan için ek ilan hakkı (mobil uygulamadan)": "Extra single listings when you run out (in the mobile app)",
+  "Ayda 5 yeni ilan (yıllıkta 60), ilan başına 20 fotoğraf": "5 new listings a month (60 yearly), 20 photos per listing",
+  "Ayda 25 yeni ilan (yıllıkta 300), ilan başına 20 fotoğraf": "25 new listings a month (300 yearly), 20 photos per listing"
 }

@@ -7,6 +7,7 @@
  * - Expo Go'da ve anahtar girilmemişse satın alma kapalıdır (available() false döner).
  *
  * Mağazadaki ürün kimlikleri: makinasal.pro.monthly, makinasal.pro.yearly, makinasal.business.monthly, makinasal.business.yearly
+ * Tek seferlik (tüketilebilir) ürün: makinasal.listing.single = 1 ek ilan hakkı
  */
 import { useEffect } from 'react';
 import { Linking, Platform } from 'react-native';
@@ -139,6 +140,35 @@ export async function manage(): Promise<void> {
     if (P) { await P.showManageSubscriptions(); return; }
   } catch { /* aşağıdaki bağlantıya düş */ }
   await Linking.openURL(Platform.OS === 'ios' ? 'https://apps.apple.com/account/subscriptions' : 'https://play.google.com/store/account/subscriptions');
+}
+
+export const LISTING_CREDIT_ID = 'makinasal.listing.single';
+
+/** Ek ilan hakkının mağazadaki fiyatı (yoksa null: mağazada henüz tanımlı değil ya da bu sürümde kapalı). */
+export async function loadListingCredit(): Promise<PurchasesStoreProduct | null> {
+  const P = ready();
+  if (!P) return null;
+  try {
+    const list = await P.getProducts([LISTING_CREDIT_ID], P.PRODUCT_CATEGORY.NON_SUBSCRIPTION);
+    return list[0] ?? null;
+  } catch {
+    return null;
+  }
+}
+
+/** Tek ilan hakkı satın alır. Hak, mağaza ödemeyi onaylayınca sunucuda eklenir (revenuecat-webhook). */
+export async function buyListingCredit(p: PurchasesStoreProduct): Promise<BuyResult> {
+  const P = ready();
+  if (!P) return 'error';
+  try {
+    await P.purchaseStoreProduct(p);
+    return 'ok';
+  } catch (e) {
+    const err = e as { userCancelled?: boolean | null; code?: string };
+    if (err.userCancelled || err.code === P.PURCHASES_ERROR_CODE.PURCHASE_CANCELLED_ERROR) return 'cancelled';
+    if (err.code === P.PURCHASES_ERROR_CODE.PAYMENT_PENDING_ERROR) return 'pending';
+    return 'error';
+  }
 }
 
 function hasActive(info: CustomerInfo): boolean {

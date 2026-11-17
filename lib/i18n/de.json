@@ -1540,5 +1540,17 @@
   "Premium ön bilgilendirme formu": "Premium-Vorabinformation",
   "Fiyat, yenileme, iptal, cayma": "Preis, Verlängerung, Kündigung, Widerruf",
   "Premium üyelik sözleşmesi": "Premium-Mitgliedschaftsvertrag",
-  "Mesafeli hizmet sözleşmesi": "Fernabsatz-Dienstleistungsvertrag"
+  "Mesafeli hizmet sözleşmesi": "Fernabsatz-Dienstleistungsvertrag",
+  "Bu üyelik yılında": "In diesem Mitgliedsjahr",
+  "Bu ay": "Diesen Monat",
+  "ilan hakkı kaldı": "Inserate übrig",
+  "ek ilan hakkı": "Zusatzinserate",
+  "Her yeni ilan ve satılmış / kaldırılmış ilanı yeniden yayına almak bir hak kullanır; duraklatıp devam ettirmek kullanmaz.": "Jedes neue Inserat und das erneute Veröffentlichen eines verkauften oder entfernten Inserats verbraucht ein Inserat; Pausieren und Fortsetzen nicht.",
+  "Bu dönemdeki ilan hakkın doldu. Premium sayfasından daha fazla ilan hakkı olan bir tarifeye geçebilir ya da mobil uygulamadan ek ilan hakkı alabilirsin.": "Deine Inserate für diesen Zeitraum sind aufgebraucht. Wechsle auf der Premium-Seite zu einem Tarif mit mehr Inseraten oder kaufe ein Zusatzinserat in der App.",
+  "Premium üyesin. Daha fazla ilan hakkı, ilan başına 20 fotoğraf ve öne çıkma özelliklerin açık.": "Du bist Premium-Mitglied. Mehr Inserate, 20 Fotos pro Inserat und Hervorhebung sind aktiv.",
+  "Ücretsiz üyesin. Ayda {0} yeni ilan verebilir, ilan başına {1} fotoğraf ekleyebilirsin.": "Du bist kostenloses Mitglied. Du kannst {0} neue Inserate pro Monat mit je {1} Fotos einstellen.",
+  "Ayda": "Pro Monat:",
+  "Hak bitince tek ilan için ek ilan hakkı (mobil uygulamadan)": "Zusatzinserate, wenn dein Kontingent aufgebraucht ist (in der App)",
+  "Ayda 5 yeni ilan (yıllıkta 60), ilan başına 20 fotoğraf": "5 neue Inserate pro Monat (60 jährlich), 20 Fotos pro Inserat",
+  "Ayda 25 yeni ilan (yıllıkta 300), ilan başına 20 fotoğraf": "25 neue Inserate pro Monat (300 jährlich), 20 Fotos pro Inserat"
 }

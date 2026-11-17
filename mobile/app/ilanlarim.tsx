@@ -12,6 +12,7 @@ import { tr } from '../lib/i18n';
 import { router, useFocusEffect } from 'expo-router';
 import { useApp } from '../lib/AppContext';
 import { photoUrl, supabase, tl } from '../lib/supabase';
+import { ensureListingQuota, isQuotaError } from '../lib/quota';
 import { color, font } from '../lib/theme';
 
 type Row = {
@@ -67,10 +68,16 @@ export default function MyListings() {
   }, [uid]);
   useFocusEffect(useCallback(() => { void load(); }, [load]));
 
-  async function patch(id: string, status: string) {
+  async function patch(id: string, status: string, retried = false): Promise<void> {
     const { error: e } = await supabase.from('listings').update({ status }).eq('id', id);
     if (!e && status === 'sold') void maybeAskReview('sold');
-    if (e) Alert.alert('İlan', e.message.includes('AUCTION_HAS_BIDS') ? 'Teklif almış açık artırma sürerken ilan değiştirilemez, duraklatılamaz veya kaldırılamaz.' : e.message.includes('limit') || e.message.includes('limitine') ? 'İlan limitine ulaştın.' : 'İşlem kaydedilemedi.');
+    // Satılmış / kaldırılmış ilanı yeniden yayına almak bir ilan hakkı kullanır; hak bittiyse seçenekler sorulur
+    if (e && isQuotaError(e.message) && !retried) {
+      if (await ensureListingQuota()) return patch(id, status, true);
+      void load();
+      return;
+    }
+    if (e) Alert.alert('İlan', e.message.includes('AUCTION_HAS_BIDS') ? 'Teklif almış açık artırma sürerken ilan değiştirilemez, duraklatılamaz veya kaldırılamaz.' : isQuotaError(e.message) ? 'İlan hakkın doldu.' : 'İşlem kaydedilemedi.');
     void load();
   }
   function confirm(r: Row, status: string, text: string, yes: string, danger = false) {
