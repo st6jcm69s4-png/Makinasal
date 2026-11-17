@@ -768,6 +768,7 @@ export const searchEn: Record<string, string> = {
   "Asistan bu ay çok yoğun. Kısa süre sonra tekrar dene.": "The assistant is very busy this month. Please try again later.",
   "Bu tarifeyi seç": "Choose this plan",
   // Apple görünümü (16 Kasım 2026)
+  "Geri": "Back",
   "En üste çık": "Scroll to top",
   "Karşılaştırmadan çıkar": "Remove from comparison",
   "Karşılaştırmaya ekle": "Add to comparison",
@@ -1569,6 +1570,7 @@ export const searchDe: Record<string, string> = {
   "Asistan bu ay çok yoğun. Kısa süre sonra tekrar dene.": "Der Assistent ist diesen Monat stark ausgelastet. Bitte versuchen Sie es später erneut.",
   "Bu tarifeyi seç": "Diesen Tarif wählen",
   // Apple görünümü (16 Kasım 2026)
+  "Geri": "Zurück",
   "En üste çık": "Nach oben",
   "Karşılaştırmadan çıkar": "Aus Vergleich entfernen",
   "Karşılaştırmaya ekle": "Zum Vergleich hinzufügen",

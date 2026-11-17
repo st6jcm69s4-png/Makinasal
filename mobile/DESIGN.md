@@ -40,7 +40,7 @@ Kaynak: Apple İnsan Arayüzü Yönergeleri ("Apple Look", github.com/dickwu/app
 
 ## Telefonun kendi parçaları (16 Kasım 2026)
 - **Alt menü:** `NativeTabs` (`app/(tabs)/_layout.tsx`). iOS 26'da cam görünümlü sistem çubuğu (kaydırınca küçülmez; küçülürken listeler zıplıyordu), Android'de Material 3. Simgeler iPhone'da SF Symbols, Android'de Material Symbols. "İlan ver" bir sekmedir ve ilan türünü seçtiren sayfayı açar (sekmeler eylem yapmaz). Sekmeler arası parmakla kaydırma kullanıcı isteğiyle duruyor (`SwipeTabs`, beş sekmenin hepsinde; simgeye dokununca anında geçer).
-- **Başlıklar:** her yerde telefonun kendi başlık çubuğu (`lib/nav.ts › headerOptions`). Başlıklar normal yazımla, büyük harfle değil. Geri düğmesinde yalnızca ok.
+- **Başlıklar:** her yerde telefonun kendi başlık çubuğu (`lib/nav.ts › headerOptions`). Başlıklar normal yazımla, büyük harfle değil. Geri düğmesi: `components/BackButton.tsx`, her iç sayfada sol üstte aynı (iOS 26 cam, diğerlerinde yuvarlak zemin; geçmiş yoksa ana sayfa simgesi).
 - **Büyük başlık:** İlan ver, Hesabım, Mesajlar, Favorilerim. Kaydırınca küçülüp çubuğa yerleşir. Yalnızca ilk öğesi sade bir kaydırma listesi olan ekranlarda açılır ve o listede `contentInsetAdjustmentBehavior="automatic"` olmalıdır; yoksa içerik başlığın altında kalır. İlanlar ve İş Ağı'nda (arama kutusu, bölüm seçici) denendi: içerik başlığın altında kaldı ve liste yüklenirken kaydı, bu yüzden orada normal başlık var.
 - **İlan seçenekleri (İlanlarım):** iPhone'da sistemin kendi eylem sayfası (`ActionSheetIOS`), Android'de alttan açılan sayfa.
 - **Başlık düğmeleri:** sekmelerde sağda arama, bildirimler, mesajlar (`HeaderButtons`, okunmamış sayısı `lib/unread.ts`). Ana sayfada marka başlığı (`HomeHeader`); marka yalnızca orada.

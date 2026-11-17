@@ -5,6 +5,7 @@ import { Stack } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { fontState } from '../lib/theme';
 import { headerOptions, largeTitle, navTheme } from '../lib/nav';
+import { BackButton } from '../components/BackButton';
 import { ThemeProvider } from 'expo-router/react-navigation';
 import { loadTheme, watchSystemTheme } from '../lib/themePref';
 import { StatusBar } from 'expo-status-bar';
@@ -28,7 +29,13 @@ function Screens() {
       <DoubleTapSearch>
       <ThemeProvider value={navTheme}>
       {/* Telefonun kendi başlık çubuğu (bkz. lib/nav.ts) */}
-      <Stack screenOptions={headerOptions}>
+      <Stack
+        screenOptions={({ navigation }) => ({
+          ...headerOptions,
+          // Her iç sayfada sol üstte aynı geri düğmesi (geri gidilecek yer yoksa ana sayfa)
+          headerLeft: () => <BackButton canGoBack={navigation.canGoBack()} />,
+        })}
+      >
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="ilan/[id]" options={{ title: T('İlan') }} />
         <Stack.Screen name="mesajlar" options={{ title: T('Mesajlar'), ...largeTitle }} />
