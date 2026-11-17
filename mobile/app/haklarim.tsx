@@ -10,6 +10,7 @@ import { useApp } from '../lib/AppContext';
 import { color, radius } from '../lib/theme';
 import { supabase } from '../lib/supabase';
 import { openWeb } from '../lib/web';
+import { confirmDeleteAccount } from '../lib/deleteAccount';
 import { getLang, localeOf } from '../lib/i18n';
 
 type Req = { id: string; kind: string; status: 'open' | 'done' | 'rejected'; created_at: string };
@@ -17,7 +18,7 @@ const KINDS: { kind: string; icon: IconName; title: string; text: string; confir
   { kind: 'export', icon: 'download', title: 'Verimin kopyasını iste', text: 'Hakkında işlenen kişisel verilerin bir dökümünü e-postana göndeririz.' },
   { kind: 'correct', icon: 'edit-3', title: 'Bilgilerimin düzeltilmesini iste', text: 'Yanlış ya da eksik kişisel verini düzelttiririz. Profil bilgilerini kendin de düzenleyebilirsin.' },
   { kind: 'object', icon: 'slash', title: 'İşlenmesine itiraz et', text: 'Verilerinin belirli bir amaçla işlenmesine itiraz edersin.' },
-  { kind: 'delete', icon: 'trash-2', title: 'Hesabımın ve verilerimin silinmesini iste', text: 'Hesabın, ilanların ve mesajların silinir. Kanunen saklamamız gereken işlem kayıtları (ör. ödeme) süresi dolana kadar ayrı tutulur.', confirm: 'Hesabın ve verilerin silinmek üzere başvuru alınacak. Bu işlem geri alınamaz. Devam edilsin mi?' },
+  { kind: 'delete', icon: 'trash-2', title: 'Hesabımı ve verilerimi sil', text: 'Hesabın, ilanların ve kişisel bilgilerin hemen silinir. Yazışmalar karşı tarafta "Silinmiş üye" adıyla kalır; kanunen saklamamız gereken işlem kayıtları (ör. ödeme) süresi dolana kadar ayrı tutulur.', confirm: 'Hesabın ve verilerin silinmek üzere başvuru alınacak. Bu işlem geri alınamaz. Devam edilsin mi?' },
 ];
 const STATUS = { open: 'Beklemede', done: 'Tamamlandı', rejected: 'Reddedildi' } as const;
 
@@ -45,6 +46,7 @@ export default function Rights() {
     toast('Başvurun kaydedildi. Kanun gereği en geç 30 gün içinde yanıtlanır.');
   }
   function ask(k: (typeof KINDS)[number]) {
+    if (k.kind === 'delete') { confirmDeleteAccount(); return; }
     if (!k.confirm) { void send(k.kind); return; }
     Alert.alert('Onay', k.confirm, [{ text: 'Vazgeç', style: 'cancel' }, { text: 'Evet, başvur', style: 'destructive', onPress: () => void send(k.kind) }]);
   }
@@ -73,7 +75,7 @@ export default function Rights() {
               <Text style={s.sub}>{k.text}</Text>
             </View>
           </View>
-          <Btn ghost={k.kind !== 'delete'} danger={k.kind === 'delete'} title={busy === k.kind ? 'Gönderiliyor…' : 'Başvur'} disabled={!!busy} onPress={() => ask(k)} />
+          <Btn ghost={k.kind !== 'delete'} danger={k.kind === 'delete'} title={busy === k.kind ? 'Gönderiliyor…' : k.kind === 'delete' ? 'Hesabı sil' : 'Başvur'} disabled={!!busy} onPress={() => ask(k)} />
         </View>
       ))}
       {reqs.length ? (

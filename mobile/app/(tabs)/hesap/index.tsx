@@ -18,6 +18,7 @@ import { useApp } from '../../../lib/AppContext';
 import { configured, supabase } from '../../../lib/supabase';
 import { SocialAuth } from '../../../components/SocialAuth';
 import { confirmSignOut } from '../../../lib/signOut';
+import { confirmDeleteAccount } from '../../../lib/deleteAccount';
 import { tr } from '../../../lib/i18n';
 
 function Member() {
@@ -110,6 +111,8 @@ function Member() {
         <ReferralBox />
       </View>
       <Group items={[{ label: 'Çıkış yap', destructive: true, go: () => void confirmSignOut() }]} />
+      {/* Apple: hesap uygulamanın içinden silinebilmeli */}
+      <Group items={[{ label: 'Hesabı sil', destructive: true, go: confirmDeleteAccount }]} footer="Profilin, ilanların ve kişisel bilgilerin kalıcı olarak silinir." />
     </ScrollView>
   );
 }

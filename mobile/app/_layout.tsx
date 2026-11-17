@@ -4,7 +4,7 @@ import { useFonts } from 'expo-font';
 import { Platform } from 'react-native';
 import { Stack } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { fontState } from '../lib/theme';
+import { color, fontState } from '../lib/theme';
 import { headerOptions, largeTitle, navTheme } from '../lib/nav';
 import { BackButton } from '../components/BackButton';
 import { ThemeProvider } from 'expo-router/react-navigation';
@@ -18,9 +18,35 @@ import { AnimatedSplash } from '../components/AnimatedSplash';
 import { ToastHost } from '../components/Toast';
 import { DoubleTapSearch } from '../components/DoubleTapSearch';
 import { noteAppOpen } from '../lib/review';
+import { installErrorReporting, reportError, setErrorRoute } from '../lib/errorReport';
+import { Pressable, Text as RNText, View } from 'react-native';
+import { usePathname, type ErrorBoundaryProps } from 'expo-router';
+
+// Yakalanmamış hatalar kaydedilir (çökme takibi, bkz. lib/errorReport.ts)
+installErrorReporting();
+
+/**
+ * Bir ekran hata verip çökerse: uygulama kapanmaz, sade bir "tekrar dene" ekranı çıkar ve hata kaydedilir.
+ * Sağlayıcıların dışında çizildiği için yalnızca temel parçalar kullanılır.
+ */
+export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
+  useEffect(() => { reportError(error, true); }, [error]);
+  return (
+    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32, gap: 10, backgroundColor: color.bg }}>
+      <RNText style={{ fontSize: 20, fontWeight: '600', color: color.ink, textAlign: 'center' }}>{tr('Bir şeyler ters gitti')}</RNText>
+      <RNText style={{ fontSize: 15, color: color.muted, textAlign: 'center', lineHeight: 21 }}>{tr('Sorunu kaydettik ve inceleyeceğiz. Tekrar denemek ister misin?')}</RNText>
+      <Pressable onPress={() => void retry()} accessibilityRole="button" style={({ pressed }) => [{ marginTop: 12, minHeight: 48, paddingHorizontal: 28, borderRadius: 14, backgroundColor: color.accent, alignItems: 'center', justifyContent: 'center' }, pressed && { opacity: 0.85 }]}>
+        <RNText style={{ color: color.accentInk, fontSize: 17, fontWeight: '600' }}>{tr('Tekrar dene')}</RNText>
+      </Pressable>
+    </View>
+  );
+}
 
 function Screens() {
   useLang();
+  // Hata kaydına hangi ekranda olunduğu eklenir
+  const pathname = usePathname();
+  useEffect(() => { setErrorRoute(pathname); }, [pathname]);
   // Başlıklar normal yazımla (Apple: başlıklar büyük harfle yazılmaz)
   const T = (x: string) => tr(x);
   return (
@@ -84,6 +110,7 @@ function Screens() {
         <Stack.Screen name="hesap-dogrula" options={{ title: T('Hesap güvenliği') }} />
         <Stack.Screen name="harita" options={{ title: T('İllere göre ilanlar') }} />
         <Stack.Screen name="yonetim" options={{ title: T('Yönetim') }} />
+        <Stack.Screen name="hatalar" options={{ title: T('Uygulama hataları') }} />
         <Stack.Screen name="ayarlar" options={{ title: T('Ayarlar') }} />
         <Stack.Screen name="ara" options={{ title: T('Uygulamada ara') }} />
       </Stack>

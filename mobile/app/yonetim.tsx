@@ -134,6 +134,7 @@ export default function Admin() {
         <PlainText style={s.h1}>{todo ? `${todo} ${tr('iş bekliyor')}` : tr('Her şey yolunda')}</PlainText>
         <Text style={s.lead}>{todo ? 'Aşağıdaki sekmelerden inceleme bekleyenleri sonuçlandır.' : 'İnceleme bekleyen ilan, şikayet veya başvuru yok.'}</Text>
       </View>
+      <View style={{ marginHorizontal: 16, marginTop: 12 }}><Btn ghost title="Uygulama hataları" onPress={() => router.push('/hatalar' as never)} /></View>
       <View style={s.grid}>
         {stats.map((x) => (
           <View key={x.label} style={s.stat}>

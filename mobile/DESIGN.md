@@ -56,3 +56,5 @@ Kaynak: Apple İnsan Arayüzü Yönergeleri ("Apple Look", github.com/dickwu/app
 - **Çekici bul:** asıl düğme "En yakın çekiciyi bul" (konum izni önceden verildiyse açılışta kendiliğinden çalışır), altında "Bölgeye göre ara". 112 sağ üstte kırmızı başlık düğmesi (`SosButton`), basınca önce sorar. Firma profili bağlantısı en altta küçük.
 - **Yenileme göstergesi:** yalnızca kullanıcı elle aşağı çekince görünür; sayfaya geri dönüşteki sessiz yenilemede görünmez.
 - **Sağ üst "…" menüsü:** `components/HeaderMenu` — iPhone'da başlık çubuğunun kendi menüsü (alt menü destekli), Android'de `MoreMenu` kartı. İlan (paylaş, karşılaştır, şikayet nedenleri alt menüde), mesajlaşma (ilana git, engelle), mağaza / firma / İş Ağı ilanı (paylaş).
+- **Hata takibi:** `lib/errorReport.ts` yakalanmamış hataları ve çöken ekranları `public.app_errors` tablosuna yazar (kişisel veri yok, 30 gün). Yönetim → Uygulama hataları. Çöken ekranda sade "Tekrar dene" ekranı (`ErrorBoundary`).
+- **Hesap silme:** Hesabım'ın en altında "Hesabı sil" (Apple 5.1.1(v)). Sunucu: `supabase/functions/delete-account`.
