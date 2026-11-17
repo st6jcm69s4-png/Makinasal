@@ -10,6 +10,7 @@ import { useApp } from '../lib/AppContext';
 import { dateLabel, money, POST_KINDS, QUOTE_STATUS, type MarketPost, type Quote } from '../lib/network';
 import { supabase } from '../lib/supabase';
 import { color, font, radius, shadow } from '../lib/theme';
+import { openTab } from '../lib/tabBack';
 import { getLang, localeOf } from '../lib/i18n';
 
 type Q = Quote & { market_posts: { title: string; kind: string } | { title: string; kind: string }[] | null };
@@ -118,7 +119,7 @@ export function NetAccountView({ onNavigate, embedded }: { onNavigate?: () => vo
             <Cell label="Tarih" value={new Date(q.created_at).toLocaleDateString(localeOf(getLang()))} left />
           </View>
         </Pressable>
-      )) : <Empty text={seg === 'incoming' ? 'Henüz gelen teklif yok.' : 'Henüz teklif vermedin.'} cta="İş ağına göz at" onPress={() => { if (onNavigate) onNavigate(); else router.navigate('/is-agi'); }} />) : null}
+      )) : <Empty text={seg === 'incoming' ? 'Henüz gelen teklif yok.' : 'Henüz teklif vermedin.'} cta="İş ağına göz at" onPress={() => { if (onNavigate) onNavigate(); else openTab('/is-agi'); }} />) : null}
     </ScrollView>
   );
 }

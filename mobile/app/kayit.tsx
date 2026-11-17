@@ -14,6 +14,7 @@ import { districtsFor, formatPersonName, validRegion } from '../lib/regions';
 import { PASSWORD_RULES, SIGNUP_OPEN, TURNSTILE_SITE_KEY, authMessage, passwordValid } from '../lib/auth';
 import { LEGAL_VERSION } from '../lib/legalTexts';
 import { supabase, SITE_URL } from '../lib/supabase';
+import { openTab } from '../lib/tabBack';
 import { color, font, radius } from '../lib/theme';
 
 export default function Register() {
@@ -66,7 +67,7 @@ export default function Register() {
         <View style={s.icon}><Icon name="user-plus" size={24} color={color.accentInk} /></View>
         <Text style={s.title}>Kayıt yakında</Text>
         <Text style={s.p}>Yeni üyelik kısa süre içinde açılacak. Hesabın varsa giriş yapabilir, uygulamayı misafir olarak gezebilirsin.</Text>
-        <View style={{ alignSelf: 'stretch' }}><Btn title="Giriş yap" onPress={() => router.navigate('/hesap')} /></View>
+        <View style={{ alignSelf: 'stretch' }}><Btn title="Giriş yap" onPress={() => openTab('/hesap')} /></View>
       </View>
     );
   }
@@ -76,7 +77,7 @@ export default function Register() {
         <View style={[s.icon, { backgroundColor: color.good }]}><Icon name="mail" size={24} color={color.accentInk} /></View>
         <Text style={s.title}>E-postanı kontrol et</Text>
         <Text style={s.p}>{`${email.trim()} adresine bir doğrulama bağlantısı gönderdik. Bağlantıya dokununca hesabın etkinleşir. Gelmediyse spam klasörüne bak.`}</Text>
-        <View style={{ alignSelf: 'stretch' }}><Btn title="Giriş ekranına dön" onPress={() => router.navigate('/hesap')} /></View>
+        <View style={{ alignSelf: 'stretch' }}><Btn title="Giriş ekranına dön" onPress={() => openTab('/hesap')} /></View>
       </View>
     );
   }
@@ -119,7 +120,7 @@ export default function Register() {
           {err ? <AlertBox variant="destructive">{err}</AlertBox> : null}
           <Btn title={busy ? 'Kaydediliyor…' : 'Üye ol'} disabled={busy} onPress={() => void submit()} />
           <SocialAuth />
-          <Pressable onPress={() => router.navigate('/hesap')} hitSlop={8} style={{ alignItems: 'center', paddingVertical: 6 }}><Text style={s.link}>Zaten hesabın var mı? Giriş yap</Text></Pressable>
+          <Pressable onPress={() => openTab('/hesap')} hitSlop={8} style={{ alignItems: 'center', paddingVertical: 6 }}><Text style={s.link}>Zaten hesabın var mı? Giriş yap</Text></Pressable>
         </View>
       </ScrollView>
       <PickerModal visible={sheet === 'city'} title="İl" selected={city} options={CITIES.map((c) => ({ value: c, label: c }))} onPick={(c) => { setCity(c); setDistrict(''); }} onClose={() => setSheet(null)} />

@@ -6,6 +6,7 @@ import { Icon } from '../components/Icon';
 import { useLang } from '../lib/lang';
 import { useApp } from '../lib/AppContext';
 import { androidThemeHidden, findFeatures, type Feature } from '../lib/features';
+import { openTab } from '../lib/tabBack';
 import { color, font, radius } from '../lib/theme';
 
 /** Uygulama içi arama: "koyu mod", "şifre", "dil", "ilan ver" gibi yazınca ilgili ayar veya sayfa açılır. */
@@ -46,7 +47,7 @@ export default function AppSearch() {
         ))}
         {q && !items.length ? <Text style={s.none}>Eşleşen ayar veya sayfa bulunamadı.</Text> : null}
         {q.trim().length > 1 ? (
-          <Pressable style={({ pressed }) => [s.row, pressed && { opacity: 0.85 }]} onPress={() => router.replace({ pathname: '/ilanlar', params: { q: q.trim() } } as never)} accessibilityRole="button">
+          <Pressable style={({ pressed }) => [s.row, pressed && { opacity: 0.85 }]} onPress={() => openTab({ pathname: '/ilanlar', params: { q: q.trim() } } as never)} accessibilityRole="button">
             <View style={[s.icon, { backgroundColor: color.tealSoft }]}><Icon name="truck" size={20} color={color.teal} /></View>
             <View style={{ flex: 1, gap: 1 }}>
               <Text style={s.title}>İlanlarda ara</Text>

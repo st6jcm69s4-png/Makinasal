@@ -3,6 +3,7 @@ import { confirmSignOut } from './signOut';
 import type { IconName } from '../components/Icon';
 import { saveTheme } from './themePref';
 import { themeSupportsChoice } from './theme';
+import { openTab } from './tabBack';
 import { foldSearch } from './suggest';
 
 export type Lang = 'tr' | 'en' | 'de';
@@ -19,7 +20,7 @@ export type Feature = {
 
 const open = (path: string) => () => { router.replace(path as never); };
 const tab = (path: string) => () => { router.navigate(path as never); };
-const net = (kind: string) => () => { router.navigate({ pathname: '/is-agi', params: { kind } } as never); };
+const net = (kind: string) => () => { openTab({ pathname: '/is-agi', params: { kind } } as never); };
 
 export const FEATURES: Feature[] = [
   // Görünüm ve dil (anında uygulanır)

@@ -8,6 +8,7 @@ import { AlertBox } from '../components/kit';
 import { Captcha } from '../components/Captcha';
 import { PASSWORD_RULES, TURNSTILE_SITE_KEY, authMessage, passwordValid } from '../lib/auth';
 import { supabase } from '../lib/supabase';
+import { openTab } from '../lib/tabBack';
 import { color } from '../lib/theme';
 
 /** Uygulama içinde şifre sıfırlama: e-posta → e-postadaki kod → yeni şifre. Tarayıcıya gitmez. */
@@ -65,7 +66,7 @@ export default function Forgot() {
         <View style={s.icon}><Icon name="check" size={24} color={color.accentInk} /></View>
         <Text style={s.title}>Şifren güncellendi</Text>
         <Text style={s.p}>Yeni şifrenle giriş yapabilirsin.</Text>
-        <View style={{ alignSelf: 'stretch' }}><Btn title="Giriş yap" onPress={() => router.replace('/hesap' as never)} /></View>
+        <View style={{ alignSelf: 'stretch' }}><Btn title="Giriş yap" onPress={() => openTab('/hesap' as never)} /></View>
       </View>
     );
   }

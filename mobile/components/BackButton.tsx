@@ -13,8 +13,8 @@ const systemGlass = Platform.OS === 'ios' && parseInt(String(Platform.Version), 
  * - 44 pt dokunma alanı; iPhone 26'da sistem camı, diğerlerinde yumuşak yuvarlak zemin.
  * Kenardan kaydırarak geri gitme (iPhone) ve Android geri tuşu aynen çalışır.
  */
-export function BackButton({ canGoBack }: { canGoBack: boolean }) {
-  const go = () => (canGoBack ? router.back() : router.replace('/'));
+export function BackButton({ canGoBack, onPress }: { canGoBack: boolean; onPress?: () => void }) {
+  const go = onPress ?? (() => (canGoBack ? router.back() : router.replace('/')));
   return (
     <Pressable
       onPress={go}

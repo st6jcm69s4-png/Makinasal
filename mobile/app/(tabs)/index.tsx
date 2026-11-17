@@ -17,6 +17,7 @@ import { tr } from '../../lib/i18n';
 import { displayName, firstName } from '../../lib/person';
 import { useApp } from '../../lib/AppContext';
 import { type MarketPost, type Provider } from '../../lib/network';
+import { openTab } from '../../lib/tabBack';
 import { supabase, type Row } from '../../lib/supabase';
 
 /** Kategori şeridi: sade, tek renkli çizimler (her temada aynı). */
@@ -27,7 +28,7 @@ const CATS: { label: string; cat: string; img: ImageSourcePropType }[] = [
   { label: 'Vinç', cat: 'group:cranes', img: require('../../assets/cat/crane.png') },
   { label: 'Parça, lastik', cat: 'group:parts', img: require('../../assets/cat/parts.png') },
 ];
-const net = (kind: string) => () => router.navigate({ pathname: '/is-agi', params: { kind } });
+const net = (kind: string) => () => openTab({ pathname: '/is-agi', params: { kind } });
 
 function SectionHead({ title, action, onAction }: { title: string; action?: string; onAction?: () => void }) {
   return (
@@ -112,7 +113,7 @@ function HomeScreen() {
   }
   useFocusEffect(useCallback(() => { void load(); }, [load]));
 
-  const search = () => router.navigate({ pathname: '/ilanlar', params: { q: q.trim() } });
+  const search = () => openTab({ pathname: '/ilanlar', params: { q: q.trim() } });
   const name = firstName(displayName(session, pname));
   // İki sütun için satırlara böl
   const pairs: Row[][] = [];
@@ -134,19 +135,19 @@ function HomeScreen() {
       {/* Kategoriler */}
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.cats}>
         {CATS.map((c) => (
-          <Pressable key={c.cat} style={({ pressed }) => [s.cat, pressed && { opacity: 0.85 }]} onPress={() => router.navigate({ pathname: '/ilanlar', params: { cat: c.cat } })} accessibilityRole="button">
+          <Pressable key={c.cat} style={({ pressed }) => [s.cat, pressed && { opacity: 0.85 }]} onPress={() => openTab({ pathname: '/ilanlar', params: { cat: c.cat } })} accessibilityRole="button">
             <View style={s.catTile}><Image source={c.img} style={s.catImg} resizeMode="contain" /></View>
             <Text style={s.catLabel} numberOfLines={1}>{c.label}</Text>
           </Pressable>
         ))}
-        <Pressable style={({ pressed }) => [s.cat, pressed && { opacity: 0.85 }]} onPress={() => router.navigate({ pathname: '/ilanlar', params: { cat: '' } })} accessibilityRole="button">
+        <Pressable style={({ pressed }) => [s.cat, pressed && { opacity: 0.85 }]} onPress={() => openTab({ pathname: '/ilanlar', params: { cat: '' } })} accessibilityRole="button">
           <View style={s.catTile}><Icon name="grid" size={26} color={color.tealText} /></View>
           <Text style={s.catLabel} numberOfLines={1}>Tümü</Text>
         </Pressable>
       </ScrollView>
 
       {/* Hizmetler: eş boyutlu, iki sütunlu düzenli ızgara */}
-      <SectionHead title="Hizmetler" action="İş Ağı" onAction={() => router.navigate('/is-agi')} />
+      <SectionHead title="Hizmetler" action="İş Ağı" onAction={() => openTab('/is-agi')} />
       <View style={s.svc}>
         {([
           ['Kiralık makine', 'Günlük, aylık · operatörlü', 'calendar', net('rental_machine'), ''],
@@ -189,7 +190,7 @@ function HomeScreen() {
             <Text style={s.guestT}>Misafir olarak geziyorsun</Text>
             <Text style={s.guestS}>Giriş yaparak ilan ver, mesajlaş, favori ekle.</Text>
           </View>
-          <Pressable style={s.guestBtn} onPress={() => router.navigate('/hesap')} accessibilityRole="button"><Text style={s.guestBtnT}>Giriş yap</Text></Pressable>
+          <Pressable style={s.guestBtn} onPress={() => openTab('/hesap')} accessibilityRole="button"><Text style={s.guestBtnT}>Giriş yap</Text></Pressable>
         </View>
       )}
 
@@ -197,7 +198,7 @@ function HomeScreen() {
 
       {featured.length ? (
         <>
-          <SectionHead title="Öne çıkanlar" action="Tümü" onAction={() => router.navigate({ pathname: '/ilanlar', params: { cat: '' } })} />
+          <SectionHead title="Öne çıkanlar" action="Tümü" onAction={() => openTab({ pathname: '/ilanlar', params: { cat: '' } })} />
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.rail}>
             {featured.map((r) => <ListingCard key={'f' + r.id} item={r} variant="wide" />)}
           </ScrollView>
@@ -206,14 +207,14 @@ function HomeScreen() {
 
       {local.length ? (
         <>
-          <SectionHead title={`${city} ${tr('ilanları')}`} action="Tümü" onAction={() => router.navigate({ pathname: '/ilanlar', params: { city } })} />
+          <SectionHead title={`${city} ${tr('ilanları')}`} action="Tümü" onAction={() => openTab({ pathname: '/ilanlar', params: { city } })} />
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.rail}>
             {local.map((r) => <ListingCard key={'c' + r.id} item={r} variant="wide" />)}
           </ScrollView>
         </>
       ) : null}
 
-      <SectionHead title="Yeni ilanlar" action="Tümü" onAction={() => router.navigate({ pathname: '/ilanlar', params: { cat: '' } })} />
+      <SectionHead title="Yeni ilanlar" action="Tümü" onAction={() => openTab({ pathname: '/ilanlar', params: { cat: '' } })} />
       {busy && !latest.length ? <CardSkeleton count={2} /> : null}
       <View style={{ paddingHorizontal: 16, gap: 10 }}>
         {pairs.map((p) => (

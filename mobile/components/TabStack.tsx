@@ -4,6 +4,8 @@ import { Text } from './LText';
 import { fireScrollTop } from '../lib/scrollTop';
 import { color, font } from '../lib/theme';
 import { HeaderButtons } from './HeaderButtons';
+import { BackButton } from './BackButton';
+import { goBackTab, useTabBack } from '../lib/tabBack';
 import { headerOptions, largeTitle } from '../lib/nav';
 import { tr } from '../lib/i18n';
 import { useLang } from '../lib/lang';
@@ -14,12 +16,19 @@ import { useLang } from '../lib/lang';
  * Büyük başlık yalnızca ilk öğesi sade bir kaydırma listesi olan ekranlarda açılır: arama kutusu ya da
  * bölüm seçici taşıyan ekranlarda (İlanlar, İş Ağı) içerik başlığın altında kalıyor ve liste yüklenirken kayıyor.
  */
+/** Başka bir sekmeden bağlantıyla gelindiyse oraya dönen geri düğmesi. */
+function TabBack({ name }: { name: string }) {
+  const to = useTabBack(name);
+  return to ? <BackButton canGoBack onPress={() => goBackTab(name)} /> : null;
+}
+
 export function TabStack({ name, title, buttons = true, large = true }: { name: string; title: string; buttons?: boolean; large?: boolean }) {
   useLang();
   return (
     <Stack screenOptions={headerOptions}>
       <Stack.Screen name="index" options={{
         title: tr(title), ...(large ? largeTitle : {}),
+        headerLeft: () => <TabBack name={name} />,
         // Başlığa dokununca sayfa en üste çıkar (iPhone'da üstteki saate dokunmak da aynısını yapar)
         headerTitle: ({ children }) => (
           <Pressable onPress={() => fireScrollTop(name)} hitSlop={10} accessibilityRole="button" accessibilityHint={tr('En üste çık')}>

@@ -5,6 +5,7 @@ import { useApp } from '../lib/AppContext';
 import { PlainText, Text } from './LText';
 import { Icon, type IconName } from './Icon';
 import { Btn } from './ui';
+import { openTab } from '../lib/tabBack';
 import { color, font, radius } from '../lib/theme';
 
 type App = ReturnType<typeof useApp>;
@@ -59,7 +60,7 @@ export function LoginPromptProvider({ children }: { children: ReactNode }) {
               <View style={s.icon}><Icon name="lock" size={24} color={color.accentInk} /></View>
               <Text style={s.title}>Giriş yap</Text>
               <Text style={s.text}>{reason}</Text>
-              <Btn title="Giriş yap" onPress={() => { close(); router.navigate('/hesap'); }} />
+              <Btn title="Giriş yap" onPress={() => { close(); openTab('/hesap'); }} />
               <Btn ghost title="Kayıt ol" onPress={() => { close(); router.push('/kayit' as never); }} />
               <Pressable onPress={close} hitSlop={10} accessibilityRole="button" style={{ alignItems: 'center', paddingVertical: 8 }}><Text style={s.skip}>Şimdilik gezmeye devam et</Text></Pressable>
             </View>
@@ -77,7 +78,7 @@ export function GuestGate({ text, icon = 'lock' }: { text: string; icon?: IconNa
       <View style={s.icon}><Icon name={icon} size={24} color={color.accentInk} /></View>
       <Text style={g.text}>{text}</Text>
       <View style={{ alignSelf: 'stretch', gap: 8 }}>
-        <Btn title="Giriş yap" onPress={() => router.navigate('/hesap')} />
+        <Btn title="Giriş yap" onPress={() => openTab('/hesap')} />
         <Btn ghost title="Kayıt ol" onPress={() => router.push('/kayit' as never)} />
       </View>
     </View>

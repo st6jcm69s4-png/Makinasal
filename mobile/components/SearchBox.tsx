@@ -4,6 +4,7 @@ import { router } from 'expo-router';
 import { PlainText, Text, TextInput } from './LText';
 import { loadPopularity, matchingRanges, recordSuggestion, searchSuggestions, type Scope, type Suggestion } from '../lib/suggest';
 import { color, font, radius, shadow } from '../lib/theme';
+import { openTab } from '../lib/tabBack';
 import { Icon } from './Icon';
 
 function Highlight({ label, query, style }: { label: string; query: string; style?: object }) {
@@ -25,19 +26,19 @@ export function openSuggestion(item: Suggestion) {
   const key = rest.join(':');
   if (kind === 'section') {
     const map: Record<string, () => void> = {
-      machines: () => router.navigate({ pathname: '/ilanlar', params: { cat: 'group:machines', brand: '', n: String(Date.now()) } }),
-      rentals: () => router.navigate({ pathname: '/is-agi', params: { kind: 'rental_machine' } }),
-      personnel: () => router.navigate({ pathname: '/is-agi', params: { kind: 'rental_operator' } }),
-      jobs: () => router.navigate({ pathname: '/is-agi', params: { kind: 'job' } }),
+      machines: () => openTab({ pathname: '/ilanlar', params: { cat: 'group:machines', brand: '', n: String(Date.now()) } }),
+      rentals: () => openTab({ pathname: '/is-agi', params: { kind: 'rental_machine' } }),
+      personnel: () => openTab({ pathname: '/is-agi', params: { kind: 'rental_operator' } }),
+      jobs: () => openTab({ pathname: '/is-agi', params: { kind: 'job' } }),
       parts: () => router.push('/yedek-parca'),
-      requests: () => router.navigate({ pathname: '/is-agi', params: { kind: 'part_request' } }),
-      companies: () => router.navigate({ pathname: '/is-agi', params: { kind: 'firma' } }),
+      requests: () => openTab({ pathname: '/is-agi', params: { kind: 'part_request' } }),
+      companies: () => openTab({ pathname: '/is-agi', params: { kind: 'firma' } }),
     };
     map[key]?.();
-  } else if (kind === 'group') router.navigate({ pathname: '/ilanlar', params: { cat: 'group:' + key, brand: '', n: String(Date.now()) } });
-  else if (kind === 'category') router.navigate({ pathname: '/ilanlar', params: { cat: key, brand: '', n: String(Date.now()) } });
+  } else if (kind === 'group') openTab({ pathname: '/ilanlar', params: { cat: 'group:' + key, brand: '', n: String(Date.now()) } });
+  else if (kind === 'category') openTab({ pathname: '/ilanlar', params: { cat: key, brand: '', n: String(Date.now()) } });
   else if (kind === 'part') router.push({ pathname: '/yedek-parca', params: { part: key, n: String(Date.now()) } });
-  else if (kind === 'brand') router.navigate({ pathname: '/ilanlar', params: { brand: key, cat: '', n: String(Date.now()) } });
+  else if (kind === 'brand') openTab({ pathname: '/ilanlar', params: { brand: key, cat: '', n: String(Date.now()) } });
 }
 
 export function SearchBox({ value, onChangeText, onSubmit, scope = 'all', placeholder, onPick, inputStyle, dark }: {

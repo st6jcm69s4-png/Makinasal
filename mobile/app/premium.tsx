@@ -8,6 +8,7 @@ import { useLang } from '../lib/lang';
 import { tr } from '../lib/i18n';
 import { supabase } from '../lib/supabase';
 import { FREE, PLANS, activePlan, money, yearlyTotal, type Period, type Plan, type PlanId } from '../lib/plans';
+import { openTab } from '../lib/tabBack';
 import { color, font, radius, shadow } from '../lib/theme';
 
 type Prof = { is_premium?: boolean | null; premium_plan?: string | null; premium_until?: string | null };
@@ -26,7 +27,7 @@ export default function Premium() {
   const until = prof?.premium_until ? new Date(prof.premium_until).toLocaleDateString(lang === 'en' ? 'en-GB' : lang === 'de' ? 'de-DE' : 'tr-TR') : '';
 
   const buy = (p: Plan) => {
-    if (!session) { router.navigate('/hesap'); return; }
+    if (!session) { openTab('/hesap'); return; }
     Alert.alert(tr('Çok yakında'), `${tr(p.name)} · ${period === 'yearly' ? money(yearlyTotal(p), lang) + ' / ' + tr('yıl') : `${tr('İlk ay')} ${money(p.intro, lang)}, ${tr('sonra')} ${money(p.monthly, lang)} / ${tr('ay')}`}\n\n${tr('Premium satın alma, ödeme altyapısı ve sözleşmeler onaylandığında açılacak. Şu anda kart bilgisi alınmıyor.')}`);
   };
 

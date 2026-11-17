@@ -5,6 +5,7 @@ import { Text } from '../components/LText';
 import { router } from 'expo-router';
 import { common } from '../components/ui';
 import { supabase } from '../lib/supabase';
+import { openTab } from '../lib/tabBack';
 import { color } from '../lib/theme';
 
 export default function CityMap() {
@@ -28,7 +29,7 @@ export default function CityMap() {
       ListHeaderComponent={<Text style={[common.meta, { padding: 12 }]}>Yayındaki ilanların illere göre sayısı. Bir ile dokununca o ildeki ilanlar açılır.</Text>}
       ListEmptyComponent={<Text style={common.empty}>Henüz ilan yok.</Text>}
       renderItem={({ item: [city, n] }) => (
-        <Pressable style={[common.card, { marginHorizontal: 12, marginBottom: 6 }]} onPress={() => router.push({ pathname: '/ilanlar', params: { city } })} accessibilityRole="button">
+        <Pressable style={[common.card, { marginHorizontal: 12, marginBottom: 6 }]} onPress={() => openTab({ pathname: '/ilanlar', params: { city } })} accessibilityRole="button">
           <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}><Text style={common.title}>{city}</Text><Text style={common.price}>{n} ilan</Text></View>
           <View style={{ height: 6, backgroundColor: color.plate, borderRadius: 3 }}><View style={{ height: 6, width: `${Math.max(4, (n / max) * 100)}%`, backgroundColor: color.accent, borderRadius: 3 }} /></View>
         </Pressable>

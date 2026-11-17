@@ -3,6 +3,7 @@ import { Animated, Dimensions, PanResponder } from 'react-native';
 import { router, useFocusEffect } from 'expo-router';
 import { color } from '../lib/theme';
 import * as haptic from '../lib/haptics';
+import { tabFocused } from '../lib/tabBack';
 import { EASE_OUT, SPRING_RELEASE, SPRING_SETTLE, reduceMotion } from '../lib/motion';
 
 /** Alt menü sırası; sağa/sola kaydırınca bir önceki/sonraki sekmeye geçilir. */
@@ -72,6 +73,7 @@ export function SwipeTabs({ route, children }: { route: string; children: ReactN
       const changed = current !== route && pendingDir !== 0;
       const dir = pendingDir;
       current = route;
+      tabFocused(route);
       pendingDir = 0;
       if (changed && !reduceMotion()) {
         x.setValue(dir * SHIFT);

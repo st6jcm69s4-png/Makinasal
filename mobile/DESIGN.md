@@ -50,3 +50,4 @@ Kaynak: Apple İnsan Arayüzü Yönergeleri ("Apple Look", github.com/dickwu/app
 - **İlanlar kayması:** arama ve filtreler listenin üstünde sabit, otomatik alt boşluk yalnızca listeye (`disableAutomaticContentInsets` + listede `contentInsetAdjustmentBehavior="automatic"`), sekme çubuğu kaydırınca küçülmez.
 - **Yazı tipi:** her yerde Inter (`font.bold`, `label` vb. de Inter'e bağlı). Barlow yalnızca logodaki MAKİNASAL yazısında (`font.brand`).
 - **En üste çık:** Ana sayfada logoya, diğer sekmelerde başlığa dokununca liste başa döner (`fireScrollTop`). iPhone'da saate dokunmak ve açık sekmeye tekrar dokunmak da aynısını yapar.
+- **Sekmeler arası geri:** uygulama içi bir bağlantı başka sekmeyi açtığında (ör. Ana sayfa → "Tümü" → İlanlar) o sekmenin sol üstünde geldiğin sekmeye dönen geri düğmesi çıkar (`lib/tabBack.ts › openTab`). Alt çubuktan ya da kaydırarak geçişte çıkmaz. Sekmeye giden yeni bağlantılar `router.navigate` yerine `openTab` kullanır.

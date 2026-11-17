@@ -12,6 +12,7 @@ import { initials } from '../lib/person';
 import { useTabScrollTop } from '../lib/scrollTop';
 import { photoUrl, supabase } from '../lib/supabase';
 import { color, font, radius } from '../lib/theme';
+import { openTab } from '../lib/tabBack';
 import { getLang, localeOf } from '../lib/i18n';
 
 type Thread = { id: string; title: string; other: string; photo: string | null; last: string; lastAt: string; mine: boolean; offer: boolean; unread: number };
@@ -134,7 +135,7 @@ export default function Messages() {
         <View style={s.empty}>
           <Text style={s.emptyT}>{mode === 'ilan' ? (threads.length ? 'Aramana uygun konuşma yok' : 'Henüz mesajın yok') : 'Henüz teklif konuşman yok'}</Text>
           <Text style={s.emptyS}>{mode === 'ilan' ? (threads.length ? 'Filtreyi değiştirmeyi dene.' : 'Bir ilanda "Mesaj gönder"e dokunarak satıcıyla yazışmaya başla.') : 'İş ağında bir ilana teklif verince ya da ilanına teklif gelince burada görünür.'}</Text>
-          {!threads.length && mode === 'ilan' ? <Btn title="İlanlara göz at" onPress={() => router.navigate('/ilanlar')} /> : null}
+          {!threads.length && mode === 'ilan' ? <Btn title="İlanlara göz at" onPress={() => openTab('/ilanlar')} /> : null}
         </View>
       }
       renderItem={({ item }) => 'unread' in item ? (
