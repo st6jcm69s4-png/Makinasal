@@ -22,8 +22,8 @@ const PATH: Record<string, string> = { index: '/', ilanlar: '/ilanlar', yeni: '/
  *   - ilk/son sekmede kenar sert durmaz, giderek artan dirençle esner.
  * Telefonun "Hareketi azalt" ayarı açıksa geçiş anında yapılır.
  */
-const OUT_MS = 160;
-const IN_MS = 240;
+const OUT_MS = 120;
+const IN_MS = 210;
 const SHIFT = 22;
 const FOLLOW = 0.35; // ekran parmağın %35'i kadar kayar (yönü gösteren ipucu; arkada boşluk görünmesin)
 
@@ -69,6 +69,10 @@ function goTab(next: string, velocity = 0) {
   pendingDir = dir;
   haptic.tick();
   const finish = () => {
+    // Gidilen sekme açık kalmış olabilir (sekmeler arka planda yaşar): açılmadan önce görünmez ve yana kaymış
+    // hale getirilir. Yoksa bir an tam görünüp sonra kaybolup yeniden beliriyordu (karmaşa).
+    const to = screens.get(next);
+    if (to && !reduceMotion()) { to.x.stopAnimation(); to.o.stopAnimation(); to.x.setValue(dir * SHIFT); to.o.setValue(0); }
     router.navigate(PATH[next] as never);
     setTimeout(() => { busy = false; }, 60);
   };
@@ -103,8 +107,9 @@ export function SwipeTabs({ route, children }: { route: string; children: ReactN
         x.setValue(0);
         o.setValue(1);
       }
-      // Ekran arkada kalınca bir sonraki açılış için sıfırla
-      return () => { x.stopAnimation(); o.stopAnimation(); x.setValue(0); o.setValue(1); };
+      // Ekran arkada kalınca burada sıfırlanmaz: sekme değişimi bitmeden eski ekran bir an yeniden
+      // beliriyordu. Bir sonraki açılışta yukarıdaki dallar değerleri zaten ayarlar.
+      return () => { x.stopAnimation(); o.stopAnimation(); };
     }, [route, x, o]),
   );
 
