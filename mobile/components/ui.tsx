@@ -1,3 +1,4 @@
+import { GrowPressable } from './Grow';
 import { Pressable, StyleSheet, View, type TextInputProps } from 'react-native';
 import { Text, TextInput } from './LText';
 import { tr } from '../lib/i18n';
@@ -39,9 +40,9 @@ export function Btn({ title, onPress, ghost, danger, disabled }: { title: string
 }
 export function Chip({ title, on, onPress }: { title: string; on?: boolean; onPress: () => void }) {
   return (
-    <Pressable style={({ pressed }) => [s.chip, on && s.chipOn, pressed && s.pressed]} onPress={onPress} accessibilityRole="button" accessibilityState={{ selected: !!on }}>
+    <GrowPressable on={!!on} style={[s.chip, on && s.chipOn]} onPress={onPress} accessibilityRole="button" accessibilityState={{ selected: !!on }}>
       <Text style={[s.chipText, on && { color: color.tealInk }]}>{title}</Text>
-    </Pressable>
+    </GrowPressable>
   );
 }
 

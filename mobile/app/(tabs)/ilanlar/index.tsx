@@ -1,3 +1,4 @@
+import { GrowPressable } from '../../../components/Grow';
 import { SwipeTabs } from '../../../components/SwipeTabs';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from '../../../components/Toast';
@@ -27,11 +28,11 @@ import { tr } from '../../../lib/i18n';
 
 function FChip({ icon, label, on, drop, onPress }: { icon: IconName; label: string; on?: boolean; drop?: boolean; onPress: () => void }) {
   return (
-    <Pressable style={({ pressed }) => [s.chip, on && s.chipOn, pressed && { opacity: 0.85 }]} onPress={onPress} accessibilityRole="button" accessibilityState={{ selected: !!on }}>
+    <GrowPressable on={!!on} grow={1.06} style={[s.chip, on && s.chipOn]} onPress={onPress} accessibilityRole="button" accessibilityState={{ selected: !!on }}>
       <Icon name={icon} size={15} color={on ? color.tealInk : color.tealText} />
       <Text style={[s.chipText, on && s.chipTextOn]} numberOfLines={1}>{label}</Text>
       {drop ? <Icon name="chevron-down" size={14} color={on ? color.tealInk : color.muted} /> : null}
-    </Pressable>
+    </GrowPressable>
   );
 }
 
@@ -128,7 +129,7 @@ function ListingsScreen() {
   const header = (
     <View>
           <View style={{ marginHorizontal: 16, marginTop: 12, marginBottom: 10 }}><SearchBox value={q} onChangeText={setQ} placeholder="Marka, model veya parça numarası ara" /></View>
-          <NoSwipe><ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flexGrow: 0 }} contentContainerStyle={s.chips} contentInsetAdjustmentBehavior="never">
+          <NoSwipe><ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flexGrow: 0, marginTop: -6 }} contentContainerStyle={[s.chips, { paddingTop: 6 }]} contentInsetAdjustmentBehavior="never">
             <FChip icon="grid" label={cat ? categoryLabel(cat) : 'Kategori'} on={!!cat} drop onPress={() => setSheet('cat')} />
             <FChip icon="map-pin" label={city === 'Tümü' ? 'İl' : city} on={city !== 'Tümü'} drop onPress={() => setSheet('city')} />
             <FChip icon="tag" label={maxPrice === '6000000' ? 'Fiyat' : PRICES.find((p) => p.value === maxPrice)?.label ?? 'Fiyat'} on={maxPrice !== '6000000'} drop onPress={() => setSheet('price')} />

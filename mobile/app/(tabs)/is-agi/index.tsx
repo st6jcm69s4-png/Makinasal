@@ -1,6 +1,8 @@
 import { SwipeTabs } from '../../../components/SwipeTabs';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, FlatList, Modal, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Animated, FlatList, Modal, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { reduceMotion } from '../../../lib/motion';
+import * as haptic from '../../../lib/haptics';
 import { PlainText, Text, TextInput } from '../../../components/LText';
 import { Icon, type IconName } from '../../../components/Icon';
 import { router, useLocalSearchParams } from 'expo-router';
@@ -25,6 +27,39 @@ const SECTIONS: { id: Section; icon: IconName; title: string; sub: string; tabs:
 ];
 const sectionOf = (t: Tab): Section => (t === 'staff_wanted' ? 'seek' : t === 'rental_operator' ? 'hire' : 'market');
 const PAGE = 20;
+
+/*
+ * Üstteki üç amaç kutusu. Seçilen kutu diğerlerinden genişler ve yukarı doğru uzar (alt kenarlar hizalı kalır);
+ * diğerleri biraz daralır. Yay hareketiyle akıcı geçer, basılıyken hafifçe küçülür, seçimde hafif titreşim.
+ */
+function SectionCard({ on, icon, title, sub, onPress }: { on: boolean; icon: IconName; title: string; sub: string; onPress: () => void }) {
+  const v = useRef(new Animated.Value(on ? 1 : 0)).current; // yerleşim (genişlik, yükseklik)
+  const press = useRef(new Animated.Value(1)).current; // basma (ekran kartında)
+  useEffect(() => {
+    if (reduceMotion()) { v.setValue(on ? 1 : 0); return; }
+    Animated.spring(v, { toValue: on ? 1 : 0, stiffness: 260, damping: 24, mass: 1, useNativeDriver: false }).start();
+  }, [on, v]);
+  const pressTo = (x: number) => { if (!reduceMotion()) Animated.spring(press, { toValue: x, stiffness: 500, damping: 34, mass: 1, useNativeDriver: true }).start(); };
+  return (
+    <Animated.View style={{ flexGrow: v.interpolate({ inputRange: [0, 1], outputRange: [1, 1.35] }), flexBasis: 0 }}>
+      <Animated.View style={{ transform: [{ scale: press }] }}>
+        <Pressable
+          style={[s.seg, on && s.segOn]}
+          onPressIn={() => pressTo(0.96)}
+          onPressOut={() => pressTo(1)}
+          onPress={() => { if (!on) haptic.tick(); onPress(); }}
+          accessibilityRole="button"
+          accessibilityState={{ selected: on }}
+        >
+          <Animated.View style={{ height: v.interpolate({ inputRange: [0, 1], outputRange: [0, 14] }) }} />
+          <Icon name={icon} size={on ? 22 : 19} color={on ? color.tealInk : color.tealText} />
+          <Text style={[s.segTitle, on && { color: color.tealInk }]} numberOfLines={2}>{title}</Text>
+          <Text style={[s.segSub, on && { color: 'rgba(255,255,255,0.85)' }]} numberOfLines={1}>{sub}</Text>
+        </Pressable>
+      </Animated.View>
+    </Animated.View>
+  );
+}
 
 function NetworkTabScreen() {
   const { kind } = useLocalSearchParams<{ kind?: string }>();
@@ -83,25 +118,18 @@ function NetworkTabScreen() {
   const header = (
     <View>
       <View style={s.switch}>
-        {SECTIONS.map((x, i) => {
-          const on = x.id === section.id;
-          return (
-            <Pressable key={x.id} style={[s.seg, on && s.segOn]} onPress={() => go(x.tabs[0][0])} accessibilityRole="button" accessibilityState={{ selected: on }}>
-              <Icon name={x.icon} size={19} color={on ? color.tealInk : color.tealText} />
-              <Text style={[s.segTitle, on && { color: color.tealInk }]}>{x.title}</Text>
-              <Text style={[s.segSub, on && { color: 'rgba(255,255,255,0.85)' }]} numberOfLines={1}>{x.sub}</Text>
-            </Pressable>
-          );
-        })}
+        {SECTIONS.map((x) => (
+          <SectionCard key={x.id} on={x.id === section.id} icon={x.icon} title={x.title} sub={x.sub} onPress={() => go(x.tabs[0][0])} />
+        ))}
       </View>
       <View style={{ gap: 12, paddingHorizontal: 16, paddingBottom: 12 }}>
         {section.tabs.length > 1 ? (
-          <NoSwipe><ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
+          <NoSwipe><ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginVertical: -6 }} contentContainerStyle={{ gap: 8, paddingVertical: 6 }}>
             {section.tabs.map(([k, l]) => <Chip key={k} title={l} on={tab === k} onPress={() => go(k)} />)}
           </ScrollView></NoSwipe>
         ) : null}
         {personnel ? (
-          <NoSwipe><ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
+          <NoSwipe><ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginVertical: -6 }} contentContainerStyle={{ gap: 8, paddingVertical: 6 }}>
             <Chip title="Tümü" on={!role} onPress={() => setRole('')} />
             {Object.entries(PERSONNEL_ROLES).map(([k, l]) => <Chip key={k} title={l} on={role === k} onPress={() => setRole(k)} />)}
           </ScrollView></NoSwipe>
@@ -154,8 +182,8 @@ const s = StyleSheet.create({
   sheetBack: { width: 40, height: 40, alignItems: 'flex-start', justifyContent: 'center', paddingLeft: 4 },
   sheetTitle: { color: color.onBar, fontFamily: font.bold, fontSize: 18 },
   sheetClose: { width: 34, height: 34, borderRadius: 17, backgroundColor: 'rgba(255,255,255,0.14)', alignItems: 'center', justifyContent: 'center' },
-  switch: { flexDirection: 'row', gap: 8, padding: 16, paddingBottom: 12 },
-  seg: { flex: 1, paddingVertical: 12, paddingHorizontal: 10, gap: 2, alignItems: 'flex-start', backgroundColor: color.surface, borderRadius: radius + 4, borderWidth: 1, borderColor: color.line },
+  switch: { flexDirection: 'row', alignItems: 'flex-end', gap: 8, padding: 16, paddingBottom: 12 },
+  seg: { paddingVertical: 12, paddingHorizontal: 10, gap: 2, alignItems: 'flex-start', backgroundColor: color.surface, borderRadius: radius + 4, borderWidth: 1, borderColor: color.line },
   segOn: { backgroundColor: color.teal, borderColor: color.teal },
   segTitle: { fontSize: 17, fontFamily: font.bold, color: color.ink, marginTop: 2 },
   segSub: { fontSize: 13.5, color: color.muted },

@@ -147,12 +147,12 @@ export default function Favorites() {
               <TextInput style={s.searchInput} placeholder="Favorilerinde ara" placeholderTextColor={color.muted} value={q} onChangeText={setQ} />
               {q ? <Pressable onPress={() => setQ('')} hitSlop={10} accessibilityRole="button" accessibilityLabel="Temizle"><Icon name="x" size={18} color={color.muted} /></Pressable> : null}
             </View>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginVertical: -6 }} contentContainerStyle={{ gap: 8, paddingVertical: 6 }}>
               <Chip title={`Tümü (${total})`} on={!group} onPress={() => setGroup('')} />
               {chips.map(([g, n]) => <Chip key={g} title={`${g} (${n})`} on={group === g} onPress={() => setGroup(group === g ? '' : g)} />)}
             </ScrollView>
             {!isNet ? (
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, alignItems: 'center' }}>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginVertical: -6 }} contentContainerStyle={{ gap: 8, alignItems: 'center', paddingVertical: 6 }}>
                 <Label>Sırala</Label>
                 {SORTS.map(([k, l]) => <Chip key={k} title={l} on={sort === k} onPress={() => setSort(k)} />)}
               </ScrollView>

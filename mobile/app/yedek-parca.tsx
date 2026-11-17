@@ -74,7 +74,7 @@ export default function Parts() {
           else openSuggestion(it);
         }}
       />
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginVertical: -6 }} contentContainerStyle={{ gap: 8, paddingVertical: 6 }}>
         <Chip title={equipment || 'Makine / araç'} on={!!equipment} onPress={() => setSheet('eq')} />
         <Chip title={group ? partGroupLabel(group) : 'Parça grubu'} on={!!group} onPress={() => setSheet('group')} />
         <Chip title={brand || 'Marka'} on={!!brand} onPress={() => setSheet('brand')} />

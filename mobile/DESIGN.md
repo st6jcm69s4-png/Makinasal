@@ -38,6 +38,13 @@ Kaynak: Apple İnsan Arayüzü Yönergeleri ("Apple Look", github.com/dickwu/app
 - **Bilinçli ayrılıklar:**
   - Uygulamada açık/koyu görünüm seçimi var; Apple uygulama içi görünüm düğmesi önermez ama kullanıcı istedi.
 
+## Seçim hareketi (17 Kasım 2026)
+- Seçilen çip ya da amaç kutusu büyür ve yukarı doğru yükselir; alt kenarı yerinde kalır. Ortak parça: `components/Grow.tsx` (`GrowPressable`).
+- Çiplerde yalnızca dönüşüm (ölçek %6–8, 3 px yükselme, `transformOrigin: 'bottom'`); yerleşim kaymaz. Yatay kaydırılan çip satırlarında taşma için `marginVertical: -6` + `paddingVertical: 6`.
+- İş Ağı'ndaki üç amaç kutusunda seçilen kutu genişler (esneme 1 → 1,35) ve yukarı uzar (14 px); satır `alignItems: 'flex-end'`.
+- Yay: sertlik 380, sönüm 22 (hafif esneme); basılıyken %96'ya küçülür. Seçim değişince hafif titreşim. "Hareketi azalt" açıksa hareket yok.
+- Bölümlü düğmelerde (segmented control: Ayarlar, kredi hesaplayıcı, sekmeli başlıklar) kullanılmaz; Apple'da bu parça büyümez, kayan zemin yeterli.
+
 ## Telefonun kendi parçaları (16 Kasım 2026)
 - **Alt menü:** `NativeTabs` (`app/(tabs)/_layout.tsx`). iOS 26'da cam görünümlü sistem çubuğu (kaydırınca küçülmez; küçülürken listeler zıplıyordu), Android'de Material 3. Simgeler iPhone'da SF Symbols, Android'de Material Symbols. "İlan ver" bir sekmedir ve ilan türünü seçtiren sayfayı açar (sekmeler eylem yapmaz). Sekmeler arası parmakla kaydırma kullanıcı isteğiyle duruyor (`SwipeTabs`, beş sekmenin hepsinde; simgeye dokununca anında geçer).
 - **Başlıklar:** her yerde telefonun kendi başlık çubuğu (`lib/nav.ts › headerOptions`). Başlıklar normal yazımla, büyük harfle değil. Geri düğmesi: iPhone'da telefonun kendi geri düğmesi ve sistem başlık düğmeleri (`unstable_headerLeftItems`, SF Symbols); kendi çizdiğimiz düğme iOS 26 cam zemininde boş daire görünüyor ve basmayı almıyordu. Android'de `components/BackButton.tsx`.

@@ -1,3 +1,4 @@
+import { GrowPressable } from '../../components/Grow';
 import { useEffect, useState, type ReactNode } from 'react';
 import { ActivityIndicator, KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, Switch, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
@@ -126,10 +127,10 @@ export default function Introduce() {
     </View>
   );
   const chip = (label: string, on: boolean, onPress: () => void, translate = true) => (
-    <Pressable hitSlop={6} key={label} style={[s.chip, on && s.chipOn]} onPress={onPress} accessibilityRole="button" accessibilityState={{ selected: on }}>
+    <GrowPressable hitSlop={6} key={label} on={on} style={[s.chip, on && s.chipOn]} onPress={onPress} accessibilityRole="button" accessibilityState={{ selected: on }}>
       {on ? <Icon name="check" size={14} color={color.tealInk} /> : null}
       {translate ? <Text style={[s.chipT, on && s.chipTOn]}>{label}</Text> : <PlainText style={[s.chipT, on && s.chipTOn]}>{label}</PlainText>}
-    </Pressable>
+    </GrowPressable>
   );
   const input = (label: string, value: string, set: (v: string) => void, extra: Record<string, unknown> = {}) => (
     <View style={{ gap: 6, flex: 1 }}><Text style={s.label}>{label}</Text><TextInput style={s.input} value={value} onChangeText={set} {...extra} /></View>

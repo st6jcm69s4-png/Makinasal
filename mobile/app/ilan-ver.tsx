@@ -1,3 +1,4 @@
+import { GrowPressable } from '../components/Grow';
 import { friendlyError } from '../lib/friendlyError';
 import { normalizeVideoUrl } from '../lib/video';
 import { toast } from '../components/Toast';
@@ -341,9 +342,9 @@ export default function NewListing() {
           {(f.options ?? []).map((o) => {
             const on = tech[f.key] === o;
             return (
-              <Pressable hitSlop={6} key={o} style={[s.chip, on && s.chipOn]} onPress={() => setTech((t) => ({ ...t, [f.key]: on ? '' : o }))} accessibilityRole="radio" accessibilityState={{ selected: on }}>
+              <GrowPressable hitSlop={6} key={o} on={on} style={[s.chip, on && s.chipOn]} onPress={() => setTech((t) => ({ ...t, [f.key]: on ? '' : o }))} accessibilityRole="radio" accessibilityState={{ selected: on }}>
                 <Text style={[s.chipT, on && { color: color.tealInk }]}>{o}</Text>
-              </Pressable>
+              </GrowPressable>
             );
           })}
         </View>
