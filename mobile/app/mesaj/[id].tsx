@@ -12,6 +12,7 @@ import { PickerModal } from '../../components/PickerModal';
 import { checkMessage } from '../../lib/messageFilter';
 import { supabase } from '../../lib/supabase';
 import { HeaderMenu } from '../../components/HeaderMenu';
+import { askPushInContext } from '../../lib/push';
 import { color, font, radius } from '../../lib/theme';
 
 type Msg = { id: string; sender_id: string; body: string; created_at: string; kind?: string | null; offer_amount?: number | null };
@@ -138,6 +139,8 @@ export default function Thread() {
     if (pending.current?.id === messageId) pending.current = null;
     setText((cur) => (cur.trim() === body ? '' : cur));
     void load();
+    // Yanıt gelince haberin olsun diye bildirim izni burada sorulur
+    askPushInContext();
   }
 
   function send() {

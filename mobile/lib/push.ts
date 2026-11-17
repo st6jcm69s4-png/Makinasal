@@ -1,9 +1,8 @@
 /**
  * Telefona anlık bildirim (Expo push).
  *
- * DİKKAT: Bu dosya şimdilik hiçbir yerden içe aktarılmıyor; çünkü `expo-notifications` paketi
- * henüz kurulu değil. Paket kurulunca app/_layout.tsx içinde `usePushNotifications()` çağrılır
- * (adımlar: docs içindeki not ve devam notları).
+ * İzin, Apple'ın istediği gibi anlamlı bir anda sorulur (askPushInContext): ilk mesaj gönderilince,
+ * arama kaydedilince ya da favori eklenince. İzin önceden verildiyse açılışta sessizce kaydedilir.
  *
  * Sunucu tarafı hazır: public.register_push_token RPC'si cihazı kaydeder; notifications tablosuna
  * eklenen her satır makinasal_private.push_notification tetikleyicisiyle Expo'ya gönderilir.
@@ -46,7 +45,7 @@ function projectId(): string | undefined {
 }
 
 /** İzin ister, cihaz anahtarını alır ve sunucuya kaydeder. Sessizce başarısız olabilir. */
-export async function registerForPush(): Promise<boolean> {
+export async function registerForPush(ask = true): Promise<boolean> {
   const N = mod();
   if (!N) return false;
   try {
@@ -54,7 +53,7 @@ export async function registerForPush(): Promise<boolean> {
       await N.setNotificationChannelAsync('default', { name: 'Bildirimler', importance: N.AndroidImportance?.HIGH ?? 4 });
     }
     let perm = await N.getPermissionsAsync();
-    if (perm.status !== 'granted' && perm.canAskAgain !== false) perm = await N.requestPermissionsAsync();
+    if (perm.status !== 'granted' && ask && perm.canAskAgain !== false) perm = await N.requestPermissionsAsync();
     if (perm.status !== 'granted') return false;
     const { data: token } = await N.getExpoPushTokenAsync({ projectId: projectId() });
     if (!token) return false;
@@ -96,6 +95,14 @@ export function usePushNotifications(userId: string | null | undefined) {
     return () => sub.remove();
   }, []);
   useEffect(() => {
-    if (userId) void registerForPush();
+    if (userId) void registerForPush(false);
   }, [userId]);
+}
+
+/** Bildirimin işe yarayacağı anda izin ister (bir oturumda en fazla bir kez). */
+let askedThisSession = false;
+export function askPushInContext() {
+  if (askedThisSession) return;
+  askedThisSession = true;
+  setTimeout(() => { void registerForPush(true); }, 1200);
 }
