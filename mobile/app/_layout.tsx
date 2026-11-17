@@ -2,7 +2,7 @@ import { Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } f
 import { BarlowSemiCondensed_600SemiBold, BarlowSemiCondensed_700Bold } from '@expo-google-fonts/barlow-semi-condensed';
 import { useFonts } from 'expo-font';
 import { Platform } from 'react-native';
-import { Stack, router } from 'expo-router';
+import { Stack } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { fontState } from '../lib/theme';
 import { headerOptions, largeTitle, navTheme } from '../lib/nav';
@@ -31,18 +31,17 @@ function Screens() {
       <ThemeProvider value={navTheme}>
       {/* Telefonun kendi başlık çubuğu (bkz. lib/nav.ts) */}
       <Stack
-        screenOptions={({ navigation }) => ({
+        screenOptions={() => ({
           ...headerOptions,
           /*
            * Sol üstte geri düğmesi.
            * iPhone: telefonun kendi geri düğmesi (iOS 26'da cam daire içinde ok). Kendi çizdiğimiz düğme iOS 26'nın
-           * cam zemininde boş beyaz daire olarak görünüyor ve basmayı almıyordu. Geri gidilecek sayfa yoksa
-           * (bildirimden / bağlantıdan açıldıysa) sistemin kendi düğmesiyle ana sayfa simgesi.
+           * cam zemininde boş beyaz daire olarak görünüyor ve basmayı almıyordu.
            * Android: kendi düğmemiz (orada sorunsuz).
            */
-          ...(Platform.OS === 'ios'
-            ? (navigation.canGoBack() ? {} : { unstable_headerLeftItems: () => [{ type: 'button' as const, label: tr('Ana sayfa'), icon: { type: 'sfSymbol' as const, name: 'house' as const }, onPress: () => router.replace('/') }] })
-            : { headerLeft: () => <BackButton canGoBack={navigation.canGoBack()} /> }),
+          // Geri gidilebilir mi bilgisini başlığın kendisinden alırız: ekran açılmadan önce hesaplanınca (ilan önizlemesi
+          // sayfayı önceden hazırlıyor) ilk açılışta "geri yok" sanılıp ev simgesi çıkıyordu.
+          ...(Platform.OS === 'ios' ? {} : { headerLeft: (p: { canGoBack?: boolean }) => <BackButton canGoBack={!!p.canGoBack} /> }),
         })}
       >
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />

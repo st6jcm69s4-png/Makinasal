@@ -45,11 +45,16 @@ export function useTabBack(tab: string): string | null {
   return backTo[tab] ?? null;
 }
 
+let animate: ((tab: string) => void) | null = null;
+/** SwipeTabs canlandırmalı geçişini buraya bağlar (döngüsel içe aktarmayı önlemek için). */
+export const setTabAnimator = (fn: (tab: string) => void) => { animate = fn; };
+
 export function goBackTab(tab: string) {
   const to = backTo[tab];
   if (!to) return;
   backTo[tab] = null;
   pending = to; // dönülen sekmenin kendi geri hedefi korunur (zincir: Ana sayfa → İlanlar → İş Ağı)
   emit();
-  router.navigate(TAB_PATH[to] as Href);
+  if (animate) animate(to);
+  else router.navigate(TAB_PATH[to] as Href);
 }

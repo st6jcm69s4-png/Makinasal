@@ -1,4 +1,4 @@
-import { SwipeTabs } from '../../components/SwipeTabs';
+import { NoSwipe, SwipeTabs } from '../../components/SwipeTabs';
 import { useCallback, useRef, useState } from 'react';
 import { useTabScrollTop } from '../../lib/scrollTop';
 import { Image, Pressable, RefreshControl, ScrollView, StyleSheet, View, type ImageSourcePropType } from 'react-native';
@@ -133,7 +133,7 @@ function HomeScreen() {
       </View>
 
       {/* Kategoriler */}
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.cats}>
+      <NoSwipe><ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.cats}>
         {CATS.map((c) => (
           <Pressable key={c.cat} style={({ pressed }) => [s.cat, pressed && { opacity: 0.85 }]} onPress={() => openTab({ pathname: '/ilanlar', params: { cat: c.cat } })} accessibilityRole="button">
             <View style={s.catTile}><Image source={c.img} style={s.catImg} resizeMode="contain" /></View>
@@ -144,7 +144,7 @@ function HomeScreen() {
           <View style={s.catTile}><Icon name="grid" size={26} color={color.tealText} /></View>
           <Text style={s.catLabel} numberOfLines={1}>Tümü</Text>
         </Pressable>
-      </ScrollView>
+      </ScrollView></NoSwipe>
 
       {/* Hizmetler: eş boyutlu, iki sütunlu düzenli ızgara */}
       <SectionHead title="Hizmetler" action="İş Ağı" onAction={() => openTab('/is-agi')} />
@@ -199,18 +199,18 @@ function HomeScreen() {
       {featured.length ? (
         <>
           <SectionHead title="Öne çıkanlar" action="Tümü" onAction={() => openTab({ pathname: '/ilanlar', params: { cat: '' } })} />
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.rail}>
+          <NoSwipe><ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.rail}>
             {featured.map((r) => <ListingCard key={'f' + r.id} item={r} variant="wide" />)}
-          </ScrollView>
+          </ScrollView></NoSwipe>
         </>
       ) : null}
 
       {local.length ? (
         <>
           <SectionHead title={`${city} ${tr('ilanları')}`} action="Tümü" onAction={() => openTab({ pathname: '/ilanlar', params: { city } })} />
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.rail}>
+          <NoSwipe><ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.rail}>
             {local.map((r) => <ListingCard key={'c' + r.id} item={r} variant="wide" />)}
-          </ScrollView>
+          </ScrollView></NoSwipe>
         </>
       ) : null}
 
