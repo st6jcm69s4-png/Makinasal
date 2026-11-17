@@ -13,6 +13,7 @@ import { CITIES } from '../../../lib/data';
 import { dateLabel, money, networkError, PERSONNEL_ROLES, PROVIDER_KINDS, RENTAL_MODES, type MarketPost, type PostKind, type Provider } from '../../../lib/network';
 import { useTabScrollTop } from '../../../lib/scrollTop';
 import { supabase } from '../../../lib/supabase';
+import { NoSwipe } from '../../../components/NoSwipe';
 import { color, font, radius } from '../../../lib/theme';
 
 type Tab = PostKind | 'firma';
@@ -95,15 +96,15 @@ function NetworkTabScreen() {
       </View>
       <View style={{ gap: 12, paddingHorizontal: 16, paddingBottom: 12 }}>
         {section.tabs.length > 1 ? (
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
+          <NoSwipe><ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
             {section.tabs.map(([k, l]) => <Chip key={k} title={l} on={tab === k} onPress={() => go(k)} />)}
-          </ScrollView>
+          </ScrollView></NoSwipe>
         ) : null}
         {personnel ? (
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
+          <NoSwipe><ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
             <Chip title="Tümü" on={!role} onPress={() => setRole('')} />
             {Object.entries(PERSONNEL_ROLES).map(([k, l]) => <Chip key={k} title={l} on={role === k} onPress={() => setRole(k)} />)}
-          </ScrollView>
+          </ScrollView></NoSwipe>
         ) : null}
         <View style={s.searchRow}>
           <Icon name="search" size={18} color={color.muted} />

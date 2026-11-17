@@ -5,6 +5,7 @@ import { Animated, Pressable, ScrollView, StyleSheet, View, type ViewStyle } fro
 import { PlainText, Text } from './LText';
 import { Icon, type IconName } from './Icon';
 import { useReducedMotion } from '../lib/motion';
+import { NoSwipe } from './NoSwipe';
 import { color, font, radius } from '../lib/theme';
 
 /* ───────── Badge ───────── */
@@ -151,7 +152,7 @@ export function Tabs<T extends string>({ items, value, onChange, variant = 'fill
   const style = variant === 'line' ? [k.tabs, { backgroundColor: color.bg }] : [k.seg];
   return scroll ? (
     <View style={style} accessibilityRole="tablist">
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ flexGrow: 1 }}>{body}</ScrollView>
+      <NoSwipe style={{ flex: 1 }}><ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ flexGrow: 1 }}>{body}</ScrollView></NoSwipe>
     </View>
   ) : (
     <View style={style} accessibilityRole="tablist">{body}</View>

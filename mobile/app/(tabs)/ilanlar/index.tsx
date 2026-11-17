@@ -21,6 +21,7 @@ import { ListingCard, type CardVariant } from '../../../components/ListingCard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { configured, supabase, type Row } from '../../../lib/supabase';
 import { color, font } from '../../../lib/theme';
+import { NoSwipe } from '../../../components/NoSwipe';
 import { tr } from '../../../lib/i18n';
 
 function FChip({ icon, label, on, drop, onPress }: { icon: IconName; label: string; on?: boolean; drop?: boolean; onPress: () => void }) {
@@ -126,7 +127,7 @@ function ListingsScreen() {
   const header = (
     <View>
           <View style={{ marginHorizontal: 16, marginTop: 12, marginBottom: 10 }}><SearchBox value={q} onChangeText={setQ} placeholder="Marka, model veya parça numarası ara" /></View>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flexGrow: 0 }} contentContainerStyle={s.chips} contentInsetAdjustmentBehavior="never">
+          <NoSwipe><ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flexGrow: 0 }} contentContainerStyle={s.chips} contentInsetAdjustmentBehavior="never">
             <FChip icon="grid" label={cat ? categoryLabel(cat) : 'Kategori'} on={!!cat} drop onPress={() => setSheet('cat')} />
             <FChip icon="map-pin" label={city === 'Tümü' ? 'İl' : city} on={city !== 'Tümü'} drop onPress={() => setSheet('city')} />
             <FChip icon="tag" label={maxPrice === '6000000' ? 'Fiyat' : PRICES.find((p) => p.value === maxPrice)?.label ?? 'Fiyat'} on={maxPrice !== '6000000'} drop onPress={() => setSheet('price')} />
@@ -135,7 +136,7 @@ function ListingsScreen() {
             <FChip icon="bookmark" label="Aramayı kaydet" onPress={() => void saveSearch()} />
             <FChip icon="settings" label="Yedek parça" onPress={() => router.push('/yedek-parca')} />
             <FChip icon="map" label="İllere göre" onPress={() => router.push('/harita')} />
-          </ScrollView>
+          </ScrollView></NoSwipe>
           {error ? <Text style={s.err}>{error}</Text> : null}
           <View style={s.countRow}>
             <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 5, flex: 1 }}>

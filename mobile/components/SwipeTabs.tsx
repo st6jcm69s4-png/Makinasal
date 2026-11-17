@@ -1,9 +1,10 @@
 import { useCallback, useRef, type ReactNode } from 'react';
-import { Animated, Dimensions, PanResponder, View } from 'react-native';
+import { Animated, Dimensions, PanResponder } from 'react-native';
 import { router, useFocusEffect } from 'expo-router';
 import { color } from '../lib/theme';
 import * as haptic from '../lib/haptics';
 import { setTabAnimator, tabFocused } from '../lib/tabBack';
+import { swipeLocked } from './NoSwipe';
 import { EASE_OUT, SPRING_RELEASE, SPRING_SETTLE, reduceMotion } from '../lib/motion';
 
 /** Alt menü sırası; sağa/sola kaydırınca bir önceki/sonraki sekmeye geçilir. */
@@ -37,23 +38,10 @@ const screens = new Map<string, Screen>();
 let current: string = 'index';
 let pendingDir = 0;
 let busy = false;
-/** Yatay kaydırılan bir şeride dokunulurken sekme kaydırması devre dışı (bkz. NoSwipe). */
-let locked = false;
 
 export const currentTab = () => current;
 
-/**
- * İçindeki yatay kaydırma (kategori şeridi, vitrin) sekme kaydırmasından önce gelir: parmak bu alandayken
- * sağa/sola kaydırmak sekme değiştirmez, yalnızca şeridi kaydırır.
- */
-export function NoSwipe({ children }: { children: ReactNode }) {
-  const off = () => { locked = false; };
-  return (
-    <View onTouchStart={() => { locked = true; }} onTouchEnd={off} onTouchCancel={off}>
-      {children}
-    </View>
-  );
-}
+export { NoSwipe } from './NoSwipe';
 
 /** Sekmeler arası "geri" düğmesi de kaydırmadaki gibi canlandırılarak geçer. */
 export const animateToTab = (next: string) => goTab(next);
@@ -120,7 +108,7 @@ export function SwipeTabs({ route, children }: { route: string; children: ReactN
   };
   const pan = useRef(
     PanResponder.create({
-      onMoveShouldSetPanResponder: (_, g) => !busy && !locked && Math.abs(g.dx) > 24 && Math.abs(g.dx) > Math.abs(g.dy) * 2.5,
+      onMoveShouldSetPanResponder: (_, g) => !busy && !swipeLocked() && Math.abs(g.dx) > 24 && Math.abs(g.dx) > Math.abs(g.dy) * 2.5,
       onPanResponderTerminationRequest: () => true,
       // Yeni dokunuş süren bir geri dönüşü yakalar: hareket ekrandaki o anki yerinden devam eder
       onPanResponderGrant: () => { x.stopAnimation(); o.stopAnimation(); },
