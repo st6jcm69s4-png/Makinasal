@@ -1,4 +1,5 @@
 'use client';
+import { friendlyError } from '@/lib/friendlyError';
 import { useLanguage } from "@/components/LanguageProvider";
 
 
@@ -257,7 +258,7 @@ function Actions({ l, part }: { l: Listing; part: boolean }) {
     if (isDemo) { setPhone('0500 000 00 00 (örnek numara)'); return; }
     if (!profile) return needLogin();
     const { data, error } = await getSupabase()!.rpc('listing_phone', { p_listing: l.id });
-    if (error) { setErr('Numara alınamadı: ' + error.message); return; }
+    if (error) { setErr(friendlyError(error.message, 'Numara alınamadı. Tekrar dene.')); return; }
     setPhone((data as string | null) || 'Satıcı henüz telefon numarası eklememiş. Mesaj göndererek ulaşabilirsin.');
   }
 
@@ -267,7 +268,7 @@ function Actions({ l, part }: { l: Listing; part: boolean }) {
     const { data: existing } = await supabase.from('threads').select('id').eq('listing_id', l.id).eq('buyer_id', profile.id).maybeSingle();
     if (existing?.id) return existing.id as string;
     const { data, error } = await supabase.from('threads').insert({ listing_id: l.id, buyer_id: profile.id, seller_id: l.sel }).select('id').single();
-    if (error || !data) { setErr(error?.message ?? 'Konuşma başlatılamadı'); return null; }
+    if (error || !data) { setErr(friendlyError(error?.message, 'Konuşma başlatılamadı. Tekrar dene.')); return null; }
     return data.id as string;
   }
 
@@ -294,7 +295,7 @@ function Actions({ l, part }: { l: Listing; part: boolean }) {
     let res = await supabase.from('messages').insert({ thread_id: t, sender_id: profile.id, body, kind: 'offer', offer_amount: n });
     if (res.error && /kind|offer_amount/.test(res.error.message)) res = await supabase.from('messages').insert({ thread_id: t, sender_id: profile.id, body });
     setBusy(false);
-    if (res.error) { setErr(res.error.message); return; }
+    if (res.error) { setErr(friendlyError(res.error.message)); return; }
     toast("Teklifin gönderildi.");
     window.location.assign(`/mesajlar/${t}`);
   }
@@ -307,7 +308,7 @@ function Actions({ l, part }: { l: Listing; part: boolean }) {
     const res = await supabase.from('reports').insert({ reporter_id: profile.id, listing_id: l.id, reason: reason }).select('ticket').maybeSingle();
     setBusy(false);
     if (res.error) {
-      setErr(/duplicate|unique/i.test(res.error.message) ? 'Bu ilanı zaten şikayet ettin.' : 'Şikayet gönderilemedi: ' + res.error.message);
+      setErr(/duplicate|unique/i.test(res.error.message) ? 'Bu ilanı zaten şikayet ettin.' : friendlyError(res.error.message, 'Şikayet gönderilemedi. Tekrar dene.'));
       return;
     }
     const tk = (res.data as { ticket?: number } | null)?.ticket;

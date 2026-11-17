@@ -1552,5 +1552,21 @@
   "Ayda": "Pro Monat:",
   "Hak bitince tek ilan için ek ilan hakkı (mobil uygulamadan)": "Zusatzinserate, wenn dein Kontingent aufgebraucht ist (in der App)",
   "Ayda 5 yeni ilan (yıllıkta 60), ilan başına 20 fotoğraf": "5 neue Inserate pro Monat (60 jährlich), 20 Fotos pro Inserat",
-  "Ayda 25 yeni ilan (yıllıkta 300), ilan başına 20 fotoğraf": "25 neue Inserate pro Monat (300 jährlich), 20 Fotos pro Inserat"
+  "Ayda 25 yeni ilan (yıllıkta 300), ilan başına 20 fotoğraf": "25 neue Inserate pro Monat (300 jährlich), 20 Fotos pro Inserat",
+  "Çok fazla işlem. Biraz bekleyip tekrar dene.": "Zu viele Aktionen. Warte kurz und versuche es erneut.",
+  "Bu dönemdeki ilan hakkın doldu. Premium tarifelere bakabilir ya da ek ilan hakkı alabilirsin.": "Deine Inserate für diesen Zeitraum sind aufgebraucht. Sieh dir Premium an oder kaufe ein Zusatzinserat.",
+  "Bu özellik Premium üyelere açık.": "Diese Funktion ist für Premium-Mitglieder.",
+  "Süren bir açık artırman varken bu işlem yapılamaz.": "Das ist während einer laufenden Auktion nicht möglich.",
+  "Bu kayıt zaten var.": "Das existiert bereits.",
+  "Bağlantı kurulamadı. İnternetini kontrol edip tekrar dene.": "Keine Verbindung. Prüfe dein Internet und versuche es erneut.",
+  "Oturumun sona ermiş olabilir. Tekrar giriş yap.": "Deine Sitzung ist möglicherweise abgelaufen. Melde dich erneut an.",
+  "İşlem tamamlanamadı. Tekrar dene.": "Das hat nicht geklappt. Versuche es erneut.",
+  "Bir hata oluştu. Tekrar dene.": "Etwas ist schiefgelaufen. Versuche es erneut.",
+  "Numara alınamadı. Tekrar dene.": "Nummer konnte nicht abgerufen werden. Versuche es erneut.",
+  "Konuşma başlatılamadı. Tekrar dene.": "Unterhaltung konnte nicht gestartet werden. Versuche es erneut.",
+  "Şikayet gönderilemedi. Tekrar dene.": "Meldung konnte nicht gesendet werden. Versuche es erneut.",
+  "Kaydedilemedi. Tekrar dene.": "Speichern fehlgeschlagen. Versuche es erneut.",
+  "Arama kaydedilemedi. Tekrar dene.": "Suche konnte nicht gespeichert werden. Versuche es erneut.",
+  "Güvenliğin için mevcut şifreni gir ya da şifre sıfırlama bağlantısı iste.": "Gib zu deiner Sicherheit dein aktuelles Passwort ein oder fordere einen Link zum Zurücksetzen an.",
+  "Mevcut şifre yanlış.": "Das aktuelle Passwort ist falsch."
 }

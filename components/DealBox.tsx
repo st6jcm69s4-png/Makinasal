@@ -1,4 +1,5 @@
 'use client';
+import { friendlyError } from '@/lib/friendlyError';
 import { useLanguage } from "@/components/LanguageProvider";
 
 
@@ -55,7 +56,7 @@ export function DealBox({ threadId, me, buyerId, sellerId }: { threadId: string;
     const res = deal
       ? await supabase.from('deals').update({ [mine]: true }).eq('thread_id', threadId)
       : await supabase.from('deals').insert({ thread_id: threadId, buyer_confirmed: iAmBuyer, seller_confirmed: !iAmBuyer });
-    if (res.error) setError(res.error.message);
+    if (res.error) setError(friendlyError(res.error.message));
     await load();
     setBusy(false);
   }
@@ -75,7 +76,7 @@ export function DealBox({ threadId, me, buyerId, sellerId }: { threadId: string;
     };
     let { error: err } = await supabase.from('reviews').insert({ ...row, tags });
     if (err && /tags/.test(err.message)) ({ error: err } = await supabase.from('reviews').insert(row));
-    if (err) setError(err.message);
+    if (err) setError(friendlyError(err.message));
     await load();
     setBusy(false);
   }

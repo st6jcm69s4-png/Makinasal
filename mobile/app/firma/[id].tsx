@@ -34,7 +34,7 @@ export default function ProviderDetail() {
   async function call() {
     if (!session) { askLogin('Firmanın telefon numarasını görmek için giriş yapman gerekir.'); return; }
     const { data, error } = await supabase.rpc('provider_phone', { p_provider: id });
-    if (error || !data) { Alert.alert('Telefon', 'Bu firma telefon numarasını paylaşmıyor.'); return; }
+    if (error || !data) { Alert.alert('Telefon', error?.message.includes('RATE_LIMIT') ? 'Kısa sürede çok fazla numara görüntülendi. Biraz sonra tekrar dene.' : 'Bu firma telefon numarasını paylaşmıyor.'); return; }
     void Linking.openURL(`tel:${String(data).replace(/[^\d+]/g, '')}`);
   }
   if (loading) return <PageSkeleton />;

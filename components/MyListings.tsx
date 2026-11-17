@@ -1,4 +1,5 @@
 'use client';
+import { friendlyError } from '@/lib/friendlyError';
 import { useLanguage } from "@/components/LanguageProvider";
 
 
@@ -50,7 +51,7 @@ export function MyListings() {
     if (!supabase || !profile) return;
     setError('');
     const { error: err } = await supabase.from('listings').update(values).eq('id', id);
-    if (err) setError(err.message); else if (ok) toast(ok);
+    if (err) setError(friendlyError(err.message)); else if (ok) toast(ok);
     await load(profile.id);
     void reload();
   }

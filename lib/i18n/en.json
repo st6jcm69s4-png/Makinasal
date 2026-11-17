@@ -1551,5 +1551,21 @@
   "Ayda": "Per month:",
   "Hak bitince tek ilan için ek ilan hakkı (mobil uygulamadan)": "Extra single listings when you run out (in the mobile app)",
   "Ayda 5 yeni ilan (yıllıkta 60), ilan başına 20 fotoğraf": "5 new listings a month (60 yearly), 20 photos per listing",
-  "Ayda 25 yeni ilan (yıllıkta 300), ilan başına 20 fotoğraf": "25 new listings a month (300 yearly), 20 photos per listing"
+  "Ayda 25 yeni ilan (yıllıkta 300), ilan başına 20 fotoğraf": "25 new listings a month (300 yearly), 20 photos per listing",
+  "Çok fazla işlem. Biraz bekleyip tekrar dene.": "Too many actions. Wait a moment and try again.",
+  "Bu dönemdeki ilan hakkın doldu. Premium tarifelere bakabilir ya da ek ilan hakkı alabilirsin.": "You've used all listings for this period. See Premium plans or buy an extra listing.",
+  "Bu özellik Premium üyelere açık.": "This feature is for Premium members.",
+  "Süren bir açık artırman varken bu işlem yapılamaz.": "You can't do this while you have an active auction.",
+  "Bu kayıt zaten var.": "This already exists.",
+  "Bağlantı kurulamadı. İnternetini kontrol edip tekrar dene.": "Couldn't connect. Check your internet and try again.",
+  "Oturumun sona ermiş olabilir. Tekrar giriş yap.": "Your session may have expired. Sign in again.",
+  "İşlem tamamlanamadı. Tekrar dene.": "Couldn't complete that. Try again.",
+  "Bir hata oluştu. Tekrar dene.": "Something went wrong. Try again.",
+  "Numara alınamadı. Tekrar dene.": "Couldn't get the number. Try again.",
+  "Konuşma başlatılamadı. Tekrar dene.": "Couldn't start the conversation. Try again.",
+  "Şikayet gönderilemedi. Tekrar dene.": "Couldn't send the report. Try again.",
+  "Kaydedilemedi. Tekrar dene.": "Couldn't save. Try again.",
+  "Arama kaydedilemedi. Tekrar dene.": "Couldn't save the search. Try again.",
+  "Güvenliğin için mevcut şifreni gir ya da şifre sıfırlama bağlantısı iste.": "For your security, enter your current password or request a password reset link.",
+  "Mevcut şifre yanlış.": "Current password is incorrect."
 }

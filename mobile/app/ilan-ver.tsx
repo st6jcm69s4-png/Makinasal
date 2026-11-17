@@ -1,3 +1,4 @@
+import { friendlyError } from '../lib/friendlyError';
 import { normalizeVideoUrl } from '../lib/video';
 import { toast } from '../components/Toast';
 import { FormSkeleton } from '../components/kit';
@@ -314,7 +315,7 @@ export default function NewListing() {
       else Alert.alert('İlan', 'İlan incelemeye gönderildi ancak video yüklenemedi. İlanı düzenleyip videoyu tekrar ekleyebilirsin.');
       router.replace('/ilanlarim');
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Bir hata oluştu.');
+      setError(friendlyError(e, 'Bir hata oluştu. Tekrar dene.'));
       if (id) router.replace('/ilanlarim');
     } finally { setBusy(false); setProgress(''); }
   }

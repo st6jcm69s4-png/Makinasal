@@ -1,3 +1,4 @@
+import { friendlyError } from '../lib/friendlyError';
 import { useCallback, useEffect, useState } from 'react';
 import { toast } from './Toast';
 import { Pressable, Share, StyleSheet, View } from 'react-native';
@@ -43,7 +44,7 @@ export function ReferralBox() {
     setBusy(true); setMsg('');
     const { error } = await supabase.rpc('claim_referral', { p_code: input });
     setBusy(false);
-    if (error) { setMsg(/RATE_LIMIT/.test(error.message) ? 'Çok fazla deneme. Daha sonra tekrar dene.' : error.message); return; }
+    if (error) { setMsg(/RATE_LIMIT/.test(error.message) ? 'Çok fazla deneme. Daha sonra tekrar dene.' : friendlyError(error.message)); return; }
     toast('Davet kodu kaydedildi.'); setInput(''); setEnter(false); void load();
   }
   const share = () => { if (code) void Share.share({ message: `Makinasal'a katıl: iş makinesi, kamyon ve yedek parça pazarı. Kayıt olurken davet kodumu gir: ${code}` }); };

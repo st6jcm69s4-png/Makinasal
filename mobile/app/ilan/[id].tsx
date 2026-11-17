@@ -160,7 +160,7 @@ export default function ListingScreen() {
   async function showPhone() {
     if (!session) return needLogin('Telefon');
     const { data, error } = await supabase.rpc('listing_phone', { p_listing: id });
-    if (error || !data) { Alert.alert('Telefon', 'Satıcı telefon numarasını paylaşmıyor ya da numara şu an alınamadı.'); return; }
+    if (error || !data) { Alert.alert('Telefon', error?.message.includes('RATE_LIMIT') ? 'Kısa sürede çok fazla numara görüntülendi. Biraz sonra tekrar dene.' : 'Satıcı telefon numarasını paylaşmıyor ya da numara şu an alınamadı.'); return; }
     setPhone(String(data));
   }
 

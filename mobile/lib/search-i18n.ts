@@ -893,6 +893,17 @@ export const searchEn: Record<string, string> = {
   "Ekran görüntüsü seç": "Choose screenshots",
   "Ekran görüntüleri okunuyor…": "Reading screenshots…",
   "Ekran görüntülerini seç, bilgileri biz dolduralım": "Choose screenshots and we'll fill in the details",
+  // Güvenlik ve hata mesajları (17 Kasım 2026)
+  "Kısa sürede çok fazla numara görüntülendi. Biraz sonra tekrar dene.": "Too many phone numbers viewed in a short time. Try again a little later.",
+  "Çok fazla işlem. Biraz bekleyip tekrar dene.": "Too many actions. Wait a moment and try again.",
+  "Bu dönemdeki ilan hakkın doldu. Premium tarifelere bakabilir ya da ek ilan hakkı alabilirsin.": "You've used all listings for this period. See Premium plans or buy an extra listing.",
+  "Bu özellik Premium üyelere açık.": "This feature is for Premium members.",
+  "Süren bir açık artırman varken bu işlem yapılamaz.": "You can't do this while you have an active auction.",
+  "Bu kayıt zaten var.": "This already exists.",
+  "Bağlantı kurulamadı. İnternetini kontrol edip tekrar dene.": "Couldn't connect. Check your internet and try again.",
+  "Oturumun sona ermiş olabilir. Tekrar giriş yap.": "Your session may have expired. Sign in again.",
+  "İşlem tamamlanamadı. Tekrar dene.": "Couldn't complete that. Try again.",
+  "Bir hata oluştu. Tekrar dene.": "Something went wrong. Try again.",
 };
 export const searchDe: Record<string, string> = {
   'Uygulamada ara': 'In der App suchen',
@@ -1788,4 +1799,15 @@ export const searchDe: Record<string, string> = {
   "Ekran görüntüsü seç": "Screenshots wählen",
   "Ekran görüntüleri okunuyor…": "Screenshots werden gelesen…",
   "Ekran görüntülerini seç, bilgileri biz dolduralım": "Screenshots wählen, wir füllen die Angaben aus",
+  // Güvenlik ve hata mesajları (17 Kasım 2026)
+  "Kısa sürede çok fazla numara görüntülendi. Biraz sonra tekrar dene.": "Zu viele Telefonnummern in kurzer Zeit angezeigt. Versuche es etwas später erneut.",
+  "Çok fazla işlem. Biraz bekleyip tekrar dene.": "Zu viele Aktionen. Warte kurz und versuche es erneut.",
+  "Bu dönemdeki ilan hakkın doldu. Premium tarifelere bakabilir ya da ek ilan hakkı alabilirsin.": "Deine Inserate für diesen Zeitraum sind aufgebraucht. Sieh dir Premium an oder kaufe ein Zusatzinserat.",
+  "Bu özellik Premium üyelere açık.": "Diese Funktion ist für Premium-Mitglieder.",
+  "Süren bir açık artırman varken bu işlem yapılamaz.": "Das ist während einer laufenden Auktion nicht möglich.",
+  "Bu kayıt zaten var.": "Das existiert bereits.",
+  "Bağlantı kurulamadı. İnternetini kontrol edip tekrar dene.": "Keine Verbindung. Prüfe dein Internet und versuche es erneut.",
+  "Oturumun sona ermiş olabilir. Tekrar giriş yap.": "Deine Sitzung ist möglicherweise abgelaufen. Melde dich erneut an.",
+  "İşlem tamamlanamadı. Tekrar dene.": "Das hat nicht geklappt. Versuche es erneut.",
+  "Bir hata oluştu. Tekrar dene.": "Etwas ist schiefgelaufen. Versuche es erneut.",
 };

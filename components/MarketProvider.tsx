@@ -1,4 +1,5 @@
 'use client';
+import { friendlyError } from '@/lib/friendlyError';
 import { useLanguage } from "@/components/LanguageProvider";
 
 
@@ -302,7 +303,7 @@ export function MarketProvider({ children }: { children: ReactNode }) {
       const params = Number(f.near) > 0 ? { ...rest, distances: req.distances } : rest;
       let ins = await supabase.from('saved_searches').insert({ user_id: profile.id, query: { f }, params, notify: true }).select('id').single();
       if (ins.error && /params|notify/.test(ins.error.message)) ins = await supabase.from('saved_searches').insert({ user_id: profile.id, query: { f } }).select('id').single();
-      if (ins.error) { toast('Arama kaydedilemedi: ' + ins.error.message); return; }
+      if (ins.error) { toast(friendlyError(ins.error.message, 'Arama kaydedilemedi. Tekrar dene.')); return; }
       await loadUserData(profile.id);
     } else {
       const next = [...lsGet<SavedSearch[]>('mk-saved', []), { id: String(Date.now()), f, notify: true, lastSeen: now }];

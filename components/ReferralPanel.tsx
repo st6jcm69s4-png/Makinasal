@@ -1,4 +1,5 @@
 'use client';
+import { friendlyError } from '@/lib/friendlyError';
 import { useEffect, useState } from 'react';
 import { useLanguage } from '@/components/LanguageProvider';
 import { getSupabase } from '@/lib/supabase/client';
@@ -36,7 +37,7 @@ export function ReferralPanel() {
     setBusy(true); setMsg('');
     const { error } = await supabase.rpc('claim_referral', { p_code: input });
     setBusy(false);
-    if (error) { setMsg(/RATE_LIMIT/.test(error.message) ? tr('Çok fazla deneme. Daha sonra tekrar dene.') : error.message); return; }
+    if (error) { setMsg(/RATE_LIMIT/.test(error.message) ? tr('Çok fazla deneme. Daha sonra tekrar dene.') : friendlyError(error.message)); return; }
     toast(tr('Davet kodu kaydedildi.')); setInput(''); void load();
   }
 

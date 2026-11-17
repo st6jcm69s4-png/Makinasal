@@ -112,7 +112,7 @@ export default function Cekici() {
     let ph = phones[id];
     if (!ph) {
       const { data, error: e } = await supabase.rpc('provider_phone', { p_provider: id });
-      if (e || !data) { Alert.alert('Telefon', 'Bu çekici telefon numarasını paylaşmıyor. Firma sayfasından iletişim kurabilirsin.'); return; }
+      if (e || !data) { Alert.alert('Telefon', e?.message.includes('RATE_LIMIT') ? 'Kısa sürede çok fazla numara görüntülendi. Biraz sonra tekrar dene.' : 'Bu çekici telefon numarasını paylaşmıyor. Firma sayfasından iletişim kurabilirsin.'); return; }
       ph = String(data); setPhones((c) => ({ ...c, [id]: ph }));
     }
     void Linking.openURL(`tel:${ph.replace(/[^\d+]/g, '')}`);

@@ -1,4 +1,5 @@
 'use client';
+import { friendlyError } from '@/lib/friendlyError';
 import { ReferralPanel } from './ReferralPanel';
 import { useLanguage } from "@/components/LanguageProvider";
 
@@ -63,7 +64,7 @@ export function ProfileView() {
       full_name: formatPersonName(name), city: city || null, district, bio: bio.trim(), company_bio: companyBio.trim(), is_store: store, store_name: store ? storeName.trim() : null, phone: cleanPhone || null,
     }).eq('id', profile!.id);
     setBusy(false);
-    if (error) { setErr(error.message); return; }
+    if (error) { setErr(friendlyError(error.message, 'Kaydedilemedi. Tekrar dene.')); return; }
     toast("Bilgilerin kaydedildi.");
     await reloadProfile();
     void reload();
