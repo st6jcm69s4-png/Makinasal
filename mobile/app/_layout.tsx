@@ -1,7 +1,8 @@
 import { Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
 import { BarlowSemiCondensed_600SemiBold, BarlowSemiCondensed_700Bold } from '@expo-google-fonts/barlow-semi-condensed';
 import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
+import { Platform } from 'react-native';
+import { Stack, router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { fontState } from '../lib/theme';
 import { headerOptions, largeTitle, navTheme } from '../lib/nav';
@@ -32,8 +33,16 @@ function Screens() {
       <Stack
         screenOptions={({ navigation }) => ({
           ...headerOptions,
-          // Her iç sayfada sol üstte aynı geri düğmesi (geri gidilecek yer yoksa ana sayfa)
-          headerLeft: () => <BackButton canGoBack={navigation.canGoBack()} />,
+          /*
+           * Sol üstte geri düğmesi.
+           * iPhone: telefonun kendi geri düğmesi (iOS 26'da cam daire içinde ok). Kendi çizdiğimiz düğme iOS 26'nın
+           * cam zemininde boş beyaz daire olarak görünüyor ve basmayı almıyordu. Geri gidilecek sayfa yoksa
+           * (bildirimden / bağlantıdan açıldıysa) sistemin kendi düğmesiyle ana sayfa simgesi.
+           * Android: kendi düğmemiz (orada sorunsuz).
+           */
+          ...(Platform.OS === 'ios'
+            ? (navigation.canGoBack() ? {} : { unstable_headerLeftItems: () => [{ type: 'button' as const, label: tr('Ana sayfa'), icon: { type: 'sfSymbol' as const, name: 'house' as const }, onPress: () => router.replace('/') }] })
+            : { headerLeft: () => <BackButton canGoBack={navigation.canGoBack()} /> }),
         })}
       >
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />

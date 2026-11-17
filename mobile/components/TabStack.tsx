@@ -1,4 +1,4 @@
-import { Pressable } from 'react-native';
+import { Platform, Pressable } from 'react-native';
 import { Stack } from 'expo-router';
 import { Text } from './LText';
 import { fireScrollTop } from '../lib/scrollTop';
@@ -24,11 +24,19 @@ function TabBack({ name }: { name: string }) {
 
 export function TabStack({ name, title, buttons = true, large = true }: { name: string; title: string; buttons?: boolean; large?: boolean }) {
   useLang();
+  const back = useTabBack(name);
+  /*
+   * Başka sekmeden bağlantıyla gelindiyse sol üstte geri düğmesi.
+   * iPhone: telefonun kendi başlık düğmesi (SF Symbols oku, iOS 26'da cam daire). Android: kendi düğmemiz.
+   */
+  const left = Platform.OS === 'ios'
+    ? { unstable_headerLeftItems: () => (back ? [{ type: 'button' as const, label: tr('Geri'), icon: { type: 'sfSymbol' as const, name: 'chevron.left' as const }, onPress: () => goBackTab(name) }] : []) }
+    : { headerLeft: () => <TabBack name={name} /> };
   return (
     <Stack screenOptions={headerOptions}>
       <Stack.Screen name="index" options={{
         title: tr(title), ...(large ? largeTitle : {}),
-        headerLeft: () => <TabBack name={name} />,
+        ...left,
         // Başlığa dokununca sayfa en üste çıkar (iPhone'da üstteki saate dokunmak da aynısını yapar)
         headerTitle: ({ children }) => (
           <Pressable onPress={() => fireScrollTop(name)} hitSlop={10} accessibilityRole="button" accessibilityHint={tr('En üste çık')}>
