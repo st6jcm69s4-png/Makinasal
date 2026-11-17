@@ -112,7 +112,7 @@ export default function MyListings() {
         cancelButtonIndex: list.length,
         ...(list.some((a) => a.danger) ? { destructiveButtonIndex: list.findIndex((a) => a.danger) } : {}),
         userInterfaceStyle: launchScheme,
-        tintColor: color.accentText,
+        // tintColor verilmez: tema rengi bu menünün kabul ettiği biçimde değil (uygulama çöküyordu); sistem rengi kullanılır
       },
       (i) => { if (i < list.length) list[i].run(); },
     );
