@@ -16,6 +16,9 @@ import { currentTab } from '../../components/SwipeTabs';
  * Apple yönergesi: sekmeler yalnızca gezinir, eylem yapmaz. Bu yüzden "İlan ver" de bir sekmedir
  * ve ne tür ilan verileceğini seçtiren bir sayfa açar. Açık sekmeye tekrar dokununca liste en üste çıkar (sistem).
  */
+/** Büyük başlık kullanan sekmeler (components/TabStack: large). */
+const LARGE_TITLE_TABS = new Set(['yeni', 'hesap']);
+
 export default function TabsLayout() {
   const { session } = useApp();
   useLang();
@@ -33,7 +36,12 @@ export default function TabsLayout() {
       // Açık sekmenin simgesine tekrar basınca o sekme en üste çıkar (beş sekmede de; iPhone bunu kendiliğinden
       // yalnızca listenin ekrandaki ilk öğe olduğu sekmelerde yapıyor, Ana sayfa ve İlanlar'da yapmıyordu)
       screenListeners={({ route }) => ({
-        tabPress: () => { if (route.name === currentTab()) fireScrollTop(route.name); },
+        tabPress: () => {
+          // Büyük başlıklı sekmelerde (İlan ver, Hesabım) iPhone bunu kendisi doğru yapar; bizimki sayfayı
+          // büyük başlığın altına kaydırıyordu (büyük başlık listeyi biraz aşağıdan başlatır).
+          if (Platform.OS === 'ios' && LARGE_TITLE_TABS.has(route.name)) return;
+          if (route.name === currentTab()) fireScrollTop(route.name);
+        },
       })}
     >
       {/* Ana sayfanın kendi marka başlığı var; altında kaydırma çubuğu ilk öğe değil, çubuk saydamlaşmasın */}

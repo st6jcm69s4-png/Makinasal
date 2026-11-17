@@ -37,12 +37,13 @@ export function TabStack({ name, title, buttons = true, large = true }: { name: 
       <Stack.Screen name="index" options={{
         title: tr(title), ...(large ? largeTitle : {}),
         ...left,
-        // Başlığa dokununca sayfa en üste çıkar (iPhone'da üstteki saate dokunmak da aynısını yapar)
-        headerTitle: ({ children }) => (
+        // Başlığa dokununca sayfa en üste çıkar (iPhone'da üstteki saate dokunmak da aynısını yapar).
+        // iPhone'da büyük başlıklı sekmelerde telefonun kendi başlığı kalır: bizim kaydırmamız sayfayı başlığın altına götürüyordu.
+        ...(Platform.OS === 'ios' && large ? {} : { headerTitle: ({ children }: { children: string }) => (
           <Pressable onPress={() => fireScrollTop(name)} hitSlop={10} accessibilityRole="button" accessibilityHint={tr('En üste çık')}>
             <Text style={{ color: color.ink, fontFamily: font.semi, fontSize: 17 }} numberOfLines={1}>{children}</Text>
           </Pressable>
-        ),
+        ) }),
         ...(buttons ? { headerRight: () => <HeaderButtons /> } : {}) }} />
     </Stack>
   );
