@@ -3,7 +3,7 @@ import { ActivityIndicator, Alert, Linking, Pressable, ScrollView, StyleSheet, V
 import { PlainText, Text } from '../components/LText';
 import { Icon } from '../components/Icon';
 import { PickerModal } from '../components/PickerModal';
-import { Btn } from '../components/ui';
+import { SosButton } from '../components/SosButton';
 import { Group } from '../components/Rows';
 import { tr } from '../lib/i18n';
 import { AlertBox, RowSkeleton } from '../components/kit';
@@ -62,6 +62,26 @@ export default function Cekici() {
     });
   }, [session]);
 
+  // Konum izni daha önce verildiyse ekran açılır açılmaz en yakın çekiciler gösterilir (izin sorulmaz).
+  useEffect(() => {
+    void (async () => {
+      try {
+        const Loc = await import('expo-location');
+        const p = await Loc.getForegroundPermissionsAsync();
+        if (p.status === 'granted') void useMyLocation();
+      } catch { /* konum yoksa il seçimi kalır */ }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  /** 112: yanlışlıkla aranmasın diye önce sorulur. */
+  function call112() {
+    Alert.alert(tr('112 Acil Çağrı'), tr('Acil bir durum varsa 112 Acil Çağrı Merkezi aranacak. Şimdi aransın mı?'), [
+      { text: tr('Vazgeç'), style: 'cancel' },
+      { text: tr("112'yi Ara"), style: 'destructive', onPress: () => void Linking.openURL('tel:112') },
+    ]);
+  }
+
   async function useMyLocation() {
     setLocBusy(true);
     try {
@@ -100,35 +120,30 @@ export default function Cekici() {
 
   return (
     <ScrollView style={{ flex: 1, backgroundColor: color.bg }} contentContainerStyle={s.body}>
-      {/* Acil durum: ekranın en üstünde, kendi kartında; tek dokunuşla 112 */}
-      <View style={s.sos}>
-        <View style={s.sosIcon}><Icon name="alert-triangle" size={18} color="#FFFFFF" /></View>
-        <View style={{ flex: 1, gap: 1 }}>
-          <Text style={s.sosT}>Can güvenliği tehlikedeyse</Text>
-          <Text style={s.sosS}>Çekiciden önce 112'yi ara.</Text>
+      {/* 112 sağ üstte: her zaman görünür, içerikte yer kaplamaz; basınca önce sorar */}
+      <SosButton onPress={call112} />
+
+      {/* Asıl iş: en yakın çekici, tek dokunuş */}
+      <Pressable style={({ pressed }) => [s.find, pressed && { opacity: 0.9, transform: [{ scale: 0.98 }] }]} onPress={() => { if (!locBusy) void useMyLocation(); }} accessibilityRole="button" accessibilityState={{ busy: locBusy }}>
+        {locBusy ? <ActivityIndicator color={color.accentInk} /> : <Icon name="navigation" size={20} color={color.accentInk} />}
+        <View style={{ flex: 1 }}>
+          <Text style={s.findT}>{gps ? 'En yakın çekiciler gösteriliyor' : 'En yakın çekiciyi bul'}</Text>
+          <Text style={s.findS}>{locBusy ? 'Konum alınıyor…' : gps ? 'Konumunu yenilemek için dokun' : 'Konumunla, yakınlığa göre sıralanır'}</Text>
         </View>
-        <Pressable style={({ pressed }) => [s.sosBtn, pressed && { opacity: 0.6 }]} onPress={() => void Linking.openURL('tel:112')} accessibilityRole="button" accessibilityLabel={tr("112'yi ara")}>
-          <Icon name="phone" size={15} color={color.bad} />
-          <PlainText style={s.sosBtnT}>112</PlainText>
-        </Pressable>
-      </View>
+      </Pressable>
 
       <Group
-        title="Nerede olduğunu seç"
-        footer="Çekiciler yakınlığa göre, puanlarıyla sıralanır."
-        items={[
-          { icon: 'crosshair', tint: 'accent', label: gps ? 'Konumum kullanılıyor' : 'Konumumu kullan', sub: locBusy ? 'Konum alınıyor…' : gps ? 'Yenilemek için dokun' : undefined, go: () => { if (!locBusy) void useMyLocation(); } },
-          { icon: 'map-pin', tint: 'green', label: 'İl seç', value: gps ? undefined : city || undefined, go: () => setSheet(true) },
-        ]}
+        footer="Can güvenliği tehlikedeyse sağ üstteki 112 düğmesini kullan."
+        items={[{ icon: 'map-pin', tint: 'green', label: 'Bölgeye göre ara', value: gps ? undefined : city || tr('İl seç'), go: () => setSheet(true) }]}
       />
 
       {rows === null ? <RowSkeleton count={4} /> : null}
       {error ? <AlertBox variant="destructive">{error}</AlertBox> : null}
       {rows && !rows.length && !error ? (
         <View style={s.empty}>
-          <Text style={s.emptyT}>Henüz kayıtlı çekici yok.</Text>
-          <Text style={s.emptyS}>Çekici hizmeti veriyorsan firma profilini "Çekici / yol yardım" türüyle oluştur, burada ilk sen görün.</Text>
-          <Btn title="Firma profili oluştur" onPress={() => router.push('/ag/firma-kaydi')} />
+          <Icon name="truck" size={26} color={color.muted} />
+          <Text style={s.emptyT}>Henüz kayıtlı çekici yok</Text>
+          <Text style={s.emptyS}>Başka bir il seçerek yakın bölgelere bakabilirsin.</Text>
         </View>
       ) : null}
       {!origin && rows?.length ? <Text style={s.hint}>Mesafeyi görmek için konumunu kullan ya da il seç.</Text> : null}
@@ -165,6 +180,12 @@ export default function Cekici() {
           </View>
         );
       })}
+      {/* Çekici firmaları için: en altta, küçük bir bağlantı */}
+      {rows !== null ? (
+        <Pressable onPress={() => router.push('/ag/firma-kaydi')} style={({ pressed }) => [s.provider, pressed && { opacity: 0.6 }]} accessibilityRole="link">
+          <PlainText style={s.providerT}>{`${tr('Çekici hizmeti mi veriyorsun?')} `}<PlainText style={s.providerL}>{tr('Firma profili oluştur')}</PlainText></PlainText>
+        </Pressable>
+      ) : null}
       <PickerModal visible={sheet} title="İl" selected={city} options={CITIES.map((c) => ({ value: c, label: c }))} onPick={(c) => { setCity(c); setGps(null); }} onClose={() => setSheet(false)} />
     </ScrollView>
   );
@@ -174,17 +195,17 @@ export default function Cekici() {
 const HAIR = StyleSheet.hairlineWidth;
 const s = StyleSheet.create({
   body: { padding: 16, paddingBottom: 40, gap: 18 },
-  sos: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: color.surface, borderRadius: 16, padding: 12 },
-  sosIcon: { width: 34, height: 34, borderRadius: 9, backgroundColor: color.bad, alignItems: 'center', justifyContent: 'center' },
-  sosT: { color: color.ink, fontFamily: font.semi, fontSize: 15.5 },
-  sosS: { color: color.muted, fontSize: 13.5 },
-  sosBtn: { flexDirection: 'row', alignItems: 'center', gap: 5, minHeight: 36, paddingHorizontal: 14, borderRadius: 18, backgroundColor: color.badBg },
-  sosBtnT: { color: color.bad, fontFamily: font.bold, fontSize: 16 },
+  find: { flexDirection: 'row', alignItems: 'center', gap: 14, backgroundColor: color.accent, borderRadius: 16, paddingHorizontal: 18, paddingVertical: 16, minHeight: 64 },
+  findT: { color: color.accentInk, fontFamily: font.semi, fontSize: 18 },
+  findS: { color: color.accentInk, opacity: 0.85, fontSize: 13.5, marginTop: 1 },
+  provider: { alignItems: 'center', paddingVertical: 12 },
+  providerT: { color: color.muted, fontSize: 13.5, textAlign: 'center' },
+  providerL: { color: color.accentText, fontFamily: font.semi, fontSize: 13.5 },
   secT: { fontSize: 13, color: color.muted, marginLeft: 16, marginBottom: -10 },
   hint: { color: color.muted, fontSize: 13.5, marginHorizontal: 16 },
-  empty: { padding: 16, gap: 10, backgroundColor: color.surface, borderRadius: 16 },
+  empty: { padding: 20, gap: 6, backgroundColor: color.surface, borderRadius: 16, alignItems: 'center' },
   emptyT: { fontSize: 17, fontFamily: font.semi, color: color.ink },
-  emptyS: { color: color.muted },
+  emptyS: { color: color.muted, textAlign: 'center' },
   card: { backgroundColor: color.surface, borderRadius: 16, overflow: 'hidden' },
   cardTop: { flexDirection: 'row', padding: 14, gap: 12, alignItems: 'flex-start' },
   name: { fontSize: 17, fontFamily: font.semi, color: color.ink },

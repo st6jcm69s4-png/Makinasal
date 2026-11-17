@@ -8,6 +8,8 @@ import { useApp } from '../../lib/AppContext';
 import { useLoginPrompt } from '../../components/LoginPrompt';
 import { dateLabel, EQUIPMENT_STATUS, money, PROVIDER_KINDS, type InventoryItem, type MarketPost, type Provider } from '../../lib/network';
 import { supabase } from '../../lib/supabase';
+import { HeaderMenu } from '../../components/HeaderMenu';
+import { shareLink } from '../../lib/share';
 import { color } from '../../lib/theme';
 
 export default function ProviderDetail() {
@@ -39,6 +41,7 @@ export default function ProviderDetail() {
   if (!p) return <Text style={common.empty}>Firma bulunamadı veya yayından kaldırıldı.</Text>;
   return (
     <ScrollView style={common.screen} contentContainerStyle={{ padding: 12, gap: 10 }}>
+      <HeaderMenu items={[{ label: 'Paylaş', icon: 'share', sf: 'square.and.arrow.up', run: () => shareLink(p.name, `/firmalar/${id}`) }]} />
       <View style={common.card}>
         <Text style={{ fontSize: 18, fontWeight: '700' }}>{p.name}</Text>
         <Text style={common.meta}>{p.company_category ?? PROVIDER_KINDS[p.kind]} · {[p.city, p.district].filter(Boolean).join(' / ')}</Text>

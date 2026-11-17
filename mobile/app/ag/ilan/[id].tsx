@@ -11,6 +11,8 @@ import { useApp } from '../../../lib/AppContext';
 import { useLoginPrompt } from '../../../components/LoginPrompt';
 import { dateLabel, money, networkError, PERSONNEL_ROLES, POST_KINDS, QUOTE_STATUS, RENTAL_MODES, UNITS, type MarketPost, type Quote } from '../../../lib/network';
 import { supabase } from '../../../lib/supabase';
+import { HeaderMenu } from '../../../components/HeaderMenu';
+import { shareLink } from '../../../lib/share';
 import { openWeb } from '../../../lib/web';
 
 export default function PostDetail() {
@@ -84,6 +86,7 @@ export default function PostDetail() {
   ];
   return (
     <ScrollView contentContainerStyle={{ padding: 12, gap: 12 }} style={common.screen}>
+      <HeaderMenu items={[{ label: 'Paylaş', icon: 'share', sf: 'square.and.arrow.up', run: () => shareLink(post.title, `/is-agi/ilan/${post.id}`) }]} />
       <View style={common.card}>
         <Text style={{ fontSize: 18, fontWeight: '700' }}>{post.title}</Text>
         <Text style={common.price}>{money(post.price, post.price_unit)}</Text>

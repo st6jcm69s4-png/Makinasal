@@ -8,6 +8,8 @@ import { ListingCard } from '../../components/ListingCard';
 import { common } from '../../components/ui';
 import { trustLevel } from '../../lib/trust';
 import { supabase, type Row } from '../../lib/supabase';
+import { HeaderMenu } from '../../components/HeaderMenu';
+import { shareLink } from '../../lib/share';
 import { getLang, localeOf } from '../../lib/i18n';
 
 type Review = { uid: string; who: string; role: string; rating: number; text: string; date: string; tags: string[] };
@@ -91,6 +93,8 @@ export default function StorePage() {
     </View>
   );
   return (
+    <>
+      {store ? <HeaderMenu items={[{ label: 'Paylaş', icon: 'share', sf: 'square.and.arrow.up', run: () => shareLink(store.name, `/magaza/${id}`) }]} /> : null}
     <FlatList
       style={common.screen}
       data={rows}
@@ -113,5 +117,6 @@ export default function StorePage() {
         </View>
       )}
     />
+    </>
   );
 }

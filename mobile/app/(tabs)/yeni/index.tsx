@@ -16,7 +16,7 @@ import { color, font } from '../../../lib/theme';
  */
 const EXCAVATOR = require('../../../assets/cat/excavator.png');
 type Choice = { icon: IconName; title: string; sub: string; to: string };
-const MAIN: Choice = { icon: 'truck', title: 'Satılık ilan ver', sub: 'İş makinesi, kamyon, vinç, yedek parça veya lastik', to: '/ilan-ver' };
+const MAIN: Choice = { icon: 'truck', title: 'İlan Ver', sub: 'İş makinesi, kamyon, vinç, yedek parça veya lastik', to: '/ilan-ver' };
 const OTHERS: Choice[] = [
   { icon: 'calendar', title: 'Kiralık makine veya araç', sub: 'Günlük, aylık, operatörlü ya da sadece makine', to: '/ag/yeni?kind=rental_machine' },
   { icon: 'users', title: 'Eleman arıyorum', sub: 'Operatör, şoför veya usta ilanı', to: '/ag/yeni?kind=staff_wanted' },

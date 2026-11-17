@@ -11,6 +11,7 @@ import { DealBox } from '../../components/DealBox';
 import { PickerModal } from '../../components/PickerModal';
 import { checkMessage } from '../../lib/messageFilter';
 import { supabase } from '../../lib/supabase';
+import { HeaderMenu } from '../../components/HeaderMenu';
 import { color, font, radius } from '../../lib/theme';
 
 type Msg = { id: string; sender_id: string; body: string; created_at: string; kind?: string | null; offer_amount?: number | null };
@@ -164,11 +165,15 @@ export default function Thread() {
             <PlainText style={s.listingT} numberOfLines={1}>{info.title}</PlainText>
           </View>
           {info.listing_id ? <Icon name="chevron-right" size={18} color={color.muted} /> : null}
-          <Pressable onPress={blockMenu} hitSlop={10} style={s.more} accessibilityRole="button" accessibilityLabel={tr(blocked ? 'Engeli kaldır' : 'Kişiyi engelle')}>
-            <Icon name={blocked ? 'unlock' : 'slash'} size={18} color={blocked ? color.tealText : color.bad} />
-          </Pressable>
         </Pressable>
       ) : null}
+      {/* Sağ üstte "…": ilana git, engelle / engeli kaldır */}
+      {info ? <HeaderMenu items={[
+        ...(info.listing_id ? [{ label: 'İlana git', icon: 'external-link' as const, sf: 'doc.text', run: () => router.push(`/ilan/${info.listing_id}`) }] : []),
+        blocked
+          ? { label: 'Engeli kaldır', icon: 'unlock' as const, sf: 'person.crop.circle.badge.checkmark', run: blockMenu }
+          : { label: 'Kişiyi engelle', icon: 'slash' as const, sf: 'nosign', danger: true, run: blockMenu },
+      ]} /> : null}
       {info && me ? <DealBox threadId={id} me={me} buyerId={info.buyer_id} sellerId={info.seller_id} /> : null}
       <FlatList
         inverted

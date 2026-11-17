@@ -70,7 +70,7 @@ export function ListingCard({ item, variant = 'row' }: { item: Row; variant?: Ca
   const cmpLabel = inCmp ? 'Karşılaştırmadan çıkar' : 'Karşılaştırmaya ekle';
   const compare = () => { const err = toggleCmp(item.id); if (err) toast(err, 'info'); else if (!inCmp) toast('Karşılaştırmaya eklendi.'); };
   const share = () => {
-    const url = SITE_URL ? `${SITE_URL.replace(/\/$/, '')}/ilan/${item.id}` : '';
+    const url = SITE_URL ? `${SITE_URL.replace(/\/$/, '')}/ilanlar/${item.id}` : '';
     void Share.share({ message: [item.title, tl(item.price), url].filter(Boolean).join('\n') }).catch(() => undefined);
   };
   // Android: uzun basınca aynı seçenekler (iPhone'da sistemin kendi menüsü açılır)

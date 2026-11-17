@@ -5,7 +5,7 @@ import { TransportEstimate } from '../../components/TransportEstimate';
 import { ListingCard } from '../../components/ListingCard';
 import { toast } from '../../components/Toast';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { ActivityIndicator, Alert, Dimensions, Image, Linking, Modal, Pressable, ScrollView, StyleSheet, Switch, View } from 'react-native';
+import { ActivityIndicator, Alert, Dimensions, Image, Linking, Modal, Pressable, ScrollView, Share, StyleSheet, Switch, View } from 'react-native';
 import { PlainText, Text, TextInput } from '../../components/LText';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Heart, Icon, type IconName } from '../../components/Icon';
@@ -23,6 +23,7 @@ import { videoHost, videoThumb } from '../../lib/video';
 import { CONDITION_FIELDS, formatTech, techFieldsFor } from '../../lib/techSpecs';
 import { caps, color, font, radius, shadow, fixed } from '../../lib/theme';
 import { getLang, localeOf, tr } from '../../lib/i18n';
+import { HeaderMenu } from '../../components/HeaderMenu';
 import { useLang } from '../../lib/lang';
 
 type Detail = {
@@ -217,6 +218,12 @@ export default function ListingScreen() {
   const tags = [item.takas ? 'Takas olur' : '', item.serial_declared ? 'Seri no beyan edildi' : ''].filter(Boolean);
   return (
     <View style={s.screen}>
+      {/* Sağ üstte "…": paylaş, karşılaştır, şikayet et (nedenler alt menüde) */}
+      <HeaderMenu items={[
+        { label: 'Paylaş', icon: 'share', sf: 'square.and.arrow.up', run: () => void Share.share({ message: [item.title, tl(item.price), SITE_URL ? `${SITE_URL.replace(/\/$/, '')}/ilanlar/${item.id}` : ''].filter(Boolean).join('\n') }).catch(() => undefined) },
+        { label: inCmp ? 'Karşılaştırmadan çıkar' : 'Karşılaştırmaya ekle', icon: 'repeat', sf: 'square.split.2x1', run: () => { const err = toggleCmp(item.id); if (err) Alert.alert('Karşılaştır', err); } },
+        ...(own ? [] : [{ label: 'İlanı şikayet et', icon: 'flag' as const, sf: 'exclamationmark.bubble', danger: true, run: () => setReportOpen(true), sub: REPORT_REASONS.map((r) => ({ label: r, run: () => void report(r) })) }]),
+      ]} />
       <ScrollView contentContainerStyle={{ paddingBottom: own ? 32 : 120 }}>
         <View>
           <ScrollView horizontal pagingEnabled showsHorizontalScrollIndicator={false} onMomentumScrollEnd={(e) => setSlide(Math.round(e.nativeEvent.contentOffset.x / W))}>
@@ -427,9 +434,6 @@ export default function ListingScreen() {
                 </Pressable>
               ))}
             </View>
-            <Pressable onPress={() => setReportOpen(true)} accessibilityRole="button" style={s.reportBtn}>
-              <Icon name="flag" size={15} color={color.muted} /><Text style={s.report}>İlanı şikayet et</Text>
-            </Pressable>
           </>
         ) : null}
         {SITE_URL && own ? (
