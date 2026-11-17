@@ -6,6 +6,8 @@ import { useApp } from '../../lib/AppContext';
 import { tr } from '../../lib/i18n';
 import { useLang } from '../../lib/lang';
 import { watchUnread } from '../../lib/unread';
+import { fireScrollTop } from '../../lib/scrollTop';
+import { currentTab } from '../../components/SwipeTabs';
 
 /*
  * Alt menü: telefonun kendi sekme çubuğu.
@@ -28,6 +30,11 @@ export default function TabsLayout() {
       backgroundColor={color.surface}
       indicatorColor={color.tealSoft}
       rippleColor={color.plate}
+      // Açık sekmenin simgesine tekrar basınca o sekme en üste çıkar (beş sekmede de; iPhone bunu kendiliğinden
+      // yalnızca listenin ekrandaki ilk öğe olduğu sekmelerde yapıyor, Ana sayfa ve İlanlar'da yapmıyordu)
+      screenListeners={({ route }) => ({
+        tabPress: () => { if (route.name === currentTab()) fireScrollTop(route.name); },
+      })}
     >
       {/* Ana sayfanın kendi marka başlığı var; altında kaydırma çubuğu ilk öğe değil, çubuk saydamlaşmasın */}
       <NativeTabs.Trigger name="index" disableTransparentOnScrollEdge>
