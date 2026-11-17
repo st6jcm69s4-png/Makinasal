@@ -5,7 +5,7 @@ import { Platform } from 'react-native';
 import { Stack } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { color, fontState } from '../lib/theme';
-import { headerOptions, largeTitle, navTheme } from '../lib/nav';
+import { largeTitle, useHeaderOptions, useNavTheme } from '../lib/nav';
 import { BackButton } from '../components/BackButton';
 import { ThemeProvider } from 'expo-router/react-navigation';
 import { loadTheme, watchSystemTheme } from '../lib/themePref';
@@ -57,6 +57,8 @@ function Screens() {
   useEffect(() => { setErrorRoute(pathname); }, [pathname]);
   // Başlıklar normal yazımla (Apple: başlıklar büyük harfle yazılmaz)
   const T = (x: string) => tr(x);
+  const headerOptions = useHeaderOptions();
+  const navTheme = useNavTheme();
   return (
     <>
       <StatusBar style="auto" />

@@ -55,7 +55,7 @@ const r = StyleSheet.create({
   // iPhone bölümlü seçicisi: gri zemin, seçili parça beyaz ve hafif gölgeli
   seg: { flexDirection: 'row', padding: 2, borderRadius: 9, backgroundColor: color.plate },
   segItem: { flex: 1, minHeight: 38, borderRadius: 7, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingHorizontal: 4 },
-  segOn: { backgroundColor: color.surface, shadowColor: '#000', shadowOpacity: 0.12, shadowRadius: 3, shadowOffset: { width: 0, height: 1 }, elevation: 2 },
+  segOn: { backgroundColor: color.segOn, shadowColor: '#000', shadowOpacity: 0.12, shadowRadius: 3, shadowOffset: { width: 0, height: 1 }, elevation: 2 },
   segT: { color: color.ink, fontFamily: font.medium, fontSize: 14 },
   pal: { flex: 1, gap: 10, padding: 12, borderRadius: 12, borderWidth: StyleSheet.hairlineWidth, borderColor: color.line, backgroundColor: color.bg },
   swatches: { flexDirection: 'row', gap: 4 },

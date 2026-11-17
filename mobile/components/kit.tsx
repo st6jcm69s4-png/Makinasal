@@ -194,6 +194,6 @@ const k = StyleSheet.create({
   tabText: { fontSize: 14.5, fontFamily: font.semi },
   // "filled": iPhone bölümlü seçicisi (gri zemin, seçili parça beyaz kabarcık)
   seg: { flexDirection: 'row', marginHorizontal: 16, marginVertical: 8, padding: 2, borderRadius: 10, backgroundColor: color.plate },
-  segOn: { backgroundColor: color.surface, borderRadius: 8, shadowColor: '#000', shadowOpacity: 0.12, shadowRadius: 3, shadowOffset: { width: 0, height: 1 }, elevation: 2 },
+  segOn: { backgroundColor: color.segOn, borderRadius: 8, shadowColor: '#000', shadowOpacity: 0.12, shadowRadius: 3, shadowOffset: { width: 0, height: 1 }, elevation: 2 },
   progress: { height: 8, backgroundColor: color.plate, borderWidth: 1, borderColor: color.line, overflow: 'hidden' },
 });

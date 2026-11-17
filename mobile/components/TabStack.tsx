@@ -6,7 +6,7 @@ import { color, font } from '../lib/theme';
 import { HeaderButtons } from './HeaderButtons';
 import { BackButton } from './BackButton';
 import { goBackTab, useTabBack } from '../lib/tabBack';
-import { headerOptions, largeTitle } from '../lib/nav';
+import { largeTitle, useHeaderOptions } from '../lib/nav';
 import { tr } from '../lib/i18n';
 import { useLang } from '../lib/lang';
 
@@ -25,6 +25,7 @@ function TabBack({ name }: { name: string }) {
 export function TabStack({ name, title, buttons = true, large = true }: { name: string; title: string; buttons?: boolean; large?: boolean }) {
   useLang();
   const back = useTabBack(name);
+  const headerOptions = useHeaderOptions();
   /*
    * Başka sekmeden bağlantıyla gelindiyse sol üstte geri düğmesi.
    * iPhone: telefonun kendi başlık düğmesi (SF Symbols oku, iOS 26'da cam daire). Android: kendi düğmemiz.
