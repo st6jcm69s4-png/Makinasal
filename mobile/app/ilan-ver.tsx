@@ -18,6 +18,7 @@ import { brandsForCategory, canonicalBrand } from '../lib/machineryCatalog';
 import { photoUrl, supabase } from '../lib/supabase';
 import { maybeAskReview } from '../lib/review';
 import * as haptic from '../lib/haptics';
+import { shrinkPhoto } from '../lib/photo';
 import { color, font, radius, shadow, fixed } from '../lib/theme';
 
 const CONDITIONS = ['Sıfır', 'Çıkma', 'Revizyonlu'];
@@ -132,10 +133,12 @@ export default function NewListing() {
     const perm = camera ? await ImagePicker.requestCameraPermissionsAsync() : await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!perm.granted) { Alert.alert('İzin gerekli', 'Fotoğraf eklemek için izin vermelisin. Telefon ayarlarından değiştirebilirsin.'); return; }
     const res = camera
-      ? await ImagePicker.launchCameraAsync({ mediaTypes: ['images'], quality: 0.6 })
-      : await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], allowsMultipleSelection: true, selectionLimit: room, quality: 0.6 });
+      ? await ImagePicker.launchCameraAsync({ mediaTypes: ['images'], quality: 0.9 })
+      : await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], allowsMultipleSelection: true, selectionLimit: room, quality: 0.9 });
     if (res.canceled) return;
-    setPhotos((cur) => [...cur, ...res.assets.map((a) => a.uri)].slice(0, maxPhotos - existing.length));
+    // Yüklemeden önce küçültülür (uzun kenar 1600 px): yükleme hızlanır, kalite farkı görülmez
+    const small = await Promise.all(res.assets.map((x) => shrinkPhoto(x.uri, x.width, x.height)));
+    setPhotos((cur) => [...cur, ...small].slice(0, maxPhotos - existing.length));
   }
 
   const MAX_VIDEO_MB = 50;

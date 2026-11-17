@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { Alert, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { useCallback, useEffect, useState } from 'react';
+import { ActivityIndicator, Alert, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { router } from 'expo-router';
 import { PlainText, Text } from '../components/LText';
 import { Icon } from '../components/Icon';
@@ -9,6 +9,9 @@ import { tr } from '../lib/i18n';
 import { supabase } from '../lib/supabase';
 import { FREE, PLANS, activePlan, money, yearlyTotal, type Period, type Plan, type PlanId } from '../lib/plans';
 import { openTab } from '../lib/tabBack';
+import { available as storeAvailable, buy as storeBuy, loadProducts, manage, redeemCode, restore, type StoreProducts } from '../lib/purchases';
+import { success as hapticSuccess } from '../lib/haptics';
+import { toast } from '../components/Toast';
 import { color, font, radius, shadow } from '../lib/theme';
 
 type Prof = { is_premium?: boolean | null; premium_plan?: string | null; premium_until?: string | null };
@@ -18,17 +21,71 @@ export default function Premium() {
   const { lang } = useLang();
   const [prof, setProf] = useState<Prof | null>(null);
   const [period, setPeriod] = useState<Period>('monthly');
-  useEffect(() => {
-    if (!session) { setProf(null); return; }
-    void supabase.from('profiles').select('is_premium,premium_plan,premium_until').eq('id', session.user.id).maybeSingle()
-      .then((r) => setProf((r.data as Prof | null) ?? null));
+  const [products, setProducts] = useState<StoreProducts>({});
+  const [busy, setBusy] = useState<string | null>(null);
+  const native = Platform.OS !== 'web';
+
+  const readProfile = useCallback(async () => {
+    if (!session) { setProf(null); return null; }
+    const r = await supabase.from('profiles').select('is_premium,premium_plan,premium_until').eq('id', session.user.id).maybeSingle();
+    const row = (r.data as Prof | null) ?? null;
+    setProf(row);
+    return row;
   }, [session]);
+  useEffect(() => { void readProfile(); }, [readProfile]);
+  useEffect(() => { void loadProducts().then(setProducts).catch(() => undefined); }, []);
+
   const current = activePlan(prof);
   const until = prof?.premium_until ? new Date(prof.premium_until).toLocaleDateString(lang === 'en' ? 'en-GB' : lang === 'de' ? 'de-DE' : 'tr-TR') : '';
 
-  const buy = (p: Plan) => {
+  // Mağaza ödemeyi onaylayınca sunucu (webhook) üyeliği birkaç saniye içinde açar; profil o zamana kadar yeniden okunur.
+  const waitForPremium = async () => {
+    for (let i = 0; i < 12; i++) {
+      const row = await readProfile();
+      if (row && activePlan(row)) return true;
+      await new Promise((r) => setTimeout(r, 1500));
+    }
+    return false;
+  };
+
+  const notReady = () => Alert.alert(tr('Satın alma bu sürümde kapalı'), tr('Premium, App Store veya Google Play’den indirilen Makinasal uygulamasından satın alınır. Ödemeyi Apple ya da Google alır; kart bilgin bize gelmez.'));
+
+  const buy = async (p: Plan) => {
     if (!session) { openTab('/hesap'); return; }
-    Alert.alert(tr('Çok yakında'), `${tr(p.name)} · ${period === 'yearly' ? money(yearlyTotal(p), lang) + ' / ' + tr('yıl') : `${tr('İlk ay')} ${money(p.intro, lang)}, ${tr('sonra')} ${money(p.monthly, lang)} / ${tr('ay')}`}\n\n${tr('Premium satın alma, ödeme altyapısı ve sözleşmeler onaylandığında açılacak. Şu anda kart bilgisi alınmıyor.')}`);
+    if (!native || !storeAvailable()) { notReady(); return; }
+    const prod = products[`${p.id}.${period}`];
+    if (!prod) { Alert.alert(tr('Tarife şu anda alınamıyor'), tr('Mağaza bu tarifeyi henüz göstermiyor. Biraz sonra yeniden dene.')); return; }
+    setBusy(p.id);
+    const r = await storeBuy(prod);
+    if (r === 'ok') {
+      const on = await waitForPremium();
+      hapticSuccess();
+      toast(on ? tr('Premium üyeliğin açıldı') : tr('Ödeme alındı, üyeliğin birkaç dakika içinde açılacak'));
+    } else if (r === 'pending') {
+      Alert.alert(tr('Ödeme onay bekliyor'), tr('Mağaza ödemeyi onaylayınca üyeliğin kendiliğinden açılacak.'));
+    } else if (r === 'error') {
+      Alert.alert(tr('Ödeme tamamlanamadı'), tr('Kartından para çekilmedi. Bağlantını kontrol edip yeniden dene.'));
+    }
+    setBusy(null);
+  };
+
+  const onRestore = async () => {
+    if (!session) { openTab('/hesap'); return; }
+    if (!storeAvailable()) { notReady(); return; }
+    setBusy('restore');
+    const r = await restore();
+    if (r === 'ok') { await waitForPremium(); toast(tr('Satın alımların geri yüklendi')); }
+    else if (r === 'none') Alert.alert(tr('Satın alım bulunamadı'), tr('Bu Apple / Google hesabıyla alınmış etkin bir Premium üyelik yok.'));
+    else Alert.alert(tr('Geri yüklenemedi'), tr('Bağlantını kontrol edip yeniden dene.'));
+    setBusy(null);
+  };
+
+  const onRedeem = async () => {
+    if (!session) { openTab('/hesap'); return; }
+    if (!storeAvailable()) { notReady(); return; }
+    await redeemCode().catch(() => undefined);
+    // Kod kullanıldıysa mağaza bildirir, sunucu üyeliği açar
+    setTimeout(() => { void readProfile(); }, 4000);
   };
 
   return (
@@ -61,7 +118,27 @@ export default function Premium() {
 
       <Text style={s.yearNote}>Yıllık üyelikte 2 ay bedava: 10 aylık ücret öde, 12 ay kullan.</Text>
 
-      {PLANS.map((p) => <PlanCard key={p.id} p={p} period={period} lang={lang} current={current} onBuy={() => buy(p)} />)}
+      {PLANS.map((p) => (
+        <PlanCard key={p.id} p={p} period={period} lang={lang} current={current} busy={busy === p.id} disabled={!!busy}
+          store={products[`${p.id}.${period}`]} onBuy={() => { void buy(p); }} />
+      ))}
+
+      {native ? (
+        <View style={s.links}>
+          <Pressable style={s.linkBtn} onPress={() => { void onRedeem(); }} disabled={!!busy} accessibilityRole="button">
+            <Icon name="tag" size={17} color={color.tealText} /><Text style={s.linkT}>İndirim kodu kullan</Text>
+          </Pressable>
+          <Pressable style={s.linkBtn} onPress={() => { void onRestore(); }} disabled={!!busy} accessibilityRole="button">
+            {busy === 'restore' ? <ActivityIndicator color={color.tealText} /> : <Icon name="refresh-cw" size={17} color={color.tealText} />}
+            <Text style={s.linkT}>Satın alımları geri yükle</Text>
+          </Pressable>
+          {current ? (
+            <Pressable style={s.linkBtn} onPress={() => { void manage(); }} accessibilityRole="button">
+              <Icon name="settings" size={17} color={color.tealText} /><Text style={s.linkT}>Üyeliği yönet veya iptal et</Text>
+            </Pressable>
+          ) : null}
+        </View>
+      ) : null}
 
       <View style={s.free}>
         <Text style={s.freeT}>Ücretsiz üyelik</Text>
@@ -70,13 +147,32 @@ export default function Premium() {
         ))}
       </View>
       <Text style={s.note}>Fiyatlar Türk lirasıdır. Güven puanı ve doğrulama rozetleri satın alınamaz; Pro rozeti yalnızca üyelik türünü gösterir. Premium görünürlük ve araçlar sağlar.</Text>
+      {native ? (
+        <Text style={s.note}>{Platform.OS === 'ios'
+          ? 'Ödeme, satın almayı onayladığında Apple Kimliği hesabından alınır. Üyelik, dönem bitmeden en az 24 saat önce iptal edilmezse aynı süre ve ücretle kendiliğinden yenilenir; yenileme ücreti dönem bitiminden önceki 24 saat içinde alınır. Üyeliği App Store hesap ayarlarından yönetebilir ve iptal edebilirsin.'
+          : 'Ödeme, satın almayı onayladığında Google Play hesabından alınır. Üyelik, dönem bitmeden iptal edilmezse aynı süre ve ücretle kendiliğinden yenilenir. Üyeliği Google Play abonelikler bölümünden yönetebilir ve iptal edebilirsin.'}</Text>
+      ) : null}
+      <View style={s.legal}>
+        <Pressable onPress={() => router.push('/hukuki/premium-sozlesme' as never)} accessibilityRole="link" hitSlop={8}><Text style={s.legalT}>Premium üyelik sözleşmesi</Text></Pressable>
+        <PlainText style={s.legalDot}>·</PlainText>
+        <Pressable onPress={() => router.push('/hukuki/kvkk' as never)} accessibilityRole="link" hitSlop={8}><Text style={s.legalT}>Gizlilik ve KVKK</Text></Pressable>
+        <PlainText style={s.legalDot}>·</PlainText>
+        <Pressable onPress={() => router.push('/hukuki/kullanim' as never)} accessibilityRole="link" hitSlop={8}><Text style={s.legalT}>Kullanım koşulları</Text></Pressable>
+      </View>
     </ScrollView>
   );
 }
 
-function PlanCard({ p, period, lang, current, onBuy }: { p: Plan; period: Period; lang: 'tr' | 'en' | 'de'; current: PlanId | null; onBuy: () => void }) {
+function PlanCard({ p, period, lang, current, onBuy, store, busy, disabled }: {
+  p: Plan; period: Period; lang: 'tr' | 'en' | 'de'; current: PlanId | null; onBuy: () => void;
+  store?: StoreProducts[keyof StoreProducts]; busy: boolean; disabled: boolean;
+}) {
   const mine = current === p.id;
   const big = p.id === 'business';
+  // Mağazanın gösterdiği fiyat (ülkeye ve vergiye göre) varsa o yazılır; yoksa tarife fiyatı
+  const headPrice = period === 'yearly' ? (store?.price ?? money(yearlyTotal(p), lang)) : (store ? (store.intro ?? store.price) : money(p.intro, lang));
+  const headPer = period === 'yearly' ? 'yıl' : store && !store.intro ? 'ay' : 'ilk ay';
+  const thenPrice = store ? store.price : money(p.monthly, lang);
   return (
     <View style={[s.card, big && s.cardBig]}>
       <View style={s.cardHead}>
@@ -85,10 +181,10 @@ function PlanCard({ p, period, lang, current, onBuy }: { p: Plan; period: Period
       </View>
       <Text style={s.tagline}>{p.tagline}</Text>
       <View style={s.priceRow}>
-        <PlainText style={s.price}>{money(period === 'yearly' ? yearlyTotal(p) : p.intro, lang)}</PlainText>
-        <PlainText style={s.per}>{` / ${tr(period === 'yearly' ? 'yıl' : 'ilk ay')}`}</PlainText>
+        <PlainText style={s.price}>{headPrice}</PlainText>
+        <PlainText style={s.per}>{` / ${tr(headPer)}`}</PlainText>
       </View>
-      {period === 'monthly' ? <PlainText style={s.then}>{`${tr('Sonraki aylar')} ${money(p.monthly, lang)} / ${tr('ay')}`}</PlainText> : null}
+      {period === 'monthly' && headPer === 'ilk ay' ? <PlainText style={s.then}>{`${tr('Sonraki aylar')} ${thenPrice} / ${tr('ay')}`}</PlainText> : null}
       {period === 'yearly'
         ? <PlainText style={s.perMonth}>{`${tr('12 ay kullan, 10 ay öde')} · ${tr('2 ay bedava')} (${money(p.monthly * 2, lang)})`}</PlainText>
         : <PlainText style={s.perMonth}>{`${tr('Yıllık üyelikte 2 ay bedava')}: ${money(yearlyTotal(p), lang)} / ${tr('yıl')}`}</PlainText>}
@@ -100,8 +196,8 @@ function PlanCard({ p, period, lang, current, onBuy }: { p: Plan; period: Period
           </View>
         ))}
       </View>
-      <Pressable style={({ pressed }) => [s.buy, mine && s.buyMine, pressed && !mine && { opacity: 0.88 }]} disabled={mine} onPress={onBuy} accessibilityRole="button">
-        <Text style={[s.buyT, mine && { color: color.tealText }]}>{mine ? 'Mevcut tarifen' : 'Bu tarifeyi seç'}</Text>
+      <Pressable style={({ pressed }) => [s.buy, mine && s.buyMine, pressed && !mine && { opacity: 0.88 }, disabled && !busy && !mine && { opacity: 0.6 }]} disabled={mine || disabled} onPress={onBuy} accessibilityRole="button" accessibilityState={{ busy, disabled: mine || disabled }}>
+        {busy ? <ActivityIndicator color={color.tealInk} /> : <Text style={[s.buyT, mine && { color: color.tealText }]}>{mine ? 'Mevcut tarifen' : 'Bu tarifeyi seç'}</Text>}
       </Pressable>
     </View>
   );
@@ -147,4 +243,10 @@ const s = StyleSheet.create({
   freeT: { color: color.ink, fontFamily: font.bold, fontSize: 17, marginBottom: 2 },
   freeF: { flex: 1, color: color.muted, fontSize: 14.5 },
   note: { color: color.muted, fontSize: 13, lineHeight: 19, marginHorizontal: 20, marginTop: 14 },
+  links: { marginHorizontal: 16, marginTop: 16, borderRadius: radius + 4, backgroundColor: color.surface, borderWidth: 1, borderColor: color.line, overflow: 'hidden' },
+  linkBtn: { flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 50, paddingHorizontal: 16, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: color.line },
+  linkT: { color: color.tealText, fontFamily: font.semi, fontSize: 15.5 },
+  legal: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', gap: 6, marginHorizontal: 20, marginTop: 14 },
+  legalT: { color: color.tealText, fontFamily: font.semi, fontSize: 13 },
+  legalDot: { color: color.muted, fontSize: 13 },
 });

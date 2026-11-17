@@ -22,6 +22,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { configured, supabase, type Row } from '../../../lib/supabase';
 import { color, font } from '../../../lib/theme';
 import { NoSwipe } from '../../../components/NoSwipe';
+import { askPushInContext } from '../../../lib/push';
 import { tr } from '../../../lib/i18n';
 
 function FChip({ icon, label, on, drop, onPress }: { icon: IconName; label: string; on?: boolean; drop?: boolean; onPress: () => void }) {
@@ -90,7 +91,7 @@ function ListingsScreen() {
     let { error: e } = await supabase.from('saved_searches').insert({ user_id: session.user.id, query: { f }, params, notify: true });
     if (e && /params|notify/.test(e.message)) ({ error: e } = await supabase.from('saved_searches').insert({ user_id: session.user.id, query: { f } }));
     if (e) Alert.alert('Aramayı kaydet', /limit/i.test(e.message) ? 'Kayıtlı arama sınırına ulaştın (ücretsiz 20, Pro 50). Eskilerden birini sil.' : 'Arama kaydedilemedi. Tekrar dene.');
-    else toast('Arama kaydedildi. Bu aramaya uyan yeni ilan gelince sana bildirim göndereceğiz.');
+    else { toast('Arama kaydedildi. Bu aramaya uyan yeni ilan gelince sana bildirim göndereceğiz.'); askPushInContext(); }
   }
   const [q, setQ] = useState('');
   const [view, setViewState] = useState<CardVariant>('row');

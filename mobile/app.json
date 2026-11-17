@@ -15,7 +15,8 @@
         }
       ],
       "expo-apple-authentication",
-      "expo-web-browser"
+      "expo-web-browser",
+      "expo-notifications"
     ],
     "experiments": {
       "typedRoutes": false
@@ -26,7 +27,11 @@
       "usesAppleSignIn": true,
       "infoPlist": {
         "CADisableMinimumFrameDurationOnPhone": true
-      }
+      },
+      "associatedDomains": [
+        "applinks:makinasal.com",
+        "applinks:www.makinasal.com"
+      ]
     },
     "android": {
       "package": "tr.com.makinasal.app",
@@ -37,6 +42,58 @@
       "permissions": [
         "android.permission.ACCESS_COARSE_LOCATION",
         "android.permission.ACCESS_FINE_LOCATION"
+      ],
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "https",
+              "host": "makinasal.com",
+              "pathPrefix": "/ilanlar"
+            },
+            {
+              "scheme": "https",
+              "host": "makinasal.com",
+              "pathPrefix": "/magaza"
+            },
+            {
+              "scheme": "https",
+              "host": "makinasal.com",
+              "pathPrefix": "/firmalar"
+            },
+            {
+              "scheme": "https",
+              "host": "makinasal.com",
+              "pathPrefix": "/is-agi"
+            },
+            {
+              "scheme": "https",
+              "host": "www.makinasal.com",
+              "pathPrefix": "/ilanlar"
+            },
+            {
+              "scheme": "https",
+              "host": "www.makinasal.com",
+              "pathPrefix": "/magaza"
+            },
+            {
+              "scheme": "https",
+              "host": "www.makinasal.com",
+              "pathPrefix": "/firmalar"
+            },
+            {
+              "scheme": "https",
+              "host": "www.makinasal.com",
+              "pathPrefix": "/is-agi"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
+        }
       ]
     },
     "icon": "./assets/brand/icon.png",
@@ -55,6 +112,14 @@
         "projectId": "0a639b03-9ba8-45a2-b6d2-dda84646cf68"
       }
     },
-    "owner": "komutanlogar0982"
+    "owner": "komutanlogar0982",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/0a639b03-9ba8-45a2-b6d2-dda84646cf68",
+      "checkAutomatically": "ON_LOAD",
+      "fallbackToCacheTimeout": 0
+    }
   }
 }

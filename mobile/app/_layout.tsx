@@ -20,6 +20,10 @@ import { DoubleTapSearch } from '../components/DoubleTapSearch';
 import { noteAppOpen } from '../lib/review';
 import { installErrorReporting, reportError, setErrorRoute } from '../lib/errorReport';
 import { Pressable, Text as RNText, View } from 'react-native';
+import { usePushNotifications } from '../lib/push';
+import { usePurchasesUser } from '../lib/purchases';
+import { useApp } from '../lib/AppContext';
+import { OfflineBanner } from '../components/OfflineBanner';
 import { usePathname, type ErrorBoundaryProps } from 'expo-router';
 
 // Yakalanmamış hatalar kaydedilir (çökme takibi, bkz. lib/errorReport.ts)
@@ -44,6 +48,10 @@ export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
 
 function Screens() {
   useLang();
+  // Anlık bildirimler: izin önceden verildiyse cihaz kaydedilir, bildirime dokununca ilgili ekran açılır
+  const { session } = useApp();
+  usePushNotifications(session?.user.id);
+  usePurchasesUser(session?.user.id);
   // Hata kaydına hangi ekranda olunduğu eklenir
   const pathname = usePathname();
   useEffect(() => { setErrorRoute(pathname); }, [pathname]);
@@ -138,6 +146,7 @@ export default function RootLayout() {
           <Screens />
           <LanguageGate />
           <ToastHost />
+          <OfflineBanner />
           <AnimatedSplash />
         </LoginPromptProvider>
       </AppProvider>
