@@ -23,6 +23,15 @@ function setChoice(c: ThemeChoice) {
   choice = c;
   subs.forEach((f) => f());
 }
+/*
+ * Geçiş perdesi (components/ThemeFade): ekran kısa bir an eski zemin rengiyle örtülür, görünüm perdenin
+ * arkasında değişir, perde yavaşça açılır. Telefonun kendi başlık çubuğu yeni rengi uygulamanın geri kalanından
+ * biraz sonra aldığı için perde olmadan üst kısım bir an geriden geliyordu.
+ */
+type Fader = (swap: () => void) => void;
+let fader: Fader | null = null;
+export function setThemeFader(f: Fader | null) { fader = f; }
+
 /** Telefonun görünümünü seçime uydurur (ThemeApplier çağırır). */
 export function applyAppearance(c: ThemeChoice) {
   try { Appearance.setColorScheme(c === 'system' ? 'auto' : c); } catch { /* yok say */ }
@@ -59,7 +68,11 @@ async function applyAndroid(): Promise<void> {
 export async function saveTheme(c: ThemeChoice): Promise<void> {
   // Önce dosyaya yazılır: Android açılışta buradan okur, görünüm dinleyicisi de buna bakar.
   writePref(THEME_FILE, c);
-  if (Platform.OS === 'ios') setChoice(c); // telefonun görünümünü ThemeApplier değiştirir
+  if (Platform.OS === 'ios') {
+    // Telefonun görünümünü ThemeApplier değiştirir (başlık yeni rengini aldıktan hemen sonra)
+    if (fader && c !== choice) fader(() => setChoice(c));
+    else setChoice(c);
+  }
   else { setChoice(c); applyAppearance(c); }
   try {
     if (c === 'system') await AsyncStorage.removeItem(KEY);

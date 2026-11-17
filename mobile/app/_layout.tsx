@@ -24,6 +24,7 @@ import { usePushNotifications } from '../lib/push';
 import { usePurchasesUser } from '../lib/purchases';
 import { useApp } from '../lib/AppContext';
 import { OfflineBanner } from '../components/OfflineBanner';
+import { ThemeFade } from '../components/ThemeFade';
 import { usePathname, type ErrorBoundaryProps } from 'expo-router';
 
 // Yakalanmamış hatalar kaydedilir (çökme takibi, bkz. lib/errorReport.ts)
@@ -147,6 +148,7 @@ export default function RootLayout() {
       <AppProvider>
         <LoginPromptProvider>
           <Screens />
+          <ThemeFade />
           <LanguageGate />
           <ToastHost />
           <OfflineBanner />
