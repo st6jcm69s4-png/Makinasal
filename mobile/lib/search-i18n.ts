@@ -880,6 +880,19 @@ export const searchEn: Record<string, string> = {
   "Ek ilan hakkın eklendi": "Your extra listing was added",
   "Ayda 5 yeni ilan (yıllıkta 60), ilan başına 20 fotoğraf": "5 new listings a month (60 yearly), 20 photos per listing",
   "Ayda 25 yeni ilan (yıllıkta 300), ilan başına 20 fotoğraf": "25 new listings a month (300 yearly), 20 photos per listing",
+  // İlan aktarma (17 Kasım 2026)
+  "Seçtiğin görüntülerde bir ilan bulamadık. İlan sayfasının ekran görüntülerini seç.": "We couldn't find a listing in these images. Choose screenshots of the listing page.",
+  "Bugünkü aktarma hakkın doldu (günde 15). Yarın tekrar deneyebilir ya da formu elle doldurabilirsin.": "You've reached today's import limit (15 a day). Try again tomorrow or fill in the form yourself.",
+  "İlan aktarma şu anda kullanılamıyor. Formu elle doldurabilirsin.": "Listing import isn't available right now. You can fill in the form yourself.",
+  "Görüntüler okunamadı. Bağlantını kontrol edip tekrar dene.": "Couldn't read the images. Check your connection and try again.",
+  "İlan aktarılamadı": "Couldn't import the listing",
+  "Bilgiler dolduruldu": "Details filled in",
+  "alan dolduruldu. Her alanı kontrol et, eksikleri tamamla ve makinenin kendi fotoğraflarını ekle (ekran görüntüleri fotoğraf olarak eklenmez).": "fields filled in. Check each field, complete what's missing and add your own photos of the machine (screenshots aren't added as photos).",
+  "Başka sitedeki ilanını aktar": "Import your listing from another site",
+  "İlanının ekran görüntülerini seç (en fazla 4): başlık, fiyat, özellikler ve açıklama görünsün. Bilgileri biz doldururuz, sen kontrol edip yayınlarsın. Yalnızca sana ait bir ilanı aktar.": "Choose screenshots of your listing (up to 4) showing the title, price, specs and description. We fill in the details; you check and publish. Only import a listing that's yours.",
+  "Ekran görüntüsü seç": "Choose screenshots",
+  "Ekran görüntüleri okunuyor…": "Reading screenshots…",
+  "Ekran görüntülerini seç, bilgileri biz dolduralım": "Choose screenshots and we'll fill in the details",
 };
 export const searchDe: Record<string, string> = {
   'Uygulamada ara': 'In der App suchen',
@@ -1762,4 +1775,17 @@ export const searchDe: Record<string, string> = {
   "Ek ilan hakkın eklendi": "Dein Zusatzinserat wurde hinzugefügt",
   "Ayda 5 yeni ilan (yıllıkta 60), ilan başına 20 fotoğraf": "5 neue Inserate pro Monat (60 jährlich), 20 Fotos pro Inserat",
   "Ayda 25 yeni ilan (yıllıkta 300), ilan başına 20 fotoğraf": "25 neue Inserate pro Monat (300 jährlich), 20 Fotos pro Inserat",
+  // İlan aktarma (17 Kasım 2026)
+  "Seçtiğin görüntülerde bir ilan bulamadık. İlan sayfasının ekran görüntülerini seç.": "In diesen Bildern wurde kein Inserat gefunden. Wähle Screenshots der Inseratsseite.",
+  "Bugünkü aktarma hakkın doldu (günde 15). Yarın tekrar deneyebilir ya da formu elle doldurabilirsin.": "Dein Importlimit für heute ist erreicht (15 pro Tag). Versuche es morgen erneut oder fülle das Formular selbst aus.",
+  "İlan aktarma şu anda kullanılamıyor. Formu elle doldurabilirsin.": "Der Inseratsimport ist gerade nicht verfügbar. Du kannst das Formular selbst ausfüllen.",
+  "Görüntüler okunamadı. Bağlantını kontrol edip tekrar dene.": "Die Bilder konnten nicht gelesen werden. Prüfe deine Verbindung und versuche es erneut.",
+  "İlan aktarılamadı": "Inserat konnte nicht importiert werden",
+  "Bilgiler dolduruldu": "Angaben ausgefüllt",
+  "alan dolduruldu. Her alanı kontrol et, eksikleri tamamla ve makinenin kendi fotoğraflarını ekle (ekran görüntüleri fotoğraf olarak eklenmez).": "Felder ausgefüllt. Prüfe jedes Feld, ergänze Fehlendes und füge eigene Fotos der Maschine hinzu (Screenshots werden nicht als Fotos übernommen).",
+  "Başka sitedeki ilanını aktar": "Inserat von einer anderen Seite importieren",
+  "İlanının ekran görüntülerini seç (en fazla 4): başlık, fiyat, özellikler ve açıklama görünsün. Bilgileri biz doldururuz, sen kontrol edip yayınlarsın. Yalnızca sana ait bir ilanı aktar.": "Wähle Screenshots deines Inserats (bis zu 4) mit Titel, Preis, Daten und Beschreibung. Wir füllen die Angaben aus, du prüfst und veröffentlichst. Importiere nur dein eigenes Inserat.",
+  "Ekran görüntüsü seç": "Screenshots wählen",
+  "Ekran görüntüleri okunuyor…": "Screenshots werden gelesen…",
+  "Ekran görüntülerini seç, bilgileri biz dolduralım": "Screenshots wählen, wir füllen die Angaben aus",
 };

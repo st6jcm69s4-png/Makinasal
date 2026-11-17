@@ -21,6 +21,7 @@ import * as haptic from '../lib/haptics';
 import { shrinkPhoto } from '../lib/photo';
 import { ensureListingQuota, fetchQuota, isQuotaError, quotaLine, type Quota } from '../lib/quota';
 import { useLang } from '../lib/lang';
+import { filledCount, importFromScreenshots, pickScreenshots, type ImportedFields } from '../lib/listingImport';
 import { color, font, radius, shadow, fixed } from '../lib/theme';
 
 const CONDITIONS = ['Sıfır', 'Çıkma', 'Revizyonlu'];
@@ -66,6 +67,56 @@ export default function NewListing() {
   const [quota, setQuota] = useState<Quota | null>(null);
   const { lang } = useLang();
   useEffect(() => { if (uid && !editId) void fetchQuota().then(setQuota); }, [uid, editId]);
+
+  // Başka sitedeki ilanı ekran görüntülerinden aktarma: bilgiler forma yazılır, kullanıcı kontrol edip yayınlar
+  const [importing, setImporting] = useState(false);
+  function applyImport(f: ImportedFields) {
+    if (f.category) setCat(f.category);
+    if (f.brand) setBrand(canonicalBrand(f.brand));
+    if (f.model) setModel(f.model);
+    if (f.year) setYear(String(f.year));
+    if (f.usage_value != null) setUsage(String(f.usage_value));
+    if (f.price) setPrice(String(f.price));
+    if (f.city) setCity(f.city);
+    if (f.description) setDesc(f.description);
+    if (f.takas != null) setTakas(f.takas);
+    if (f.cond) setCond(f.cond);
+    if (f.qty) setQty(String(f.qty));
+    if (f.part_group) setGroup(f.part_group);
+    if (f.equipment_category) setEquip(f.equipment_category);
+    if (f.compat) setCompat(f.compat);
+  }
+  async function runImport() {
+    const assets = await pickScreenshots();
+    if (!assets) return;
+    setImporting(true);
+    const r = await importFromScreenshots(assets);
+    setImporting(false);
+    if (!r.ok) {
+      if (r.error === 'cancelled') return;
+      haptic.failure();
+      const m = r.error === 'not_listing' ? 'Seçtiğin görüntülerde bir ilan bulamadık. İlan sayfasının ekran görüntülerini seç.'
+        : r.error === 'limit' ? 'Bugünkü aktarma hakkın doldu (günde 15). Yarın tekrar deneyebilir ya da formu elle doldurabilirsin.'
+        : r.error === 'not_configured' ? 'İlan aktarma şu anda kullanılamıyor. Formu elle doldurabilirsin.'
+        : 'Görüntüler okunamadı. Bağlantını kontrol edip tekrar dene.';
+      Alert.alert(tr('İlan aktarılamadı'), tr(m));
+      return;
+    }
+    applyImport(r.fields);
+    haptic.success();
+    const n = filledCount(r.fields);
+    Alert.alert(
+      tr('Bilgiler dolduruldu'),
+      `${n} ${tr('alan dolduruldu. Her alanı kontrol et, eksikleri tamamla ve makinenin kendi fotoğraflarını ekle (ekran görüntüleri fotoğraf olarak eklenmez).')}${r.notes ? `\n\n${r.notes}` : ''}`,
+    );
+  }
+  function startImport() {
+    Alert.alert(
+      tr('Başka sitedeki ilanını aktar'),
+      tr('İlanının ekran görüntülerini seç (en fazla 4): başlık, fiyat, özellikler ve açıklama görünsün. Bilgileri biz doldururuz, sen kontrol edip yayınlarsın. Yalnızca sana ait bir ilanı aktar.'),
+      [{ text: tr('Vazgeç'), style: 'cancel' }, { text: tr('Ekran görüntüsü seç'), onPress: () => { void runImport(); } }],
+    );
+  }
 
   useEffect(() => {
     if (!uid) return;
@@ -310,6 +361,16 @@ export default function NewListing() {
   return (
     <KeyboardAvoidingView style={{ flex: 1, backgroundColor: color.bg }} behavior="padding">
       <ScrollView style={{ backgroundColor: color.bg }} contentContainerStyle={s.form} keyboardShouldPersistTaps="handled">
+        {!editId ? (
+          <Pressable style={({ pressed }) => [s.importCard, pressed && { opacity: 0.85 }]} onPress={startImport} disabled={importing} accessibilityRole="button" accessibilityState={{ busy: importing }}>
+            <View style={s.importIcon}>{importing ? <ActivityIndicator color={color.tealText} /> : <Icon name="download" size={20} color={color.tealText} />}</View>
+            <View style={{ flex: 1 }}>
+              <Text style={s.importT}>{importing ? 'Ekran görüntüleri okunuyor…' : 'Başka sitedeki ilanını aktar'}</Text>
+              <Text style={s.importS}>Ekran görüntülerini seç, bilgileri biz dolduralım</Text>
+            </View>
+            {importing ? null : <Icon name="chevron-right" size={18} color={color.muted} />}
+          </Pressable>
+        ) : null}
         {!editId && quota ? (
           <Pressable style={({ pressed }) => [s.quota, pressed && { opacity: 0.8 }]} onPress={() => router.push('/premium')} accessibilityRole="button">
             <Icon name="layers" size={16} color={quota.remaining + quota.credits > 0 ? color.tealText : color.bad} />
@@ -450,6 +511,10 @@ export default function NewListing() {
 }
 
 const s = StyleSheet.create({
+  importCard: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14, borderRadius: radius + 4, backgroundColor: color.surface, borderWidth: 1, borderColor: color.line },
+  importIcon: { width: 40, height: 40, borderRadius: 12, alignItems: 'center', justifyContent: 'center', backgroundColor: color.tealSoft },
+  importT: { color: color.ink, fontFamily: font.semi, fontSize: 16 },
+  importS: { color: color.muted, fontSize: 13.5, marginTop: 2 },
   quota: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 14, minHeight: 44, borderRadius: radius, backgroundColor: color.surface, borderWidth: StyleSheet.hairlineWidth, borderColor: color.line },
   quotaT: { flex: 1, color: color.ink, fontFamily: font.medium, fontSize: 14 },
   hint: { color: color.muted, fontSize: 12.5, lineHeight: 18 },
