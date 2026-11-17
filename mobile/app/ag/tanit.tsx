@@ -1,3 +1,4 @@
+import { ChoiceRow, ExpandChoice } from '../../components/ExpandChoice';
 import { GrowPressable } from '../../components/Grow';
 import { useEffect, useState, type ReactNode } from 'react';
 import { ActivityIndicator, KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, Switch, View } from 'react-native';
@@ -145,14 +146,15 @@ export default function Introduce() {
         </View>
 
         {section('Ne iş yapıyorsun?', 'briefcase', <>
-          <View style={s.roles}>
+          <ChoiceRow>
             {(Object.keys(PERSONNEL_ROLES) as Role[]).map((k) => (
-              <Pressable key={k} style={[s.role, role === k && s.roleOn]} onPress={() => setRole(k)} accessibilityRole="button" accessibilityState={{ selected: role === k }}>
-                <Icon name={ROLE_ICON[k]} size={20} color={role === k ? color.tealInk : color.tealText} />
+              <ExpandChoice key={k} on={role === k} onPress={() => setRole(k)} height={80} tallHeight={112} grow={1.25} style={s.role} onStyle={s.roleOn}>
+                <Icon name={ROLE_ICON[k]} size={role === k ? 24 : 20} color={role === k ? color.tealInk : color.tealText} />
+                <View style={{ flex: 1 }} />
                 <Text style={[s.roleT, role === k && { color: color.tealInk }]} numberOfLines={2}>{PERSONNEL_ROLES[k]}</Text>
-              </Pressable>
+              </ExpandChoice>
             ))}
-          </View>
+          </ChoiceRow>
           {input('Başlık', title, setTitle, { placeholder: 'ör. 10 yıllık ekskavatör operatörü', maxLength: 120 })}
         </>)}
 
@@ -248,7 +250,7 @@ const s = StyleSheet.create({
   input: { minHeight: 50, paddingHorizontal: 14, paddingVertical: 12, fontSize: 16, backgroundColor: color.bg, borderRadius: radius, borderWidth: 1, borderColor: color.line, color: color.ink },
   select: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   roles: { flexDirection: 'row', gap: 8 },
-  role: { flex: 1, minHeight: 74, padding: 10, gap: 6, borderRadius: radius, borderWidth: 1.5, borderColor: color.line, backgroundColor: color.bg, justifyContent: 'center' },
+  role: { padding: 10, gap: 6, borderRadius: radius, borderWidth: 1.5, borderColor: color.line, backgroundColor: color.bg, overflow: 'hidden' },
   roleOn: { backgroundColor: color.teal, borderColor: color.teal },
   roleT: { color: color.ink, fontFamily: font.semi, fontSize: 13.5, lineHeight: 17 },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },

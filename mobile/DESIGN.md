@@ -41,7 +41,7 @@ Kaynak: Apple İnsan Arayüzü Yönergeleri ("Apple Look", github.com/dickwu/app
 ## Seçim hareketi (17 Kasım 2026)
 - Seçilen çip ya da amaç kutusu büyür ve yukarı doğru yükselir; alt kenarı yerinde kalır. Ortak parça: `components/Grow.tsx` (`GrowPressable`).
 - Çiplerde yalnızca dönüşüm (ölçek %6–8, 3 px yükselme, `transformOrigin: 'bottom'`); yerleşim kaymaz. Yatay kaydırılan çip satırlarında taşma için `marginVertical: -6` + `paddingVertical: 6`.
-- İş Ağı'ndaki üç amaç kutusunda seçilen kutu genişler (esneme 1 → 1,35) ve yukarı uzar (14 px); satır `alignItems: 'flex-end'`.
+- Yan yana seçim kutuları (`components/ExpandChoice.tsx`: İş Ağı amaç kutuları, "Kendini tanıt" meslek kutuları): seçilen kutu yukarı doğru uzayıp uzunlamasına dikdörtgen olur (İş Ağı 112 → 156 px, genişlik payı 1,22), diğerleri %95'e küçülür; satır yüksekliği sabit kalır. Yay: sertlik 220, sönüm 26 (zıplamasız, ~0,45 sn).
 - Yay: sertlik 380, sönüm 22 (hafif esneme); basılıyken %96'ya küçülür. Seçim değişince hafif titreşim. "Hareketi azalt" açıksa hareket yok.
 - Bölümlü düğmelerde (segmented control: Ayarlar, kredi hesaplayıcı, sekmeli başlıklar) kullanılmaz; Apple'da bu parça büyümez, kayan zemin yeterli.
 
