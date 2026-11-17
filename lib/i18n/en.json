@@ -1567,5 +1567,6 @@
   "Kaydedilemedi. Tekrar dene.": "Couldn't save. Try again.",
   "Arama kaydedilemedi. Tekrar dene.": "Couldn't save the search. Try again.",
   "Güvenliğin için mevcut şifreni gir ya da şifre sıfırlama bağlantısı iste.": "For your security, enter your current password or request a password reset link.",
-  "Mevcut şifre yanlış.": "Current password is incorrect."
+  "Mevcut şifre yanlış.": "Current password is incorrect.",
+  "Güvenlik için önce çıkış yapıp yeniden giriş yapman gerekiyor, sonra tekrar dene.": "For security, sign out and sign in again, then try again."
 }

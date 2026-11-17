@@ -51,7 +51,12 @@ export async function POST(request: NextRequest) {
    const check = createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
    const login = await check.auth.signInWithPassword({ email: data.user.email, password: currentPassword });
    if (login.error || login.data.user?.id !== data.user.id) return fail(/rate|too many/i.test(login.error?.message ?? "") ? "Çok fazla deneme yapıldı. Biraz bekleyip tekrar dene." : "Mevcut şifre yanlış.", 403);
+   // Supabase "Secure password change" açık: şifre, mevcut şifreyle yeni açılan (taze) oturumdan değiştirilir
+   const fresh = await check.auth.updateUser({ password });
    await check.auth.signOut({ scope: "local" }).catch(() => undefined);
+   if (fresh.error) return fail(authError(fresh.error.message));
+   await db.auth.signOut();
+   return response;
   }
 
   const { error } = await db.auth.updateUser({ password });

@@ -1568,5 +1568,6 @@
   "Kaydedilemedi. Tekrar dene.": "Speichern fehlgeschlagen. Versuche es erneut.",
   "Arama kaydedilemedi. Tekrar dene.": "Suche konnte nicht gespeichert werden. Versuche es erneut.",
   "Güvenliğin için mevcut şifreni gir ya da şifre sıfırlama bağlantısı iste.": "Gib zu deiner Sicherheit dein aktuelles Passwort ein oder fordere einen Link zum Zurücksetzen an.",
-  "Mevcut şifre yanlış.": "Das aktuelle Passwort ist falsch."
+  "Mevcut şifre yanlış.": "Das aktuelle Passwort ist falsch.",
+  "Güvenlik için önce çıkış yapıp yeniden giriş yapman gerekiyor, sonra tekrar dene.": "Melde dich zur Sicherheit ab und wieder an und versuche es dann erneut."
 }
