@@ -1,6 +1,6 @@
 import { SwipeTabs } from '../../../components/SwipeTabs';
 import { useRef } from 'react';
-import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Image, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useTabScrollTop } from '../../../lib/scrollTop';
 import { router } from 'expo-router';
 import { Text } from '../../../components/LText';
@@ -14,6 +14,7 @@ import { color, font } from '../../../lib/theme';
  * "İlan ver" sekmesi. Apple yönergesi: sekme bir eylem değil, bir yerdir.
  * Burada ne tür ilan verileceği seçilir; seçilen form ana yığında açılır.
  */
+const EXCAVATOR = require('../../../assets/cat/excavator.png');
 type Choice = { icon: IconName; title: string; sub: string; to: string };
 const MAIN: Choice = { icon: 'truck', title: 'Satılık ilan ver', sub: 'İş makinesi, kamyon, vinç, yedek parça veya lastik', to: '/ilan-ver' };
 const OTHERS: Choice[] = [
@@ -27,7 +28,8 @@ const OTHERS: Choice[] = [
 function Big({ c }: { c: Choice }) {
   return (
     <Pressable onPress={() => router.push(c.to as never)} style={({ pressed }) => [s.big, pressed && { opacity: 0.9, transform: [{ scale: 0.98 }] }]} accessibilityRole="button">
-      <View style={s.bigIcon}><Icon name={c.icon} size={26} color={color.tealInk} /></View>
+      {/* Ana sayfadaki kategori çizimleriyle aynı ekskavatör (açık karo içinde, çizgileri görünsün) */}
+      <View style={s.bigIcon}><Image source={EXCAVATOR} style={{ width: 40, height: 40 }} resizeMode="contain" accessibilityIgnoresInvertColors /></View>
       <View style={{ flex: 1, gap: 3 }}>
         <Text style={s.bigTitle}>{c.title}</Text>
         <Text style={s.bigSub}>{c.sub}</Text>
@@ -62,7 +64,7 @@ function NewListingScreen() {
 const s = StyleSheet.create({
   body: { paddingHorizontal: 16, paddingTop: 8, paddingBottom: 40, gap: 24 },
   big: { flexDirection: 'row', alignItems: 'center', gap: 14, padding: 18, borderRadius: 18, backgroundColor: color.teal },
-  bigIcon: { width: 48, height: 48, borderRadius: 14, backgroundColor: 'rgba(255,255,255,0.18)', alignItems: 'center', justifyContent: 'center' },
+  bigIcon: { width: 52, height: 52, borderRadius: 14, backgroundColor: '#F7F1E6', alignItems: 'center', justifyContent: 'center' },
   bigTitle: { color: color.tealInk, fontFamily: font.bold, fontSize: 20 },
   bigSub: { color: color.tealInk, opacity: 0.85, fontSize: 14, lineHeight: 19 },
 });

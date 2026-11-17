@@ -4,14 +4,15 @@ import { toast } from '../components/Toast';
 import { maybeAskReview } from '../lib/review';
 import { CardSkeleton } from '../components/kit';
 import { GuestGate } from '../components/LoginPrompt';
-import { ActionSheetIOS, Alert, FlatList, Image, Modal, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Alert, FlatList, Image, Modal, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { MoreMenu, type MenuItem } from '../components/MoreMenu';
 import { PlainText, Text, TextInput } from '../components/LText';
 import { Icon, type IconName } from '../components/Icon';
 import { tr } from '../lib/i18n';
 import { router, useFocusEffect } from 'expo-router';
 import { useApp } from '../lib/AppContext';
 import { photoUrl, supabase, tl } from '../lib/supabase';
-import { color, font, launchScheme } from '../lib/theme';
+import { color, font } from '../lib/theme';
 
 type Row = {
   id: string; title: string; price: number | string; city: string; status: string;
@@ -29,7 +30,7 @@ function statusTone(r: Row): { bg: string; fg: string } {
   if (r.moderation_status === 'rejected') return { bg: color.badBg, fg: color.bad };
   return { bg: color.tealSoft, fg: color.tealText };
 }
-type Action = { icon: IconName; label: string; danger?: boolean; run: () => void };
+type Action = MenuItem;
 
 function statusText(r: Row) {
   if (r.status === 'sold') return 'Satıldı';
@@ -44,7 +45,6 @@ export default function MyListings() {
   const uid = session?.user.id;
   const [rows, setRows] = useState<Row[] | null>(null);
   const [error, setError] = useState('');
-  const [menu, setMenu] = useState<Row | null>(null);
   const [quality, setQuality] = useState<Row | null>(null);
   const [stats, setStats] = useState<Map<string, Stat>>(new Map());
   const [auctions, setAuctions] = useState<Map<string, { current_price: number | null; bid_count: number }>>(new Map());
@@ -80,42 +80,25 @@ export default function MyListings() {
     const au = auctions.get(r.id);
     if (au && au.bid_count > 0) {
       return [
-        { icon: 'award', label: 'Açık artırmayı gör', run: () => router.push(`/ilan/${r.id}`) },
-        { icon: 'lock', label: 'Neden değiştiremiyorum?', run: () => Alert.alert(tr('Açık artırma sürüyor'), tr('Bu ilan teklif almış bir açık artırmada. Süre bitene kadar ilan düzenlenemez, duraklatılamaz, satıldı yapılamaz veya kaldırılamaz. Süre bitince en yüksek teklifi verenle mesajlaşma otomatik açılır.')) },
+        { sf: 'hammer', icon: 'award', label: 'Açık artırmayı gör', run: () => router.push(`/ilan/${r.id}`) },
+        { sf: 'lock', icon: 'lock', label: 'Neden değiştiremiyorum?', run: () => Alert.alert(tr('Açık artırma sürüyor'), tr('Bu ilan teklif almış bir açık artırmada. Süre bitene kadar ilan düzenlenemez, duraklatılamaz, satıldı yapılamaz veya kaldırılamaz. Süre bitince en yüksek teklifi verenle mesajlaşma otomatik açılır.')) },
       ];
     }
-    const list: Action[] = [{ icon: 'edit-2', label: 'Düzenle', run: () => router.push(`/ilan-ver?duzenle=${r.id}`) }];
+    const list: Action[] = [{ sf: 'pencil', icon: 'edit-2', label: 'Düzenle', run: () => router.push(`/ilan-ver?duzenle=${r.id}`) }];
     if (r.status === 'active') {
-      list.push({ icon: 'check-circle', label: 'Satıldı', run: () => confirm(r, 'sold', 'Bu ilan satıldı olarak işaretlensin mi? İlan yayından kalkar.', 'Evet, satıldı') });
-      list.push({ icon: 'pause-circle', label: 'Duraklat', run: () => void patch(r.id, 'paused') });
+      list.push({ sf: 'checkmark.circle', icon: 'check-circle', label: 'Satıldı', run: () => confirm(r, 'sold', 'Bu ilan satıldı olarak işaretlensin mi? İlan yayından kalkar.', 'Evet, satıldı') });
+      list.push({ sf: 'pause.circle', icon: 'pause-circle', label: 'Duraklat', run: () => void patch(r.id, 'paused') });
     }
-    if (r.status === 'active' && !isBoosted(r)) list.push({ icon: 'trending-up', label: 'Öne çıkar', run: () => Alert.alert(tr('Öne çıkar'), tr('İlanın 7 gün boyunca aramalarda üst sıralarda ve "Öne çıkan" etiketiyle görünür. Ödeme sistemi açılınca buradan satın alabileceksin. Premium üyelikte ilanların zaten öne çıkar.'), [{ text: tr('Tamam'), style: 'cancel' }, { text: tr("Premium'a bak"), onPress: () => router.push('/premium') }]) });
-    if (r.status === 'active' && r.moderation_status === 'approved' && !auctions.has(r.id)) list.push({ icon: 'award', label: 'Açık artırmaya çıkar', run: () => {
+    if (r.status === 'active' && !isBoosted(r)) list.push({ sf: 'chart.line.uptrend.xyaxis', icon: 'trending-up', label: 'Öne çıkar', run: () => Alert.alert(tr('Öne çıkar'), tr('İlanın 7 gün boyunca aramalarda üst sıralarda ve "Öne çıkan" etiketiyle görünür. Ödeme sistemi açılınca buradan satın alabileceksin. Premium üyelikte ilanların zaten öne çıkar.'), [{ text: tr('Tamam'), style: 'cancel' }, { text: tr("Premium'a bak"), onPress: () => router.push('/premium') }]) });
+    if (r.status === 'active' && r.moderation_status === 'approved' && !auctions.has(r.id)) list.push({ sf: 'hammer', icon: 'award', label: 'Açık artırmaya çıkar', run: () => {
       const p = Number(r.price) || 0;
       setAStart(p ? String(Math.round(p * 0.7)) : ''); setAInc(p ? String(Math.max(100, Math.round(p * 0.01 / 100) * 100)) : ''); setADays(7); setAErr(''); setAuc(r);
     } });
-    if (r.category !== 'Yedek parça' && r.category !== 'Lastik ve jant') list.push({ icon: 'tool', label: 'Makine karnesi', run: () => router.push({ pathname: '/karne/[id]', params: { id: r.id, title: r.title, unit: r.usage_unit ?? '' } } as never) });
-    if (r.status === 'active' && r.moderation_status === 'approved') list.push({ icon: 'grid', label: 'Satılık afişi (QR kod)', run: () => router.push({ pathname: '/afis/[id]', params: { id: r.id, title: r.title, price: tl(r.price), city: r.city } } as never) });
-    if (r.status === 'paused') list.push({ icon: 'play-circle', label: 'Yayına al', run: () => void patch(r.id, 'active') });
-    list.push({ icon: 'trash-2', label: 'Kaldır', danger: true, run: () => confirm(r, 'removed', 'İlan kaldırılsın mı? İşlem ve değerlendirme geçmişi korunur.', 'Kaldır', true) });
+    if (r.category !== 'Yedek parça' && r.category !== 'Lastik ve jant') list.push({ sf: 'wrench.and.screwdriver', icon: 'tool', label: 'Makine karnesi', run: () => router.push({ pathname: '/karne/[id]', params: { id: r.id, title: r.title, unit: r.usage_unit ?? '' } } as never) });
+    if (r.status === 'active' && r.moderation_status === 'approved') list.push({ sf: 'qrcode', icon: 'grid', label: 'Satılık afişi (QR kod)', run: () => router.push({ pathname: '/afis/[id]', params: { id: r.id, title: r.title, price: tl(r.price), city: r.city } } as never) });
+    if (r.status === 'paused') list.push({ sf: 'play.circle', icon: 'play-circle', label: 'Yayına al', run: () => void patch(r.id, 'active') });
+    list.push({ sf: 'trash', icon: 'trash-2', label: 'Kaldır', danger: true, run: () => confirm(r, 'removed', 'İlan kaldırılsın mı? İşlem ve değerlendirme geçmişi korunur.', 'Kaldır', true) });
     return list;
-  }
-
-  /** İlan seçenekleri: iPhone'da sistemin kendi eylem sayfası, Android'de alttan açılan sayfa. */
-  function openMenu(r: Row) {
-    if (Platform.OS !== 'ios') { setMenu(r); return; }
-    const list = actions(r);
-    ActionSheetIOS.showActionSheetWithOptions(
-      {
-        title: r.title,
-        options: [...list.map((a) => tr(a.label)), tr('Vazgeç')],
-        cancelButtonIndex: list.length,
-        ...(list.some((a) => a.danger) ? { destructiveButtonIndex: list.findIndex((a) => a.danger) } : {}),
-        userInterfaceStyle: launchScheme,
-        // tintColor verilmez: tema rengi bu menünün kabul ettiği biçimde değil (uygulama çöküyordu); sistem rengi kullanılır
-      },
-      (i) => { if (i < list.length) list[i].run(); },
-    );
   }
 
   if (!session) return <GuestGate icon="list" text="İlanlarını görmek ve yönetmek için giriş yap." />;
@@ -186,28 +169,12 @@ export default function MyListings() {
                   </Pressable>
                 );
               })() : null}
-              <Pressable style={({ pressed }) => [s.more, pressed && { opacity: 0.5 }]} onPress={() => openMenu(r)} hitSlop={8} accessibilityRole="button" accessibilityLabel={tr('İlan seçenekleri')}>
-                <View style={s.moreDot}><Icon name="more-horizontal" size={18} color={color.accentText} /></View>
-              </Pressable>
+              {/* Seçenekler: düğmenin yanında küçük menü (iPhone'da sistemin kendi menüsü) */}
+              <View style={s.more}><MoreMenu items={actions(r)} /></View>
             </View>
           );
         }}
       />
-      <Modal visible={!!menu} transparent animationType="fade" onRequestClose={() => setMenu(null)}>
-        <Pressable style={s.backdrop} onPress={() => setMenu(null)} accessibilityLabel={tr('Kapat')}>
-          <Pressable style={s.sheet} onPress={() => undefined}>
-            <View style={s.grab} />
-            {menu ? <PlainText style={s.sheetTitle} numberOfLines={1}>{menu.title}</PlainText> : null}
-            {menu ? actions(menu).map((a, i) => (
-              <Pressable key={a.label} style={({ pressed }) => [s.row, i > 0 && s.sep, pressed && { opacity: 0.7 }]} onPress={() => { setMenu(null); setTimeout(a.run, 250); }} accessibilityRole="button">
-                <View style={[s.rowIcon, a.danger && { backgroundColor: color.bad }]}><Icon name={a.icon} size={17} color="#FFFFFF" /></View>
-                <Text style={[s.rowT, a.danger && { color: color.bad }]}>{a.label}</Text>
-              </Pressable>
-            )) : null}
-            <Pressable style={s.cancel} onPress={() => setMenu(null)} accessibilityRole="button"><Text style={s.cancelT}>Vazgeç</Text></Pressable>
-          </Pressable>
-        </Pressable>
-      </Modal>
       {/* İlan kalitesi: puanın maddeleri ve eksikler */}
       <Modal visible={!!quality} transparent animationType="slide" onRequestClose={() => setQuality(null)}>
         <Pressable style={s.backdrop} onPress={() => setQuality(null)} accessibilityLabel={tr('Kapat')}>
@@ -343,7 +310,7 @@ const s = StyleSheet.create({
   sumItem: { flex: 1, alignItems: 'center', gap: 3 },
   sumN: { color: color.ink, fontFamily: font.semi, fontSize: 19 },
   sumL: { color: color.muted, fontSize: 12 },
-  more: { position: 'absolute', top: 4, right: 2, width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },
+  more: { position: 'absolute', top: 4, right: 2 },
   moreDot: { width: 30, height: 30, borderRadius: 15, backgroundColor: color.plate, alignItems: 'center', justifyContent: 'center' },
   backdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' },
   sheet: { backgroundColor: color.surface, borderTopLeftRadius: 26, borderTopRightRadius: 26, paddingHorizontal: 16, paddingTop: 8, paddingBottom: 34 },

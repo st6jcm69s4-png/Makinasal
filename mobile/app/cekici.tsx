@@ -3,14 +3,16 @@ import { ActivityIndicator, Alert, Linking, Pressable, ScrollView, StyleSheet, V
 import { PlainText, Text } from '../components/LText';
 import { Icon } from '../components/Icon';
 import { PickerModal } from '../components/PickerModal';
-import { Btn, Label } from '../components/ui';
+import { Btn } from '../components/ui';
+import { Group } from '../components/Rows';
+import { tr } from '../lib/i18n';
 import { AlertBox, RowSkeleton } from '../components/kit';
 import { router } from 'expo-router';
 import { useApp } from '../lib/AppContext';
 import { useLoginPrompt } from '../components/LoginPrompt';
 import { CITIES } from '../lib/data';
 import { COORDS } from '../lib/geo';
-import { color, font, radius } from '../lib/theme';
+import { color, font } from '../lib/theme';
 import type { Provider } from '../lib/network';
 import { supabase } from '../lib/supabase';
 
@@ -97,25 +99,31 @@ export default function Cekici() {
   }
 
   return (
-    <ScrollView style={{ flex: 1, backgroundColor: color.bg }} contentContainerStyle={{ paddingBottom: 32 }}>
-      <View style={s.hero}>
-        <Label style={{ color: color.onNavy }}>Yol yardım</Label>
-        <Text style={s.h1}>En yakın çekiciyi bul</Text>
-        <Text style={s.lead}>Konumunu paylaş ya da il seç; çekiciler yakınlığa göre, puanlarıyla sıralanır.</Text>
-        <Pressable style={({ pressed }) => [s.locBtn, pressed && { opacity: 0.85 }]} onPress={() => void useMyLocation()} disabled={locBusy} accessibilityRole="button">
-          {locBusy ? <ActivityIndicator color={color.onBar} /> : <Icon name="crosshair" size={20} color={color.onBar} />}
-          <Text style={s.locText}>{gps ? 'Konumum kullanılıyor · yenile' : 'Konumumu kullan'}</Text>
-        </Pressable>
-        <Pressable style={s.cityBtn} onPress={() => setSheet(true)} accessibilityRole="button">
-          <Icon name="map-pin" size={18} color={color.onNavy} />
-          <Text style={s.cityText}>{gps ? 'Ya da il seç' : city || 'İl seç'}</Text>
-          <Icon name="chevron-down" size={18} color={color.onNavy} />
+    <ScrollView style={{ flex: 1, backgroundColor: color.bg }} contentContainerStyle={s.body}>
+      {/* Acil durum: ekranın en üstünde, kendi kartında; tek dokunuşla 112 */}
+      <View style={s.sos}>
+        <View style={s.sosIcon}><Icon name="alert-triangle" size={18} color="#FFFFFF" /></View>
+        <View style={{ flex: 1, gap: 1 }}>
+          <Text style={s.sosT}>Can güvenliği tehlikedeyse</Text>
+          <Text style={s.sosS}>Çekiciden önce 112'yi ara.</Text>
+        </View>
+        <Pressable style={({ pressed }) => [s.sosBtn, pressed && { opacity: 0.6 }]} onPress={() => void Linking.openURL('tel:112')} accessibilityRole="button" accessibilityLabel={tr("112'yi ara")}>
+          <Icon name="phone" size={15} color={color.bad} />
+          <PlainText style={s.sosBtnT}>112</PlainText>
         </Pressable>
       </View>
-      <View style={s.sos}><Icon name="alert-triangle" size={16} color={color.warn} /><Text style={s.sosText}>Can güvenliği tehlikesinde önce 112'yi ara.</Text></View>
+
+      <Group
+        title="Nerede olduğunu seç"
+        footer="Çekiciler yakınlığa göre, puanlarıyla sıralanır."
+        items={[
+          { icon: 'crosshair', tint: 'accent', label: gps ? 'Konumum kullanılıyor' : 'Konumumu kullan', sub: locBusy ? 'Konum alınıyor…' : gps ? 'Yenilemek için dokun' : undefined, go: () => { if (!locBusy) void useMyLocation(); } },
+          { icon: 'map-pin', tint: 'green', label: 'İl seç', value: gps ? undefined : city || undefined, go: () => setSheet(true) },
+        ]}
+      />
 
       {rows === null ? <RowSkeleton count={4} /> : null}
-      {error ? <View style={{ margin: 12 }}><AlertBox variant="destructive">{error}</AlertBox></View> : null}
+      {error ? <AlertBox variant="destructive">{error}</AlertBox> : null}
       {rows && !rows.length && !error ? (
         <View style={s.empty}>
           <Text style={s.emptyT}>Henüz kayıtlı çekici yok.</Text>
@@ -125,38 +133,32 @@ export default function Cekici() {
       ) : null}
       {!origin && rows?.length ? <Text style={s.hint}>Mesafeyi görmek için konumunu kullan ya da il seç.</Text> : null}
 
+      {sorted.length ? <Text style={s.secT} accessibilityRole="header">Çekiciler</Text> : null}
       {sorted.map(({ t, d, serves }) => {
         const st = stats[t.user_id];
         return (
           <View key={t.user_id} style={s.card}>
-            <Pressable onPress={() => router.push(`/firma/${t.user_id}` as never)} accessibilityRole="button" style={s.cardTop}>
+            <Pressable onPress={() => router.push(`/firma/${t.user_id}` as never)} accessibilityRole="button" style={({ pressed }) => [s.cardTop, pressed && { backgroundColor: color.plate }]}>
               <View style={{ flex: 1, gap: 3 }}>
                 <Text style={s.name} numberOfLines={2}>{t.name}</Text>
                 <Text style={s.where}>{[t.city, t.district].filter(Boolean).join(' / ')}</Text>
+                <View style={s.meta}>
+                  <Icon name="star" size={13} color={st && st.review_count ? '#C99A06' : color.muted} />
+                  <Text style={s.metaT}>{st && st.review_count ? `${st.score.toFixed(1)} (${st.review_count})` : 'Yeni'}</Text>
+                  <Text style={s.metaT}>·</Text>
+                  <Text style={s.metaT} numberOfLines={1}>{serves ? 'Bölgende hizmet veriyor' : `${t.service_cities.length} il`}</Text>
+                </View>
               </View>
               <View style={s.dist}>
                 <PlainText style={s.distNum}>{d == null ? '–' : String(d)}</PlainText>
-                <Label>km</Label>
+                <Text style={s.distUnit}>km</Text>
               </View>
             </Pressable>
-            <View style={s.strip}>
-              <View style={s.cell}>
-                <Label>Puan</Label>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                  <Icon name="star" size={14} color={st && st.review_count ? color.accent : color.muted} />
-                  <Text style={s.val}>{st && st.review_count ? `${st.score.toFixed(1)} (${st.review_count})` : 'Yeni'}</Text>
-                </View>
-              </View>
-              <View style={[s.cell, s.cellL]}>
-                <Label>Hizmet</Label>
-                <Text style={s.val} numberOfLines={1}>{serves ? 'Bölgende hizmet veriyor' : `${t.service_cities.length} il`}</Text>
-              </View>
-            </View>
             <View style={s.actions}>
-              <Pressable style={({ pressed }) => [s.call, pressed && { opacity: 0.85 }]} onPress={() => void call(t.user_id)} accessibilityRole="button">
-                <Icon name="phone" size={18} color={color.accentInk} /><Text style={s.callText}>Ara</Text>
+              <Pressable style={({ pressed }) => [s.call, pressed && { opacity: 0.85, transform: [{ scale: 0.98 }] }]} onPress={() => void call(t.user_id)} accessibilityRole="button">
+                <Icon name="phone" size={17} color={color.accentInk} /><Text style={s.callText}>Ara</Text>
               </Pressable>
-              <Pressable style={({ pressed }) => [s.more, pressed && { backgroundColor: color.plate }]} onPress={() => router.push(`/firma/${t.user_id}` as never)} accessibilityRole="button">
+              <Pressable style={({ pressed }) => [s.more, pressed && { opacity: 0.7 }]} onPress={() => router.push(`/firma/${t.user_id}` as never)} accessibilityRole="button">
                 <Text style={s.moreText}>Firma sayfası</Text>
               </Pressable>
             </View>
@@ -168,34 +170,33 @@ export default function Cekici() {
   );
 }
 
+/* Apple gruplu liste düzeni: gölgesiz, çerçevesiz kartlar; kırmızı yalnızca acil durumda. */
+const HAIR = StyleSheet.hairlineWidth;
 const s = StyleSheet.create({
-  hero: { backgroundColor: color.navy, paddingHorizontal: 16, paddingTop: 16, paddingBottom: 20, gap: 8, borderBottomLeftRadius: 28, borderBottomRightRadius: 28 },
-  h1: { color: color.onBar, fontFamily: font.bold, fontSize: 26, lineHeight: 32 },
-  lead: { color: color.onNavy },
-  locBtn: { backgroundColor: color.accent, borderRadius: radius, minHeight: 50, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 6 },
-  locText: { color: color.onBar, fontSize: 16, fontWeight: '700' },
-  cityBtn: { borderWidth: 1, borderColor: color.navy2, backgroundColor: color.navy2, borderRadius: radius, minHeight: 46, flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 12 },
-  cityText: { flex: 1, color: color.onBar, fontSize: 16 },
-  sos: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: color.warnBg, paddingVertical: 8, paddingHorizontal: 14 },
-  sosText: { color: color.warn, fontSize: 14, fontWeight: '600' },
-  err: { color: color.bad, margin: 12 },
-  hint: { color: color.muted, margin: 12, marginBottom: 0 },
-  empty: { margin: 12, padding: 16, gap: 10, backgroundColor: color.surface, borderWidth: 1, borderColor: color.line },
-  emptyT: { fontSize: 17, fontWeight: '700', color: color.ink },
+  body: { padding: 16, paddingBottom: 40, gap: 18 },
+  sos: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: color.surface, borderRadius: 16, padding: 12 },
+  sosIcon: { width: 34, height: 34, borderRadius: 9, backgroundColor: color.bad, alignItems: 'center', justifyContent: 'center' },
+  sosT: { color: color.ink, fontFamily: font.semi, fontSize: 15.5 },
+  sosS: { color: color.muted, fontSize: 13.5 },
+  sosBtn: { flexDirection: 'row', alignItems: 'center', gap: 5, minHeight: 36, paddingHorizontal: 14, borderRadius: 18, backgroundColor: color.badBg },
+  sosBtnT: { color: color.bad, fontFamily: font.bold, fontSize: 16 },
+  secT: { fontSize: 13, color: color.muted, marginLeft: 16, marginBottom: -10 },
+  hint: { color: color.muted, fontSize: 13.5, marginHorizontal: 16 },
+  empty: { padding: 16, gap: 10, backgroundColor: color.surface, borderRadius: 16 },
+  emptyT: { fontSize: 17, fontFamily: font.semi, color: color.ink },
   emptyS: { color: color.muted },
-  card: { marginHorizontal: 12, marginTop: 10, backgroundColor: color.surface, borderWidth: 1, borderColor: color.line, borderRadius: radius, overflow: 'hidden' },
-  cardTop: { flexDirection: 'row', padding: 12, gap: 10, alignItems: 'flex-start' },
-  name: { fontSize: 17, fontWeight: '700', color: color.ink },
+  card: { backgroundColor: color.surface, borderRadius: 16, overflow: 'hidden' },
+  cardTop: { flexDirection: 'row', padding: 14, gap: 12, alignItems: 'flex-start' },
+  name: { fontSize: 17, fontFamily: font.semi, color: color.ink },
   where: { color: color.muted, fontSize: 14 },
+  meta: { flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 2 },
+  metaT: { color: color.muted, fontSize: 13.5, flexShrink: 1 },
   dist: { alignItems: 'flex-end' },
-  distNum: { fontFamily: font.bold, fontSize: 30, color: color.accentText, lineHeight: 32 },
-  strip: { flexDirection: 'row', borderTopWidth: 1, borderTopColor: color.line },
-  cell: { flex: 1, paddingVertical: 7, paddingHorizontal: 12, gap: 1 },
-  cellL: { flex: 1.5, borderLeftWidth: 1, borderLeftColor: color.line },
-  val: { fontSize: 15, color: color.ink, fontWeight: '500' },
-  actions: { flexDirection: 'row', borderTopWidth: 1, borderTopColor: color.line },
-  call: { flex: 1, backgroundColor: color.accent, minHeight: 48, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
-  callText: { color: color.accentInk, fontWeight: '700', fontSize: 16 },
-  more: { flex: 1, minHeight: 48, alignItems: 'center', justifyContent: 'center' },
-  moreText: { color: color.accentText, fontWeight: '600', fontSize: 15 },
+  distNum: { fontFamily: font.bold, fontSize: 26, color: color.ink, lineHeight: 30 },
+  distUnit: { color: color.muted, fontSize: 13 },
+  actions: { flexDirection: 'row', gap: 10, paddingHorizontal: 14, paddingBottom: 14 },
+  call: { flex: 1, backgroundColor: color.accent, minHeight: 46, borderRadius: 12, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
+  callText: { color: color.accentInk, fontFamily: font.semi, fontSize: 16 },
+  more: { flex: 1, minHeight: 46, borderRadius: 12, backgroundColor: color.tealSoft, alignItems: 'center', justifyContent: 'center' },
+  moreText: { color: color.tealText, fontFamily: font.semi, fontSize: 16 },
 });

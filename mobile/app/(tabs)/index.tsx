@@ -63,6 +63,10 @@ function HomeScreen() {
   const [jobs, setJobs] = useState<MarketPost[]>([]);
   const [firms, setFirms] = useState<Provider[]>([]);
   const [busy, setBusy] = useState(false);
+  // Yenileme göstergesi yalnızca kullanıcı sayfayı elle aşağı çektiğinde görünür; sayfaya geri dönünce
+  // yapılan sessiz yenilemede görünmez.
+  const [pulling, setPulling] = useState(false);
+  const pull = async () => { setPulling(true); await load(); setPulling(false); };
   const [error, setError] = useState(false);
 
   const base = { q: '', categories: [], city: 'Tümü', maxPrice: 6000000 };
@@ -122,7 +126,7 @@ function HomeScreen() {
   return (
     <View style={{ flex: 1, backgroundColor: color.bg }}>
     <HomeHeader />
-    <ScrollView ref={scroller} style={s.screen} contentContainerStyle={{ paddingBottom: 32 }} contentInsetAdjustmentBehavior="automatic" refreshControl={<RefreshControl refreshing={busy} onRefresh={() => void load()} />} keyboardShouldPersistTaps="handled">
+    <ScrollView ref={scroller} style={s.screen} contentContainerStyle={{ paddingBottom: 32 }} contentInsetAdjustmentBehavior="automatic" refreshControl={<RefreshControl refreshing={pulling} onRefresh={() => void pull()} />} keyboardShouldPersistTaps="handled">
       {/* Selam + arama */}
       <View style={s.hero}>
         <PlainText style={s.hello}>{session && name ? `${tr('Merhaba,')} ${name}. ${tr('Bugün ne arıyorsun?')}` : tr('Makine, parça ve iş: hepsi burada.')}</PlainText>
