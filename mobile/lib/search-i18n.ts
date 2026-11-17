@@ -849,6 +849,12 @@ export const searchEn: Record<string, string> = {
   "Ödeme, satın almayı onayladığında Google Play hesabından alınır. Üyelik, dönem bitmeden iptal edilmezse aynı süre ve ücretle kendiliğinden yenilenir. Üyeliği Google Play abonelikler bölümünden yönetebilir ve iptal edebilirsin.": "Payment is charged to your Google Play account when you confirm the purchase. The membership renews automatically for the same period and price unless cancelled before the period ends. You can manage and cancel it under Google Play subscriptions.",
   "Gizlilik ve KVKK": "Privacy",
   "Kullanım koşulları": "Terms of use",
+  // Şifre değiştirme (17 Kasım 2026)
+  "Mevcut şifre": "Current password",
+  "Mevcut şifreni gir.": "Enter your current password.",
+  "Mevcut şifre yanlış.": "Current password is incorrect.",
+  "Çok fazla deneme yapıldı. Birkaç dakika sonra tekrar dene.": "Too many attempts. Try again in a few minutes.",
+  "Hesabına Google veya Apple ile giriyorsun. Buradan e-postanla giriş için bir şifre belirleyebilirsin.": "You sign in with Google or Apple. Here you can set a password for signing in with your email.",
 };
 export const searchDe: Record<string, string> = {
   'Uygulamada ara': 'In der App suchen',
@@ -1700,4 +1706,10 @@ export const searchDe: Record<string, string> = {
   "Ödeme, satın almayı onayladığında Google Play hesabından alınır. Üyelik, dönem bitmeden iptal edilmezse aynı süre ve ücretle kendiliğinden yenilenir. Üyeliği Google Play abonelikler bölümünden yönetebilir ve iptal edebilirsin.": "Die Zahlung wird bei Bestätigung des Kaufs deinem Google-Play-Konto belastet. Die Mitgliedschaft verlängert sich automatisch zum gleichen Zeitraum und Preis, wenn sie nicht vor Ablauf gekündigt wird. Du kannst sie unter Google Play › Abos verwalten und kündigen.",
   "Gizlilik ve KVKK": "Datenschutz",
   "Kullanım koşulları": "Nutzungsbedingungen",
+  // Şifre değiştirme (17 Kasım 2026)
+  "Mevcut şifre": "Aktuelles Passwort",
+  "Mevcut şifreni gir.": "Gib dein aktuelles Passwort ein.",
+  "Mevcut şifre yanlış.": "Das aktuelle Passwort ist falsch.",
+  "Çok fazla deneme yapıldı. Birkaç dakika sonra tekrar dene.": "Zu viele Versuche. Versuche es in ein paar Minuten erneut.",
+  "Hesabına Google veya Apple ile giriyorsun. Buradan e-postanla giriş için bir şifre belirleyebilirsin.": "Du meldest dich mit Google oder Apple an. Hier kannst du ein Passwort für die Anmeldung mit deiner E-Mail festlegen.",
 };

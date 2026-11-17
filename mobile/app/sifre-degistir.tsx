@@ -8,8 +8,16 @@ import { AlertBox } from '../components/kit';
 import { PASSWORD_RULES, passwordValid } from '../lib/auth';
 import { supabase } from '../lib/supabase';
 import { color } from '../lib/theme';
+import { useApp } from '../lib/AppContext';
 
 export default function ChangePassword() {
+  const { session } = useApp();
+  const user = session?.user;
+  // Şifreyle giriş yapabilen hesaplarda eski şifre zorunlu. Yalnızca Google / Apple ile girilen hesapta
+  // henüz şifre yoktur; orada ilk şifre belirlenir.
+  const providers = ((user?.app_metadata as { providers?: string[] } | undefined)?.providers ?? []);
+  const hasPassword = providers.includes('email') || providers.includes('phone') || providers.length === 0;
+  const [current, setCurrent] = useState('');
   const [password, setPassword] = useState('');
   const [again, setAgain] = useState('');
   const [err, setErr] = useState('');
@@ -18,9 +26,23 @@ export default function ChangePassword() {
 
   async function submit() {
     setErr('');
+    if (hasPassword && !current) return setErr('Mevcut şifreni gir.');
     if (!passwordValid(password)) return setErr('Şifre aşağıdaki koşulların hepsini karşılamalı.');
     if (password !== again) return setErr('Şifreler eşleşmiyor.');
+    if (hasPassword && current === password) return setErr('Yeni şifre eskisiyle aynı olamaz.');
     setBusy(true);
+    if (hasPassword) {
+      // Mevcut şifre doğrulanır (aynı hesaba yeniden giriş). Yanlışsa şifre değişmez.
+      const login = user?.email
+        ? await supabase.auth.signInWithPassword({ email: user.email, password: current })
+        : user?.phone ? await supabase.auth.signInWithPassword({ phone: user.phone, password: current }) : null;
+      if (!login || login.error || login.data.user?.id !== user?.id) {
+        setBusy(false);
+        const m = (login?.error?.message ?? '').toLowerCase();
+        setErr(m.includes('rate') || m.includes('too many') ? 'Çok fazla deneme yapıldı. Birkaç dakika sonra tekrar dene.' : 'Mevcut şifre yanlış.');
+        return;
+      }
+    }
     const { error } = await supabase.auth.updateUser({ password });
     setBusy(false);
     if (error) {
@@ -31,7 +53,7 @@ export default function ChangePassword() {
       else setErr('Şifre değiştirilemedi. Bağlantını kontrol edip tekrar dene.');
       return;
     }
-    setPassword(''); setAgain(''); setDone(true);
+    setCurrent(''); setPassword(''); setAgain(''); setDone(true);
   }
 
   if (done) {
@@ -47,6 +69,11 @@ export default function ChangePassword() {
   return (
     <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding">
       <ScrollView style={{ backgroundColor: color.bg }} contentContainerStyle={s.body} keyboardShouldPersistTaps="handled">
+        {hasPassword ? (
+          <Field label="Mevcut şifre" value={current} onChangeText={setCurrent} secureTextEntry autoCapitalize="none" autoCorrect={false} textContentType="password" autoComplete="current-password" />
+        ) : (
+          <Text style={s.ruleText}>Hesabına Google veya Apple ile giriyorsun. Buradan e-postanla giriş için bir şifre belirleyebilirsin.</Text>
+        )}
         <Field label="Yeni şifre" value={password} onChangeText={setPassword} secureTextEntry autoCapitalize="none" autoCorrect={false} textContentType="newPassword" />
         <View style={{ gap: 4 }}>
           {PASSWORD_RULES.map((r) => {

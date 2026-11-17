@@ -128,7 +128,7 @@ export default function Favorites() {
   const head = (
     <View>
       <Tabs value={top} onChange={changeTop} items={[
-        { id: 'machine', label: 'Makineler', count: counts.machine, icon: 'truck' },
+        { id: 'machine', label: 'Makineler', count: counts.machine, icon: 'excavator' },
         { id: 'part', label: 'Parça', count: counts.part, icon: 'tool' },
         { id: 'net', label: 'İş ağı', count: counts.net, icon: 'briefcase' },
       ]} />

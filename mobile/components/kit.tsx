@@ -3,7 +3,7 @@
 import { useEffect, useRef } from 'react';
 import { Animated, Pressable, ScrollView, StyleSheet, View, type ViewStyle } from 'react-native';
 import { PlainText, Text } from './LText';
-import { Icon, type IconName } from './Icon';
+import { AnyIcon, Icon, type AnyIconName, type IconName } from './Icon';
 import { useReducedMotion } from '../lib/motion';
 import { NoSwipe } from './NoSwipe';
 import { color, font, radius } from '../lib/theme';
@@ -126,7 +126,7 @@ export function FormSkeleton({ count = 6 }: { count?: number }) {
 }
 
 /* ───────── Tabs ───────── */
-export type TabItem<T extends string> = { id: T; label: string; count?: number; icon?: IconName };
+export type TabItem<T extends string> = { id: T; label: string; count?: number; icon?: AnyIconName };
 /** variant "filled": seçili sekme lacivert (ana bölüm anahtarı). "line": altı çizgili (alt bölümler). */
 export function Tabs<T extends string>({ items, value, onChange, variant = 'filled' }: { items: TabItem<T>[]; value: T; onChange: (v: T) => void; variant?: 'filled' | 'line' }) {
   // 4 ve daha fazla sekme sığmaz: yatay kaydırılır, her sekme yazısı kadar geniş olur (kelime bölünmez).
@@ -141,7 +141,7 @@ export function Tabs<T extends string>({ items, value, onChange, variant = 'fill
             onPress={() => onChange(t.id)} accessibilityRole="tab" accessibilityState={{ selected: on }}
           >
             {filled && i > 0 && !on && items[i - 1].id !== value ? <View style={k.tabDivider} /> : null}
-            {t.icon ? <Icon name={t.icon} size={16} color={on && filled ? color.ink : on ? color.accentText : color.muted} /> : null}
+            {t.icon ? <AnyIcon name={t.icon} size={16} color={on && filled ? color.ink : on ? color.accentText : color.muted} /> : null}
             <Text numberOfLines={1} style={[k.tabText, !scroll && { flexShrink: 1 }, { color: on ? color.ink : color.muted }]}>{t.label}</Text>
             {t.count ? (on && filled
               ? <View style={[k.badge, { backgroundColor: color.teal, borderColor: color.teal }]}><Text style={[k.badgeText, { color: color.tealInk }]}>{String(t.count)}</Text></View>
