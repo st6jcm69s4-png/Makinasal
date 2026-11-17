@@ -22,7 +22,7 @@ function TabBack({ name }: { name: string }) {
   return to ? <BackButton canGoBack onPress={() => goBackTab(name)} /> : null;
 }
 
-export function TabStack({ name, title, buttons = true, large = true }: { name: string; title: string; buttons?: boolean; large?: boolean }) {
+export function TabStack({ name, title, buttons = true, large = false }: { name: string; title: string; buttons?: boolean; large?: boolean }) {
   useLang();
   const back = useTabBack(name);
   const headerOptions = useHeaderOptions();

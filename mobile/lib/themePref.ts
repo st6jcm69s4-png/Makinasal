@@ -9,13 +9,33 @@ const KEY = 'mk-theme';
 
 const asChoice = (v: string | null | undefined): ThemeChoice => (v === 'light' || v === 'dark' ? v : 'system');
 
+/*
+ * Seçili görünüm uygulama içinde de tutulur: başlık çubuğu (telefonun kendi parçası) rengini buradan alır.
+ * iPhone'da görünüm değişikliği önce burada yapılır; telefonun görünümü, başlık yeni rengini aldıktan hemen sonra
+ * (aynı karede) değiştirilir (ThemeApplier). Böylece başlık ve sayfa birlikte döner.
+ */
+let choice: ThemeChoice = Platform.OS === 'android' ? asChoice(readPref(THEME_FILE)) : 'system';
+const subs = new Set<() => void>();
+export const getThemeChoice = () => choice;
+export function subscribeThemeChoice(cb: () => void) { subs.add(cb); return () => { subs.delete(cb); }; }
+function setChoice(c: ThemeChoice) {
+  if (c === choice) return;
+  choice = c;
+  subs.forEach((f) => f());
+}
+/** Telefonun görünümünü seçime uydurur (ThemeApplier çağırır). */
+export function applyAppearance(c: ThemeChoice) {
+  try { Appearance.setColorScheme(c === 'system' ? 'auto' : c); } catch { /* yok say */ }
+}
+
 /** Kayıtlı görünüm tercihini okuyup uygular (iOS'ta renkler anında değişir). */
 export async function loadTheme(): Promise<ThemeChoice> {
   if (Platform.OS === 'android') return asChoice(readPref(THEME_FILE));
   try {
     const v = await AsyncStorage.getItem(KEY);
     const c = asChoice(v);
-    Appearance.setColorScheme(c === 'system' ? 'auto' : c);
+    setChoice(c);
+    applyAppearance(c);
     return c;
   } catch {
     return 'system';
@@ -39,7 +59,8 @@ async function applyAndroid(): Promise<void> {
 export async function saveTheme(c: ThemeChoice): Promise<void> {
   // Önce dosyaya yazılır: Android açılışta buradan okur, görünüm dinleyicisi de buna bakar.
   writePref(THEME_FILE, c);
-  Appearance.setColorScheme(c === 'system' ? 'auto' : c);
+  if (Platform.OS === 'ios') setChoice(c); // telefonun görünümünü ThemeApplier değiştirir
+  else { setChoice(c); applyAppearance(c); }
   try {
     if (c === 'system') await AsyncStorage.removeItem(KEY);
     else await AsyncStorage.setItem(KEY, c);

@@ -1,5 +1,6 @@
-import { useMemo } from 'react';
+import { useLayoutEffect, useMemo, useRef, useSyncExternalStore } from 'react';
 import { Platform, useColorScheme } from 'react-native';
+import { applyAppearance, getThemeChoice, subscribeThemeChoice, type ThemeChoice } from './themePref';
 import { DarkTheme, DefaultTheme, type Theme } from 'expo-router/react-navigation';
 import { color, launchScheme, palettes } from './theme';
 
@@ -21,23 +22,31 @@ export const headerOptions = {
   contentStyle: { backgroundColor: color.bg },
 };
 
+export const useThemeChoice = (): ThemeChoice => useSyncExternalStore(subscribeThemeChoice, getThemeChoice, getThemeChoice);
+
 /**
- * Şu anki görünüm (açık / koyu). iPhone'da telefonun ya da Ayarlar'daki seçimin anlık değeri;
+ * Şu anki görünüm (açık / koyu). iPhone'da Ayarlar'daki seçim ya da telefonun görünümü;
  * Android'de renkler açılışta hesaplandığı için açılıştaki görünüm.
  */
 export function useScheme(): 'light' | 'dark' {
-  const s = useColorScheme();
+  const sys = useColorScheme();
+  const c = useThemeChoice();
   if (Platform.OS !== 'ios') return launchScheme;
-  return s === 'dark' ? 'dark' : 'light';
+  if (c !== 'system') return c;
+  return sys === 'dark' ? 'dark' : 'light';
 }
 
 /**
- * Başlık çubuğu renkleri düz renk değeriyle verilir: telefonun kendi başlık çubuğu iPhone'un açık/koyu
- * değişen rengini okuyamıyor, koyu görünümde üstte açık renkli bir şerit kalıyordu.
+ * Başlık çubuğu renkleri.
+ * - "Sistem" seçiliyken telefonun açık/koyu değişen rengi: telefon görünümü değiştirince başlık sayfayla aynı anda döner.
+ * - Uygulamada Açık / Koyu seçiliyken düz renk: telefonun kendi başlık çubuğu bu seçimi görmüyor, aksi halde
+ *   koyu görünümde üstte açık renkli bir şerit kalıyordu.
  */
 export function useHeaderOptions() {
+  const c = useThemeChoice();
   const scheme = useScheme();
   return useMemo(() => {
+    if (Platform.OS === 'ios' && c === 'system') return headerOptions;
     const p = palettes[scheme];
     return {
       ...headerOptions,
@@ -48,17 +57,31 @@ export function useHeaderOptions() {
       headerLargeTitleStyle: { color: p.ink },
       contentStyle: { backgroundColor: p.bg },
     };
-  }, [scheme]);
+  }, [c, scheme]);
 }
 
-/** Gezinme bileşenlerinin renkleri (görünüme göre). */
+/**
+ * Görünüm seçimini telefona uygular. Kök düzende bir kez kullanılır; başlık çubuğu yeni rengi aldığı
+ * çizimden hemen sonra çalışır, böylece başlık ile sayfanın geri kalanı aynı anda değişir.
+ */
+export function useApplyTheme() {
+  const c = useThemeChoice();
+  const first = useRef(true);
+  useLayoutEffect(() => {
+    if (first.current) { first.current = false; return; } // açılışta loadTheme uygular
+    if (Platform.OS === 'ios') applyAppearance(c);
+  }, [c]);
+}
+
+/** Gezinme bileşenlerinin renkleri (görünüme göre; "Sistem" seçiliyken iPhone'da telefonla aynı anda değişen renkler). */
 export function useNavTheme(): Theme {
+  const c = useThemeChoice();
   const scheme = useScheme();
   return useMemo(() => {
-    const p = palettes[scheme];
+    const p = Platform.OS === 'ios' && c === 'system' ? color : palettes[scheme];
     const base = scheme === 'dark' ? DarkTheme : DefaultTheme;
     return { ...base, dark: scheme === 'dark', colors: { ...base.colors, primary: p.accentText, background: p.bg, card: p.bg, text: p.ink, border: p.line, notification: p.bad } };
-  }, [scheme]);
+  }, [c, scheme]);
 }
 
 /** Büyük başlıklı liste ekranı (iOS). Android'de normal başlık kalır. */
@@ -70,3 +93,10 @@ export const navTheme: Theme = {
   ...base,
   colors: { ...base.colors, primary: color.accentText, background: color.bg, card: color.bg, text: color.ink, border: color.line, notification: color.bad },
 };
+
+/** Başlık çubuğundaki yerel düğmeler için renk (useHeaderOptions ile aynı kural). */
+export function useHeaderColor(k: keyof typeof palettes.light): string {
+  const c = useThemeChoice();
+  const scheme = useScheme();
+  return Platform.OS === 'ios' && c === 'system' ? color[k] : palettes[scheme][k];
+}

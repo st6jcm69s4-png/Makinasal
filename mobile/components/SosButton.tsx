@@ -4,6 +4,7 @@ import { Icon } from './Icon';
 import { PlainText } from './LText';
 import { tr } from '../lib/i18n';
 import { color, font } from '../lib/theme';
+import { useHeaderColor } from '../lib/nav';
 
 /*
  * Sağ üstte kırmızı "112" düğmesi (Çekici bul). Her zaman görünür ama içerikte yer kaplamaz.
@@ -11,12 +12,13 @@ import { color, font } from '../lib/theme';
  * Basınca doğrudan aramaz; ekran önce sorar (call112).
  */
 export function SosButton({ onPress }: { onPress: () => void }) {
+  const red = useHeaderColor('bad');
   if (Platform.OS === 'ios') {
     return (
       <Stack.Screen
         options={{
           unstable_headerRightItems: () => [{
-            type: 'button', label: '112', icon: { type: 'sfSymbol', name: 'phone.fill' as never }, tintColor: color.bad, onPress,
+            type: 'button', label: '112', icon: { type: 'sfSymbol', name: 'phone.fill' as never }, tintColor: red, onPress,
           }],
         }}
       />
