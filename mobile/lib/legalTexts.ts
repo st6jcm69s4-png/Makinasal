@@ -2,8 +2,8 @@
 // Makinasal hukuki metinleri (Türkçe, bağlayıcı sürüm).
 // ÖNEMLİ: Bu metinler yaygın ilan/pazaryeri sözleşmelerinin yapısı ve KVKK Aydınlatma Yükümlülüğü Tebliği esas alınarak hazırlanmıştır.
 // Yayınlanmadan önce bir avukat tarafından incelenmelidir. {{unvan}}, {{adres}}, {{eposta}} alanları LEGAL_OPERATOR_* ortam değişkenlerinden gelir.
-export const LEGAL_VERSION = '2026-11-13';
-export const LEGAL_VERSION_LABEL = '13 Kasım 2026';
+export const LEGAL_VERSION = '2026-11-17';
+export const LEGAL_VERSION_LABEL = '17 Kasım 2026';
 
 export type LegalSlugTr = 'kvkk' | 'kullanim' | 'cerez' | 'satis' | 'ilan-kurallari' | 'acik-artirma' | 'premium-on-bilgi' | 'premium-sozlesme';
 export type LegalDoc = { title: string; intro?: string; sections: [string, string[]][] };
@@ -121,7 +121,7 @@ export const LEGAL_TR: Record<LegalSlugTr, LegalDoc> = {
         'Veriler; üyelik ve profil formları, ilan ve mesaj ekranları, mobil uygulama ve web sitesi kullanımı, destek ve şikayet kanalları aracılığıyla elektronik ortamda, otomatik veya kısmen otomatik yöntemlerle toplanır.',
       ]],
       ['6. Verilerin aktarımı', [
-        'Yurt içi ve yurt dışı hizmet sağlayıcılar: barındırma ve veritabanı (Supabase; veritabanı Avrupa Birliği/Frankfurt bölgesindedir), web barındırma (Vercel), e-posta gönderimi (Resend), bot koruması (Cloudflare Turnstile), Google ve Apple ile giriş (yalnızca bu yöntemi seçersen), anlık bildirim altyapısı (Expo ve cihaz üreticisinin bildirim hizmeti; bildirim açıldığında), yapay zeka asistanı (Anthropic; asistanı kullanırsan sorduğun soru ve gerekli ilan/profil bilgisi), hata izleme ve — ödeme açıldığında — ödeme kuruluşu (iyzico). Bu sağlayıcılar yalnızca Makinasal adına ve talimatlarımız kapsamında veri işler.',
+        'Yurt içi ve yurt dışı hizmet sağlayıcılar: barındırma ve veritabanı (Supabase; veritabanı Avrupa Birliği/Frankfurt bölgesindedir), web barındırma (Vercel), e-posta gönderimi (Resend), bot koruması (Cloudflare Turnstile), Google ve Apple ile giriş (yalnızca bu yöntemi seçersen), anlık bildirim altyapısı (Expo ve cihaz üreticisinin bildirim hizmeti; bildirim açıldığında), yapay zeka asistanı (Anthropic; asistanı kullanırsan sorduğun soru ve gerekli ilan/profil bilgisi), hata izleme ve — ödeme açıldığında — ödeme kuruluşu (web sitesinden ödemede iyzico), uygulama içi satın almada Apple (App Store) veya Google (Google Play) ile satın alma doğrulama hizmeti (RevenueCat; yalnızca kullanıcı kimlik numarası ve satın alma kaydı aktarılır, kart bilgisi aktarılmaz). Bu sağlayıcılar yalnızca Makinasal adına ve talimatlarımız kapsamında veri işler.',
         'Diğer kullanıcılar: ilan ve profil bilgilerin, ilan videoların, makine karnesi kayıtların ve üyelik türün (Pro rozeti) yayımlamayı seçtiğin kapsamda diğer ziyaretçilere görünür; mesajların yalnızca görüşmenin taraflarına gösterilir; telefon numaran giriş yapmış kullanıcılara yalnızca paylaşmayı seçtiğin ölçüde gösterilir. Açık artırmada teklif geçmişi diğer katılımcılara adın gösterilmeden (anonim) gösterilir; açık artırma sonunda kazananın bilgileri satıcıyla, satıcının bilgileri kazananla paylaşılır.',
         'Resmî mercilere: mahkeme, savcılık, kolluk ve düzenleyici kurumlar tarafından mevzuata uygun talep edilmesi halinde.',
         'Yurt dışına aktarım yapılması halinde KVKK m.9 kapsamında öngörülen güvencelerden (yeterlilik kararı, standart sözleşme, bağlayıcı şirket kuralları veya Kanun’da sayılan diğer yöntemler) biri uygulanır.',
@@ -172,7 +172,7 @@ export const LEGAL_TR: Record<LegalSlugTr, LegalDoc> = {
     sections: [
       ['1. Mevcut durum', [
         'Makinasal, ilanlar ve açık artırmalar üzerinden yapılan alım-satım, kiralama ve hizmet işlemlerinde ödeme tahsil etmez, emanet para tutmaz ve ödeme aracılığı yapmaz. Bu anlaşmalar doğrudan kullanıcılar arasında kurulur.',
-        'Makinasal’ın kendi sattığı tek hizmet premium üyeliktir (Pro, Firma Pro). Premium üyelik ödemesi açıldığında ödeme lisanslı ödeme kuruluşu (iyzico) aracılığıyla alınır. Premium üyeliğin fiyatı, süresi, yenilenmesi, iptali ve cayma koşulları “Premium Üyelik Ön Bilgilendirme Formu” ve “Premium Üyelik Mesafeli Hizmet Sözleşmesi”nde yer alır.',
+        'Makinasal’ın kendi sattığı tek hizmet premium üyeliktir (Pro, Firma Pro). Premium üyelik ödemesi açıldığında ödeme, web sitesinde lisanslı ödeme kuruluşu (iyzico), mobil uygulamada ise Apple App Store veya Google Play aracılığıyla alınır. Premium üyeliğin fiyatı, süresi, yenilenmesi, iptali ve cayma koşulları “Premium Üyelik Ön Bilgilendirme Formu” ve “Premium Üyelik Mesafeli Hizmet Sözleşmesi”nde yer alır.',
         'Platform adına kapora, ön ödeme veya “komisyon” isteyen mesajlara itibar etme; ilan, mesaj veya teklif alanlarına kart ve banka bilgisi yazma. Şüpheli durumu “Şikayet et” ile bildir.',
       ]],
       ['2. Alıcı için öneriler', [
@@ -278,7 +278,8 @@ export const LEGAL_TR: Record<LegalSlugTr, LegalDoc> = {
         'Fiyatlara KDV dahildir [AVUKAT/MALİ MÜŞAVİR TEYİT EDECEK]. Ödeme dışında ek bir masraf alınmaz.',
       ]],
       ['4. Ödeme ve yenileme', [
-        'Ödeme, lisanslı ödeme kuruluşu iyzico aracılığıyla banka veya kredi kartı ile alınır. Kart bilgileri Makinasal’da saklanmaz.',
+        'Web sitesinden satın almada ödeme, lisanslı ödeme kuruluşu iyzico aracılığıyla banka veya kredi kartı ile alınır. Mobil uygulamadan satın almada ödeme, Apple App Store veya Google Play hesabına kayıtlı ödeme yöntemiyle (kart, Apple Pay, Google Pay, mağaza bakiyesi) mağaza tarafından alınır ve mağazanın satın alma koşulları da uygulanır. Kart bilgileri Makinasal’da saklanmaz.',
+        'İndirim kodları: web sitesinde Makinasal indirim kodları, mobil uygulamada App Store teklif kodları veya Google Play promosyon kodları kullanılır. Kodun indirimi ve geçerlilik süresi kodun sunulduğu kampanyada belirtilir.',
         'Aylık üyelik, sen iptal edene kadar her ay aynı gün kendiliğinden yenilenir ve yenilemede o aya ait normal fiyat tahsil edilir. Yıllık üyelik, sen iptal edene kadar her yıl yenilenir. Yenilemeden önce sana bildirim gönderilir.',
         'Fiyatlar değiştirilecekse, değişiklik yürürlüğe girmeden en az 30 gün önce bildirilir. Yeni fiyat, bildirimden sonraki ilk yenilemede uygulanır; kabul etmezsen yenileme öncesinde iptal edebilirsin.',
       ]],
@@ -287,6 +288,7 @@ export const LEGAL_TR: Record<LegalSlugTr, LegalDoc> = {
       ]],
       ['6. İptal', [
         'Yenilemeyi istediğin zaman Hesabım → Üyelik sayfasından iptal edebilirsin. İptal, bir sonraki yenilemeyi durdurur; içinde bulunduğun dönemin sonuna kadar premium avantajlarını kullanmaya devam edersin.',
+        'Üyeliği mobil uygulamadan (App Store veya Google Play) satın aldıysan yenilemeyi Apple veya Google hesap ayarlarındaki abonelikler bölümünden iptal edersin; iade talepleri de mağaza üzerinden yapılır ve mağazanın kurallarına göre sonuçlandırılır [AVUKAT TEYİT EDECEK].',
       ]],
       ['7. Cayma hakkı', [
         'Premium üyelik, elektronik ortamda anında ifa edilen bir hizmettir. Mesafeli Sözleşmeler Yönetmeliği’nin cayma hakkı istisnalarına ilişkin hükmü uyarınca, satın alma sırasında hizmetin hemen başlamasını onayladığında cayma hakkın bulunmaz [AVUKAT: istisnanın kapsamı, onay metni ve ilk yenilemelerdeki durum teyit edilecek].',
@@ -312,7 +314,7 @@ export const LEGAL_TR: Record<LegalSlugTr, LegalDoc> = {
         'Bu sözleşmenin konusu, Üyenin satın alma ekranında seçtiği premium tarifenin (Pro veya Firma Pro; aylık veya yıllık) Ön Bilgilendirme Formu’nda belirtilen kapsam, fiyat ve süre ile sunulmasıdır.',
       ]],
       ['3. Fiyat, ödeme ve yenileme', [
-        'Fiyat, vergiler, ilk ay tanışma fiyatı, sonraki dönemlerde uygulanacak fiyat ve yenileme koşulları Ön Bilgilendirme Formu’nda ve satın alma ekranında gösterildiği gibidir. Ödeme iyzico aracılığıyla alınır.',
+        'Fiyat, vergiler, ilk ay tanışma fiyatı, sonraki dönemlerde uygulanacak fiyat ve yenileme koşulları Ön Bilgilendirme Formu’nda ve satın alma ekranında gösterildiği gibidir. Ödeme web sitesinde iyzico, mobil uygulamada Apple App Store veya Google Play aracılığıyla alınır.',
         'Üye, aylık veya yıllık üyeliğin iptal edilene kadar kendiliğinden yenileneceğini ve yenilemede o tarihteki normal fiyatın tahsil edileceğini kabul eder.',
       ]],
       ['4. Hizmetin ifası', [

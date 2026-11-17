@@ -7,11 +7,15 @@
     "preview": {
       "distribution": "internal",
       "environment": "preview",
-      "ios": { "resourceClass": "default" }
+      "ios": {
+        "resourceClass": "default"
+      },
+      "channel": "preview"
     },
     "production": {
       "autoIncrement": true,
-      "environment": "production"
+      "environment": "production",
+      "channel": "production"
     }
   },
   "submit": {
