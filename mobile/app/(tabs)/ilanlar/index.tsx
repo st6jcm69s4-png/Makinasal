@@ -11,7 +11,8 @@ import { Icon, type IconName } from '../../../components/Icon';
 import { SearchBox } from '../../../components/SearchBox';
 import { PickerModal } from '../../../components/PickerModal';
 import { advCount, FilterModal, NO_ADV, type Adv } from '../../../components/FilterModal';
-import { techFilterParams } from '../../../lib/techSpecs';
+import { filterFieldsFor, techFilterParams } from '../../../lib/techSpecs';
+import * as haptic from '../../../lib/haptics';
 import { CITIES } from '../../../lib/data';
 import { COORDS, distanceKm } from '../../../lib/geo';
 import { CATEGORY_GROUPS, categoryLabel, categoryValues } from '../../../lib/machineryCatalog';
@@ -46,6 +47,33 @@ const PRICES = [
   { value: '1000000', label: '1.000.000 ₺ ve altı' }, { value: '2500000', label: '2.500.000 ₺ ve altı' }, { value: '5000000', label: '5.000.000 ₺ ve altı' },
 ];
 type Sheet = null | 'cat' | 'city' | 'price' | 'sort';
+
+const n = (v: string) => Number(v).toLocaleString('tr-TR');
+const range = (a: string, b: string, unit = '') => (a && b ? `${n(a)}–${n(b)}${unit}` : a ? `${n(a)}${unit}+` : `≤ ${n(b)}${unit}`);
+
+/** Seçili filtreler: her biri tek dokunuşla kaldırılabilir çip ("Ankara ✕"). */
+function activeFilters(o: { cat: string; city: string; maxPrice: string; adv: Adv; setCat: (v: string) => void; setCity: (v: string) => void; setMaxPrice: (v: string) => void; setAdv: (f: (a: Adv) => Adv) => void }) {
+  const { cat, city, maxPrice, adv, setCat, setCity, setMaxPrice, setAdv } = o;
+  const out: { key: string; label: string; clear: () => void }[] = [];
+  if (cat) out.push({ key: 'cat', label: tr(categoryLabel(cat)), clear: () => setCat('') });
+  if (city !== 'Tümü') out.push({ key: 'city', label: city, clear: () => setCity('Tümü') });
+  if (maxPrice !== '6000000') out.push({ key: 'price', label: tr(PRICES.find((x) => x.value === maxPrice)?.label ?? 'Fiyat'), clear: () => setMaxPrice('6000000') });
+  if (adv.brand) out.push({ key: 'brand', label: adv.brand, clear: () => setAdv((a) => ({ ...a, brand: '' })) });
+  if (adv.yMin || adv.yMax) out.push({ key: 'year', label: `${tr('Yıl')} ${adv.yMin && adv.yMax ? `${adv.yMin}–${adv.yMax}` : adv.yMin ? `${adv.yMin}+` : `≤ ${adv.yMax}`}`, clear: () => setAdv((a) => ({ ...a, yMin: '', yMax: '' })) });
+  if (adv.useMin || adv.useMax) out.push({ key: 'use', label: range(adv.useMin, adv.useMax, adv.unit === 'km' ? ' km' : ` ${tr('saat')}`), clear: () => setAdv((a) => ({ ...a, useMin: '', useMax: '' })) });
+  if (adv.minScore) out.push({ key: 'score', label: `${tr('Puan')} ${String(adv.minScore).replace('.', ',')}+`, clear: () => setAdv((a) => ({ ...a, minScore: 0 })) });
+  if (adv.near) out.push({ key: 'near', label: `${adv.near} ${tr('km içinde')}`, clear: () => setAdv((a) => ({ ...a, near: 0 })) });
+  if (adv.ver) out.push({ key: 'ver', label: tr('Doğrulanmış satıcı'), clear: () => setAdv((a) => ({ ...a, ver: false })) });
+  if (adv.hide) out.push({ key: 'hide', label: tr('Riskliler gizli'), clear: () => setAdv((a) => ({ ...a, hide: false })) });
+  if (adv.takas) out.push({ key: 'takas', label: tr('Takasa açık'), clear: () => setAdv((a) => ({ ...a, takas: false })) });
+  for (const f of filterFieldsFor(cat)) {
+    const v = adv.tech[f.key];
+    if (!v) continue;
+    const label = typeof v === 'string' ? `${tr(f.label)}: ${tr(v)}` : (v.min || v.max) ? `${tr(f.label)} ${range(v.min ?? '', v.max ?? '', f.unit ? ` ${f.unit}` : '')}` : '';
+    if (label) out.push({ key: `t:${f.key}`, label, clear: () => setAdv((a) => { const t = { ...a.tech }; delete t[f.key]; return { ...a, tech: t }; }) });
+  }
+  return out;
+}
 
 function ListingsScreen() {
   const { askLogin } = useLoginPrompt();
@@ -125,6 +153,8 @@ function ListingsScreen() {
     return () => clearTimeout(t);
   }, [q, cat, city, maxPrice, sort, adv, load]);
 
+  const active = activeFilters({ cat, city, maxPrice, adv, setCat, setCity, setMaxPrice, setAdv });
+
   // Arama, filtreler ve sayı listenin üstünde sabit durur (liste kaydırılırken yerinden oynamaz)
   const header = (
     <View>
@@ -139,6 +169,21 @@ function ListingsScreen() {
             <FChip icon="settings" label="Yedek parça" onPress={() => router.push('/yedek-parca')} />
             <FChip icon="map" label="İllere göre" onPress={() => router.push('/harita')} />
           </ScrollView></NoSwipe>
+          {active.length ? (
+            <NoSwipe><ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flexGrow: 0 }} contentContainerStyle={s.active} contentInsetAdjustmentBehavior="never">
+              {active.map((f) => (
+                <Pressable key={f.key} onPress={() => { haptic.tick(); f.clear(); }} style={({ pressed }) => [s.activeChip, pressed && { opacity: 0.7, transform: [{ scale: 0.96 }] }]} accessibilityRole="button" accessibilityLabel={`${f.label}, ${tr('filtreyi kaldır')}`}>
+                  <PlainText style={s.activeT} numberOfLines={1}>{f.label}</PlainText>
+                  <Icon name="x" size={14} color={color.muted} />
+                </Pressable>
+              ))}
+              {active.length > 1 ? (
+                <Pressable onPress={() => { haptic.tick(); setCat(''); setCity('Tümü'); setMaxPrice('6000000'); setAdv(NO_ADV); }} style={({ pressed }) => [s.clearAll, pressed && { opacity: 0.6 }]} accessibilityRole="button">
+                  <Text style={s.clearAllT}>Tümünü temizle</Text>
+                </Pressable>
+              ) : null}
+            </ScrollView></NoSwipe>
+          ) : null}
           {error ? <Text style={s.err}>{error}</Text> : null}
           <View style={s.countRow}>
             <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 5, flex: 1 }}>
@@ -189,6 +234,11 @@ function ListingsScreen() {
 const s = StyleSheet.create({
   screen: { flex: 1, backgroundColor: color.bg },
   chips: { paddingHorizontal: 16, gap: 8, paddingBottom: 6 },
+  active: { paddingHorizontal: 16, gap: 8, paddingTop: 4, paddingBottom: 6, alignItems: 'center' },
+  activeChip: { flexDirection: 'row', alignItems: 'center', gap: 6, height: 34, paddingLeft: 12, paddingRight: 10, borderRadius: 17, backgroundColor: color.tealSoft },
+  activeT: { color: color.tealText, fontFamily: font.semi, fontSize: 13.5, maxWidth: 200 },
+  clearAll: { height: 34, paddingHorizontal: 8, justifyContent: 'center' },
+  clearAllT: { color: color.tealText, fontFamily: font.semi, fontSize: 13.5, textDecorationLine: 'underline' },
   chip: { flexDirection: 'row', alignItems: 'center', gap: 6, height: 40, paddingHorizontal: 14, backgroundColor: color.surface, borderRadius: 20, borderWidth: 1, borderColor: color.line },
   chipOn: { backgroundColor: color.teal, borderColor: color.teal },
   chipText: { color: color.ink, fontFamily: font.semi, fontSize: 14, maxWidth: 180 },

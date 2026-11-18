@@ -3,7 +3,9 @@ import { GuestGate } from '../components/LoginPrompt';
 import { Pressable, RefreshControl, ScrollView, SectionList, StyleSheet, View } from 'react-native';
 import { PlainText, Text, TextInput } from '../components/LText';
 import { Icon } from '../components/Icon';
-import { Btn, Chip, Label } from '../components/ui';
+import { Btn, Chip } from '../components/ui';
+import { PickerModal } from '../components/PickerModal';
+import { tr } from '../lib/i18n';
 import { AlertBox, Badge, CardSkeleton, Tabs } from '../components/kit';
 import { FirmCard, PostCard } from '../components/NetCards';
 import { POST_KINDS, type MarketPost, type Provider } from '../lib/network';
@@ -47,6 +49,7 @@ export default function Favorites() {
   const [group, setGroup] = useState('');
   const [sort, setSort] = useState<Sort>('new');
   const [q, setQ] = useState('');
+  const [sortOpen, setSortOpen] = useState(false);
   const key = [...favs].sort().join(',');
 
   const load = useCallback(async () => {
@@ -133,12 +136,22 @@ export default function Favorites() {
         { id: 'net', label: 'İş ağı', count: counts.net, icon: 'briefcase' },
       ]} />
       <View style={{ padding: 12, gap: 10 }}>
+        {/* Özet: sayı, fiyatı düşenler ve sıralama tek satırda (sade, Apple listelerindeki gibi) */}
         <View style={s.top}>
-          <PlainText style={s.count}>{String(total)}</PlainText>
-          <View style={{ flex: 1, gap: 2 }}>
-            <Label style={{ color: color.onNavy }}>{`Kayıtlı ${noun}`}</Label>
-            {!isNet && dropCount ? <Badge variant="success" icon="trending-down">{`${dropCount} ilanda fiyat düştü`}</Badge> : <Text style={s.small}>{isNet ? 'Kiralık, eleman, iş ve firmalar' : 'Fiyatı düşen ilan yok'}</Text>}
+          <View style={{ flex: 1, gap: 4 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 6 }}>
+              <PlainText style={s.count}>{String(total)}</PlainText>
+              <Text style={s.small}>{`Kayıtlı ${noun}`}</Text>
+            </View>
+            {!isNet && dropCount ? <Badge variant="success" icon="trending-down">{`${dropCount} ilanda fiyat düştü`}</Badge> : null}
           </View>
+          {!isNet && total ? (
+            <Pressable style={({ pressed }) => [s.sortBtn, pressed && { opacity: 0.7 }]} onPress={() => setSortOpen(true)} accessibilityRole="button" accessibilityLabel={tr('Sırala')}>
+              <Icon name="list" size={15} color={color.tealText} />
+              <Text style={s.sortT}>{SORTS.find(([k]) => k === sort)?.[1] ?? 'Sırala'}</Text>
+              <Icon name="chevron-down" size={14} color={color.tealText} />
+            </Pressable>
+          ) : null}
         </View>
         {total ? (
           <>
@@ -151,12 +164,6 @@ export default function Favorites() {
               <Chip title={`Tümü (${total})`} on={!group} onPress={() => setGroup('')} />
               {chips.map(([g, n]) => <Chip key={g} title={`${g} (${n})`} on={group === g} onPress={() => setGroup(group === g ? '' : g)} />)}
             </ScrollView>
-            {!isNet ? (
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginVertical: -6 }} contentContainerStyle={{ gap: 8, alignItems: 'center', paddingVertical: 6 }}>
-                <Label>Sırala</Label>
-                {SORTS.map(([k, l]) => <Chip key={k} title={l} on={sort === k} onPress={() => setSort(k)} />)}
-              </ScrollView>
-            ) : null}
           </>
         ) : null}
         {error ? <AlertBox variant="destructive">{error}</AlertBox> : null}
@@ -165,6 +172,8 @@ export default function Favorites() {
   );
 
   return (
+    <>
+    <PickerModal visible={sortOpen} title="Sırala" selected={sort} options={SORTS.map(([k, l]) => ({ value: k, label: l }))} onPick={(v) => setSort(v as Sort)} onClose={() => setSortOpen(false)} />
     <SectionList<Fav | Net, { title: string; data: (Fav | Net)[] }>
       contentInsetAdjustmentBehavior="automatic"
       ref={scroller}
@@ -200,18 +209,21 @@ export default function Favorites() {
       }
       ListFooterComponent={shown && !isNet && shown !== tabRows.length ? <Text style={s.foot}>{shown} / {tabRows.length} ilan gösteriliyor</Text> : undefined}
     />
+    </>
   );
 }
 
 const s = StyleSheet.create({
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12, padding: 24, backgroundColor: color.bg },
-  top: { flexDirection: 'row', alignItems: 'center', gap: 14, backgroundColor: color.navy, paddingHorizontal: 18, paddingVertical: 16, borderBottomLeftRadius: 28, borderBottomRightRadius: 28 },
-  count: { color: color.onBar, fontFamily: font.bold, fontSize: 40, lineHeight: 44, minWidth: 50 },
-  small: { color: color.onNavy, fontSize: 14 },
+  top: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 4, paddingTop: 4 },
+  sortBtn: { flexDirection: 'row', alignItems: 'center', gap: 5, minHeight: 36, paddingHorizontal: 12, borderRadius: 18, backgroundColor: color.tealSoft },
+  sortT: { color: color.tealText, fontFamily: font.semi, fontSize: 14 },
+  count: { color: color.ink, fontFamily: font.bold, fontSize: 34, lineHeight: 40 },
+  small: { color: color.muted, fontSize: 15 },
   search: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: color.surface, borderWidth: 1, borderColor: color.line, borderRadius: radius + 2, paddingHorizontal: 14, minHeight: 50 },
   searchInput: { flex: 1, paddingVertical: 11, fontSize: 16, color: color.ink },
-  sec: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 22, marginBottom: 12, marginHorizontal: 16 },
-  secT: { color: color.ink, fontFamily: font.bold, fontSize: 18 },
+  sec: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 18, marginBottom: 10, marginHorizontal: 20 },
+  secT: { color: color.muted, fontFamily: font.semi, fontSize: 14, letterSpacing: 0.3 },
   secN: { color: color.tealText, fontFamily: font.bold, fontSize: 15, backgroundColor: color.tealSoft, borderRadius: 11, paddingHorizontal: 9, paddingVertical: 2, overflow: 'hidden' },
   dropTag: { flexDirection: 'row', alignItems: 'center', gap: 4, marginHorizontal: 16, marginBottom: 6 },
   dropText: { color: color.good, fontSize: 13, fontWeight: '700' },

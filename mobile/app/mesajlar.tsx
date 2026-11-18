@@ -13,7 +13,7 @@ import { useTabScrollTop } from '../lib/scrollTop';
 import { photoUrl, supabase } from '../lib/supabase';
 import { color, font, radius } from '../lib/theme';
 import { openTab } from '../lib/tabBack';
-import { getLang, localeOf } from '../lib/i18n';
+import { getLang, localeOf, tr } from '../lib/i18n';
 
 type Thread = { id: string; title: string; other: string; photo: string | null; last: string; lastAt: string; mine: boolean; offer: boolean; unread: number };
 type Quote = { id: string; post_id: string; other: string; title: string; amount: number; unit: string; status: string; at: string; incoming: boolean };
@@ -138,33 +138,44 @@ export default function Messages() {
           {!threads.length && mode === 'ilan' ? <Btn title="İlanlara göz at" onPress={() => openTab('/ilanlar')} /> : null}
         </View>
       }
+      ItemSeparatorComponent={() => <View style={s.sep} />}
       renderItem={({ item }) => 'unread' in item ? (
-        <Pressable style={({ pressed }) => [s.row, item.unread > 0 && s.rowUnread, pressed && { opacity: 0.88 }]} onPress={() => router.push(`/mesaj/${item.id}`)} accessibilityRole="button">
-          {item.photo ? <Image source={{ uri: item.photo }} style={s.thumb} /> : <Avatar name={item.other} size={56} />}
-          <View style={{ flex: 1, gap: 2 }}>
+        // Mesajlar uygulaması gibi: okunmamışta solda nokta, yuvarlak kişi resmi ve köşesinde ilan fotoğrafı
+        <Pressable style={({ pressed }) => [s.row, pressed && s.rowPressed]} onPress={() => router.push(`/mesaj/${item.id}`)} accessibilityRole="button" accessibilityLabel={`${item.other}, ${item.title}${item.unread ? `, ${item.unread} ${tr('okunmamış')}` : ''}`}>
+          <View style={[s.dot, item.unread > 0 && s.dotOn]} />
+          <View>
+            <Avatar name={item.other} size={52} />
+            {item.photo ? <Image source={{ uri: item.photo }} style={s.badgePhoto} /> : null}
+          </View>
+          <View style={{ flex: 1, gap: 1 }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-              <PlainText style={[s.other, item.unread > 0 && { color: color.ink }]} numberOfLines={1}>{item.other}</PlainText>
-              <Text style={s.time}>{short(item.lastAt)}</Text>
+              <PlainText style={[s.other, item.unread > 0 && s.otherUnread]} numberOfLines={1}>{item.other}</PlainText>
+              <Text style={[s.time, item.unread > 0 && { color: color.tealText, fontFamily: font.semi }]}>{short(item.lastAt)}</Text>
+              <Icon name="chevron-right" size={16} color={color.muted} />
             </View>
             <Text style={s.listing} numberOfLines={1}>{item.title}</Text>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-              {item.mine ? <Icon name="check" size={14} color={color.muted} /> : null}
+              {item.mine ? <Icon name="corner-up-right" size={13} color={color.muted} /> : null}
               {item.offer ? <Badge variant="default">Teklif</Badge> : null}
-              <Text style={[s.last, item.unread > 0 && { color: color.ink, fontWeight: '600' }]} numberOfLines={1}>{item.last}</Text>
-              {item.unread > 0 ? <Badge variant="default">{item.unread}</Badge> : null}
+              <Text style={[s.last, item.unread > 0 && { color: color.ink }]} numberOfLines={2}>{item.last}</Text>
             </View>
           </View>
         </Pressable>
       ) : (
-        <Pressable style={({ pressed }) => [s.row, pressed && { opacity: 0.88 }]} onPress={() => router.push(`/ag/ilan/${item.post_id}` as never)} accessibilityRole="button">
-          <View style={[s.thumb, s.avatar]}><Icon name={item.incoming ? 'inbox' : 'send'} size={22} color={color.tealText} /></View>
-          <View style={{ flex: 1, gap: 2 }}>
+        <Pressable style={({ pressed }) => [s.row, pressed && s.rowPressed]} onPress={() => router.push(`/ag/ilan/${item.post_id}` as never)} accessibilityRole="button">
+          <View style={[s.dot, item.incoming && item.status === 'pending' && s.dotOn]} />
+          <View style={s.qIcon}><Icon name={item.incoming ? 'inbox' : 'send'} size={22} color={color.tealText} /></View>
+          <View style={{ flex: 1, gap: 1 }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-              <PlainText style={s.other} numberOfLines={1}>{item.incoming ? `Gelen: ${item.other}` : 'Verdiğin teklif'}</PlainText>
+              <PlainText style={s.other} numberOfLines={1}>{item.incoming ? `${tr('Gelen')}: ${item.other}` : tr('Verdiğin teklif')}</PlainText>
               <Text style={s.time}>{short(item.at)}</Text>
+              <Icon name="chevron-right" size={16} color={color.muted} />
             </View>
             <Text style={s.listing} numberOfLines={1}>{item.title}</Text>
-            <Text style={s.last}>{money(item.amount, item.unit)} · {QUOTE_STATUS[item.status] ?? item.status}</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+              <PlainText style={s.amount}>{money(item.amount, item.unit)}</PlainText>
+              <Badge variant={item.status === 'accepted' ? 'success' : item.status === 'pending' ? 'default' : 'outline'}>{QUOTE_STATUS[item.status] ?? item.status}</Badge>
+            </View>
           </View>
         </Pressable>
       )}
@@ -178,23 +189,25 @@ const s = StyleSheet.create({
   mode: { flex: 1, minHeight: 48, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, borderTopWidth: 3, borderTopColor: 'transparent' },
   modeOn: { backgroundColor: color.navy, borderTopColor: color.accent },
   modeText: { fontSize: 15, fontFamily: font.bold, color: color.ink },
-  dot: { minWidth: 20, height: 20, borderRadius: 10, backgroundColor: color.accent, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 5 },
-  dotText: { color: color.accentInk, fontSize: 11, fontWeight: '700' },
   search: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: color.surface, borderWidth: 1, borderColor: color.line, borderRadius: radius + 2, paddingHorizontal: 14, minHeight: 50 },
   searchInput: { flex: 1, paddingVertical: 11, fontSize: 16, color: color.ink },
   err: { color: color.bad, marginHorizontal: 12 },
   empty: { alignItems: 'center', gap: 10, padding: 28 },
   emptyT: { fontSize: 17, fontWeight: '700', color: color.ink, textAlign: 'center' },
   emptyS: { color: color.muted, textAlign: 'center' },
-  row: { flexDirection: 'row', gap: 12, padding: 12, marginHorizontal: 12, marginBottom: 8, backgroundColor: color.surface, borderRadius: radius + 4, borderWidth: 1, borderColor: color.line },
-  rowUnread: { borderColor: color.teal, borderWidth: 1.5 },
-  thumb: { width: 58, height: 58, borderRadius: 16, backgroundColor: color.plate },
-  avatar: { backgroundColor: color.tealSoft, alignItems: 'center', justifyContent: 'center' },
-  avatarText: { color: color.tealText, fontFamily: font.bold, fontSize: 20 },
-  other: { flex: 1, fontSize: 16, fontFamily: font.semi, color: color.ink },
-  time: { color: color.muted, fontSize: 12.5 },
-  listing: { color: color.tealText, fontSize: 13.5, fontWeight: '600' },
-  last: { flex: 1, color: color.muted, fontSize: 14.5 },
+  row: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 11, paddingLeft: 6, paddingRight: 14, backgroundColor: color.bg },
+  rowPressed: { backgroundColor: color.plate },
+  sep: { height: StyleSheet.hairlineWidth, backgroundColor: color.line, marginLeft: 84 },
+  dot: { width: 10, height: 10, borderRadius: 5, marginRight: 2 },
+  dotOn: { backgroundColor: color.teal },
+  badgePhoto: { position: 'absolute', right: -4, bottom: -4, width: 26, height: 26, borderRadius: 8, borderWidth: 2, borderColor: color.bg, backgroundColor: color.plate },
+  qIcon: { width: 52, height: 52, borderRadius: 26, backgroundColor: color.tealSoft, alignItems: 'center', justifyContent: 'center' },
+  other: { flex: 1, fontSize: 16.5, fontFamily: font.semi, color: color.ink },
+  otherUnread: { fontFamily: font.bold },
+  time: { color: color.muted, fontSize: 13.5 },
+  listing: { color: color.tealText, fontSize: 13.5, fontFamily: font.semi },
+  last: { flex: 1, color: color.muted, fontSize: 14.5, lineHeight: 19 },
+  amount: { color: color.ink, fontFamily: font.semi, fontSize: 14.5 },
   badge: { minWidth: 22, height: 22, borderRadius: 11, backgroundColor: color.accent, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 6 },
   badgeText: { color: color.accentInk, fontSize: 12, fontWeight: '700' },
 });

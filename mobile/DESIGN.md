@@ -65,3 +65,10 @@ Kaynak: Apple İnsan Arayüzü Yönergeleri ("Apple Look", github.com/dickwu/app
 - **Sağ üst "…" menüsü:** `components/HeaderMenu` — iPhone'da başlık çubuğunun kendi menüsü (alt menü destekli), Android'de `MoreMenu` kartı. İlan (paylaş, karşılaştır, şikayet nedenleri alt menüde), mesajlaşma (ilana git, engelle), mağaza / firma / İş Ağı ilanı (paylaş).
 - **Hata takibi:** `lib/errorReport.ts` yakalanmamış hataları ve çöken ekranları `public.app_errors` tablosuna yazar (kişisel veri yok, 30 gün). Yönetim → Uygulama hataları. Çöken ekranda sade "Tekrar dene" ekranı (`ErrorBoundary`).
 - **Hesap silme:** Hesabım'ın en altında "Hesabı sil" (Apple 5.1.1(v)). Sunucu: `supabase/functions/delete-account`.
+
+## 18 Kasım 2026 güncellemeleri
+- İş Ağı (onaylı taslak): alt sekmeler altı çizili (`components/UnderlineTabs.tsx`, çizgi yayla kayar); sağ altta sabit koyu "İş ağı ilanı ver" düğmesi; arama yanında tek simgeli "Hesabım"; kartta üstte tür · tarih, altta çizgiyle ayrılmış fiyat ve eylem düğmesi (Teklif iste / Teklif ver / Başvur / İletişime geç).
+- İlanlar: seçili filtreler ikinci satırda "Ankara ✕" çipleri; birden fazlaysa "Tümünü temizle".
+- Mesajlar: Mesajlar uygulaması gibi düz liste, okunmamışta solda vurgu noktası, yuvarlak kişi resmi ve köşesinde ilan fotoğrafı, ince ayırıcı.
+- Favorilerim: koyu üst şerit yerine sade özet (sayı + fiyatı düşenler), sıralama tek düğmeden alt pencerede.
+- İlan ver formu: bölüm başlığı kartın üstünde küçük ve sakin; alanlar dolgulu (çerçevesiz), kartlarda ince çizgi, gölge yok.

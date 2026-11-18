@@ -1,6 +1,9 @@
 import { SwipeTabs } from '../../../components/SwipeTabs';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, FlatList, Modal, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { FlatList, Modal, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { UnderlineTabs } from '../../../components/UnderlineTabs';
+import { tr } from '../../../lib/i18n';
 import { ChoiceRow, ExpandChoice } from '../../../components/ExpandChoice';
 import { PlainText, Text, TextInput } from '../../../components/LText';
 import { Icon, type IconName } from '../../../components/Icon';
@@ -93,6 +96,9 @@ function NetworkTabScreen() {
   }, [tab, city, q, role, personnel]);
   useEffect(() => { const t = setTimeout(() => void load(0), 300); return () => clearTimeout(t); }, [load]);
 
+  const insets = useSafeAreaInsets();
+  // iPhone'da sekme çubuğu içeriğin üstünde yüzer; düğme onun üstünde durur
+  const fabBottom = Platform.OS === 'ios' ? insets.bottom + 62 : 16;
   const go = (t: Tab) => { setPosts([]); setProviders([]); setRole(''); setTab(t); };
   const create = () => router.push(tab === 'firma' ? '/ag/firma-kaydi' : section.cta[1] === 'rental_operator' ? ('/ag/tanit' as never) : (`/ag/yeni?kind=${section.cta[1] || tab}` as never));
 
@@ -103,29 +109,26 @@ function NetworkTabScreen() {
           <SectionCard key={x.id} on={x.id === section.id} icon={x.icon} title={x.title} sub={x.sub} onPress={() => go(x.tabs[0][0])} />
         ))}
       </ChoiceRow>
-      <View style={{ gap: 12, paddingHorizontal: 16, paddingBottom: 12 }}>
-        {section.tabs.length > 1 ? (
-          <NoSwipe><ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginVertical: -6 }} contentContainerStyle={{ gap: 8, paddingVertical: 6 }}>
-            {section.tabs.map(([k, l]) => <Chip key={k} title={l} on={tab === k} onPress={() => go(k)} />)}
-          </ScrollView></NoSwipe>
-        ) : null}
+      {section.tabs.length > 1 ? <UnderlineTabs tabs={section.tabs} value={tab} onChange={go} /> : null}
+      <View style={{ gap: 12, paddingHorizontal: 16, paddingTop: 12, paddingBottom: 12 }}>
         {personnel ? (
           <NoSwipe><ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginVertical: -6 }} contentContainerStyle={{ gap: 8, paddingVertical: 6 }}>
             <Chip title="Tümü" on={!role} onPress={() => setRole('')} />
             {Object.entries(PERSONNEL_ROLES).map(([k, l]) => <Chip key={k} title={l} on={role === k} onPress={() => setRole(k)} />)}
           </ScrollView></NoSwipe>
         ) : null}
-        <View style={s.searchRow}>
-          <Icon name="search" size={18} color={color.muted} />
-          <TextInput style={s.input} placeholder={tab === 'firma' ? 'Firma ara' : tab === 'staff_wanted' ? 'Pozisyon ara' : 'İlan ara'} placeholderTextColor={color.muted} value={q} onChangeText={setQ} />
-          <Pressable style={s.cityBtn} onPress={() => setSheet(true)} accessibilityRole="button">
-            <Icon name="map-pin" size={15} color={city ? color.tealText : color.muted} />
-            <Text style={[s.cityText, city && { color: color.tealText, fontWeight: '700' }]} numberOfLines={1}>{city || 'Tüm iller'}</Text>
+        <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}>
+          <View style={[s.searchRow, { flex: 1 }]}>
+            <Icon name="search" size={18} color={color.muted} />
+            <TextInput style={s.input} placeholder={tab === 'firma' ? 'Firma ara' : tab === 'staff_wanted' ? 'Pozisyon ara' : 'İlan ara'} placeholderTextColor={color.muted} value={q} onChangeText={setQ} />
+            <Pressable style={s.cityBtn} onPress={() => setSheet(true)} accessibilityRole="button">
+              <Icon name="map-pin" size={15} color={city ? color.tealText : color.muted} />
+              <Text style={[s.cityText, city && { color: color.tealText, fontWeight: '700' }]} numberOfLines={1}>{city || 'Tüm iller'}</Text>
+            </Pressable>
+          </View>
+          <Pressable style={({ pressed }) => [s.acctBtn, pressed && { opacity: 0.8, transform: [{ scale: 0.96 }] }]} onPress={() => setAcct(true)} accessibilityRole="button" accessibilityLabel={tr('İş ağı hesabım')}>
+            <Icon name="user" size={20} color={color.tealText} />
           </Pressable>
-        </View>
-        <View style={{ flexDirection: 'row', gap: 8 }}>
-          <View style={{ flex: 1 }}><Btn title={tab === 'firma' ? 'Firma profilim' : section.cta[0]} onPress={create} /></View>
-          <View style={{ flex: 1 }}><Btn ghost title="Hesabım" onPress={() => setAcct(true)} /></View>
         </View>
         {error ? <AlertBox variant="destructive">{error}</AlertBox> : null}
       </View>
@@ -140,11 +143,16 @@ function NetworkTabScreen() {
         data={tab === 'firma' ? providers : posts}
         keyExtractor={(i) => ('user_id' in i ? i.user_id : i.id)}
         ListHeaderComponent={header}
-        contentContainerStyle={{ paddingBottom: 24 }}
+        contentContainerStyle={{ paddingBottom: fabBottom + 76 }}
         ListEmptyComponent={loading ? undefined : <Text style={s.empty}>{empty}</Text>}
         ListFooterComponent={loading ? <CardSkeleton count={(tab === 'firma' ? providers : posts).length ? 1 : 3} /> : more ? <View style={{ padding: 12 }}><Btn ghost title="Daha fazla yükle" onPress={() => void load(page + 1)} /></View> : undefined}
         renderItem={({ item }) => 'user_id' in item ? <FirmCard p={item} /> : <PostCard p={item} />}
       />
+      {/* Yeni ilan: sağ altta sabit düğme (onaylı taslak) */}
+      <Pressable style={({ pressed }) => [s.fab, { bottom: fabBottom }, pressed && { transform: [{ scale: 0.96 }], opacity: 0.92 }]} onPress={create} accessibilityRole="button">
+        <Icon name="plus" size={20} color={color.tealBright} />
+        <Text style={s.fabT}>{tab === 'firma' ? 'Firma profilim' : section.cta[0] === 'İlan ver' ? 'İş ağı ilanı ver' : section.cta[0]}</Text>
+      </Pressable>
       <Modal visible={acct} animationType="slide" presentationStyle="pageSheet" onRequestClose={() => setAcct(false)}>
         <View style={{ flex: 1, backgroundColor: color.navy }}>
           <View style={s.sheetBar}>
@@ -172,6 +180,9 @@ const s = StyleSheet.create({
   input: { flex: 1, paddingVertical: 11, fontSize: 16, color: color.ink },
   cityBtn: { flexDirection: 'row', alignItems: 'center', gap: 4, maxWidth: 120, minHeight: 44, paddingHorizontal: 10, borderLeftWidth: 1, borderLeftColor: color.line },
   cityText: { color: color.muted, fontSize: 14, flexShrink: 1 },
+  acctBtn: { width: 50, height: 50, borderRadius: radius + 2, backgroundColor: color.tealSoft, alignItems: 'center', justifyContent: 'center' },
+  fab: { position: 'absolute', right: 16, height: 52, paddingLeft: 16, paddingRight: 20, borderRadius: 26, backgroundColor: color.navyDeep, flexDirection: 'row', alignItems: 'center', gap: 8, shadowColor: '#000', shadowOpacity: 0.22, shadowRadius: 14, shadowOffset: { width: 0, height: 6 }, elevation: 6 },
+  fabT: { color: '#FFFFFF', fontFamily: font.bold, fontSize: 16 },
   err: { color: color.bad },
   empty: { textAlign: 'center', color: color.muted, margin: 24 },
   card: { marginHorizontal: 16, marginBottom: 12, backgroundColor: color.surface, borderWidth: 1, borderColor: color.line, borderRadius: radius + 4, overflow: 'hidden' },

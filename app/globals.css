@@ -8,6 +8,8 @@
   --good:#1B6F40; --good-bg:#DCEFE3; --warn:#7F5200; --warn-bg:#FFF0C2; --bad:#9C2626; --bad-bg:#F5DADA; --neutral-bg:#E2D7C2;
   --f-display:'Inter','Segoe UI',system-ui,sans-serif;
   --f-body:'Inter','Segoe UI',system-ui,sans-serif;
+  /* Yalnızca logo (mobil ile aynı): dar sanayi yazısı */
+  --f-brand:'Barlow Semi Condensed','Inter',system-ui,sans-serif;
   color-scheme:light;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
@@ -27,7 +29,7 @@
 .top{position:sticky;top:0;z-index:5;background:var(--navy);color:#fff;padding:10px 0}
 .top::after{content:"";position:absolute;left:0;right:0;bottom:-2px;height:2px;background:var(--pop)}
 .top .wrap{display:flex;flex-wrap:wrap;align-items:center;gap:8px 18px}
-.logo{display:flex;align-items:center;gap:8px;font:700 26px/1 var(--f-display);letter-spacing:.03em;text-transform:uppercase;color:#fff}
+.logo{display:flex;align-items:center;gap:8px;font:700 28px/1 var(--f-brand);letter-spacing:.04em;text-transform:uppercase;color:#fff}
 .logo .gear{flex:none;color:var(--pop)}
 .logo small{display:block;font:500 12px/1.3 var(--f-body);letter-spacing:0;color:#D5CDD2;text-transform:none;margin-top:3px}
 .top nav{display:flex;gap:2px;flex-wrap:wrap}
@@ -42,14 +44,15 @@
 @media (max-width:900px){.top .wrap nav{order:3;flex:1 1 100%;flex-wrap:nowrap;overflow-x:auto;padding-bottom:2px}}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
-body{background:var(--bg);color:var(--ink);font:16px/1.6 var(--f-body);margin:0;font-variant-numeric:tabular-nums}
+body{background:var(--bg);color:var(--ink);font:16px/1.6 var(--f-body);margin:0;font-variant-numeric:tabular-nums;font-optical-sizing:auto;-webkit-font-smoothing:antialiased}
 a{color:inherit;text-decoration:none}
 button,input,select,textarea{font:inherit;color:inherit}
 :focus-visible{outline:2px solid var(--accent-text);outline-offset:2px}
 .wrap{max-width:1180px;margin-inline:auto;padding-inline:16px}
 h1 mark{background:var(--pop);color:var(--pop-ink);padding:0 .18em;border-radius:3px;box-decoration-break:clone;-webkit-box-decoration-break:clone}
 main.wrap{padding-block:22px 110px}
-h1,h2,h3{font-family:var(--f-display);font-weight:700;text-wrap:balance;margin:0}
+h1,h2,h3{font-family:var(--f-display);font-weight:700;text-wrap:balance;margin:0;letter-spacing:-.018em}
+h1{letter-spacing:-.024em}
 h1{font-size:clamp(30px,5vw,42px);line-height:1.1}
 h2{font-size:28px;line-height:1.15}
 h3{font-size:20px;line-height:1.25}
@@ -355,3 +358,9 @@ button,.btn,[role=button]{-webkit-user-select:none;user-select:none}
 @media (prefers-reduced-transparency:reduce){*{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}}
 @media (prefers-contrast:more){:root{--line:var(--muted)}}
 @media (prefers-reduced-motion:reduce){.btn:active,button:active{transform:none}}
+
+/* İlan aktarma kutusu (ilan formu) */
+.import-box{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:14px 16px;border:1px dashed var(--accent);border-radius:10px;background:var(--bg)}
+.import-box>div{display:flex;flex-direction:column;gap:2px;flex:1;min-width:220px}
+.import-box .sub{margin:0;font-size:14px;color:var(--muted)}
+.import-box .btn{cursor:pointer;white-space:nowrap}

@@ -30,7 +30,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
         <meta name="theme-color" content="#2A2F31" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@700&family=Inter:opsz,wght@14..32,400..700&display=swap" />
       </head>
       <body>
         <script type="application/ld+json" dangerouslySetInnerHTML={{__html:jsonLd({"@context":"https://schema.org","@type":"WebSite",name:"Makinasal",url:SITE_ORIGIN,inLanguage:["tr","en","de"]})}} />

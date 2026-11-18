@@ -74,6 +74,8 @@ function Form() {
   const [busy, setBusy] = useState(false);
   const [progress, setProgress] = useState("");
   const [error, setError] = useState("");
+  const [importing, setImporting] = useState(false);
+  const [importMsg, setImportMsg] = useState("");
   const [partial, setPartial] = useState<{
     id: string;
     message: string;
@@ -163,6 +165,55 @@ function Form() {
     setBrand("");
     setUnit(KM_CATEGORIES.has(c) ? "km" : "saat");
   };
+  // Başka sitedeki ilanı ekran görüntülerinden aktarma (sunucu: supabase/functions/listing-import, günde 15)
+  async function onImport(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = [...(e.target.files ?? [])].filter((f) => f.type.startsWith("image/")).slice(0, 4);
+    e.target.value = "";
+    const supabase = getSupabase();
+    if (!files.length || !supabase) return;
+    setImporting(true); setImportMsg(""); setError("");
+    try {
+      const images = await Promise.all(files.map(async (f) => {
+        const blob = await resizeImage(f, 1568, 0.7);
+        const buf = new Uint8Array(await blob.arrayBuffer());
+        let bin = "";
+        for (let i = 0; i < buf.length; i += 0x8000) bin += String.fromCharCode(...buf.subarray(i, i + 0x8000));
+        return btoa(bin);
+      }));
+      const { data, error: err } = await supabase.functions.invoke("listing-import", { body: { images } });
+      const status = (err as { context?: { status?: number } } | null)?.context?.status;
+      if (err) {
+        setError(tr(status === 429 ? "Bugünkü aktarma hakkın doldu (günde 15). Yarın tekrar deneyebilir ya da formu elle doldurabilirsin." : status === 503 ? "İlan aktarma şu anda kullanılamıyor. Formu elle doldurabilirsin." : "Görüntüler okunamadı. Bağlantını kontrol edip tekrar dene."));
+        return;
+      }
+      const r = data as { ok?: boolean; reason?: string; notes?: string | null; fields?: Record<string, string | number | boolean | null> } | null;
+      if (!r?.ok || !r.fields) { setError(tr(r?.reason === "not_listing" ? "Seçtiğin görüntülerde bir ilan bulamadık. İlan sayfasının ekran görüntülerini seç." : "Görüntüler okunamadı. Bağlantını kontrol edip tekrar dene.")); return; }
+      const f = r.fields;
+      const str = (k: string) => (typeof f[k] === "string" && f[k] ? String(f[k]) : "");
+      if (str("category")) pickCat(str("category"));
+      if (str("brand")) setBrand(canonicalBrand(str("brand")));
+      if (str("model")) setModel(str("model"));
+      if (f.year) setYear(String(f.year));
+      if (f.usage_value != null) setUsage(String(f.usage_value));
+      if (f.usage_unit === "km" || f.usage_unit === "saat") setUnit(f.usage_unit);
+      if (f.price) setPrice(String(f.price));
+      if (str("city")) setCity(str("city"));
+      if (str("description")) setDesc(str("description"));
+      if (typeof f.takas === "boolean") setTakas(f.takas);
+      if (str("cond")) setCond(str("cond"));
+      if (f.qty) setQty(String(f.qty));
+      if (str("part_group") && validPartGroup(str("part_group"))) setPartGroup(str("part_group"));
+      if (str("equipment_category")) setEquipmentCategory(str("equipment_category"));
+      if (str("compat")) setCompat(str("compat"));
+      const n = Object.entries(f).filter(([k, v]) => k !== "usage_unit" && v !== null && v !== "").length;
+      setImportMsg(`${n} ${tr("alan dolduruldu. Her alanı kontrol et, eksikleri tamamla ve makinenin kendi fotoğraflarını ekle (ekran görüntüleri fotoğraf olarak eklenmez).")}${r.notes ? ` ${r.notes}` : ""}`);
+    } catch {
+      setError(tr("Görüntüler okunamadı. Bağlantını kontrol edip tekrar dene."));
+    } finally {
+      setImporting(false);
+    }
+  }
+
 
   function addFiles(list: FileList | null) {
     if (!list || busy) return;
@@ -487,6 +538,19 @@ function Form() {
           display: "contents",
         }}
       >
+        {!editId ? (
+          <div className="import-box">
+            <div>
+              <strong>{tr("Başka sitedeki ilanını aktar")}</strong>
+              <span className="sub">{tr("İlanının ekran görüntülerini seç (en fazla 4): başlık, fiyat, özellikler ve açıklama görünsün. Bilgileri biz doldururuz, sen kontrol edip yayınlarsın. Yalnızca sana ait bir ilanı aktar.")}</span>
+            </div>
+            <label className="btn ghost" aria-busy={importing}>
+              {importing ? tr("Ekran görüntüleri okunuyor…") : tr("Ekran görüntüsü seç")}
+              <input type="file" accept="image/*" multiple hidden disabled={importing} onChange={(e) => void onImport(e)} />
+            </label>
+          </div>
+        ) : null}
+        {importMsg ? <p className="note good" role="status">{importMsg}</p> : null}
         <div className="row2">
           <div className="field">
             <label htmlFor="f-cat">{tr("Kategori")}</label>

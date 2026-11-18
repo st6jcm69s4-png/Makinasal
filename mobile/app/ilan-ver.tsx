@@ -353,10 +353,11 @@ export default function NewListing() {
       )}
     </View>
   );
+  // Apple'ın gruplanmış form dili: bölüm başlığı kartın üstünde küçük ve sakin, alanlar dolgulu
   const section = (title: string, icon: IconName, children: ReactNode) => (
-    <View style={s.card}>
-      <View style={s.cardHead}><View style={s.cardIcon}><Icon name={icon} size={17} color={color.tealText} /></View><Text style={s.cardT}>{title}</Text></View>
-      {children}
+    <View style={s.sec}>
+      <View style={s.cardHead}><Icon name={icon} size={14} color={color.muted} /><Text style={s.cardT}>{title}</Text></View>
+      <View style={s.card}>{children}</View>
     </View>
   );
   const total = photos.length + existing.length;
@@ -513,7 +514,7 @@ export default function NewListing() {
 }
 
 const s = StyleSheet.create({
-  importCard: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14, borderRadius: radius + 4, backgroundColor: color.surface, borderWidth: 1, borderColor: color.line },
+  importCard: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14, borderRadius: radius + 6, backgroundColor: color.surface, borderWidth: StyleSheet.hairlineWidth, borderColor: color.line },
   importIcon: { width: 40, height: 40, borderRadius: 12, alignItems: 'center', justifyContent: 'center', backgroundColor: color.tealSoft },
   importT: { color: color.ink, fontFamily: font.semi, fontSize: 16 },
   importS: { color: color.muted, fontSize: 13.5, marginTop: 2 },
@@ -521,21 +522,22 @@ const s = StyleSheet.create({
   quotaT: { flex: 1, color: color.ink, fontFamily: font.medium, fontSize: 14 },
   hint: { color: color.muted, fontSize: 12.5, lineHeight: 18 },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  chip: { minHeight: 38, paddingHorizontal: 14, borderRadius: 19, borderWidth: 1, borderColor: color.line, backgroundColor: color.bg, alignItems: 'center', justifyContent: 'center' },
+  chip: { minHeight: 38, paddingHorizontal: 14, borderRadius: 19, borderWidth: 0, backgroundColor: color.plate, alignItems: 'center', justifyContent: 'center' },
   chipOn: { backgroundColor: color.teal, borderColor: color.teal },
   chipT: { color: color.ink, fontFamily: font.semi, fontSize: 14 },
   videoRow: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 12, borderRadius: radius, backgroundColor: color.tealSoft },
   videoIcon: { width: 40, height: 40, borderRadius: 12, backgroundColor: color.teal, alignItems: 'center', justifyContent: 'center' },
   videoT: { color: color.ink, fontFamily: font.semi, fontSize: 15 },
   videoBtn: { flex: 1, minHeight: 56, borderRadius: radius, borderWidth: 1.5, borderStyle: 'dashed', borderColor: color.teal, alignItems: 'center', justifyContent: 'center', gap: 4 },
-  form: { padding: 16, gap: 14, paddingBottom: 40 },
-  card: { backgroundColor: color.surface, borderRadius: radius + 4, padding: 14, gap: 12, ...shadow },
-  cardHead: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  form: { padding: 16, gap: 22, paddingBottom: 40 },
+  sec: { gap: 8 },
+  card: { backgroundColor: color.surface, borderRadius: radius + 6, padding: 14, gap: 14, borderWidth: StyleSheet.hairlineWidth, borderColor: color.line },
+  cardHead: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 6 },
   cardIcon: { width: 32, height: 32, borderRadius: 10, backgroundColor: color.tealSoft, alignItems: 'center', justifyContent: 'center' },
-  cardT: { fontFamily: font.bold, fontSize: 17, color: color.ink },
+  cardT: { fontFamily: font.semi, fontSize: 13.5, color: color.muted, letterSpacing: 0.3 },
   field: { gap: 6 },
-  label: { fontFamily: font.semi, fontSize: 14, color: color.muted },
-  input: { minHeight: 50, paddingHorizontal: 14, paddingVertical: 12, fontSize: 16, backgroundColor: color.bg, borderRadius: radius, borderWidth: 1, borderColor: color.line, color: color.ink },
+  label: { fontFamily: font.semi, fontSize: 14, color: color.ink },
+  input: { minHeight: 50, paddingHorizontal: 14, paddingVertical: 12, fontSize: 16, backgroundColor: color.plate, borderRadius: radius + 2, borderWidth: 0, color: color.ink },
   select: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   rowSwitch: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   switchT: { flex: 1, color: color.ink, fontSize: 15.5 },
