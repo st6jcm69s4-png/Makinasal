@@ -147,9 +147,9 @@ export function MessagesView({ activeId }: { activeId?: string }) {
     const supabase = getSupabase();
     if (!supabase || !active) return;
     let live = true;
-    supabase.from('user_stats').select('score,review_count,deals,reports').eq('id', active.otherId).maybeSingle().then(({ data: st }) => {
+    supabase.from('user_stats').select('score,review_count,deals,flagged').eq('id', active.otherId).maybeSingle().then(({ data: st }) => {
       if (!live) return;
-      setTrust({ rep: Number(st?.reports ?? 0), deals: Number(st?.deals ?? 0), s: st && Number(st.review_count) > 0 ? Number(st.score) : null });
+      setTrust({ rep: st?.flagged ? 2 : 0, deals: Number(st?.deals ?? 0), s: st && Number(st.review_count) > 0 ? Number(st.score) : null });
     });
     return () => { live = false; };
   }, [active?.otherId]); // eslint-disable-line react-hooks/exhaustive-deps

@@ -74,7 +74,7 @@ const SELLER_FULL = 'id,full_name,store_name,is_store,is_premium,verified_phone,
 const SELLER_BASE = 'id,full_name,store_name,is_store,is_premium,verified_phone,city,district,bio,company_bio,created_at';
 
 type Stat = {
-  id: string; score: number | string; review_count: number | string; deals: number | string; reports: number | string;
+  id: string; score: number | string; review_count: number | string; deals: number | string; flagged?: boolean | null;
   seller_score?: number | string; seller_reviews?: number | string; buyer_score?: number | string; buyer_reviews?: number | string;
 };
 
@@ -84,8 +84,8 @@ export async function loadSellers(supabase: SupabaseClient, ids: string[]): Prom
   let pr: QueryResult = await supabase.from('profiles').select(SELLER_FULL).in('id', ids);
   if (pr.error) pr = await supabase.from('profiles').select(SELLER_BASE).in('id', ids);
   let sr: QueryResult = await supabase.from('user_stats')
-    .select('id,score,review_count,deals,reports,seller_score,seller_reviews,buyer_score,buyer_reviews').in('id', ids);
-  if (sr.error) sr = await supabase.from('user_stats').select('id,score,review_count,deals,reports').in('id', ids);
+    .select('id,score,review_count,deals,flagged,seller_score,seller_reviews,buyer_score,buyer_reviews').in('id', ids);
+  if (sr.error) sr = await supabase.from('user_stats').select('id,score,review_count,deals,flagged').in('id', ids);
   const statById = new Map<string, Stat>();
   for (const s of (sr.data ?? []) as unknown as Stat[]) statById.set(s.id, s);
   for (const p of (pr.data ?? []) as unknown as Record<string, unknown>[]) {
@@ -106,7 +106,7 @@ export async function loadSellers(supabase: SupabaseClient, ids: string[]): Prom
       b: st && buyerN > 0 ? Number(st.buyer_score) : null,
       bn: buyerN,
       deals: Number(st?.deals ?? 0),
-      rep: Number(st?.reports ?? 0),
+      rep: st?.flagged ? 2 : 0,
       city: (p.city as string | null) ?? '', district: (p.district as string) ?? '', bio: (p.bio as string) ?? '', companyBio: (p.company_bio as string) ?? '',
       since: new Date(p.created_at as string).getFullYear(),
       reviews: [],

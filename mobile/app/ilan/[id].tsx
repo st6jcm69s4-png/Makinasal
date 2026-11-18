@@ -102,12 +102,12 @@ export default function ListingScreen() {
         if (session) void supabase.from('profiles').select('city').eq('id', session.user.id).maybeSingle().then(({ data: pc }) => { if (alive) setMyCity((pc as { city?: string | null } | null)?.city ?? ''); });
         const sid = (data as unknown as Detail).seller_id;
         const [st, pr] = await Promise.all([
-          supabase.from('user_stats').select('score,review_count,deals,reports').eq('id', sid).maybeSingle(),
+          supabase.from('user_stats').select('score,review_count,deals,flagged').eq('id', sid).maybeSingle(),
           supabase.from('profiles').select('full_name,store_name,is_store').eq('id', sid).maybeSingle(),
         ]);
         if (!alive) return;
-        const r = st.data as { score: number; review_count: number; deals: number; reports: number } | null;
-        setTrust(trustLevel({ rep: Number(r?.reports ?? 0), deals: Number(r?.deals ?? 0), s: r && Number(r.review_count) > 0 ? Number(r.score) : null }));
+        const r = st.data as { score: number; review_count: number; deals: number; flagged: boolean | null } | null;
+        setTrust(trustLevel({ rep: r?.flagged ? 2 : 0, deals: Number(r?.deals ?? 0), s: r && Number(r.review_count) > 0 ? Number(r.score) : null }));
         setRating(r && Number(r.review_count) > 0 ? { score: Number(r.score), count: Number(r.review_count) } : null);
         const p = pr.data as { full_name: string | null; store_name: string | null; is_store: boolean | null } | null;
         setSeller((p?.is_store && p.store_name) || p?.full_name || '');

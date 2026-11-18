@@ -30,8 +30,9 @@ export default function Premium() {
 
   const readProfile = useCallback(async () => {
     if (!session) { setProf(null); return null; }
-    const r = await supabase.from('profiles').select('is_premium,premium_plan,premium_until').eq('id', session.user.id).maybeSingle();
-    const row = (r.data as Prof | null) ?? null;
+    const r = await supabase.rpc('profile_plans', { p_ids: [session.user.id] });
+    const x = ((r.data ?? []) as { plan: string | null; until: string | null }[])[0];
+    const row: Prof | null = x ? { is_premium: !!x.plan, premium_plan: x.plan, premium_until: x.until } : null;
     setProf(row);
     return row;
   }, [session]);

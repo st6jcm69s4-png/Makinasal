@@ -56,7 +56,7 @@ export default function StorePage() {
           city: [p.city, p.district].filter(Boolean).join(' / '), bio: (p.bio as string) ?? '', companyBio: (p.company_bio as string) ?? '',
           since: new Date(p.created_at as string).getFullYear(),
           s: sellerN > 0 ? Number(split ? s.seller_score : s.score) : null, b: buyerN > 0 ? Number(s.buyer_score) : null,
-          deals: Number(s.deals ?? 0), rep: Number(s.reports ?? 0),
+          deals: Number(s.deals ?? 0), rep: s.flagged ? 2 : 0,
         });
       }
       setRows((ls.data ?? []) as unknown as Row[]);

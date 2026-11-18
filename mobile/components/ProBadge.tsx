@@ -22,9 +22,10 @@ async function flush() {
   const ids = [...queue].slice(0, 200);
   queue = new Set([...queue].slice(200));
   if (!ids.length) return;
-  const { data, error } = await supabase.from('profiles').select('id,is_premium,premium_plan,premium_until').in('id', ids);
+  // Etkin tarife sunucuda hesaplanır (üyelik bitiş tarihi herkese açık değil)
+  const { data, error } = await supabase.rpc('profile_plans', { p_ids: ids });
   if (!error) {
-    const got = new Map((data ?? []).map((p) => [p.id as string, activePlan(p)]));
+    const got = new Map(((data ?? []) as { id: string; plan: PlanId | null }[]).map((p) => [p.id, p.plan]));
     for (const id of ids) cache.set(id, got.get(id) ?? null);
     listeners.forEach((f) => f());
   }

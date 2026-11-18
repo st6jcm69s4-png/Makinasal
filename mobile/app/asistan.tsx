@@ -7,7 +7,7 @@ import { Icon, type IconName } from '../components/Icon';
 import { useApp } from '../lib/AppContext';
 import { tr } from '../lib/i18n';
 import { supabase } from '../lib/supabase';
-import { PLANS, activePlan, type PlanId } from '../lib/plans';
+import { PLANS, type PlanId } from '../lib/plans';
 import { color, font, radius, shadow } from '../lib/theme';
 
 type Msg = { role: 'user' | 'assistant'; content: string };
@@ -43,10 +43,10 @@ export default function Assistant() {
     const uid = session.user.id;
     const month = new Date(); month.setUTCDate(1);
     void Promise.all([
-      supabase.from('profiles').select('is_premium,premium_plan,premium_until').eq('id', uid).maybeSingle(),
+      supabase.rpc('profile_plans', { p_ids: [uid] }),
       supabase.from('ai_usage').select('used').eq('user_id', uid).eq('month', month.toISOString().slice(0, 10)).maybeSingle(),
     ]).then(([p, u]) => {
-      const pl = activePlan(p.data as never);
+      const pl = (((p.data ?? []) as { plan: 'pro' | 'business' | null }[])[0]?.plan) ?? null;
       setPlan(pl);
       if (pl) setUsage({ used: (u.data as { used?: number } | null)?.used ?? 0, limit: PLANS.find((x) => x.id === pl)!.aiLimit });
     });
